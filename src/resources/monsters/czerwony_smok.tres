@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://src/resources/monster_data.gd" id="1_data"]
+[ext_resource type="Resource" path="res://src/resources/types/smok.tres" id="2_type"]
+[ext_resource type="Resource" path="res://src/resources/rarities/legendary.tres" id="3_rarity"]
+[ext_resource type="Texture2D" path="res://src/assets/monsters/czerwony_smok.jpg" id="4_sprite"]
+
+[resource]
+script = ExtResource("1_data")
+monster_name = "Czerwony Smok"
+max_health = 15
+attack = 5
+types = [ExtResource("2_type")]
+rarity = ExtResource("3_rarity")
+description = "Zionie ogniem i pali wszystko w zasięgu wzroku."
+visual_color = Color(0.8, 0.1, 0.1, 1)
+sprite = ExtResource("4_sprite")

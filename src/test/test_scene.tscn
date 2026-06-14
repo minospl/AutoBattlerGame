@@ -1,0 +1,104 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/test/test_scene.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/ui/team_bench_view.tscn" id="2_view"]
+
+[node name="TestScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderBar" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_font_sizes/font_size = 20
+text = "BATAMON Roguelike Auto-Battler"
+
+[node name="ControlSpacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar"]
+layout_mode = 2
+theme_override_constants/horizontal_separation = 12
+
+[node name="AddButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Dodaj Losowego Potwora"
+
+[node name="ClearButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Wyczyść Wszystko"
+
+[node name="MultiplyButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Statystyki x10"
+
+[node name="TeamBenchView" parent="BackgroundPanel/MarginContainer/VBoxContainer" instance=ExtResource("2_view")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="LogSection" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LogHeaderLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/LogSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 12
+text = "KONSOLA LOGÓW BITEWNYCH / AKCJI UI"
+
+[node name="LogPanel" type="PanelContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/LogSection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+
+[node name="ConsoleLog" type="RichTextLabel" parent="BackgroundPanel/MarginContainer/VBoxContainer/LogSection/LogPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/line_separation = 3
+theme_override_font_sizes/normal_font_size = 12
+bbcode_enabled = true
+scroll_following = true
+
+[connection signal="pressed" from="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar/ButtonsContainer/AddButton" to="." method="_on_add_monster_pressed"]
+[connection signal="pressed" from="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar/ButtonsContainer/ClearButton" to="." method="_on_clear_pressed"]
+[connection signal="pressed" from="BackgroundPanel/MarginContainer/VBoxContainer/HeaderBar/ButtonsContainer/MultiplyButton" to="." method="_on_multiply_pressed"]

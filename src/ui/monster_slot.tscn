@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/ui/monster_slot.gd" id="1_script"]
+
+[node name="MonsterSlot" type="PanelContainer"]
+custom_minimum_size = Vector2(100, 125)
+offset_right = 100.0
+offset_bottom = 125.0
+script = ExtResource("1_script")
+
+[node name="EmptyPlaceholderLabel" type="Label" parent="."]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 0.12)
+theme_override_font_sizes/font_size = 24
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1

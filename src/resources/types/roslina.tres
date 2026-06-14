@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="MonsterType" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/resources/monster_type.gd" id="1_type"]
+
+[resource]
+script = ExtResource("1_type")
+type_name = "Roślina"
+color = Color(0.18, 0.8, 0.44, 1)

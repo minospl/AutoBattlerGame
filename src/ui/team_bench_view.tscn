@@ -1,0 +1,87 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/ui/team_bench_view.gd" id="1_script"]
+
+[node name="TeamBenchView" type="PanelContainer"]
+script = ExtResource("1_script")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TeamSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TeamHeaderLabel" type="Label" parent="VBoxContainer/TeamSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 16
+text = "AKTYWNA DRUŻYNA"
+horizontal_alignment = 1
+
+[node name="FrontlineWrapper" type="VBoxContainer" parent="VBoxContainer/TeamSection"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="FrontlineLabel" type="Label" parent="VBoxContainer/TeamSection/FrontlineWrapper"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.4, 0.4, 0.8)
+theme_override_font_sizes/font_size = 11
+text = "LINIA PRZEDNIA (SLOTY 3, 4, 5) - BLISKO WROGA"
+horizontal_alignment = 1
+
+[node name="FrontlineAlign" type="CenterContainer" parent="VBoxContainer/TeamSection/FrontlineWrapper"]
+layout_mode = 2
+
+[node name="FrontlineHBox" type="HBoxContainer" parent="VBoxContainer/TeamSection/FrontlineWrapper/FrontlineAlign"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/horizontal_separation = 12
+alignment = 1
+
+[node name="BacklineWrapper" type="VBoxContainer" parent="VBoxContainer/TeamSection"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BacklineLabel" type="Label" parent="VBoxContainer/TeamSection/BacklineWrapper"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.65, 0.85, 0.8)
+theme_override_font_sizes/font_size = 11
+text = "LINIA TYLNA (SLOTY 0, 1, 2) - CHRONIONA"
+horizontal_alignment = 1
+
+[node name="BacklineAlign" type="CenterContainer" parent="VBoxContainer/TeamSection/BacklineWrapper"]
+layout_mode = 2
+
+[node name="BacklineHBox" type="HBoxContainer" parent="VBoxContainer/TeamSection/BacklineWrapper/BacklineAlign"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/horizontal_separation = 12
+alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="BenchSection" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="BenchHeaderLabel" type="Label" parent="VBoxContainer/BenchSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.95, 1)
+theme_override_font_sizes/font_size = 16
+text = "ŁAWKA REZERWOWYCH"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/BenchSection"]
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="BenchHBox" type="HBoxContainer" parent="VBoxContainer/BenchSection/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/horizontal_separation = 12
+alignment = 1
