@@ -38,15 +38,18 @@ void fragment() {
     
     int W1 = int(outer_border_width);
     int W2 = int(inner_border_width);
+    int C1 = int(outer_corner_cut_size);
+    int C2 = int(middle_corner_cut_size);
+    int C3 = int(inner_corner_cut_size);
     
     // 2. Apply pixel-perfect corner cuts and coloring overrides
-    if (vx == 0 && vy == 0) {
+    if (vx < C1 && vy < C1) {
         discard;
     }
-    else if (vx == W1 + W2 - 2 && vy == W1 + W2 - 2) { // Outer border pixel in Inner border corners
+    else if (vx == W1 + W2 - 1 - C2 && vy == W1 + W2 - 1 - C2) { // Outer border pixel in Inner border corners
 		COLOR = outer_border_color;
     }
-    else if (vx == W1 + W2 + 0 && vy == W1 + W2 + 0) { // Inner border pixel in Interior corners
+    else if (vx == W1 + W2 - 1 + C3 && vy == W1 + W2 - 1 + C3) { // Inner border pixel in Interior corners
 		COLOR = inner_border_color;
     }
     else if (vx < W1 || vy < W1) { // General outer border area: gray-blue (color1)
