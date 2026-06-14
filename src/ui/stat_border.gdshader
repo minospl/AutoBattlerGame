@@ -1,10 +1,8 @@
 shader_type canvas_item;
 
 uniform vec2 size;
-uniform float border_width = 1.0; // border thickness in virtual pixels
-uniform float corner_radius = 2.0; // corner radius in virtual pixels
-uniform vec4 border_color : source_color = vec4(0.12, 0.12, 0.13, 1.0);
 uniform vec4 bg_color : source_color = vec4(0.92, 0.22, 0.38, 1.0);
+uniform vec4 border_color : source_color = vec4(0.32, 0.32, 0.32, 1.0);
 uniform float pixel_scale = 2.0; // size of 1 virtual pixel in screen pixels
 
 void fragment() {
@@ -23,31 +21,26 @@ void fragment() {
     if (ap.x > b.x || ap.y > b.y) {
         discard;
     }
-    
-    // Work in virtual pixel units relative to the edge
-    vec2 vp = ap / pixel_scale;
-    vec2 vb = b / pixel_scale;
-    
-    // Compute distance to rounded box
-    vec2 q = vp - vb + vec2(corner_radius);
-    float dist = length(max(q, vec2(0.0))) - corner_radius;
-    
-    // If inside the central non-rounded region, use standard box distance
-    if (max(q.x, q.y) < 0.0) {
-        dist = max(vp.x - vb.x, vp.y - vb.y);
-    }
-    
-    // Render layers
-    if (dist > 0.0) {
-        // Cut-out corner area
+	
+    // 1. Calculate virtual pixel coordinates from the nearest edge (0-indexed)
+    int vx = int(floor((b.x - ap.x) / pixel_scale));
+    int vy = int(floor((b.y - ap.y) / pixel_scale));
+	
+    // 2. Apply pixel-perfect corner cuts and coloring overrides
+	if (vx == 0 && vy == 0) {
         discard;
     }
-    else if (dist >= -border_width) {
-        // Border area
+    else if (vx == 1 && vy == 1) { // Outer border pixel in Inner border corners
+		COLOR = border_color;
+    }
+    else if (vx < 1 || vy < 1) { // General outer border area: gray-blue (color1)
         COLOR = border_color;
     }
-    else {
-        // Interior background
-        COLOR = bg_color;
+    else { // Interior: transparent (discard) or solid background
+        if (bg_color.a > 0.0) {
+            COLOR = bg_color;
+        } else {
+            discard;
+        }
     }
 }

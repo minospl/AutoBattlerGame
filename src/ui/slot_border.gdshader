@@ -3,12 +3,9 @@ shader_type canvas_item;
 uniform vec2 size;
 uniform float outer_border_width = 2.0; // outer border width (in virtual pixels)
 uniform float inner_border_width = 2.0; // inner border width (in virtual pixels)
-uniform float outer_corner_cut_size = 1.0; // outer corner cut-out size (in virtual pixels)
-uniform float middle_corner_cut_size = 1.0; // middle corner cut-out size (in virtual pixels)
-uniform float inner_corner_cut_size = 1.0; // inner corner cut-out size (in virtual pixels)
 uniform vec4 outer_border_color : source_color = vec4(0.58, 0.59, 0.65, 1.0); // outer border color
 uniform vec4 inner_border_color : source_color = vec4(0.89, 0.90, 0.92, 1.0); // inner border color
-uniform vec4 interior_color : source_color = vec4(0.0, 0.0, 0.0, 0.0); // interior background color (transparent by default)
+uniform vec4 interior_color : source_color = vec4(1.0, 1.0, 1.0, 1.0); // interior background color (transparent by default)
 uniform float pixel_scale = 2.0; // size of 1 virtual pixel in screen pixels
 
 void fragment() {
@@ -38,18 +35,15 @@ void fragment() {
     
     int W1 = int(outer_border_width);
     int W2 = int(inner_border_width);
-    int C1 = int(outer_corner_cut_size);
-    int C2 = int(middle_corner_cut_size);
-    int C3 = int(inner_corner_cut_size);
     
     // 2. Apply pixel-perfect corner cuts and coloring overrides
-    if (vx < C1 && vy < C1) {
+    if (vx == 0 && vy == 0) {
         discard;
     }
-    else if (vx == W1 + W2 - 1 - C2 && vy == W1 + W2 - 1 - C2) { // Outer border pixel in Inner border corners
+    else if (vx == W1 + W2 - 2 && vy == W1 + W2 - 2) { // Outer border pixel in Inner border corners
 		COLOR = outer_border_color;
     }
-    else if (vx == W1 + W2 - 1 + C3 && vy == W1 + W2 - 1 + C3) { // Inner border pixel in Interior corners
+    else if (vx == W1 + W2 + 0 && vy == W1 + W2 + 0) { // Inner border pixel in Interior corners
 		COLOR = inner_border_color;
     }
     else if (vx < W1 || vy < W1) { // General outer border area: gray-blue (color1)

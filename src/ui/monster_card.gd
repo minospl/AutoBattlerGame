@@ -87,7 +87,12 @@ func update_ui() -> void:
 	var stat_size = Vector2(stat_width, 16)
 
 	# Style Stats Panels using the custom pixel-art shader
-	setup_stat_panel_shader(%AttackPanel, Color(0.92, 0.22, 0.38, 1.0), stat_size) # Pink/Red
+	
+	if monster_instance.current_attack > 0:
+		%AttackPanel.visible = true
+		setup_stat_panel_shader(%AttackPanel, Color(0.92, 0.22, 0.38, 1.0), stat_size) # Pink/Red
+	else:
+		%AttackPanel.visible = false
 	
 	# Style Poison Panel (only visible if poison > 0)
 	if monster_instance.poison > 0:
@@ -182,5 +187,5 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 		mat.set_shader_parameter("border_width", 1.0) # 1 virtual pixel (2 screen pixels) border
 		mat.set_shader_parameter("corner_radius", 2.0) # 2 virtual pixels corner radius (rounded)
 		mat.set_shader_parameter("pixel_scale", 2.0)
-		mat.set_shader_parameter("border_color", Color(0.12, 0.12, 0.13, 1.0)) # Dark border
+		mat.set_shader_parameter("border_color", Color(0.2, 0.2, 0.2, 1.0)) # Dark border
 		mat.set_shader_parameter("bg_color", bg_color) # Background color
