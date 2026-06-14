@@ -41,16 +41,7 @@ func update_ui() -> void:
 		return
 	
 	%AttackLabel.text = str(monster_instance.get_attack())
-	%HealthLabel.text = str(monster_instance.current_health)
 	%PoisonLabel.text = str(monster_instance.poison)
-	
-	# Border color represents rarity
-	#var border_color = Color(0.4, 0.45, 0.5, 1.0) # Default gray
-	#if monster_instance.data and monster_instance.data.rarity:
-	#	border_color = monster_instance.data.rarity.border_color
-		
-	# Card body color is clean flat white/light gray (Batamon style)
-	#var body_color = Color(0.98, 0.98, 0.98, 1.0)
 		
 	# Soft shadow style for the card container (with transparent center)
 	var shadow_style: StyleBoxFlat = StyleBoxFlat.new()
@@ -81,10 +72,8 @@ func update_ui() -> void:
 		mat.set_shader_parameter("outer_border_color", monster_instance.data.rarity.border_color) # Outer border represents rarity!
 		mat.set_shader_parameter("interior_color", Color(0.98, 0.98, 0.98, 1.0)) # Solid background color for the card!
 
-	# Determine stats block size dynamically to prevent stretching the card
-	var has_poison = monster_instance.poison > 0
-	var stat_width = 28 if has_poison else 32
-	var stat_size = Vector2(stat_width, 16)
+	# Set stats block size to a clean, constant 32px width
+	var stat_size = Vector2(32, 16)
 
 	# Style Stats Panels using the custom pixel-art shader
 	
@@ -100,9 +89,6 @@ func update_ui() -> void:
 		setup_stat_panel_shader(%PoisonPanel, Color(0.55, 0.27, 0.77, 1.0), stat_size) # Violet/Purple
 	else:
 		%PoisonPanel.visible = false
-	
-	# Style Health Panel (Orange/Peach)
-	setup_stat_panel_shader(%HealthPanel, Color(0.93, 0.50, 0.17, 1.0), stat_size) # Orange
 	
 	# Handle sprite texture or text fallback representation
 	if monster_instance.data and monster_instance.data.sprite:
@@ -139,10 +125,15 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	preview.modulate.a = 0.7
 	set_drag_preview(preview)
 	
+	# Find original MonsterSlot ancestor
+	var original_slot = get_parent()
+	while original_slot and not original_slot.has_method("add_card"):
+		original_slot = original_slot.get_parent()
+	
 	# Return data containing this node and its origin
 	return {
 		"card": self,
-		"original_slot": get_parent()
+		"original_slot": original_slot
 	}
 
 func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: Vector2) -> void:

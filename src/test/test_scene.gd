@@ -196,11 +196,12 @@ func _on_multiply_pressed() -> void:
 			m.current_health *= 10
 			m.poison *= 10
 			
-	# Refresh all UI cards
+	# Refresh all UI cards and slot health bars
 	for slot in team_bench_view.active_slots + team_bench_view.bench_slots:
 		var card = slot.get_card()
 		if card:
 			card.update_ui()
+			slot.update_health_bar()
 			
 	log_message("[color=#eb3860][MOC x10][/color] Pomnożono statystyki wszystkich potworów x10!")
 

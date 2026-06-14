@@ -1,5 +1,5 @@
 class_name MonsterSlot
-extends PanelContainer
+extends VBoxContainer
 
 ## Signal emitted when the card inside this slot changes (added, removed, swapped)
 signal slot_changed(slot: MonsterSlot)
@@ -13,10 +13,6 @@ signal slot_changed(slot: MonsterSlot)
 var is_highlighted: bool = false
 
 func _ready() -> void:
-	# Define a clean style box for the empty slot (flat design)
-	var empty_style = StyleBoxEmpty.new()
-	add_theme_stylebox_override("panel", empty_style)
-	
 	# Create and add a ColorRect to draw our custom pixel-perfect slot borders via shader
 	var border_rect = ColorRect.new()
 	border_rect.name = "BorderRect"
@@ -36,7 +32,7 @@ func _ready() -> void:
 	shader_material.shader = shader
 	
 	# Set size uniform to match our custom minimum size
-	shader_material.set_shader_parameter("size", custom_minimum_size)
+	shader_material.set_shader_parameter("size", $CardContainer.custom_minimum_size)
 	
 	# Colors matching the reference image:
 	# outer_border_color (outer): gray-blue #9194a6 (0.57, 0.58, 0.65)
@@ -45,51 +41,78 @@ func _ready() -> void:
 	shader_material.set_shader_parameter("inner_border_color", Color(0.88, 0.89, 0.91, 1.0))
 	
 	border_rect.material = shader_material
-	add_child(border_rect)
-	move_child(border_rect, 0) # Make sure it is drawn behind other elements (like the card)
+	$CardContainer.add_child(border_rect)
+	$CardContainer.move_child(border_rect, 0) # Make sure it is drawn behind other elements (like the card)
 	
 	# Support dynamic resizing for scaling/monitors
-	resized.connect(func():
+	$CardContainer.resized.connect(func():
 		if border_rect and border_rect.material:
-			border_rect.material.set_shader_parameter("size", size)
+			border_rect.material.set_shader_parameter("size", $CardContainer.size)
 	)
 	
 	# Connect tree notifications to toggle placeholder visibility and border visibility
-	child_entered_tree.connect(func(_node): update_placeholder.call_deferred())
-	child_exiting_tree.connect(func(_node): update_placeholder.call_deferred())
+	$CardContainer.child_entered_tree.connect(func(_node): update_placeholder.call_deferred())
+	$CardContainer.child_exiting_tree.connect(func(_node): update_placeholder.call_deferred())
+	
+	# Load and assign the health bar shader material
+	var hp_shader = load("res://src/ui/hp_border.gdshader")
+	var hp_material = ShaderMaterial.new()
+	hp_material.shader = hp_shader
+	hp_material.set_shader_parameter("size", %HealthBarRect.custom_minimum_size)
+	hp_material.set_shader_parameter("fill_percentage", 1.0)
+	%HealthBarRect.material = hp_material
+	
+	%HealthBarRect.resized.connect(func():
+		if %HealthBarRect.material:
+			%HealthBarRect.material.set_shader_parameter("size", %HealthBarRect.size)
+	)
+	
 	update_placeholder()
 
 func update_style(is_hovered: bool = false) -> void:
 	is_highlighted = is_hovered
-	var border_rect = get_node_or_null("BorderRect")
+	var border_rect = $CardContainer.get_node_or_null("BorderRect")
 	if not border_rect or not border_rect.material:
 		return
 		
 	var mat = border_rect.material as ShaderMaterial
 	if is_hovered:
-		# Hover state highlight
 		mat.set_shader_parameter("outer_border_color", Color(0.259, 0.614, 0.282, 1.0)) # blue border
 		mat.set_shader_parameter("inner_border_color", Color(0.718, 0.99, 0.721, 1.0)) # light gray inner border
 	else:
-		# Normal state:
 		mat.set_shader_parameter("outer_border_color", Color(0.57, 0.58, 0.65, 1.0)) # gray-blue border
 		mat.set_shader_parameter("inner_border_color", Color(0.88, 0.89, 0.91, 1.0)) # light gray inner border
 
 func update_placeholder() -> void:
 	var empty = is_empty()
-	if has_node("EmptyPlaceholderLabel"):
-		$EmptyPlaceholderLabel.visible = empty
+	if $CardContainer.has_node("EmptyPlaceholderLabel"):
+		$CardContainer.get_node("EmptyPlaceholderLabel").visible = empty
 		
-	var border_rect = get_node_or_null("BorderRect")
+	var border_rect = $CardContainer.get_node_or_null("BorderRect")
 	if border_rect:
 		border_rect.visible = empty
 		
 	update_style()
+	update_health_bar()
+
+func update_health_bar() -> void:
+	var card = get_card()
+	if card and card.monster_instance:
+		%HealthBarContainer.visible = true
+		var inst = card.monster_instance
+		var fill = float(inst.current_health) / float(inst.get_max_health())
+		var mat = %HealthBarRect.material as ShaderMaterial
+		if mat:
+			mat.set_shader_parameter("fill_percentage", fill)
+			mat.set_shader_parameter("size", %HealthBarRect.size if %HealthBarRect.size != Vector2.ZERO else %HealthBarRect.custom_minimum_size)
+		%HealthLabel.text = str(inst.current_health)
+	else:
+		%HealthBarContainer.visible = false
 
 func _process(_delta: float) -> void:
 	if is_highlighted and get_viewport().gui_is_dragging():
-		var mouse_pos = get_local_mouse_position()
-		var rect = Rect2(Vector2.ZERO, size)
+		var mouse_pos = $CardContainer.get_local_mouse_position()
+		var rect = Rect2(Vector2.ZERO, $CardContainer.size)
 		if not rect.has_point(mouse_pos):
 			update_style(false)
 
@@ -111,34 +134,44 @@ func _notification(what: int) -> void:
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	update_style(false)
 	
-	var dragged_card: MonsterCard = data["card"]
+	var dragged_card = data["card"]
 	var original_slot: MonsterSlot = data["original_slot"]
 	
 	if original_slot == self:
 		return # Dropped on itself
 		
-	var current_card: MonsterCard = get_card()
+	var current_card = get_card()
 	
 	if current_card:
 		# SWAP logic: Swap the parent slots of the two cards
-		remove_child(current_card)
-		original_slot.remove_child(dragged_card)
+		remove_card(current_card)
+		original_slot.remove_card(dragged_card)
 		
-		add_child(dragged_card)
-		original_slot.add_child(current_card)
+		add_card(dragged_card)
+		original_slot.add_card(current_card)
 	else:
 		# MOVE logic: Move card from original slot to this empty slot
-		original_slot.remove_child(dragged_card)
-		add_child(dragged_card)
+		original_slot.remove_card(dragged_card)
+		add_card(dragged_card)
 		
 	# Emit signals
 	slot_changed.emit(self)
 	original_slot.slot_changed.emit(original_slot)
 
+func add_card(card: Control) -> void:
+	if has_node("CardContainer"):
+		$CardContainer.add_child(card)
+
+func remove_card(card: Control) -> void:
+	if has_node("CardContainer"):
+		$CardContainer.remove_child(card)
+
 ## Returns the MonsterCard child node of this slot, if any. Otherwise returns null.
-func get_card() -> MonsterCard:
-	for child in get_children():
-		if child is MonsterCard:
+func get_card() -> Control:
+	if not has_node("CardContainer"):
+		return null
+	for child in $CardContainer.get_children():
+		if child.has_method("update_ui"):
 			return child
 	return null
 

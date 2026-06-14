@@ -104,13 +104,13 @@ func populate_ui() -> void:
 	for slot in active_slots:
 		var card = slot.get_card()
 		if card:
-			slot.remove_child(card)
+			slot.remove_card(card)
 			card.queue_free()
 			
 	for slot in bench_slots:
 		var card = slot.get_card()
 		if card:
-			slot.remove_child(card)
+			slot.remove_card(card)
 			card.queue_free()
 			
 	# Instantiate cards according to the data state
@@ -118,13 +118,13 @@ func populate_ui() -> void:
 		if i < active_team.size() and active_team[i] != null:
 			var card = card_scene.instantiate()
 			card.monster_instance = active_team[i]
-			active_slots[i].add_child(card)
+			active_slots[i].add_card(card)
 			
 	for i in range(bench_slot_count):
 		if i < bench.size() and bench[i] != null:
 			var card = card_scene.instantiate()
 			card.monster_instance = bench[i]
-			bench_slots[i].add_child(card)
+			bench_slots[i].add_card(card)
 
 ## Add a monster to the first empty slot on the bench
 func add_monster_to_bench(monster: MonsterInstance) -> bool:
@@ -134,7 +134,7 @@ func add_monster_to_bench(monster: MonsterInstance) -> bool:
 			var card_scene = load("res://src/ui/monster_card.tscn")
 			var card = card_scene.instantiate()
 			card.monster_instance = monster
-			bench_slots[i].add_child(card)
+			bench_slots[i].add_card(card)
 			sync_data_from_ui()
 			return true
 	return false # Bench is full
@@ -145,14 +145,14 @@ func clear_all() -> void:
 		active_team[i] = null
 		var card = active_slots[i].get_card()
 		if card:
-			active_slots[i].remove_child(card)
+			active_slots[i].remove_card(card)
 			card.queue_free()
 			
 	for i in range(bench_slot_count):
 		bench[i] = null
 		var card = bench_slots[i].get_card()
 		if card:
-			bench_slots[i].remove_child(card)
+			bench_slots[i].remove_card(card)
 			card.queue_free()
 			
 	sync_data_from_ui()
