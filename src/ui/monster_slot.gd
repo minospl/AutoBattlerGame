@@ -10,6 +10,8 @@ signal slot_changed(slot: MonsterSlot)
 ## Index of the slot in the respective team/bench array
 @export var slot_index: int = 0
 
+var is_highlighted: bool = false
+
 func _ready() -> void:
 	# Define a clean style box for the empty slot (flat design)
 	var empty_style = StyleBoxEmpty.new()
@@ -58,6 +60,7 @@ func _ready() -> void:
 	update_placeholder()
 
 func update_style(is_hovered: bool = false) -> void:
+	is_highlighted = is_hovered
 	var border_rect = get_node_or_null("BorderRect")
 	if not border_rect or not border_rect.material:
 		return
@@ -65,8 +68,8 @@ func update_style(is_hovered: bool = false) -> void:
 	var mat = border_rect.material as ShaderMaterial
 	if is_hovered:
 		# Hover state highlight
-		mat.set_shader_parameter("outer_border_color", Color(0.35, 0.50, 0.90, 1.0)) # blue border
-		mat.set_shader_parameter("inner_border_color", Color(0.35, 0.50, 0.90, 0.2)) # semi-transparent blue inner
+		mat.set_shader_parameter("outer_border_color", Color(0.259, 0.614, 0.282, 1.0)) # blue border
+		mat.set_shader_parameter("inner_border_color", Color(0.718, 0.99, 0.721, 1.0)) # light gray inner border
 	else:
 		# Normal state:
 		mat.set_shader_parameter("outer_border_color", Color(0.57, 0.58, 0.65, 1.0)) # gray-blue border
@@ -83,6 +86,13 @@ func update_placeholder() -> void:
 		
 	update_style()
 
+func _process(_delta: float) -> void:
+	if is_highlighted and get_viewport().gui_is_dragging():
+		var mouse_pos = get_local_mouse_position()
+		var rect = Rect2(Vector2.ZERO, size)
+		if not rect.has_point(mouse_pos):
+			update_style(false)
+
 # Determine if we can drop a dragged item onto this slot
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	if typeof(data) == TYPE_DICTIONARY and data.has("card"):
@@ -91,7 +101,7 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		return true
 	return false
 
-# Handle cleanup when drag drops elsewhere or is canceled
+# Handle cleanup when drag drops elsewhere, leaves the slot, or is canceled
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_END:
 		# Restore proper style based on slot occupancy

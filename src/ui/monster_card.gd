@@ -45,12 +45,12 @@ func update_ui() -> void:
 	%PoisonLabel.text = str(monster_instance.poison)
 	
 	# Border color represents rarity
-	var border_color = Color(0.4, 0.45, 0.5, 1.0) # Default gray
-	if monster_instance.data and monster_instance.data.rarity:
-		border_color = monster_instance.data.rarity.border_color
+	#var border_color = Color(0.4, 0.45, 0.5, 1.0) # Default gray
+	#if monster_instance.data and monster_instance.data.rarity:
+	#	border_color = monster_instance.data.rarity.border_color
 		
 	# Card body color is clean flat white/light gray (Batamon style)
-	var body_color = Color(0.98, 0.98, 0.98, 1.0)
+	#var body_color = Color(0.98, 0.98, 0.98, 1.0)
 		
 	# Soft shadow style for the card container (with transparent center)
 	var shadow_style: StyleBoxFlat = StyleBoxFlat.new()
@@ -78,8 +78,8 @@ func update_ui() -> void:
 	if border_rect and border_rect.material:
 		var mat = border_rect.material as ShaderMaterial
 		mat.set_shader_parameter("size", size if size != Vector2.ZERO else custom_minimum_size)
-		mat.set_shader_parameter("outer_border_color", border_color) # Outer border represents rarity!
-		mat.set_shader_parameter("interior_color", body_color) # Solid background color for the card!
+		mat.set_shader_parameter("outer_border_color", monster_instance.data.rarity.border_color) # Outer border represents rarity!
+		mat.set_shader_parameter("interior_color", Color(0.98, 0.98, 0.98, 1.0)) # Solid background color for the card!
 
 	# Determine stats block size dynamically to prevent stretching the card
 	var has_poison = monster_instance.poison > 0
