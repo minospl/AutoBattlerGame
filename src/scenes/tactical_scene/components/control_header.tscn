@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://dm0yq7hsqt4k"]
+
+[ext_resource type="Script" path="res://src/scenes/tactical_scene/components/control_header.gd" id="1_script"]
+
+[node name="ControlHeader" type="HBoxContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 36.0
+grow_horizontal = 2
+script = ExtResource("1_script")
+
+[node name="TitleLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.08, 0.09, 1)
+theme_override_font_sizes/font_size = 20
+text = "BATAMON Roguelike Auto-Battler"
+
+[node name="ControlSpacer" type="Control" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="AddButton" type="Button" parent="ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Dodaj Losowego Potwora"
+
+[node name="ClearButton" type="Button" parent="ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Wyczyść Wszystko"
+
+[node name="MultiplyButton" type="Button" parent="ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Statystyki x10"

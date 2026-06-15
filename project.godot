@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="AutoBattlerDungeonGame"
-run/main_scene="res://src/test/test_scene.tscn"
+run/main_scene="res://src/scenes/tactical_scene/tactical_scene.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 
 [display]
@@ -27,7 +27,7 @@ version_control/autoload_on_startup=true
 
 [gui]
 
-theme/custom="res://src/resources/game_theme.tres"
+theme/custom="res://src/shared/theme/game_theme.tres"
 
 [rendering]
 

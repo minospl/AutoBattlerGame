@@ -1,0 +1,54 @@
+[gd_scene load_steps=5 format=3 uid="uid://bb7tf4ytmscoh"]
+
+[ext_resource type="Script" path="res://src/scenes/tactical_scene/tactical_scene.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/scenes/tactical_scene/components/bench_panel.tscn" id="2_bench"]
+[ext_resource type="PackedScene" path="res://src/scenes/tactical_scene/components/team_panel.tscn" id="3_team"]
+[ext_resource type="PackedScene" path="res://src/scenes/tactical_scene/components/control_header.tscn" id="4_header"]
+
+[node name="TacticalScene" type="Control" unique_id=520390897]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BackgroundPanel" type="Panel" parent="." unique_id=2073420315]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel" unique_id=1875125863]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer" unique_id=2033298553]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ControlHeader" parent="BackgroundPanel/MarginContainer/VBoxContainer" instance=ExtResource("4_header")]
+unique_name_in_owner = true
+
+[node name="ContentVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=511004923]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="BenchSection" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentVBox" instance=ExtResource("2_bench")]
+unique_name_in_owner = true
+
+[node name="TeamSection" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentVBox" instance=ExtResource("3_team")]
+unique_name_in_owner = true

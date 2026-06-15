@@ -31,7 +31,7 @@ func _ready() -> void:
 	border_rect.offset_bottom = 0
 	
 	# Load and assign the shader material
-	var shader = load("res://src/ui/slot_border.gdshader")
+	var shader = load("res://src/shared/shaders/slot_border.gdshader")
 	var shader_material: ShaderMaterial = ShaderMaterial.new()
 	shader_material.shader = shader
 	
@@ -59,7 +59,7 @@ func _ready() -> void:
 	$CardContainer.child_exiting_tree.connect(func(_node): update_placeholder.call_deferred())
 	
 	# Load and assign the health bar shader material
-	var hp_shader = load("res://src/ui/hp_border.gdshader")
+	var hp_shader = load("res://src/shared/shaders/hp_border.gdshader")
 	var hp_material = ShaderMaterial.new()
 	hp_material.shader = hp_shader
 	hp_material.set_shader_parameter("size", %HealthBarRect.custom_minimum_size)

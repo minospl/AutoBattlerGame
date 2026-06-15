@@ -20,7 +20,7 @@ func _ready() -> void:
 		border_rect.offset_right = 0
 		border_rect.offset_bottom = 0
 		
-		var shader = load("res://src/ui/slot_border.gdshader")
+		var shader = load("res://src/shared/shaders/slot_border.gdshader")
 		var shader_material = ShaderMaterial.new()
 		shader_material.shader = shader
 		border_rect.material = shader_material
@@ -86,7 +86,7 @@ func update_ui() -> void:
 		
 		# Assign chroma-key shader material if not already present
 		if not %SpriteRect.material:
-			var shader = load("res://src/ui/chroma_key.gdshader")
+			var shader = load("res://src/shared/shaders/chroma_key.gdshader")
 			var mat = ShaderMaterial.new()
 			mat.shader = shader
 			%SpriteRect.material = mat
@@ -104,7 +104,7 @@ func update_ui() -> void:
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Create a visual preview of what we are dragging
-	var preview_scene = load("res://src/ui/monster_card.tscn")
+	var preview_scene = load("res://src/shared/components/monster_card.tscn")
 	var preview = preview_scene.instantiate()
 	preview.monster_instance = monster_instance
 	preview.custom_minimum_size = custom_minimum_size
@@ -151,7 +151,7 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 		border_rect.offset_right = 0
 		border_rect.offset_bottom = 0
 		
-		var shader = load("res://src/ui/stat_border.gdshader")
+		var shader = load("res://src/shared/shaders/stat_border.gdshader")
 		var shader_material = ShaderMaterial.new()
 		shader_material.shader = shader
 		border_rect.material = shader_material
