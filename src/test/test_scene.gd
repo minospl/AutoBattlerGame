@@ -43,6 +43,9 @@ func _ready() -> void:
 	# Spawn initial monsters
 	_on_add_monster_pressed()
 	_on_add_monster_pressed()
+	
+	# Hide logs on start
+	%LogSection.visible = false
 
 func _apply_visual_styling() -> void:
 	# 1. Main Background Panel
@@ -121,6 +124,33 @@ func _apply_visual_styling() -> void:
 	var mult_pressed = mult_normal.duplicate() as StyleBoxFlat
 	mult_pressed.bg_color = Color(0.35, 0.20, 0.60, 1.0)
 	multiply_btn.add_theme_stylebox_override("pressed", mult_pressed)
+	
+	# 3c. Toggle Log Button (Sleek Dark Gray with border)
+	var toggle_btn = %ToggleLogButton as Button
+	var toggle_normal = StyleBoxFlat.new()
+	toggle_normal.bg_color = Color(0.12, 0.13, 0.15, 1.0) # Dark gray
+	toggle_normal.border_width_left = 1
+	toggle_normal.border_width_top = 1
+	toggle_normal.border_width_right = 1
+	toggle_normal.border_width_bottom = 1
+	toggle_normal.border_color = Color(0.35, 0.50, 0.90, 0.7) # Indigo/blue border
+	toggle_normal.corner_radius_top_left = 6
+	toggle_normal.corner_radius_top_right = 6
+	toggle_normal.corner_radius_bottom_right = 6
+	toggle_normal.corner_radius_bottom_left = 6
+	toggle_normal.content_margin_left = 16
+	toggle_normal.content_margin_right = 16
+	toggle_normal.content_margin_top = 8
+	toggle_normal.content_margin_bottom = 8
+	toggle_btn.add_theme_stylebox_override("normal", toggle_normal)
+	
+	var toggle_hover = toggle_normal.duplicate() as StyleBoxFlat
+	toggle_hover.bg_color = Color(0.35, 0.50, 0.90, 0.15) # Indigo tint on hover
+	toggle_btn.add_theme_stylebox_override("hover", toggle_hover)
+	
+	var toggle_pressed = toggle_normal.duplicate() as StyleBoxFlat
+	toggle_pressed.bg_color = Color(0.35, 0.50, 0.90, 0.30)
+	toggle_btn.add_theme_stylebox_override("pressed", toggle_pressed)
 	
 	# 4. Console Log Panel
 	var log_panel = %LogPanel as PanelContainer
@@ -228,3 +258,10 @@ func _on_team_state_changed() -> void:
 			
 	log_message("  [b]Drużyna:[/b] " + ", ".join(active_names))
 	log_message("  [b]Ławka:[/b] [" + ", ".join(bench_names) + "]")
+
+func _on_toggle_log_pressed() -> void:
+	%LogSection.visible = not %LogSection.visible
+	if %LogSection.visible:
+		%ToggleLogButton.text = "Ukryj Logi"
+	else:
+		%ToggleLogButton.text = "Pokaż Logi"

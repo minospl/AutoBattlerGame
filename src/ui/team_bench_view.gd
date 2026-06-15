@@ -24,24 +24,64 @@ func _ready() -> void:
 	active_team.resize(active_slot_count)
 	bench.resize(bench_slot_count)
 	
-	# Set up a clean, flat container stylebox (Batamon aesthetic)
-	var style = StyleBoxFlat.new()
-	style.bg_color = Color(0.08, 0.08, 0.09, 1) # sleek dark background canvas
-	style.content_margin_left = 10
-	style.content_margin_right = 10
-	style.content_margin_top = 10
-	style.content_margin_bottom = 10
-	style.corner_radius_top_left = 12
-	style.corner_radius_top_right = 12
-	style.corner_radius_bottom_right = 12
-	style.corner_radius_bottom_left = 12
-	style.border_width_left = 2
-	style.border_width_top = 2
-	style.border_width_right = 2
-	style.border_width_bottom = 2
-	style.border_color = Color(0.14, 0.15, 0.17, 1.0)
+	# Root container transparent style
+	var transparent_style = StyleBoxEmpty.new()
+	add_theme_stylebox_override("panel", transparent_style)
 	
-	add_theme_stylebox_override("panel", style)
+	var container_border_color = Color(0.08, 0.08, 0.09, 1.0) # Thick dark outline
+	
+	# Bench Section Container Style (White Box)
+	var bench_style = StyleBoxFlat.new()
+	bench_style.bg_color = Color(1.0, 1.0, 1.0, 1.0) # Solid white
+	bench_style.border_width_left = 3
+	bench_style.border_width_top = 3
+	bench_style.border_width_right = 3
+	bench_style.border_width_bottom = 3
+	bench_style.border_color = container_border_color
+	bench_style.corner_radius_top_left = 8
+	bench_style.corner_radius_top_right = 8
+	bench_style.corner_radius_bottom_right = 8
+	bench_style.corner_radius_bottom_left = 8
+	%BenchSection.add_theme_stylebox_override("panel", bench_style)
+	
+	# Bench Header Style (Yellow Banner)
+	var bench_header_style = StyleBoxFlat.new()
+	bench_header_style.bg_color = Color(0.95, 0.72, 0.18, 1.0) # Yellow (#f1b82d)
+	bench_header_style.corner_radius_top_left = 5
+	bench_header_style.corner_radius_top_right = 5
+	bench_header_style.corner_radius_bottom_right = 0
+	bench_header_style.corner_radius_bottom_left = 0
+	%BenchHeader.add_theme_stylebox_override("panel", bench_header_style)
+	
+	# Team Section Container Style (White Box)
+	var team_style = StyleBoxFlat.new()
+	team_style.bg_color = Color(1.0, 1.0, 1.0, 1.0) # Solid white
+	team_style.border_width_left = 3
+	team_style.border_width_top = 3
+	team_style.border_width_right = 3
+	team_style.border_width_bottom = 3
+	team_style.border_color = container_border_color
+	team_style.corner_radius_top_left = 8
+	team_style.corner_radius_top_right = 8
+	team_style.corner_radius_bottom_right = 8
+	team_style.corner_radius_bottom_left = 8
+	%TeamSection.add_theme_stylebox_override("panel", team_style)
+	
+	# Team Header Style (Pink Banner)
+	var team_header_style = StyleBoxFlat.new()
+	team_header_style.bg_color = Color(0.89, 0.31, 0.44, 1.0) # Pink (#e24f70)
+	team_header_style.corner_radius_top_left = 5
+	team_header_style.corner_radius_top_right = 5
+	team_header_style.corner_radius_bottom_right = 0
+	team_header_style.corner_radius_bottom_left = 0
+	%TeamHeader.add_theme_stylebox_override("panel", team_header_style)
+	
+	# Label outline styling
+	var label_outline_color = Color(0.1, 0.1, 0.1, 1.0)
+	%BenchLabel.add_theme_color_override("font_outline_color", label_outline_color)
+	%BenchLabel.add_theme_constant_override("outline_size", 5)
+	%TeamLabel.add_theme_color_override("font_outline_color", label_outline_color)
+	%TeamLabel.add_theme_constant_override("outline_size", 5)
 	
 	create_slots()
 

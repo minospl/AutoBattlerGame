@@ -43,26 +43,14 @@ func update_ui() -> void:
 	%AttackLabel.text = str(monster_instance.get_attack())
 	%PoisonLabel.text = str(monster_instance.poison)
 		
-	# Soft shadow style for the card container (with transparent center)
-	var shadow_style: StyleBoxFlat = StyleBoxFlat.new()
-	shadow_style.bg_color = Color(0, 0, 0, 0) # Completely transparent bg
-	shadow_style.draw_center = false
-	shadow_style.corner_radius_top_left = 8
-	shadow_style.corner_radius_top_right = 8
-	shadow_style.corner_radius_bottom_right = 8
-	shadow_style.corner_radius_bottom_left = 8
+	# Empty style for the card container to prevent drawing any default panel background or shadow
+	var card_style = StyleBoxEmpty.new()
+	card_style.content_margin_left = 0
+	card_style.content_margin_right = 0
+	card_style.content_margin_top = 0
+	card_style.content_margin_bottom = 0
 	
-	# Premium soft drop shadow
-	shadow_style.shadow_color = Color(0, 0, 0, 0.15) # Softer shadow for light card
-	shadow_style.shadow_size = 4
-	shadow_style.shadow_offset = Vector2(0, 3)
-	
-	shadow_style.content_margin_left = 0
-	shadow_style.content_margin_right = 0
-	shadow_style.content_margin_top = 0
-	shadow_style.content_margin_bottom = 0
-	
-	add_theme_stylebox_override("panel", shadow_style)
+	add_theme_stylebox_override("panel", card_style)
 	
 	# Configure the pixel-art border shader on the card
 	var border_rect = get_node_or_null("BorderRect")
@@ -123,7 +111,13 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	
 	# Semitransparent preview
 	preview.modulate.a = 0.7
-	set_drag_preview(preview)
+	
+	# Create a wrapper control to center the preview under the mouse cursor
+	var preview_wrapper = Control.new()
+	preview_wrapper.add_child(preview)
+	preview.position = -custom_minimum_size / 2.0
+	
+	set_drag_preview(preview_wrapper)
 	
 	# Find original MonsterSlot ancestor
 	var original_slot = get_parent()

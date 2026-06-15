@@ -13,6 +13,10 @@ signal slot_changed(slot: MonsterSlot)
 var is_highlighted: bool = false
 
 func _ready() -> void:
+	# Remove Godot's default panel borders from CardContainer
+	var empty_style = StyleBoxEmpty.new()
+	$CardContainer.add_theme_stylebox_override("panel", empty_style)
+	
 	# Create and add a ColorRect to draw our custom pixel-perfect slot borders via shader
 	var border_rect = ColorRect.new()
 	border_rect.name = "BorderRect"
@@ -28,7 +32,7 @@ func _ready() -> void:
 	
 	# Load and assign the shader material
 	var shader = load("res://src/ui/slot_border.gdshader")
-	var shader_material = ShaderMaterial.new()
+	var shader_material: ShaderMaterial = ShaderMaterial.new()
 	shader_material.shader = shader
 	
 	# Set size uniform to match our custom minimum size

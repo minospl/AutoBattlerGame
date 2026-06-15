@@ -7,69 +7,101 @@ script = ExtResource("1_script")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 16
 
-[node name="TeamSection" type="VBoxContainer" parent="VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="TeamHeaderLabel" type="Label" parent="VBoxContainer/TeamSection"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.95, 1)
-theme_override_font_sizes/font_size = 16
-text = "AKTYWNA DRUŻYNA"
-horizontal_alignment = 1
-
-[node name="FrontlineWrapper" type="VBoxContainer" parent="VBoxContainer/TeamSection"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-
-[node name="FrontlineAlign" type="CenterContainer" parent="VBoxContainer/TeamSection/FrontlineWrapper"]
-layout_mode = 2
-
-[node name="FrontlineHBox" type="HBoxContainer" parent="VBoxContainer/TeamSection/FrontlineWrapper/FrontlineAlign"]
+[node name="BenchSection" type="PanelContainer" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/horizontal_separation = 12
-alignment = 1
 
-[node name="BacklineWrapper" type="VBoxContainer" parent="VBoxContainer/TeamSection"]
+[node name="VBox" type="VBoxContainer" parent="VBoxContainer/BenchSection"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 0
 
-
-[node name="BacklineAlign" type="CenterContainer" parent="VBoxContainer/TeamSection/BacklineWrapper"]
-layout_mode = 2
-
-[node name="BacklineHBox" type="HBoxContainer" parent="VBoxContainer/TeamSection/BacklineWrapper/BacklineAlign"]
+[node name="BenchHeader" type="PanelContainer" parent="VBoxContainer/BenchSection/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/horizontal_separation = 12
-alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+[node name="Margin" type="MarginContainer" parent="VBoxContainer/BenchSection/VBox/BenchHeader"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
 
-[node name="BenchSection" type="VBoxContainer" parent="VBoxContainer"]
+[node name="BenchLabel" type="Label" parent="VBoxContainer/BenchSection/VBox/BenchHeader/Margin"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "BENCH"
 
-[node name="BenchHeaderLabel" type="Label" parent="VBoxContainer/BenchSection"]
+[node name="BenchMargin" type="MarginContainer" parent="VBoxContainer/BenchSection/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.9, 0.9, 0.95, 1)
-theme_override_font_sizes/font_size = 16
-text = "ŁAWKA REZERWOWYCH"
-horizontal_alignment = 1
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/BenchSection"]
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/BenchSection/VBox/BenchMargin"]
 layout_mode = 2
 vertical_scroll_mode = 0
 
-[node name="BenchHBox" type="HBoxContainer" parent="VBoxContainer/BenchSection/ScrollContainer"]
+[node name="BenchHBox" type="HBoxContainer" parent="VBoxContainer/BenchSection/VBox/BenchMargin/ScrollContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/horizontal_separation = 12
+alignment = 1
+
+[node name="TeamSection" type="PanelContainer" parent="VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="VBoxContainer/TeamSection"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TeamHeader" type="PanelContainer" parent="VBoxContainer/TeamSection/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="VBoxContainer/TeamSection/VBox/TeamHeader"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="TeamLabel" type="Label" parent="VBoxContainer/TeamSection/VBox/TeamHeader/Margin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "MY TEAM"
+
+[node name="TeamMargin" type="MarginContainer" parent="VBoxContainer/TeamSection/VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="TeamRows" type="VBoxContainer" parent="VBoxContainer/TeamSection/VBox/TeamMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="FrontlineAlign" type="CenterContainer" parent="VBoxContainer/TeamSection/VBox/TeamMargin/TeamRows"]
+layout_mode = 2
+
+[node name="FrontlineHBox" type="HBoxContainer" parent="VBoxContainer/TeamSection/VBox/TeamMargin/TeamRows/FrontlineAlign"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/horizontal_separation = 12
+alignment = 1
+
+[node name="BacklineAlign" type="CenterContainer" parent="VBoxContainer/TeamSection/VBox/TeamMargin/TeamRows"]
+layout_mode = 2
+
+[node name="BacklineHBox" type="HBoxContainer" parent="VBoxContainer/TeamSection/VBox/TeamMargin/TeamRows/BacklineAlign"]
+unique_name_in_owner = true
+layout_mode = 2
 theme_override_constants/horizontal_separation = 12
 alignment = 1
