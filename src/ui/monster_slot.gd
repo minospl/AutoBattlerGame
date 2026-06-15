@@ -1,5 +1,5 @@
 class_name MonsterSlot
-extends VBoxContainer
+extends Control
 
 ## Signal emitted when the card inside this slot changes (added, removed, swapped)
 signal slot_changed(slot: MonsterSlot)
