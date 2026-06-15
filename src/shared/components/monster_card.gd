@@ -9,7 +9,9 @@ extends PanelContainer
 
 func _ready() -> void:
 	var border_rect = get_node_or_null("BorderRect")
+	var is_new = false
 	if not border_rect:
+		is_new = true
 		border_rect = ColorRect.new()
 		border_rect.name = "BorderRect"
 		border_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -20,19 +22,24 @@ func _ready() -> void:
 		border_rect.offset_right = 0
 		border_rect.offset_bottom = 0
 		
-		var shader = load("res://src/shared/shaders/slot_border.gdshader")
+		var shader = load("res://src/shared/shaders/double_border.gdshader")
 		var shader_material = ShaderMaterial.new()
 		shader_material.shader = shader
 		border_rect.material = shader_material
 		
+	# Connect resized signal to keep shader size updated
+	border_rect.resized.connect(func():
+		if border_rect.material:
+			border_rect.material.set_shader_parameter("size", border_rect.size)
+	)
+	
+	if is_new:
 		add_child(border_rect)
 		move_child(border_rect, 0) # Draw behind other children (like labels and sprite)
 		
-	# Connect resized signal to keep shader size updated
-	resized.connect(func():
-		if border_rect and border_rect.material:
-			border_rect.material.set_shader_parameter("size", size)
-	)
+	if border_rect.material:
+		var initial_size = border_rect.size if border_rect.size != Vector2.ZERO else (size if size != Vector2.ZERO else custom_minimum_size)
+		border_rect.material.set_shader_parameter("size", initial_size)
 	
 	update_ui()
 
@@ -57,6 +64,8 @@ func update_ui() -> void:
 	if border_rect and border_rect.material:
 		var mat = border_rect.material as ShaderMaterial
 		mat.set_shader_parameter("size", size if size != Vector2.ZERO else custom_minimum_size)
+		mat.set_shader_parameter("outer_border_width", 3)
+		mat.set_shader_parameter("inner_border_width", 3)
 		mat.set_shader_parameter("outer_border_color", monster_instance.data.rarity.border_color) # Outer border represents rarity!
 		mat.set_shader_parameter("interior_color", Color(0.98, 0.98, 0.98, 1.0)) # Solid background color for the card!
 
@@ -151,7 +160,7 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 		border_rect.offset_right = 0
 		border_rect.offset_bottom = 0
 		
-		var shader = load("res://src/shared/shaders/stat_border.gdshader")
+		var shader = load("res://src/shared/shaders/single_border.gdshader")
 		var shader_material = ShaderMaterial.new()
 		shader_material.shader = shader
 		border_rect.material = shader_material
@@ -169,8 +178,8 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 	if border_rect.material:
 		var mat = border_rect.material as ShaderMaterial
 		mat.set_shader_parameter("size", panel.size if panel.size != Vector2.ZERO else panel.custom_minimum_size)
-		mat.set_shader_parameter("border_width", 1.0) # 1 virtual pixel (2 screen pixels) border
-		mat.set_shader_parameter("corner_radius", 2.0) # 2 virtual pixels corner radius (rounded)
-		mat.set_shader_parameter("pixel_scale", 2.0)
+		mat.set_shader_parameter("border_width", 2)
+		mat.set_shader_parameter("border_indentation", 1)
 		mat.set_shader_parameter("border_color", Color(0.2, 0.2, 0.2, 1.0)) # Dark border
-		mat.set_shader_parameter("bg_color", bg_color) # Background color
+		mat.set_shader_parameter("interior_color", bg_color) # Background color
+		mat.set_shader_parameter("corner_color", Color(1.0, 1.0, 1.0, 0.0)) # Transparent corners

@@ -31,28 +31,31 @@ func _ready() -> void:
 	border_rect.offset_bottom = 0
 	
 	# Load and assign the shader material
-	var shader = load("res://src/shared/shaders/slot_border.gdshader")
+	var shader = load("res://src/shared/shaders/double_border.gdshader")
 	var shader_material: ShaderMaterial = ShaderMaterial.new()
 	shader_material.shader = shader
 	
-	# Set size uniform to match our custom minimum size
-	shader_material.set_shader_parameter("size", $CardContainer.custom_minimum_size)
-	
 	# Colors matching the reference image:
-	# outer_border_color (outer): gray-blue #9194a6 (0.57, 0.58, 0.65)
-	# inner_border_color (inner): light gray #e1e3e8 (0.88, 0.89, 0.91)
+	shader_material.set_shader_parameter("outer_border_width", 3)
+	shader_material.set_shader_parameter("inner_border_width", 3)
 	shader_material.set_shader_parameter("outer_border_color", Color(0.57, 0.58, 0.65, 1.0))
 	shader_material.set_shader_parameter("inner_border_color", Color(0.88, 0.89, 0.91, 1.0))
 	
 	border_rect.material = shader_material
+	
+	# Support dynamic resizing for scaling/monitors - connect before add_child to ensure we capture initial layout resizing
+	border_rect.resized.connect(func():
+		if border_rect.material:
+			border_rect.material.set_shader_parameter("size", border_rect.size)
+	)
+	
 	$CardContainer.add_child(border_rect)
 	$CardContainer.move_child(border_rect, 0) # Make sure it is drawn behind other elements (like the card)
 	
-	# Support dynamic resizing for scaling/monitors
-	$CardContainer.resized.connect(func():
-		if border_rect and border_rect.material:
-			border_rect.material.set_shader_parameter("size", $CardContainer.size)
-	)
+	# Set size uniform to match our actual size or fallback to custom minimum size
+	if border_rect.material:
+		var initial_size = border_rect.size if border_rect.size != Vector2.ZERO else $CardContainer.custom_minimum_size
+		border_rect.material.set_shader_parameter("size", initial_size)
 	
 	# Connect tree notifications to toggle placeholder visibility and border visibility
 	$CardContainer.child_entered_tree.connect(func(_node): update_placeholder.call_deferred())
@@ -62,7 +65,6 @@ func _ready() -> void:
 	var hp_shader = load("res://src/shared/shaders/hp_border.gdshader")
 	var hp_material = ShaderMaterial.new()
 	hp_material.shader = hp_shader
-	hp_material.set_shader_parameter("size", %HealthBarRect.custom_minimum_size)
 	hp_material.set_shader_parameter("fill_percentage", 1.0)
 	%HealthBarRect.material = hp_material
 	
@@ -70,6 +72,11 @@ func _ready() -> void:
 		if %HealthBarRect.material:
 			%HealthBarRect.material.set_shader_parameter("size", %HealthBarRect.size)
 	)
+	
+	# Set initial size uniform to actual size or fallback to custom minimum size
+	if %HealthBarRect.material:
+		var initial_hp_size = %HealthBarRect.size if %HealthBarRect.size != Vector2.ZERO else %HealthBarRect.custom_minimum_size
+		%HealthBarRect.material.set_shader_parameter("size", initial_hp_size)
 	
 	update_placeholder()
 

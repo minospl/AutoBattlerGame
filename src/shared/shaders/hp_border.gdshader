@@ -2,7 +2,6 @@ shader_type canvas_item;
 
 uniform vec2 size;
 uniform float fill_percentage : hint_range(0.0, 1.0) = 1.0;
-uniform float pixel_scale = 2.0; // size of 1 virtual pixel in screen pixels
 
 uniform vec4 outer_color : source_color = vec4(0.08, 0.08, 0.09, 1.0); // black outline
 uniform vec4 middle_color : source_color = vec4(0.85, 0.86, 0.88, 1.0); // light gray
@@ -12,29 +11,14 @@ uniform vec4 dark_red : source_color = vec4(0.71, 0.15, 0.15, 1.0); // bottom ha
 uniform vec4 bg_color : source_color = vec4(0.06, 0.07, 0.08, 1.0); // depleted background
 
 void fragment() {
-    // Quantize size to ensure perfect symmetry on the virtual pixel grid
-    vec2 virtual_size = floor(size / pixel_scale) * pixel_scale;
-    vec2 b = virtual_size * 0.5;
+    vec2 size_i = round(size);
+    int w = int(size_i.x);
+    int h = int(size_i.y);
+    int x = clamp(int(floor(UV.x * size_i.x)), 0, w - 1);
+    int y = clamp(int(floor(UV.y * size_i.y)), 0, h - 1);
     
-    // Normalize coordinates relative to the center
-    vec2 p = (UV - 0.5) * size;
-    
-    // Snap coordinate to virtual pixel centers
-    p = floor(p / pixel_scale) * pixel_scale + vec2(pixel_scale * 0.5);
-    vec2 ap = abs(p);
-    
-    // Check if pixel is outside the main boundaries
-    if (ap.x > b.x || ap.y > b.y) {
-        discard;
-    }
-    
-    // 1. Calculate virtual pixel coordinates from the nearest edge (0-indexed)
-    int vx = int(floor((b.x - ap.x) / pixel_scale));
-    int vy = int(floor((b.y - ap.y) / pixel_scale));
-    
-    if (vx < 0 || vy < 0) {
-        discard;
-    }
+    int vx = min(x, w - 1 - x);
+    int vy = min(y, h - 1 - y);
     
     // 2. Apply pixel-perfect corner cuts and coloring overrides
     if (vx == 0 && vy == 0) {
@@ -60,13 +44,13 @@ void fragment() {
     }
     else {
         // Interior: progress bar fill
-        float interior_width = virtual_size.x - 6.0 * pixel_scale;
-        float x_rel = p.x - (-b.x) - 3.0 * pixel_scale;
+        float interior_width = float(w - 6);
+        float x_rel = float(x - 3) + 0.5;
         float x_ratio = x_rel / interior_width;
         
         if (x_ratio < fill_percentage) {
             // Fill: Red (top half lighter, bottom half darker)
-            if (p.y < 0.0) {
+            if (UV.y < 0.5) {
                 COLOR = light_red;
             } else {
                 COLOR = dark_red;

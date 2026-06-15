@@ -33,3 +33,5 @@ theme/custom="res://src/shared/theme/game_theme.tres"
 
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="mobile"
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_vertices_to_pixel=true

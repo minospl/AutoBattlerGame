@@ -26,7 +26,7 @@ func _ready() -> void:
 	team_border.offset_right = 0
 	team_border.offset_bottom = 0
 	
-	var border_shader = load("res://src/shared/shaders/panel_border.gdshader")
+	var border_shader = load("res://src/shared/shaders/single_border.gdshader")
 	var border_color = Color(0.57, 0.58, 0.65, 1.0)
 	
 	var team_mat = ShaderMaterial.new()
@@ -36,13 +36,17 @@ func _ready() -> void:
 	team_mat.set_shader_parameter("corner_color", Color(1.0, 1.0, 1.0, 1.0)) # Solid white corners to overlay top header corners
 	
 	team_border.material = team_mat
+	team_border.resized.connect(func():
+		if team_border.material:
+			team_border.material.set_shader_parameter("size", team_border.size)
+	)
+	
 	add_child(team_border)
 	# Drawn last (no move_child to 0) to overlay top header corners
 	
-	resized.connect(func():
-		if team_border and team_border.material:
-			team_border.material.set_shader_parameter("size", size)
-	)
+	if team_border.material:
+		var initial_size = team_border.size if team_border.size != Vector2.ZERO else (size if size != Vector2.ZERO else custom_minimum_size)
+		team_border.material.set_shader_parameter("size", initial_size)
 	
 	# Team Header Style (Pink Banner)
 	var team_header_style = StyleBoxFlat.new()
