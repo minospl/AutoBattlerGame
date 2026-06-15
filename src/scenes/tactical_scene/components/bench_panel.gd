@@ -28,7 +28,6 @@ func _ready() -> void:
 	
 	var bench_mat = ShaderMaterial.new()
 	bench_mat.shader = border_shader
-	bench_mat.set_shader_parameter("border_width", 3.0)
 	bench_mat.set_shader_parameter("border_color", border_color)
 	bench_mat.set_shader_parameter("interior_color", Color(1.0, 1.0, 1.0, 1.0)) # White background
 	
@@ -36,31 +35,9 @@ func _ready() -> void:
 	add_child(bench_border)
 	move_child(bench_border, 0)
 	
-	# Top border rect to draw borders on top of the yellow header
-	var bench_top_border = ColorRect.new()
-	bench_top_border.name = "TopBorderRect"
-	bench_top_border.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bench_top_border.layout_mode = 1
-	bench_top_border.anchors_preset = Control.PRESET_FULL_RECT
-	bench_top_border.offset_left = 0
-	bench_top_border.offset_top = 0
-	bench_top_border.offset_right = 0
-	bench_top_border.offset_bottom = 0
-	
-	var bench_top_mat = ShaderMaterial.new()
-	bench_top_mat.shader = border_shader
-	bench_top_mat.set_shader_parameter("border_width", 3.0)
-	bench_top_mat.set_shader_parameter("border_color", border_color)
-	bench_top_mat.set_shader_parameter("interior_color", Color(0.0, 0.0, 0.0, 0.0)) # Transparent interior
-	
-	bench_top_border.material = bench_top_mat
-	add_child(bench_top_border) # Drawn on top!
-	
 	resized.connect(func():
 		if bench_border and bench_border.material:
 			bench_border.material.set_shader_parameter("size", size)
-		if bench_top_border and bench_top_border.material:
-			bench_top_border.material.set_shader_parameter("size", size)
 	)
 	
 	# Bench Header Style (Yellow Banner)

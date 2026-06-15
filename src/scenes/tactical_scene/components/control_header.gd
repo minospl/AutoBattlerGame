@@ -87,4 +87,3 @@ func _apply_visual_styling() -> void:
 	mult_pressed.bg_color = Color(0.35, 0.20, 0.60, 1.0)
 	multiply_btn.add_theme_stylebox_override("pressed", mult_pressed)
 	
-

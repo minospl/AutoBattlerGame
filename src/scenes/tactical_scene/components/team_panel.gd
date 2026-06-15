@@ -29,7 +29,6 @@ func _ready() -> void:
 	
 	var team_mat = ShaderMaterial.new()
 	team_mat.shader = border_shader
-	team_mat.set_shader_parameter("border_width", 3.0)
 	team_mat.set_shader_parameter("border_color", border_color)
 	team_mat.set_shader_parameter("interior_color", Color(1.0, 1.0, 1.0, 1.0)) # White background
 	
@@ -37,31 +36,9 @@ func _ready() -> void:
 	add_child(team_border)
 	move_child(team_border, 0)
 	
-	# Top border rect to draw borders on top of the pink header
-	var team_top_border = ColorRect.new()
-	team_top_border.name = "TopBorderRect"
-	team_top_border.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	team_top_border.layout_mode = 1
-	team_top_border.anchors_preset = Control.PRESET_FULL_RECT
-	team_top_border.offset_left = 0
-	team_top_border.offset_top = 0
-	team_top_border.offset_right = 0
-	team_top_border.offset_bottom = 0
-	
-	var team_top_mat = ShaderMaterial.new()
-	team_top_mat.shader = border_shader
-	team_top_mat.set_shader_parameter("border_width", 3.0)
-	team_top_mat.set_shader_parameter("border_color", border_color)
-	team_top_mat.set_shader_parameter("interior_color", Color(0.0, 0.0, 0.0, 0.0)) # Transparent interior
-	
-	team_top_border.material = team_top_mat
-	add_child(team_top_border) # Drawn on top!
-	
 	resized.connect(func():
 		if team_border and team_border.material:
 			team_border.material.set_shader_parameter("size", size)
-		if team_top_border and team_top_border.material:
-			team_top_border.material.set_shader_parameter("size", size)
 	)
 	
 	# Team Header Style (Pink Banner)
@@ -69,8 +46,7 @@ func _ready() -> void:
 	var team_color = Color(0.89, 0.31, 0.44, 1.0) # Pink (#e24f70)
 	team_header_style.bg_color = team_color
 	team_header_style.border_width_bottom = 3
-	team_header_style.border_color = team_color.lightened(0.2) # Lighter pink border
-	team_header_style.content_margin_top = 8
+	team_header_style.border_color = team_color.lightened(0.5) # Lighter pink border
 	team_header_style.content_margin_bottom = 2
 	team_header_style.content_margin_left = 2
 	team_header.add_theme_stylebox_override("panel", team_header_style)
