@@ -65,9 +65,11 @@ func _ready() -> void:
 			
 		monster_templates.append(template)
 			
-	# Spawn initial monsters
-	_on_add_monster_pressed()
-	_on_add_monster_pressed()
+	# Spawn initial monsters: 1 of each type that currently exists
+	for template in monster_templates:
+		var instance = MonsterInstance.new()
+		instance.initialize(template)
+		add_monster_to_bench(instance)
 
 func _apply_visual_styling() -> void:
 	# 1. Main Background Panel

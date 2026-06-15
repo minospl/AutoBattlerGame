@@ -68,6 +68,7 @@ func update_ui() -> void:
 		mat.set_shader_parameter("inner_border_width", 3)
 		mat.set_shader_parameter("outer_border_color", monster_instance.data.rarity.border_color) # Outer border represents rarity!
 		mat.set_shader_parameter("interior_color", Color(0.98, 0.98, 0.98, 1.0)) # Solid background color for the card!
+		mat.set_shader_parameter("corner_color", Color(0, 0, 0, 0)) # Transparent color for the corner
 
 	# Set stats block size to a clean, constant 32px width
 	var stat_size = Vector2(32, 16)
@@ -132,6 +133,21 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	var original_slot = get_parent()
 	while original_slot and not original_slot.has_method("add_card"):
 		original_slot = original_slot.get_parent()
+		
+	# Temporarily remove the card from the original slot (deferred to avoid event propagation issues)
+	if original_slot:
+		original_slot.remove_card.call_deferred(self)
+		original_slot.slot_changed.emit.call_deferred(original_slot)
+		
+	var viewport = get_viewport()
+	# Connect to the preview wrapper's tree_exiting signal (which runs when the drag session ends)
+	preview_wrapper.tree_exiting.connect(func():
+		# If the drag was not successful, return the card to its original slot
+		if viewport and not viewport.gui_is_drag_successful():
+			if original_slot:
+				original_slot.add_card(self)
+				original_slot.slot_changed.emit(original_slot)
+	)
 	
 	# Return data containing this node and its origin
 	return {
@@ -180,6 +196,6 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 		mat.set_shader_parameter("size", panel.size if panel.size != Vector2.ZERO else panel.custom_minimum_size)
 		mat.set_shader_parameter("border_width", 2)
 		mat.set_shader_parameter("border_indentation", 1)
-		mat.set_shader_parameter("border_color", Color(0.2, 0.2, 0.2, 1.0)) # Dark border
+		mat.set_shader_parameter("border_color", bg_color.lightened(.2)) # Dark border
 		mat.set_shader_parameter("interior_color", bg_color) # Background color
 		mat.set_shader_parameter("corner_color", Color(1.0, 1.0, 1.0, 0.0)) # Transparent corners

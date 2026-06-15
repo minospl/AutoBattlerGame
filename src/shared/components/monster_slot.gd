@@ -40,6 +40,7 @@ func _ready() -> void:
 	shader_material.set_shader_parameter("inner_border_width", 3)
 	shader_material.set_shader_parameter("outer_border_color", Color(0.57, 0.58, 0.65, 1.0))
 	shader_material.set_shader_parameter("inner_border_color", Color(0.88, 0.89, 0.91, 1.0))
+	shader_material.set_shader_parameter("corner_color", Color(0, 0, 0, 0)) # Transparent color for the corner
 	
 	border_rect.material = shader_material
 	
@@ -75,7 +76,9 @@ func _ready() -> void:
 	
 	# Set initial size uniform to actual size or fallback to custom minimum size
 	if %HealthBarRect.material:
-		var initial_hp_size = %HealthBarRect.size if %HealthBarRect.size != Vector2.ZERO else %HealthBarRect.custom_minimum_size
+		var initial_hp_size = %HealthBarRect.size
+		if initial_hp_size.x == 0.0:
+			initial_hp_size = Vector2(84, 20)
 		%HealthBarRect.material.set_shader_parameter("size", initial_hp_size)
 	
 	update_placeholder()
@@ -115,7 +118,10 @@ func update_health_bar() -> void:
 		var mat = %HealthBarRect.material as ShaderMaterial
 		if mat:
 			mat.set_shader_parameter("fill_percentage", fill)
-			mat.set_shader_parameter("size", %HealthBarRect.size if %HealthBarRect.size != Vector2.ZERO else %HealthBarRect.custom_minimum_size)
+			var current_hp_size = %HealthBarRect.size
+			if current_hp_size.x == 0.0:
+				current_hp_size = Vector2(84, 20)
+			mat.set_shader_parameter("size", current_hp_size)
 		%HealthLabel.text = str(inst.current_health)
 	else:
 		%HealthBarContainer.visible = false
@@ -149,20 +155,19 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	var original_slot: MonsterSlot = data["original_slot"]
 	
 	if original_slot == self:
-		return # Dropped on itself
+		add_card(dragged_card)
+		slot_changed.emit(self)
+		return
 		
 	var current_card = get_card()
 	
 	if current_card:
 		# SWAP logic: Swap the parent slots of the two cards
 		remove_card(current_card)
-		original_slot.remove_card(dragged_card)
-		
 		add_card(dragged_card)
 		original_slot.add_card(current_card)
 	else:
 		# MOVE logic: Move card from original slot to this empty slot
-		original_slot.remove_card(dragged_card)
 		add_card(dragged_card)
 		
 	# Emit signals

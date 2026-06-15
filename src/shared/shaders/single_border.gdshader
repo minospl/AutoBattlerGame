@@ -23,11 +23,8 @@ void fragment() {
 	int max_inner_fill_val = border_width + border_indentation;
 	
 	if (vx >= min_cut_val && vx <= max_cut_val && vy >= min_cut_val && vy <= max_cut_val) { // cut outer edge
-		if (corner_color.a > 0.0) {
-			COLOR = corner_color;
-		} else {
-			discard;
-		}
+		if (corner_color.a > 0.0) COLOR = corner_color;
+		else discard;
 	}
 	else if (vx >= min_inner_fill_val && vx <= max_inner_fill_val && vy >= min_inner_fill_val && vy <= max_inner_fill_val) { // fill inner edge
     	COLOR = border_color;
@@ -36,10 +33,7 @@ void fragment() {
         COLOR = border_color;
     }
     else { // Interior: transparent (discard) or solid background
-        if (interior_color.a > 0.0) {
-            COLOR = interior_color;
-        } else {
-            discard;
-        }
+        if (interior_color.a > 0.0) COLOR = interior_color; 
+		else discard;
     }
 }
