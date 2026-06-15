@@ -2,9 +2,10 @@ shader_type canvas_item;
 
 uniform vec2 size;
 uniform int border_width = 4; // border width
-uniform int border_indentation = 4; // border indentation
+uniform int border_indentation = 3; // border indentation
 uniform vec4 border_color : source_color = vec4(0.57, 0.58, 0.65, 1.0); // border color
 uniform vec4 interior_color : source_color = vec4(1.0, 1.0, 1.0, 1.0); // interior background color (transparent by default)
+uniform vec4 corner_color : source_color = vec4(1.0, 1.0, 1.0, 1.0); // color to fill cut corners
 
 void fragment() {
     // Quantize size to ensure symmetry on the pixel grid
@@ -38,7 +39,11 @@ void fragment() {
 	int max_inner_fill_val = border_indentation + border_indentation;
 	
 	if (vx >= min_cut_val && vx <= max_cut_val && vy >= min_cut_val && vy <= max_cut_val) { // cut outer edge
-    	discard;
+		if (corner_color.a > 0.0) {
+			COLOR = corner_color;
+		} else {
+			discard;
+		}
 	}
 	else if (vx >= min_inner_fill_val && vx <= max_inner_fill_val && vy >= min_inner_fill_val && vy <= max_inner_fill_val) { // fill inner edge
     	COLOR = border_color;

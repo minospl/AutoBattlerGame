@@ -10,8 +10,10 @@ signal slot_changed(slot: MonsterSlot)
 var slots: Array[MonsterSlot] = []
 
 func _ready() -> void:
-	# Bench Section Container Style (White Box with Shader)
-	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	# Bench Section Container Style (White Box under everything)
+	var bg_style = StyleBoxFlat.new()
+	bg_style.bg_color = Color(1.0, 1.0, 1.0, 1.0) # Solid white
+	add_theme_stylebox_override("panel", bg_style)
 	
 	var bench_border = ColorRect.new()
 	bench_border.name = "BorderRect"
@@ -29,11 +31,12 @@ func _ready() -> void:
 	var bench_mat = ShaderMaterial.new()
 	bench_mat.shader = border_shader
 	bench_mat.set_shader_parameter("border_color", border_color)
-	bench_mat.set_shader_parameter("interior_color", Color(1.0, 1.0, 1.0, 1.0)) # White background
+	bench_mat.set_shader_parameter("interior_color", Color(1.0, 1.0, 1.0, 0.0)) # Transparent interior
+	bench_mat.set_shader_parameter("corner_color", Color(1.0, 1.0, 1.0, 1.0)) # Solid white corners to overlay top header corners
 	
 	bench_border.material = bench_mat
 	add_child(bench_border)
-	move_child(bench_border, 0)
+	# Drawn last (no move_child to 0) to overlay top header corners
 	
 	resized.connect(func():
 		if bench_border and bench_border.material:

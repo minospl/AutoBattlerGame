@@ -11,8 +11,10 @@ signal slot_changed(slot: MonsterSlot)
 var slots: Array[MonsterSlot] = []
 
 func _ready() -> void:
-	# Team Section Container Style (White Box with Shader)
-	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	# Team Section Container Style (White Box under everything)
+	var bg_style = StyleBoxFlat.new()
+	bg_style.bg_color = Color(1.0, 1.0, 1.0, 1.0) # Solid white
+	add_theme_stylebox_override("panel", bg_style)
 	
 	var team_border = ColorRect.new()
 	team_border.name = "BorderRect"
@@ -30,11 +32,12 @@ func _ready() -> void:
 	var team_mat = ShaderMaterial.new()
 	team_mat.shader = border_shader
 	team_mat.set_shader_parameter("border_color", border_color)
-	team_mat.set_shader_parameter("interior_color", Color(1.0, 1.0, 1.0, 1.0)) # White background
+	team_mat.set_shader_parameter("interior_color", Color(1.0, 1.0, 1.0, 0.0)) # Transparent interior
+	team_mat.set_shader_parameter("corner_color", Color(1.0, 1.0, 1.0, 1.0)) # Solid white corners to overlay top header corners
 	
 	team_border.material = team_mat
 	add_child(team_border)
-	move_child(team_border, 0)
+	# Drawn last (no move_child to 0) to overlay top header corners
 	
 	resized.connect(func():
 		if team_border and team_border.material:
