@@ -1,4 +1,4 @@
-class_name TacticalScene
+class_name ShopScene
 extends Control
 
 ## Signal emitted when the team or bench contents are reorganized
@@ -12,9 +12,9 @@ var active_team: Array[MonsterInstance] = []
 var bench: Array[MonsterInstance] = []
 var monster_templates: Array[MonsterData] = []
 
-@onready var control_header: ControlHeader = %ControlHeader
-@onready var bench_panel: BenchPanel = %BenchSection
-@onready var team_panel: TeamPanel = %TeamSection
+@onready var shop_bar: ShopBar = %ShopBar
+@onready var bench_panel: BenchPanel = %BenchPanel
+@onready var team_panel: TeamPanel = %TeamPanel
 
 var slot_scene = preload("res://src/shared/components/monster_slot.tscn")
 
@@ -34,10 +34,9 @@ func _ready() -> void:
 	bench_panel.slot_changed.connect(_on_slot_changed)
 	team_panel.slot_changed.connect(_on_slot_changed)
 	
-	# Connect control header signals
-	control_header.add_monster_requested.connect(_on_add_monster_pressed)
-	control_header.clear_requested.connect(_on_clear_pressed)
-	control_header.multiply_requested.connect(_on_multiply_pressed)
+	# Connect control panel signals
+	shop_bar.add_monster_requested.connect(_on_add_monster_pressed)
+	shop_bar.clear_requested.connect(_on_clear_pressed)
 	
 	create_slots()
 	
@@ -177,24 +176,5 @@ func _on_add_monster_pressed() -> void:
 func _on_clear_pressed() -> void:
 	clear_all()
 
-func _on_multiply_pressed() -> void:
-	for m in active_team:
-		if m:
-			m.current_attack *= 10
-			m.current_health *= 10
-			m.poison *= 10
-	for m in bench:
-		if m:
-			m.current_attack *= 10
-			m.current_health *= 10
-			m.poison *= 10
-			
-	# Refresh all UI cards and slot health bars
-	for slot in active_slots + bench_slots:
-		var card = slot.get_card()
-		if card:
-			card.update_ui()
-			slot.update_health_bar()
-			
 func _on_team_state_changed() -> void:
 	pass

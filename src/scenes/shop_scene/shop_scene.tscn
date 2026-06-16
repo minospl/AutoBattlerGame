@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://bb7tf4ytmscoh"]
+
+[ext_resource type="Script" uid="uid://dcwm3m7vnavik" path="res://src/scenes/shop_scene/shop_scene.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/scenes/shop_scene/components/bench_panel.tscn" id="2_bench"]
+[ext_resource type="PackedScene" path="res://src/scenes/shop_scene/components/team_panel.tscn" id="3_team"]
+[ext_resource type="PackedScene" uid="uid://dm0yq7hsqt4k" path="res://src/scenes/shop_scene/components/shop_bar.tscn" id="4_panel"]
+
+[node name="ShopScene" type="Control" unique_id=520390897]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BackgroundPanel" type="Panel" parent="." unique_id=2073420315]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel" unique_id=1875125863]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer" unique_id=2033298553]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ShopBar" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=518349254 instance=ExtResource("4_panel")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ContentVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=511004923]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="BenchPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentVBox" instance=ExtResource("2_bench")]
+unique_name_in_owner = true
+
+[node name="TeamPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentVBox" instance=ExtResource("3_team")]
+unique_name_in_owner = true

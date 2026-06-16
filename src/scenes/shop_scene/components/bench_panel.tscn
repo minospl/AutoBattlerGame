@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cx8g0ytsq24a"]
 
-[ext_resource type="Script" path="res://src/scenes/tactical_scene/components/bench_panel.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/scenes/shop_scene/components/bench_panel.gd" id="1_script"]
 
 [node name="BenchPanel" type="PanelContainer"]
 size_flags_horizontal = 4

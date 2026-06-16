@@ -23,16 +23,14 @@ const BENCH_HEADER_BG = Color(0.95, 0.72, 0.18, 1) # Yellow (#f1b82d)
 const TEAM_HEADER_BG = Color(0.89, 0.31, 0.44, 1) # Pink (#e24f70)
 const LABEL_OUTLINE = Color(0.1, 0.1, 0.1, 1) # Black outline
 
-# Control Header Buttons
+# Control Panel Buttons
 const BTN_GREEN_NORMAL = Color(0.15, 0.50, 0.30, 1) # Flat emerald green
 const BTN_GREEN_HOVER = Color(0.18, 0.60, 0.36, 1) # Brighter green on hover
 const BTN_GREEN_PRESSED = Color(0.12, 0.40, 0.24, 1)
 const BTN_DARK_NORMAL = Color(0.10, 0.11, 0.13, 1) # Sleek dark
 const BTN_RED_HOVER = Color(0.15, 0.163, 0.189, 1.0) # Red tint on hover
 const BTN_RED_PRESSED = Color(0.173, 0.188, 0.217, 1.0)
-const BTN_PURPLE_NORMAL = Color(0.45, 0.25, 0.75, 1) # Flat purple
-const BTN_PURPLE_HOVER = Color(0.55, 0.30, 0.85, 1) # Brighter purple on hover
-const BTN_PURPLE_PRESSED = Color(0.35, 0.20, 0.60, 1)
+
 
 # Card portrait fallback text color
 const PORTRAIT_FALLBACK_TEXT = Color(0.2, 0.2, 0.2, 0.75)
