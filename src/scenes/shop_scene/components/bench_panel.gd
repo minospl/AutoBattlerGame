@@ -11,42 +11,74 @@ var slots: Array[MonsterSlot] = []
 
 func _ready() -> void:
 	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = GameColors.WHITE_COLOR
+	bg_style.bg_color = GameColors.TRANSPARENT
 	add_theme_stylebox_override("panel", bg_style)
-	
-	var bench_border = ColorRect.new()
-	bench_border.name = "BorderRect"
-	bench_border.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bench_border.layout_mode = 1
-	bench_border.anchors_preset = Control.PRESET_FULL_RECT
-	bench_border.offset_left = 0
-	bench_border.offset_top = 0
-	bench_border.offset_right = 0
-	bench_border.offset_bottom = 0
 	
 	var border_shader = load("res://src/shared/shaders/double_border.gdshader")
 	
-	var bench_mat = ShaderMaterial.new()
-	bench_mat.shader = border_shader
-	bench_mat.set_shader_parameter("outer_border_color", GameColors.PANEL_BORDER_DEFAULT)
-	bench_mat.set_shader_parameter("inner_border_color", GameColors.WHITE_COLOR)
-	bench_mat.set_shader_parameter("inner_border_width", 3)
-	bench_mat.set_shader_parameter("inner_border_indentation", 3)
-	bench_mat.set_shader_parameter("interior_color", GameColors.TRANSPARENT)
-	bench_mat.set_shader_parameter("corner_color", GameColors.WHITE_COLOR)
+	# 1. Background Rect (draws solid white with cut corners, placed at the bottom)
+	var bg_rect = ColorRect.new()
+	bg_rect.name = "BackgroundRect"
+	bg_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg_rect.layout_mode = 1
+	bg_rect.anchors_preset = Control.PRESET_FULL_RECT
+	bg_rect.offset_left = 0
+	bg_rect.offset_top = 0
+	bg_rect.offset_right = 0
+	bg_rect.offset_bottom = 0
 	
-	bench_border.material = bench_mat
-	bench_border.resized.connect(func():
-		if bench_border.material:
-			bench_border.material.set_shader_parameter("size", bench_border.size)
+	var bg_mat = ShaderMaterial.new()
+	bg_mat.shader = load("res://src/shared/shaders/single_border.gdshader")
+	bg_mat.set_shader_parameter("border_color", GameColors.WHITE_COLOR)
+	bg_mat.set_shader_parameter("border_width", 3)
+	bg_mat.set_shader_parameter("border_indentation", 3)
+	bg_mat.set_shader_parameter("interior_color", GameColors.WHITE_COLOR)
+	bg_mat.set_shader_parameter("corner_color", GameColors.TRANSPARENT)
+	bg_rect.material = bg_mat
+	
+	add_child(bg_rect)
+	move_child(bg_rect, 0)
+	
+	bg_rect.resized.connect(func():
+		if bg_rect.material:
+			bg_rect.material.set_shader_parameter("size", bg_rect.size)
 	)
 	
-	add_child(bench_border)
-	# Drawn last (no move_child to 0) to overlay top header corners
+	# 2. Border Rect (draws only the borders, placed at the top to overlay headers/slots)
+	var border_rect = ColorRect.new()
+	border_rect.name = "BorderRect"
+	border_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	border_rect.layout_mode = 1
+	border_rect.anchors_preset = Control.PRESET_FULL_RECT
+	border_rect.offset_left = 0
+	border_rect.offset_top = 0
+	border_rect.offset_right = 0
+	border_rect.offset_bottom = 0
 	
-	if bench_border.material:
-		var initial_size = bench_border.size if bench_border.size != Vector2.ZERO else (size if size != Vector2.ZERO else custom_minimum_size)
-		bench_border.material.set_shader_parameter("size", initial_size)
+	var border_mat = ShaderMaterial.new()
+	border_mat.shader = border_shader
+	border_mat.set_shader_parameter("outer_border_color", GameColors.PANEL_BORDER_DEFAULT)
+	border_mat.set_shader_parameter("inner_border_color", GameColors.WHITE_COLOR)
+	border_mat.set_shader_parameter("inner_border_width", 3)
+	border_mat.set_shader_parameter("inner_border_indentation", 3)
+	border_mat.set_shader_parameter("interior_color", GameColors.TRANSPARENT)
+	border_mat.set_shader_parameter("corner_color", GameColors.TRANSPARENT)
+	border_rect.material = border_mat
+	
+	add_child(border_rect)
+	# Drawn last (no move_child to 0) to overlay header/content corners
+	
+	border_rect.resized.connect(func():
+		if border_rect.material:
+			border_rect.material.set_shader_parameter("size", border_rect.size)
+	)
+	
+	# Force initial sizes
+	var initial_size = size if size != Vector2.ZERO else custom_minimum_size
+	if bg_rect.material:
+		bg_rect.material.set_shader_parameter("size", initial_size)
+	if border_rect.material:
+		border_rect.material.set_shader_parameter("size", initial_size)
 	
 	# Bench Header Style (Yellow Banner)
 	var bench_header_style = StyleBoxFlat.new()

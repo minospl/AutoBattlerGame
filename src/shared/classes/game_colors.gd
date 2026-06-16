@@ -11,8 +11,8 @@ const SLOT_HOVER_OUTER_BORDER = Color(0.259, 0.614, 0.282, 1) # Green
 const SLOT_HOVER_INNER_BORDER = Color(0.718, 0.99, 0.721, 1) # Light green
 
 # Card background and corners
-const WHITE_COLOR = Color(1, 1, 1, 1) # Solid off-white
-const TRANSPARENT = Color(0, 0, 0, 0) # Transparent
+const WHITE_COLOR = Color(1, 1, 1, 1.0) # Solid off-white
+const TRANSPARENT = Color(0, 0, 0, 0.0) # Transparent
 
 # Statistics panel backgrounds
 const STAT_ATTACK_BG = Color(0.92, 0.22, 0.38, 1) # Pink-red

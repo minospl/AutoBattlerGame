@@ -73,9 +73,18 @@ func _ready() -> void:
 func _apply_visual_styling() -> void:
 	# 1. Main Background Panel
 	var bg_panel = get_node("BackgroundPanel") as Panel
-	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = GameColors.WHITE_COLOR # Solid white
-	bg_panel.add_theme_stylebox_override("panel", bg_style)
+	if bg_panel:
+		var bg_style = StyleBoxTexture.new()
+		bg_style.texture = load("res://src/assets/ui/shop_background.jpg")
+		bg_style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
+		bg_style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
+		bg_style.modulate_color = Color(1.0, 1.0, 1.0, 1.0) # Full color for the classic Pokemon storage box tiled texture
+		bg_panel.add_theme_stylebox_override("panel", bg_style)
+	
+	# 2. Outer Border Color
+	var outer_border = %OuterBorder as ColorRect
+	if outer_border:
+		outer_border.color = GameColors.PANEL_BORDER_DEFAULT
 	
 
 

@@ -3,8 +3,6 @@ shader_type canvas_item;
 uniform vec4 top_color : source_color = vec4(0.00, 0.44, 0.77, 1.0); // Darker blue
 uniform vec4 bottom_color : source_color = vec4(0.00, 0.69, 0.95, 1.0); // Lighter blue
 uniform vec4 line_color : source_color = vec4(1.00, 1.00, 1.00, 0.20); // Semi-transparent white
-uniform vec4 border_color : source_color = vec4(1.00, 1.00, 1.00, 1.00); // White bottom border
-uniform float border_width = 3.0;
 uniform vec2 size;
 
 void fragment() {
@@ -24,11 +22,6 @@ void fragment() {
 	
 	if (is_line) {
 		col = mix(col, line_color, line_color.a);
-	}
-	
-	// Draw bottom border
-	if (y_pixel >= size.y - border_width) {
-		col = border_color;
 	}
 	
 	COLOR = col;
