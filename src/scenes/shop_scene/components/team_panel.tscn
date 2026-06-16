@@ -1,10 +1,15 @@
 [gd_scene load_steps=2 format=3 uid="uid://dm0yq7hsqt4l"]
 
 [ext_resource type="Script" path="res://src/scenes/shop_scene/components/team_panel.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/shared/components/panel_border_decorator.gd" id="2_decorator"]
 
 [node name="TeamPanel" type="PanelContainer"]
 size_flags_horizontal = 4
 script = ExtResource("1_script")
+
+[node name="PanelBorderDecorator" type="Control" parent="."]
+layout_mode = 2
+script = ExtResource("2_decorator")
 
 [node name="TeamOuterMargin" type="MarginContainer" parent="."]
 layout_mode = 2

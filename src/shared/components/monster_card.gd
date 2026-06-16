@@ -15,7 +15,6 @@ func _ready() -> void:
 		border_rect = ColorRect.new()
 		border_rect.name = "BorderRect"
 		border_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		border_rect.layout_mode = 1
 		border_rect.anchors_preset = Control.PRESET_FULL_RECT
 		border_rect.offset_left = 0
 		border_rect.offset_top = 0
@@ -169,7 +168,6 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 		border_rect = ColorRect.new()
 		border_rect.name = "BorderRect"
 		border_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		border_rect.layout_mode = 1
 		border_rect.anchors_preset = Control.PRESET_FULL_RECT
 		border_rect.offset_left = 0
 		border_rect.offset_top = 0

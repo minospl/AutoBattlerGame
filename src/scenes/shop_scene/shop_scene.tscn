@@ -34,7 +34,7 @@ grow_vertical = 2
 layout_mode = 2
 theme_override_constants/separation = 32
 
-[node name="HeaderVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+[node name="HeaderVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=1673930287]
 layout_mode = 2
 theme_override_constants/separation = 0
 
@@ -42,19 +42,19 @@ theme_override_constants/separation = 0
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ShopBarBorder" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
+[node name="ShopBarBorder" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" unique_id=677598013]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="InnerBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/ShopBarBorder"]
+[node name="InnerBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/ShopBarBorder" unique_id=1310137001]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
 
-[node name="OuterBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/ShopBarBorder"]
+[node name="OuterBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/ShopBarBorder" unique_id=1983801270]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 3)
-color = Color(0.29, 0.251, 0.255, 1)
 layout_mode = 2
+color = Color(0.29, 0.251, 0.255, 1)
 
 [node name="ContentVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=511004923]
 layout_mode = 2
