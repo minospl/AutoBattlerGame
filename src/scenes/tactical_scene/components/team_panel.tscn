@@ -8,9 +8,9 @@ script = ExtResource("1_script")
 
 [node name="TeamOuterMargin" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 2
-theme_override_constants/margin_right = 0
+theme_override_constants/margin_left = 3
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 3
 theme_override_constants/margin_bottom = 0
 
 [node name="VBox" type="VBoxContainer" parent="TeamOuterMargin"]

@@ -75,7 +75,7 @@ func _apply_visual_styling() -> void:
 	# 1. Main Background Panel
 	var bg_panel = get_node("BackgroundPanel") as Panel
 	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = Color(1.0, 1.0, 1.0, 1.0) # Solid white
+	bg_style.bg_color = GameColors.WHITE_COLOR # Solid white
 	bg_panel.add_theme_stylebox_override("panel", bg_style)
 	
 

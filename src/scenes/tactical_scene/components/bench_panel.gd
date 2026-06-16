@@ -10,9 +10,8 @@ signal slot_changed(slot: MonsterSlot)
 var slots: Array[MonsterSlot] = []
 
 func _ready() -> void:
-	# Bench Section Container Style (White Box under everything)
 	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = Color(1.0, 1.0, 1.0, 1.0) # Solid white
+	bg_style.bg_color = GameColors.WHITE_COLOR
 	add_theme_stylebox_override("panel", bg_style)
 	
 	var bench_border = ColorRect.new()
@@ -25,14 +24,16 @@ func _ready() -> void:
 	bench_border.offset_right = 0
 	bench_border.offset_bottom = 0
 	
-	var border_shader = load("res://src/shared/shaders/single_border.gdshader")
-	var border_color = Color(0.57, 0.58, 0.65, 1.0)
+	var border_shader = load("res://src/shared/shaders/double_border.gdshader")
 	
 	var bench_mat = ShaderMaterial.new()
 	bench_mat.shader = border_shader
-	bench_mat.set_shader_parameter("border_color", border_color)
-	bench_mat.set_shader_parameter("interior_color", Color(1.0, 1.0, 1.0, 0.0)) # Transparent interior
-	bench_mat.set_shader_parameter("corner_color", Color(1.0, 1.0, 1.0, 1.0)) # Solid white corners to overlay top header corners
+	bench_mat.set_shader_parameter("outer_border_color", GameColors.PANEL_BORDER_DEFAULT)
+	bench_mat.set_shader_parameter("inner_border_color", GameColors.WHITE_COLOR)
+	bench_mat.set_shader_parameter("inner_border_width", 3)
+	bench_mat.set_shader_parameter("inner_border_indentation", 3)
+	bench_mat.set_shader_parameter("interior_color", GameColors.TRANSPARENT)
+	bench_mat.set_shader_parameter("corner_color", GameColors.WHITE_COLOR)
 	
 	bench_border.material = bench_mat
 	bench_border.resized.connect(func():
@@ -49,17 +50,16 @@ func _ready() -> void:
 	
 	# Bench Header Style (Yellow Banner)
 	var bench_header_style = StyleBoxFlat.new()
-	var bench_color = Color(0.95, 0.72, 0.18, 1.0) # Yellow (#f1b82d)
+	var bench_color = GameColors.BENCH_HEADER_BG
 	bench_header_style.bg_color = bench_color
 	bench_header_style.border_width_bottom = 3
-	bench_header_style.border_color = bench_color.lightened(0.5) # Lighter yellow border
+	bench_header_style.border_color = bench_color.lightened(0.5)
 	bench_header_style.content_margin_bottom = 2
 	bench_header_style.content_margin_left = 2
 	bench_header.add_theme_stylebox_override("panel", bench_header_style)
 	
 	# Label outline styling
-	var label_outline_color = Color(0.1, 0.1, 0.1, 1.0)
-	bench_label.add_theme_color_override("font_outline_color", label_outline_color)
+	bench_label.add_theme_color_override("font_outline_color", GameColors.LABEL_OUTLINE)
 	bench_label.add_theme_constant_override("outline_size", 5)
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:

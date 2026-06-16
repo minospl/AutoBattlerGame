@@ -6,9 +6,9 @@ uniform float fill_percentage : hint_range(0.0, 1.0) = 1.0;
 uniform int outer_border_width = 2; // outer border width
 uniform int middle_border_width = 2; // middle border width
 
-uniform int outer_border_indentation = 2; // outer border indentation
-uniform int middle_border_indentation = 2; // middle border indentation
-uniform int interior_corner_indentation = 2; // interior corner indentation
+uniform int outer_border_indentation = 1; // outer border indentation
+uniform int middle_border_indentation = 1; // middle border indentation
+uniform int interior_corner_indentation = 1; // interior corner indentation
 
 uniform vec4 outer_color : source_color = vec4(0.08, 0.08, 0.09, 1.0); // outer border color
 uniform vec4 middle_color : source_color = vec4(0.85, 0.86, 0.88, 1.0); // middle border color

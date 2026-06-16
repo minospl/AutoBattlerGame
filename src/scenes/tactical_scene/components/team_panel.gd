@@ -13,7 +13,7 @@ var slots: Array[MonsterSlot] = []
 func _ready() -> void:
 	# Team Section Container Style (White Box under everything)
 	var bg_style = StyleBoxFlat.new()
-	bg_style.bg_color = Color(1.0, 1.0, 1.0, 1.0) # Solid white
+	bg_style.bg_color = GameColors.WHITE_COLOR # Solid white
 	add_theme_stylebox_override("panel", bg_style)
 	
 	var team_border = ColorRect.new()
@@ -26,14 +26,16 @@ func _ready() -> void:
 	team_border.offset_right = 0
 	team_border.offset_bottom = 0
 	
-	var border_shader = load("res://src/shared/shaders/single_border.gdshader")
-	var border_color = Color(0.57, 0.58, 0.65, 1.0)
+	var border_shader = load("res://src/shared/shaders/double_border.gdshader")
 	
 	var team_mat = ShaderMaterial.new()
 	team_mat.shader = border_shader
-	team_mat.set_shader_parameter("border_color", border_color)
-	team_mat.set_shader_parameter("interior_color", Color(1.0, 1.0, 1.0, 0.0)) # Transparent interior
-	team_mat.set_shader_parameter("corner_color", Color(1.0, 1.0, 1.0, 1.0)) # Solid white corners to overlay top header corners
+	team_mat.set_shader_parameter("outer_border_color", GameColors.PANEL_BORDER_DEFAULT)
+	team_mat.set_shader_parameter("inner_border_color", GameColors.WHITE_COLOR)
+	team_mat.set_shader_parameter("inner_border_width", 3)
+	team_mat.set_shader_parameter("inner_border_indentation", 3)
+	team_mat.set_shader_parameter("interior_color", GameColors.TRANSPARENT) # Transparent interior
+	team_mat.set_shader_parameter("corner_color", GameColors.TRANSPARENT) # Solid white corners to overlay top header corners
 	
 	team_border.material = team_mat
 	team_border.resized.connect(func():
@@ -48,19 +50,17 @@ func _ready() -> void:
 		var initial_size = team_border.size if team_border.size != Vector2.ZERO else (size if size != Vector2.ZERO else custom_minimum_size)
 		team_border.material.set_shader_parameter("size", initial_size)
 	
-	# Team Header Style (Pink Banner)
 	var team_header_style = StyleBoxFlat.new()
-	var team_color = Color(0.89, 0.31, 0.44, 1.0) # Pink (#e24f70)
+	var team_color = GameColors.TEAM_HEADER_BG
 	team_header_style.bg_color = team_color
 	team_header_style.border_width_bottom = 3
-	team_header_style.border_color = team_color.lightened(0.5) # Lighter pink border
+	team_header_style.border_color = team_color.lightened(0.5)
 	team_header_style.content_margin_bottom = 2
 	team_header_style.content_margin_left = 2
 	team_header.add_theme_stylebox_override("panel", team_header_style)
 	
 	# Label outline styling
-	var label_outline_color = Color(0.1, 0.1, 0.1, 1.0)
-	team_label.add_theme_color_override("font_outline_color", label_outline_color)
+	team_label.add_theme_color_override("font_outline_color", GameColors.LABEL_OUTLINE)
 	team_label.add_theme_constant_override("outline_size", 5)
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:

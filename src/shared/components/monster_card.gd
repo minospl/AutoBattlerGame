@@ -67,8 +67,8 @@ func update_ui() -> void:
 		mat.set_shader_parameter("outer_border_width", 3)
 		mat.set_shader_parameter("inner_border_width", 3)
 		mat.set_shader_parameter("outer_border_color", monster_instance.data.rarity.border_color) # Outer border represents rarity!
-		mat.set_shader_parameter("interior_color", Color(0.98, 0.98, 0.98, 1.0)) # Solid background color for the card!
-		mat.set_shader_parameter("corner_color", Color(0, 0, 0, 0)) # Transparent color for the corner
+		mat.set_shader_parameter("interior_color", GameColors.WHITE_COLOR) # Solid background color for the card!
+		mat.set_shader_parameter("corner_color", GameColors.TRANSPARENT) # Transparent color for the corner
 
 	# Set stats block size to a clean, constant 32px width
 	var stat_size = Vector2(32, 16)
@@ -77,14 +77,14 @@ func update_ui() -> void:
 	
 	if monster_instance.current_attack > 0:
 		%AttackPanel.visible = true
-		setup_stat_panel_shader(%AttackPanel, Color(0.92, 0.22, 0.38, 1.0), stat_size) # Pink/Red
+		setup_stat_panel_shader(%AttackPanel, GameColors.STAT_ATTACK_BG, stat_size) # Pink/Red
 	else:
 		%AttackPanel.visible = false
 	
 	# Style Poison Panel (only visible if poison > 0)
 	if monster_instance.poison > 0:
 		%PoisonPanel.visible = true
-		setup_stat_panel_shader(%PoisonPanel, Color(0.55, 0.27, 0.77, 1.0), stat_size) # Violet/Purple
+		setup_stat_panel_shader(%PoisonPanel, GameColors.STAT_POISON_BG, stat_size) # Violet/Purple
 	else:
 		%PoisonPanel.visible = false
 	
@@ -107,10 +107,10 @@ func update_ui() -> void:
 		# Display initial character / icon on portrait (using dark color for light background)
 		if monster_instance.data and not monster_instance.get_monster_name().is_empty():
 			%PortraitCharLabel.text = monster_instance.get_monster_name().left(1).to_upper()
-			%PortraitCharLabel.add_theme_color_override("font_color", Color(0.2, 0.2, 0.2, 0.75))
+			%PortraitCharLabel.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
 		else:
 			%PortraitCharLabel.text = "?"
-			%PortraitCharLabel.add_theme_color_override("font_color", Color(0.2, 0.2, 0.2, 0.75))
+			%PortraitCharLabel.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Create a visual preview of what we are dragging
@@ -198,4 +198,4 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 		mat.set_shader_parameter("border_indentation", 1)
 		mat.set_shader_parameter("border_color", bg_color.lightened(.2)) # Dark border
 		mat.set_shader_parameter("interior_color", bg_color) # Background color
-		mat.set_shader_parameter("corner_color", Color(1.0, 1.0, 1.0, 0.0)) # Transparent corners
+		mat.set_shader_parameter("corner_color", GameColors.TRANSPARENT) # Transparent corners

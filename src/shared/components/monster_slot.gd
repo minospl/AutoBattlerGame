@@ -38,9 +38,9 @@ func _ready() -> void:
 	# Colors matching the reference image:
 	shader_material.set_shader_parameter("outer_border_width", 3)
 	shader_material.set_shader_parameter("inner_border_width", 3)
-	shader_material.set_shader_parameter("outer_border_color", Color(0.57, 0.58, 0.65, 1.0))
-	shader_material.set_shader_parameter("inner_border_color", Color(0.88, 0.89, 0.91, 1.0))
-	shader_material.set_shader_parameter("corner_color", Color(0, 0, 0, 0)) # Transparent color for the corner
+	shader_material.set_shader_parameter("outer_border_color", GameColors.BORDER_OUTER_DEFAULT)
+	shader_material.set_shader_parameter("inner_border_color", GameColors.BORDER_INNER_DEFAULT)
+	shader_material.set_shader_parameter("corner_color", GameColors.TRANSPARENT)
 	
 	border_rect.material = shader_material
 	
@@ -91,11 +91,11 @@ func update_style(is_hovered: bool = false) -> void:
 		
 	var mat = border_rect.material as ShaderMaterial
 	if is_hovered:
-		mat.set_shader_parameter("outer_border_color", Color(0.259, 0.614, 0.282, 1.0)) # blue border
-		mat.set_shader_parameter("inner_border_color", Color(0.718, 0.99, 0.721, 1.0)) # light gray inner border
+		mat.set_shader_parameter("outer_border_color", GameColors.SLOT_HOVER_OUTER_BORDER) # blue border
+		mat.set_shader_parameter("inner_border_color", GameColors.SLOT_HOVER_INNER_BORDER) # light gray inner border
 	else:
-		mat.set_shader_parameter("outer_border_color", Color(0.57, 0.58, 0.65, 1.0)) # gray-blue border
-		mat.set_shader_parameter("inner_border_color", Color(0.88, 0.89, 0.91, 1.0)) # light gray inner border
+		mat.set_shader_parameter("outer_border_color", GameColors.BORDER_OUTER_DEFAULT) # gray-blue border
+		mat.set_shader_parameter("inner_border_color", GameColors.BORDER_INNER_DEFAULT) # light gray inner border
 
 func update_placeholder() -> void:
 	var empty = is_empty()
