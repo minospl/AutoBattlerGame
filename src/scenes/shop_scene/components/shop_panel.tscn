@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://b23tfd4ytmsc1"]
+[gd_scene load_steps=6 format=3 uid="uid://b23tfd4ytmsc1"]
 
 [ext_resource type="Script" path="res://src/scenes/shop_scene/components/shop_panel.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/shared/components/panel_border_decorator.gd" id="2_decorator"]
-[ext_resource type="Texture2D" path="res://src/assets/ui/gold_icon.jpg" id="3_gold"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/coin_stack.png" id="3_gold"]
 [ext_resource type="Script" path="res://src/scenes/shop_scene/components/sell_overlay.gd" id="4_sell"]
+[ext_resource type="Script" path="res://src/shared/components/panel_header_decorator.gd" id="5_header_decorator"]
 
 [node name="ShopPanel" type="PanelContainer"]
 size_flags_horizontal = 4
@@ -29,12 +30,16 @@ unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 1
 
+[node name="PanelHeaderDecorator" type="Node" parent="ShopOuterMargin/VBox/ShopHeader"]
+script = ExtResource("5_header_decorator")
+header_color = Color(0.2, 0.55, 0.85, 1)
+
 [node name="Margin" type="MarginContainer" parent="ShopOuterMargin/VBox/ShopHeader"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 4
+theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_bottom = 6
 
 [node name="HeaderHBox" type="HBoxContainer" parent="ShopOuterMargin/VBox/ShopHeader/Margin"]
 layout_mode = 2
@@ -52,7 +57,7 @@ theme_override_constants/separation = 4
 alignment = 1
 
 [node name="GoldIcon" type="TextureRect" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/GoldContainer" unique_id=83271892]
-custom_minimum_size = Vector2(24, 24)
+custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture = ExtResource("3_gold")
 expand_mode = 1
@@ -78,13 +83,13 @@ mouse_filter = 2
 [node name="RollButton" type="Button" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 13
-text = "ROLL (1g)"
+theme_override_font_sizes/font_size = 11
+text = "↻ 1g"
 
 [node name="ShopMargin" type="MarginContainer" parent="ShopOuterMargin/VBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
+theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 

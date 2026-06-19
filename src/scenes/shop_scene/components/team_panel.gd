@@ -5,24 +5,8 @@ signal slot_changed(slot: MonsterSlot)
 
 @onready var frontline_hbox: HBoxContainer = %FrontlineHBox
 @onready var backline_hbox: HBoxContainer = %BacklineHBox
-@onready var team_header: PanelContainer = %TeamHeader
-@onready var team_label: Label = %TeamLabel
 
 var slots: Array[MonsterSlot] = []
-
-func _ready() -> void:
-	var team_header_style = StyleBoxFlat.new()
-	var team_color = GameColors.TEAM_HEADER_BG
-	team_header_style.bg_color = team_color
-	team_header_style.border_width_bottom = 3
-	team_header_style.border_color = team_color.lightened(0.5)
-	team_header_style.content_margin_bottom = 2
-	team_header_style.content_margin_left = 2
-	team_header.add_theme_stylebox_override("panel", team_header_style)
-	
-	# Label outline styling
-	team_label.add_theme_color_override("font_outline_color", GameColors.LABEL_OUTLINE)
-	team_label.add_theme_constant_override("outline_size", 5)
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 	for child in frontline_hbox.get_children():

@@ -14,5 +14,4 @@ attack = 5
 types = [ExtResource("2_type")]
 rarity = ExtResource("3_rarity")
 description = "Zionie ogniem i pali wszystko w zasięgu wzroku."
-visual_color = Color(0.8, 0.1, 0.1, 1)
 sprite = ExtResource("4_sprite")

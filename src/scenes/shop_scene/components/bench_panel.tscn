@@ -1,7 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://cx8g0ytsq24a"]
+[gd_scene load_steps=3 format=3 uid="uid://cx8g0ytsq24a"]
 
 [ext_resource type="Script" path="res://src/scenes/shop_scene/components/bench_panel.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/shared/components/panel_border_decorator.gd" id="2_decorator"]
+[ext_resource type="Script" path="res://src/shared/components/panel_header_decorator.gd" id="3_header_decorator"]
 
 [node name="BenchPanel" type="PanelContainer"]
 size_flags_horizontal = 4
@@ -25,6 +26,10 @@ theme_override_constants/separation = 0
 [node name="BenchHeader" type="PanelContainer" parent="BenchOuterMargin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="PanelHeaderDecorator" type="Node" parent="BenchOuterMargin/VBox/BenchHeader"]
+script = ExtResource("3_header_decorator")
+header_color = Color(0.95, 0.72, 0.18, 1)
 
 [node name="Margin" type="MarginContainer" parent="BenchOuterMargin/VBox/BenchHeader"]
 layout_mode = 2

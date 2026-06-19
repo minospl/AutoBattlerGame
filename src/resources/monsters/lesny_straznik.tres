@@ -14,5 +14,4 @@ attack = 2
 types = [ExtResource("2_type")]
 rarity = ExtResource("3_rarity")
 description = "Ochronny duch lasu, regeneruje siły."
-visual_color = Color(0.1, 0.6, 0.2, 1)
 sprite = ExtResource("4_sprite")
