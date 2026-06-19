@@ -9,7 +9,6 @@ extends Node
 @export var margin_right: int = 12
 @export var margin_top: int = 6
 @export var margin_bottom: int = 6
-@export var vertical_offset: int = -1 # Kompensacja dla baseline fontów pikselowych (ujemna wartość przesuwa tekst w górę)
 
 @export var color_normal: Color = Color(0.15, 0.50, 0.30, 1.0) # BTN_GREEN_NORMAL
 @export var color_hover: Color = Color(0.18, 0.60, 0.36, 1.0) # BTN_GREEN_HOVER
@@ -42,8 +41,8 @@ func _ready() -> void:
 	transparent_style.bg_color = Color(0, 0, 0, 0)
 	transparent_style.content_margin_left = margin_left
 	transparent_style.content_margin_right = margin_right
-	transparent_style.content_margin_top = max(0, margin_top + vertical_offset)
-	transparent_style.content_margin_bottom = max(0, margin_bottom - vertical_offset)
+	transparent_style.content_margin_top = margin_top
+	transparent_style.content_margin_bottom = margin_bottom
 	
 	parent_button.add_theme_stylebox_override("normal", transparent_style)
 	parent_button.add_theme_stylebox_override("hover", transparent_style)
@@ -113,6 +112,11 @@ func _deferred_setup() -> void:
 	
 	if mat:
 		mat.set_shader_parameter("size", border_rect.size if border_rect.size != Vector2.ZERO else parent_button.size)
+		
+	# Upewnienie się, że inne elementy potomne (np. RichTextLabel z tekstem) nie przechwytują myszy
+	for child in parent_button.get_children():
+		if child is Control and child != border_rect:
+			child.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _on_normal() -> void:
 	if mat:

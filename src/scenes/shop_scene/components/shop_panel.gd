@@ -6,7 +6,7 @@ signal sell_card_requested(card: Control, original_slot: MonsterSlot)
 
 @onready var slots_hbox: HBoxContainer = %SlotsHBox
 @onready var refresh_shop_button: Button = %RefreshShopButton
-@onready var gold_label: Label = %GoldLabel
+@onready var gold_label: RichTextLabel = %GoldLabel
 @onready var sell_overlay: MarginContainer = %SellOverlay
 @onready var sell_panel: PanelContainer = %SellPanel
 @onready var sell_label: Label = $SellOverlay/SellPanel/Center/SellLabel
@@ -94,4 +94,4 @@ func _process(_delta: float) -> void:
 
 func _update_labels() -> void:
 	if is_inside_tree() and gold_label:
-		gold_label.text = str(gold) + "G"
+		gold_label.text = str(gold) + "[color=#f2b726]G[/color]"
