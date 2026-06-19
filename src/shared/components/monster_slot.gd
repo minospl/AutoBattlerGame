@@ -10,6 +10,14 @@ signal slot_changed(slot: MonsterSlot)
 ## Index of the slot in the respective team/bench array
 @export var slot_index: int = 0
 
+@export var is_shop_slot: bool = false
+@export var price: int = 3:
+	set(val):
+		price = val
+		if has_node("%PriceLabel"):
+			%PriceLabel.text = str(price) + "g"
+var is_frozen: bool = false
+
 var is_highlighted: bool = false
 
 func _ready() -> void:
@@ -82,6 +90,33 @@ func _ready() -> void:
 		%HealthBarRect.material.set_shader_parameter("size", initial_hp_size)
 	
 	update_placeholder()
+	
+	# Setup Shop Controls
+	if is_shop_slot:
+		custom_minimum_size.y = 160
+		if has_node("%ShopControls"):
+			%ShopControls.visible = true
+			%PriceLabel.text = str(price) + "g"
+			%FreezeButton.toggled.connect(func(pressed: bool):
+				is_frozen = pressed
+				_update_freeze_button_style()
+			)
+			_update_freeze_button_style()
+	else:
+		if has_node("%ShopControls"):
+			%ShopControls.visible = false
+		custom_minimum_size.y = 135
+
+func _update_freeze_button_style() -> void:
+	if not has_node("%FreezeButton"):
+		return
+	var btn = %FreezeButton as Button
+	if is_frozen:
+		btn.add_theme_color_override("font_color", Color(0.3, 0.7, 1.0)) # Ice blue
+		btn.text = "❄"
+	else:
+		btn.remove_theme_color_override("font_color")
+		btn.text = "❄"
 
 func update_style(is_hovered: bool = false) -> void:
 	is_highlighted = is_hovered
@@ -111,7 +146,7 @@ func update_placeholder() -> void:
 
 func update_health_bar() -> void:
 	var card = get_card()
-	if card and card.monster_instance:
+	if card and "monster_instance" in card and card.monster_instance:
 		%HealthBarContainer.visible = true
 		var inst = card.monster_instance
 		var fill = float(inst.current_health) / float(inst.get_max_health())
@@ -135,10 +170,32 @@ func _process(_delta: float) -> void:
 
 # Determine if we can drop a dragged item onto this slot
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
+	if is_shop_slot:
+		return false # Cannot drop cards into shop slots!
+		
 	if typeof(data) == TYPE_DICTIONARY and data.has("card"):
-		# Highlight the slot to show it is a valid target
-		update_style(true)
-		return true
+		var dragged_card = data["card"]
+		var original_slot = data["original_slot"] as MonsterSlot
+		
+		# Check if the player has enough gold for a purchase
+		if original_slot and original_slot.is_shop_slot:
+			var shop_scene = get_tree().current_scene
+			if shop_scene and shop_scene.has_method("get_gold"):
+				if shop_scene.get_gold() < original_slot.price:
+					return false # Cannot afford this card
+		
+		# If the dragged card is food:
+		if dragged_card.has_method("apply_food_effect"):
+			# Food can ONLY be dropped onto an occupied monster slot to consume it
+			var target_card = get_card()
+			if target_card and "monster_instance" in target_card:
+				update_style(true)
+				return true
+			return false
+		else:
+			# Normal monster card
+			update_style(true)
+			return true
 	return false
 
 # Handle cleanup when drag drops elsewhere, leaves the slot, or is canceled
@@ -154,6 +211,8 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	var dragged_card = data["card"]
 	var original_slot: MonsterSlot = data["original_slot"]
 	
+
+		
 	if original_slot == self:
 		add_card(dragged_card)
 		slot_changed.emit(self)
@@ -161,6 +220,31 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 		
 	var current_card = get_card()
 	
+	# 1. If dragged card is food:
+	if dragged_card.has_method("apply_food_effect"):
+		if current_card and "monster_instance" in current_card:
+			# Apply food stats directly to monster in this slot
+			dragged_card.apply_food_effect(current_card)
+			current_card.update_ui()
+			update_health_bar()
+			
+			# Deduct gold if purchased
+			if original_slot and original_slot.is_shop_slot:
+				var shop_scene = get_tree().current_scene
+				if shop_scene and shop_scene.has_method("deduct_gold"):
+					shop_scene.deduct_gold(original_slot.price)
+					if shop_scene.has_method("refill_shop_slot"):
+						shop_scene.refill_shop_slot(original_slot.slot_index)
+			
+			# Consume food item
+			dragged_card.queue_free()
+			
+			slot_changed.emit(self)
+			if original_slot:
+				original_slot.slot_changed.emit(original_slot)
+			return
+			
+	# 2. Normal monster card move/swap:
 	if current_card:
 		# SWAP logic: Swap the parent slots of the two cards
 		remove_card(current_card)
@@ -170,6 +254,14 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 		# MOVE logic: Move card from original slot to this empty slot
 		add_card(dragged_card)
 		
+	# Deduct gold if purchased from the shop
+	if original_slot and original_slot.is_shop_slot:
+		var shop_scene = get_tree().current_scene
+		if shop_scene and shop_scene.has_method("deduct_gold"):
+			shop_scene.deduct_gold(original_slot.price)
+			if shop_scene.has_method("refill_shop_slot"):
+				shop_scene.refill_shop_slot(original_slot.slot_index)
+			
 	# Emit signals
 	slot_changed.emit(self)
 	original_slot.slot_changed.emit(original_slot)
@@ -177,6 +269,8 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 func add_card(card: Control) -> void:
 	if has_node("CardContainer"):
 		$CardContainer.add_child(card)
+		if is_shop_slot and "price" in card:
+			price = card.price
 
 func remove_card(card: Control) -> void:
 	if has_node("CardContainer"):
@@ -198,4 +292,6 @@ func is_empty() -> bool:
 ## Returns the MonsterInstance from the card in this slot, or null
 func get_monster_instance() -> MonsterInstance:
 	var card = get_card()
-	return card.monster_instance if card else null
+	if card and "monster_instance" in card:
+		return card.monster_instance
+	return null

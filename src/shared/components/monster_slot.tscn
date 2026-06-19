@@ -57,3 +57,29 @@ theme_override_font_sizes/font_size = 13
 text = "0/0"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="ShopControls" type="HBoxContainer" parent="." unique_id=1812831201]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_top = 138.0
+offset_right = 100.0
+offset_bottom = 158.0
+alignment = 1
+theme_override_constants/separation = 4
+
+[node name="PriceLabel" type="Label" parent="ShopControls" unique_id=193498101]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 11
+text = "3g"
+horizontal_alignment = 1
+
+[node name="FreezeButton" type="Button" parent="ShopControls" unique_id=98710291]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+toggle_mode = true
+text = "❄"

@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cx8g0ytsq24a" path="res://src/scenes/shop_scene/components/bench_panel.tscn" id="2_bench"]
 [ext_resource type="PackedScene" uid="uid://dm0yq7hsqt4l" path="res://src/scenes/shop_scene/components/team_panel.tscn" id="3_team"]
 [ext_resource type="PackedScene" uid="uid://dm0yq7hsqt4k" path="res://src/scenes/shop_scene/components/shop_bar.tscn" id="4_panel"]
+[ext_resource type="PackedScene" uid="uid://b23tfd4ytmsc1" path="res://src/scenes/shop_scene/components/shop_panel.tscn" id="5_shop"]
 
 [node name="ShopScene" type="Control" unique_id=520390897]
 layout_mode = 3
@@ -66,6 +67,15 @@ theme_override_constants/separation = 16
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="TeamPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentVBox" unique_id=2049561967 instance=ExtResource("3_team")]
+[node name="BottomRowHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentVBox" unique_id=98317822]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="TeamPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentVBox/BottomRowHBox" unique_id=2049561967 instance=ExtResource("3_team")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ShopPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/ContentVBox/BottomRowHBox" unique_id=89234812 instance=ExtResource("5_shop")]
 unique_name_in_owner = true
 layout_mode = 2

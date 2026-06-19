@@ -16,6 +16,8 @@ extends Resource
 ## Level/Stars of the monster (useful for future upgrades)
 @export var level: int = 1
 
+@export var max_health_bonus: int = 0
+
 ## Initialize the instance using a template
 func initialize(p_data: MonsterData) -> void:
 	data = p_data
@@ -27,7 +29,7 @@ func get_monster_name() -> String:
 	return data.monster_name if data else "Nieznany"
 
 func get_max_health() -> int:
-	return data.max_health if data else 1
+	return (data.max_health if data else 1) + max_health_bonus
 
 func get_attack() -> int:
 	return current_attack

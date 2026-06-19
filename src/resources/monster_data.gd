@@ -4,6 +4,9 @@ extends Resource
 ## The name of the monster
 @export var monster_name: String = ""
 
+## Price of the monster card in the shop
+@export var price: int = 0
+
 ## Base maximum health
 @export var max_health: int = 10
 

@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("1_data")
 monster_name = "Czerwony Smok"
+price = 5
 max_health = 15
 attack = 5
 types = [ExtResource("2_type")]

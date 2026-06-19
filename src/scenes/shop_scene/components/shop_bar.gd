@@ -2,12 +2,14 @@ class_name ShopBar
 extends PanelContainer
 
 signal add_monster_requested
-signal clear_requested
+signal restart_requested
 
 @export var lives: int = 10:
 	set(value):
 		lives = value
 		_update_labels()
+
+
 
 @export var day: int = 4:
 	set(value):
@@ -25,16 +27,17 @@ signal clear_requested
 		_update_labels()
 
 @onready var add_btn: Button = %AddButton
-@onready var clear_btn: Button = %ClearButton
+@onready var restart_btn: Button = %RestartButton
 
 @onready var lives_label: Label = %LivesLabel
+
 @onready var day_label: Label = %DayLabel
 @onready var trophies_label: Label = %TrophiesLabel
 
 func _ready() -> void:
 	# Connect local button signals
 	add_btn.pressed.connect(func(): add_monster_requested.emit())
-	clear_btn.pressed.connect(func(): clear_requested.emit())
+	restart_btn.pressed.connect(func(): restart_requested.emit())
 	
 	# Apply visual styling programmatically to keep the presentation premium and clean
 	_apply_visual_styling()
@@ -44,6 +47,7 @@ func _update_labels() -> void:
 	if is_inside_tree():
 		if lives_label:
 			lives_label.text = str(lives)
+
 		if day_label:
 			day_label.text = "DAY " + str(day)
 		if trophies_label:
@@ -92,7 +96,7 @@ func _apply_visual_styling() -> void:
 	btn_pressed.bg_color = GameColors.BTN_GREEN_PRESSED
 	add_btn.add_theme_stylebox_override("pressed", btn_pressed)
 	
-	# 4. Clear Button (Danger Outline Action)
+	# 4. Restart Button (Danger Outline Action)
 	var clear_normal = StyleBoxFlat.new()
 	clear_normal.bg_color = GameColors.BTN_DARK_NORMAL # Sleek dark
 	clear_normal.corner_radius_top_left = 6
@@ -103,12 +107,12 @@ func _apply_visual_styling() -> void:
 	clear_normal.content_margin_right = 12
 	clear_normal.content_margin_top = 6
 	clear_normal.content_margin_bottom = 6
-	clear_btn.add_theme_stylebox_override("normal", clear_normal)
+	restart_btn.add_theme_stylebox_override("normal", clear_normal)
 	
 	var clear_hover = clear_normal.duplicate() as StyleBoxFlat
 	clear_hover.bg_color = GameColors.BTN_RED_HOVER # Red tint on hover
-	clear_btn.add_theme_stylebox_override("hover", clear_hover)
+	restart_btn.add_theme_stylebox_override("hover", clear_hover)
 	
 	var clear_pressed = clear_normal.duplicate() as StyleBoxFlat
 	clear_pressed.bg_color = GameColors.BTN_RED_PRESSED
-	clear_btn.add_theme_stylebox_override("pressed", clear_pressed)
+	restart_btn.add_theme_stylebox_override("pressed", clear_pressed)

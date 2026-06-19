@@ -98,3 +98,8 @@ func _deferred_setup() -> void:
 		bg_rect.material.set_shader_parameter("size", parent.size)
 	if border_rect.material:
 		border_rect.material.set_shader_parameter("size", parent.size)
+
+func set_border_color(new_color: Color) -> void:
+	border_color = new_color
+	if border_rect and border_rect.material:
+		border_rect.material.set_shader_parameter("outer_border_color", new_color)

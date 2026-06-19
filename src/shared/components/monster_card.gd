@@ -1,9 +1,13 @@
 class_name MonsterCard
 extends PanelContainer
 
+@export var price: int = 3
+
 @export var monster_instance: MonsterInstance:
 	set(val):
 		monster_instance = val
+		if monster_instance and monster_instance.data:
+			price = monster_instance.data.price
 		if is_inside_tree():
 			update_ui()
 
@@ -137,6 +141,11 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	if original_slot:
 		original_slot.remove_card.call_deferred(self)
 		original_slot.slot_changed.emit.call_deferred(original_slot)
+		
+	# Notify ShopScene about the drag starting
+	var shop_scene = get_tree().current_scene
+	if shop_scene and shop_scene.has_method("notify_drag_started"):
+		shop_scene.notify_drag_started(self, original_slot)
 		
 	var viewport = get_viewport()
 	# Connect to the preview wrapper's tree_exiting signal (which runs when the drag session ends)

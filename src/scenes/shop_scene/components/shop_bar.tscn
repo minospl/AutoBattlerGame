@@ -30,11 +30,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Dodaj Losowego Potwora"
 
-[node name="ClearButton" type="Button" parent="SideMarginContainer/SideHBox/ButtonsContainer"]
+[node name="RestartButton" type="Button" parent="SideMarginContainer/SideHBox/ButtonsContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Wyczyść Wszystko"
+text = "Restart"
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 2
@@ -68,6 +68,8 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 24
 text = "10"
 vertical_alignment = 1
+
+
 
 [node name="DayLabel" type="Label" parent="CenterContainer/CenterHBox"]
 unique_name_in_owner = true
