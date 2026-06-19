@@ -206,3 +206,15 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 		mat.set_shader_parameter("border_color", bg_color.lightened(.2)) # Dark border
 		mat.set_shader_parameter("interior_color", bg_color) # Background color
 		mat.set_shader_parameter("corner_color", GameColors.TRANSPARENT) # Transparent corners
+
+func set_highlight(active: bool) -> void:
+	var border_rect = get_node_or_null("BorderRect")
+	if border_rect and border_rect.material:
+		var mat = border_rect.material as ShaderMaterial
+		if active:
+			mat.set_shader_parameter("outer_border_color", GameColors.SLOT_HOVER_OUTER_BORDER)
+			mat.set_shader_parameter("inner_border_color", GameColors.SLOT_HOVER_INNER_BORDER)
+		else:
+			var rarity_color = monster_instance.data.rarity.border_color if (monster_instance and monster_instance.data and monster_instance.data.rarity) else GameColors.BORDER_OUTER_DEFAULT
+			mat.set_shader_parameter("outer_border_color", rarity_color)
+			mat.set_shader_parameter("inner_border_color", GameColors.BORDER_INNER_DEFAULT)

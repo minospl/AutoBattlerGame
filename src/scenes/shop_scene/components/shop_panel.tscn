@@ -70,7 +70,6 @@ clip_contents = false
 bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
-text = "10[color=#f2b726]G[/color]"
 
 [node name="Spacer" type="Control" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 layout_mode = 2

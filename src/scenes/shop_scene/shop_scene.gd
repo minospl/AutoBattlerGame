@@ -88,6 +88,14 @@ func _ready() -> void:
 	# Set initial gold and roll the shop for free
 	gold = 10
 	roll_shop(true)
+	
+	# Instantiate and add the targeting line overlay to draw on top of everything
+	var overlay_script = load("res://src/scenes/shop_scene/components/targeting_line_overlay.gd")
+	var overlay = Control.new()
+	overlay.name = "TargetingLineOverlay"
+	overlay.set_script(overlay_script)
+	overlay.parent_scene = self
+	add_child(overlay)
 func _apply_visual_styling() -> void:
 	# 1. Main Background Panel
 	var bg_panel = get_node("BackgroundPanel") as Panel

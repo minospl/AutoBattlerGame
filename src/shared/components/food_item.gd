@@ -138,40 +138,25 @@ func apply_food_effect(monster_card: Control) -> void:
 		inst.current_health += stat_boost_hp
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
-	# Preview
-	var preview_scene = load("res://src/shared/components/food_item.tscn")
-	var preview = preview_scene.instantiate()
-	preview.food_name = food_name
-	preview.stat_boost_attack = stat_boost_attack
-	preview.stat_boost_hp = stat_boost_hp
-	preview.custom_minimum_size = custom_minimum_size
-	preview.modulate.a = 0.7
+	# Keep the card in place but dim it visually to indicate it is active
+	modulate.a = 0.5
 	
+	# Create an empty transparent preview so no card visual is dragged under the mouse
 	var preview_wrapper = Control.new()
-	preview_wrapper.add_child(preview)
-	preview.position = -custom_minimum_size / 2.0
-	
 	set_drag_preview(preview_wrapper)
 	
 	var original_slot = get_parent()
 	while original_slot and not original_slot.has_method("add_card"):
 		original_slot = original_slot.get_parent()
 		
-	if original_slot:
-		original_slot.remove_card.call_deferred(self)
-		original_slot.slot_changed.emit.call_deferred(original_slot)
-		
 	# Notify ShopScene about the drag starting
 	var shop_scene = get_tree().current_scene
 	if shop_scene and shop_scene.has_method("notify_drag_started"):
 		shop_scene.notify_drag_started(self, original_slot)
 		
-	var viewport = get_viewport()
+	# Restore normal modulate when drag ends
 	preview_wrapper.tree_exiting.connect(func():
-		if viewport and not viewport.gui_is_drag_successful():
-			if original_slot:
-				original_slot.add_card(self)
-				original_slot.slot_changed.emit(original_slot)
+		modulate.a = 1.0
 	)
 	
 	return {

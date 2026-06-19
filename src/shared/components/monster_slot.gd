@@ -120,14 +120,18 @@ func _update_freeze_button_style() -> void:
 
 func update_style(is_hovered: bool = false) -> void:
 	is_highlighted = is_hovered
+	var card = get_card()
+	if card and card.has_method("set_highlight"):
+		card.set_highlight(is_hovered)
+		
 	var border_rect = $CardContainer.get_node_or_null("BorderRect")
 	if not border_rect or not border_rect.material:
 		return
 		
 	var mat = border_rect.material as ShaderMaterial
 	if is_hovered:
-		mat.set_shader_parameter("outer_border_color", GameColors.SLOT_HOVER_OUTER_BORDER) # blue border
-		mat.set_shader_parameter("inner_border_color", GameColors.SLOT_HOVER_INNER_BORDER) # light gray inner border
+		mat.set_shader_parameter("outer_border_color", GameColors.SLOT_HOVER_OUTER_BORDER) # green border
+		mat.set_shader_parameter("inner_border_color", GameColors.SLOT_HOVER_INNER_BORDER) # light green inner border
 	else:
 		mat.set_shader_parameter("outer_border_color", GameColors.BORDER_OUTER_DEFAULT) # gray-blue border
 		mat.set_shader_parameter("inner_border_color", GameColors.BORDER_INNER_DEFAULT) # light gray inner border
@@ -237,7 +241,10 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 						shop_scene.refill_shop_slot(original_slot.slot_index)
 			
 			# Consume food item
-			dragged_card.queue_free()
+			if dragged_card.get_parent() != null:
+				dragged_card.get_parent().remove_child(dragged_card)
+			if not dragged_card.is_queued_for_deletion():
+				dragged_card.queue_free()
 			
 			slot_changed.emit(self)
 			if original_slot:
