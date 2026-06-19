@@ -88,7 +88,6 @@ func _ready() -> void:
 	# Set initial gold and roll the shop for free
 	gold = 10
 	roll_shop(true)
-
 func _apply_visual_styling() -> void:
 	# 1. Main Background Panel
 	var bg_panel = get_node("BackgroundPanel") as Panel

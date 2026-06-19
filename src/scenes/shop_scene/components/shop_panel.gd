@@ -5,7 +5,7 @@ signal roll_requested
 signal sell_card_requested(card: Control, original_slot: MonsterSlot)
 
 @onready var slots_hbox: HBoxContainer = %SlotsHBox
-@onready var roll_button: Button = %RollButton
+@onready var refresh_shop_button: Button = %RefreshShopButton
 @onready var gold_label: Label = %GoldLabel
 @onready var sell_overlay: MarginContainer = %SellOverlay
 @onready var sell_panel: PanelContainer = %SellPanel
@@ -20,28 +20,7 @@ signal sell_card_requested(card: Control, original_slot: MonsterSlot)
 var slots: Array[MonsterSlot] = []
 
 func _ready() -> void:
-	# Roll Button Styling (Premium Orange/Gold)
-	var roll_normal = StyleBoxFlat.new()
-	roll_normal.bg_color = Color(0.95, 0.6, 0.15, 1.0) # Golden orange
-	roll_normal.corner_radius_top_left = 4
-	roll_normal.corner_radius_top_right = 4
-	roll_normal.corner_radius_bottom_right = 4
-	roll_normal.corner_radius_bottom_left = 4
-	roll_normal.content_margin_left = 5
-	roll_normal.content_margin_right = 5
-	roll_normal.content_margin_top = 2
-	roll_normal.content_margin_bottom = 2
-	roll_button.add_theme_stylebox_override("normal", roll_normal)
-	
-	var roll_hover = roll_normal.duplicate() as StyleBoxFlat
-	roll_hover.bg_color = Color(1.0, 0.7, 0.2, 1.0) # Brighter orange
-	roll_button.add_theme_stylebox_override("hover", roll_hover)
-	
-	var roll_pressed = roll_normal.duplicate() as StyleBoxFlat
-	roll_pressed.bg_color = Color(0.8, 0.5, 0.1, 1.0)
-	roll_button.add_theme_stylebox_override("pressed", roll_pressed)
-	
-	roll_button.pressed.connect(func(): roll_requested.emit())
+	refresh_shop_button.pressed.connect(func(): roll_requested.emit())
 		
 	# Sell Overlay styling
 	var sell_style = StyleBoxFlat.new()
@@ -49,6 +28,7 @@ func _ready() -> void:
 	sell_panel.add_theme_stylebox_override("panel", sell_style)
 	
 	_update_labels()
+	set_process(false)
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 	for child in slots_hbox.get_children():
@@ -88,18 +68,30 @@ func _notification(what: int) -> void:
 			var card = shop_scene.dragged_card
 			var original_slot = shop_scene.dragged_card_original_slot
 			if card is MonsterCard and original_slot and not original_slot.is_shop_slot:
-				if sell_overlay:
-					sell_overlay.visible = true
 				if sell_label and "price" in card:
 					sell_label.text = "RELEASE TO SELL (+" + str(card.price) + "g)"
-				if border_decorator:
-					border_decorator.set_border_color(GameColors.GOLDEN_BORDER)
+				set_process(true)
 	elif what == NOTIFICATION_DRAG_END:
+		set_process(false)
 		if sell_overlay:
 			sell_overlay.visible = false
 		if border_decorator:
 			border_decorator.set_border_color(GameColors.PANEL_BORDER_DEFAULT)
 
+func _process(_delta: float) -> void:
+	var mouse_pos = get_global_mouse_position()
+	var is_inside = get_global_rect().has_point(mouse_pos)
+	if is_inside:
+		if sell_overlay and not sell_overlay.visible:
+			sell_overlay.visible = true
+			if border_decorator:
+				border_decorator.set_border_color(GameColors.GOLDEN_BORDER)
+	else:
+		if sell_overlay and sell_overlay.visible:
+			sell_overlay.visible = false
+			if border_decorator:
+				border_decorator.set_border_color(GameColors.PANEL_BORDER_DEFAULT)
+
 func _update_labels() -> void:
 	if is_inside_tree() and gold_label:
-		gold_label.text = str(gold)
+		gold_label.text = str(gold) + "G"

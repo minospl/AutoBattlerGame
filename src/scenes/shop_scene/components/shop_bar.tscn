@@ -1,8 +1,9 @@
-[gd_scene format=3 uid="uid://dm0yq7hsqt4k"]
+[gd_scene load_steps=6 format=3 uid="uid://dm0yq7hsqt4k"]
 
 [ext_resource type="Script" path="res://src/scenes/shop_scene/components/shop_bar.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://src/assets/ui/heart_icon.png" id="2_heart"]
 [ext_resource type="Texture2D" path="res://src/assets/ui/trophy_icon.png" id="3_trophy"]
+[ext_resource type="Script" path="res://src/shared/components/game_button_decorator.gd" id="4_button_decorator"]
 
 [node name="ShopBar" type="PanelContainer"]
 anchors_preset = 10
@@ -30,11 +31,20 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Dodaj Losowego Potwora"
 
+[node name="GameButtonDecorator" type="Node" parent="SideMarginContainer/SideHBox/ButtonsContainer/AddButton"]
+script = ExtResource("4_button_decorator")
+
 [node name="RestartButton" type="Button" parent="SideMarginContainer/SideHBox/ButtonsContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Restart"
+
+[node name="GameButtonDecorator" type="Node" parent="SideMarginContainer/SideHBox/ButtonsContainer/RestartButton"]
+script = ExtResource("4_button_decorator")
+color_normal = Color(0.1, 0.11, 0.13, 1)
+color_hover = Color(0.15, 0.163, 0.189, 1)
+color_pressed = Color(0.173, 0.188, 0.217, 1)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 2
