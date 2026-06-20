@@ -1,7 +1,7 @@
 class_name Card
 extends PanelContainer
 
-@export var price: int = 3
+@export var price: int
 
 @export var unit_instance: UnitInstance:
 	set(val):

@@ -56,6 +56,8 @@ func _setup_unit_ui() -> void:
 		border_rect.interior_color = rarity_color
 		border_rect.update_shader_parameters()
 		
+	_update_sub_panel_borders(rarity_color.lightened(0.5))
+		
 	# 3. Sprite/Artwork
 	if _unit_instance.data and _unit_instance.data.sprite:
 		sprite_rect.visible = true
@@ -117,6 +119,8 @@ func _setup_item_ui() -> void:
 		border_rect.interior_color = Color(0.9, 0.6, 0.1) # Golden orange background for items
 		border_rect.update_shader_parameters()
 		
+	_update_sub_panel_borders(Color(0.9, 0.6, 0.1).lightened(0.5))
+		
 	# 3. Sprite (Item fallback character icon)
 	sprite_rect.visible = false
 	fallback_label.visible = true
@@ -152,3 +156,17 @@ func _setup_item_ui() -> void:
 		
 	desc_panel.visible = true
 	desc_label.text = desc
+
+func _update_sub_panel_borders(border_col: Color) -> void:
+	var panels = [
+		%PortraitBorderRect,
+		%SpriteBorderRect,
+		%StatsBorderRect,
+		%DescBorderRect,
+		%HelpBorderRect
+	]
+	for rect in panels:
+		if rect and rect is ShaderBorderDecorator:
+			rect.border_color = border_col
+			rect.interior_color = Color(1, 1, 1, 1)
+			rect.update_shader_parameters()

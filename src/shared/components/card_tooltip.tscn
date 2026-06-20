@@ -47,10 +47,11 @@ theme_override_font_sizes/font_size = 16
 text = "COMMON"
 horizontal_alignment = 2
 
-[node name="ArtworkPanel" type="PanelContainer" parent="Padding/VBox"]
+[node name="PortraitPanel" type="PanelContainer" parent="Padding/VBox"]
 layout_mode = 2
 
-[node name="BorderRect" type="ColorRect" parent="Padding/VBox/ArtworkPanel"]
+[node name="PortraitBorderRect" type="ColorRect" parent="Padding/VBox/PortraitPanel"]
+unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 0
@@ -59,43 +60,44 @@ interior_color = Color(1, 1, 1, 1)
 outer_border_width = 2
 border_indentation = 1
 
-[node name="Margin" type="MarginContainer" parent="Padding/VBox/ArtworkPanel"]
+[node name="Margin" type="MarginContainer" parent="Padding/VBox/PortraitPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="ArtworkHBox" type="HBoxContainer" parent="Padding/VBox/ArtworkPanel/Margin"]
+[node name="ArtworkHBox" type="HBoxContainer" parent="Padding/VBox/PortraitPanel/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="SpriteFrame" type="PanelContainer" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox"]
+[node name="SpriteFrame" type="PanelContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 
-[node name="BorderRect" type="ColorRect" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox/SpriteFrame"]
+[node name="SpriteBorderRect" type="ColorRect" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame"]
+unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 1
 border_color = Color(0.57, 0.58, 0.65, 1)
 inner_border_color = Color(0.88, 0.89, 0.91, 1)
 interior_color = Color(1, 1, 1, 1)
-outer_border_width = 2
-inner_border_width = 2
-border_indentation = 2
+outer_border_width = 3
+inner_border_width = 3
+border_indentation = 3
 
-[node name="Center" type="CenterContainer" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox/SpriteFrame"]
+[node name="Center" type="CenterContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame"]
 layout_mode = 2
 
-[node name="SpriteRect" type="TextureRect" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
+[node name="SpriteRect" type="TextureRect" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="FallbackLabel" type="Label" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
+[node name="FallbackLabel" type="Label" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.22, 1)
@@ -104,15 +106,15 @@ text = "?"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BadgeCenter" type="CenterContainer" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox"]
+[node name="BadgeCenter" type="CenterContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BadgePanel" type="PanelContainer" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox/BadgeCenter"]
+[node name="BadgePanel" type="PanelContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/BadgeCenter"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="BadgeLabel" type="Label" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox/BadgeCenter/BadgePanel"]
+[node name="BadgeLabel" type="Label" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/BadgeCenter/BadgePanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -127,7 +129,8 @@ vertical_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="BorderRect" type="ColorRect" parent="Padding/VBox/StatsPanel"]
+[node name="StatsBorderRect" type="ColorRect" parent="Padding/VBox/StatsPanel"]
+unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 0
@@ -148,14 +151,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.3, 0.32, 1)
 theme_override_font_sizes/font_size = 14
-text = "10 HP | 4 ATK"
 horizontal_alignment = 1
 
 [node name="DescPanel" type="PanelContainer" parent="Padding/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="BorderRect" type="ColorRect" parent="Padding/VBox/DescPanel"]
+[node name="DescBorderRect" type="ColorRect" parent="Padding/VBox/DescPanel"]
+unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 0
@@ -176,14 +179,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.22, 1)
 theme_override_font_sizes/font_size = 13
-text = "Description goes here."
 horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="HelpPanel" type="PanelContainer" parent="Padding/VBox"]
 layout_mode = 2
 
-[node name="BorderRect" type="ColorRect" parent="Padding/VBox/HelpPanel"]
+[node name="HelpBorderRect" type="ColorRect" parent="Padding/VBox/HelpPanel"]
+unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 0
