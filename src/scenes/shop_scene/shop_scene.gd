@@ -179,14 +179,10 @@ func add_monster_to_bench(monster: MonsterInstance) -> bool:
 
 ## Empty all team and bench slots
 func clear_all() -> void:
-	var refund_gold = 0
-	
 	for i in range(active_slot_count):
 		active_team[i] = null
 		var card = active_slots[i].get_card()
 		if card:
-			if card is MonsterCard:
-				refund_gold += 1
 			active_slots[i].remove_card(card)
 			card.queue_free()
 			
@@ -194,12 +190,9 @@ func clear_all() -> void:
 		bench[i] = null
 		var card = bench_slots[i].get_card()
 		if card:
-			if card is MonsterCard:
-				refund_gold += 1
 			bench_slots[i].remove_card(card)
 			card.queue_free()
 			
-	gold += refund_gold
 	sync_data_from_ui()
 
 func _on_add_monster_pressed() -> void:
@@ -243,9 +236,6 @@ func get_gold() -> int:
 
 func deduct_gold(amount: int) -> void:
 	gold -= amount
-
-func refund_sell() -> void:
-	gold += 1
 
 func _on_roll_requested() -> void:
 	if gold >= 1:
