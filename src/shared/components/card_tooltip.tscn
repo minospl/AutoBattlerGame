@@ -22,28 +22,32 @@ theme_override_constants/margin_bottom = 12
 
 [node name="VBox" type="VBoxContainer" parent="Padding"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 
-[node name="HeaderHBox" type="HBoxContainer" parent="Padding/VBox"]
+[node name="HeaderMargin" type="MarginContainer" parent="Padding/VBox"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 4
+
+[node name="HeaderHBox" type="HBoxContainer" parent="Padding/VBox/HeaderMargin"]
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="Padding/VBox/HeaderHBox"]
+[node name="NameLabel" type="Label" parent="Padding/VBox/HeaderMargin/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 16
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
 text = "NAME"
 
-[node name="RarityLabel" type="Label" parent="Padding/VBox/HeaderHBox"]
+[node name="RarityLabel" type="Label" parent="Padding/VBox/HeaderMargin/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 16
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 18
 text = "COMMON"
 horizontal_alignment = 2
 
@@ -198,9 +202,9 @@ border_indentation = 1
 [node name="Margin" type="MarginContainer" parent="Padding/VBox/HelpPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 3
+theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 3
+theme_override_constants/margin_bottom = 4
 
 [node name="HelpLabel" type="Label" parent="Padding/VBox/HelpPanel/Margin"]
 layout_mode = 2
