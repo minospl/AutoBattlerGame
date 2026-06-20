@@ -19,6 +19,7 @@ signal slot_changed(slot: CardSlot)
 var is_frozen: bool = false
 
 var is_highlighted: bool = false
+var is_targeted: bool = false
 
 func _ready() -> void:
 	# Connect tree notifications to toggle placeholder visibility and border visibility
@@ -76,8 +77,11 @@ func _update_freeze_button_style() -> void:
 func update_style(is_hovered: bool = false) -> void:
 	is_highlighted = is_hovered
 	var card = get_card()
-	if card and card.has_method("set_highlight"):
-		card.set_highlight(is_hovered)
+	if card:
+		if card.has_method("set_highlight"):
+			card.set_highlight(is_hovered)
+		if card.has_method("set_target_highlight"):
+			card.set_target_highlight(is_targeted)
 		
 	var border_rect = $CardContainer.get_node_or_null("BorderRect") as ShaderBorderDecorator
 	if not border_rect:
@@ -86,10 +90,17 @@ func update_style(is_hovered: bool = false) -> void:
 	if is_hovered:
 		border_rect.border_color = GameColors.SLOT_HOVER_OUTER_BORDER
 		border_rect.inner_border_color = GameColors.SLOT_HOVER_INNER_BORDER
+	elif is_targeted:
+		border_rect.border_color = Color(0.9, 0.15, 0.15, 1.0)
+		border_rect.inner_border_color = Color(0.5, 0.05, 0.05, 1.0)
 	else:
 		border_rect.border_color = GameColors.BORDER_OUTER_DEFAULT
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 	border_rect.update_shader_parameters()
+
+func set_target_highlight(active: bool) -> void:
+	is_targeted = active
+	update_style(is_highlighted)
 
 func update_placeholder() -> void:
 	var empty = is_empty()

@@ -3,15 +3,15 @@ extends PanelContainer
 
 signal slot_changed(slot: CardSlot)
 
-@onready var frontline_hbox: HBoxContainer = %FrontlineHBox
-@onready var backline_hbox: HBoxContainer = %BacklineHBox
+@onready var row0_hbox: HBoxContainer = %Row0HBox
+@onready var row1_hbox: HBoxContainer = %Row1HBox
 
 var slots: Array[CardSlot] = []
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
-	for child in frontline_hbox.get_children():
+	for child in row0_hbox.get_children():
 		child.queue_free()
-	for child in backline_hbox.get_children():
+	for child in row1_hbox.get_children():
 		child.queue_free()
 	slots.clear()
 	
@@ -22,8 +22,8 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 		slot.slot_changed.connect(func(_slot): slot_changed.emit(_slot))
 		
 		if i < 3:
-			backline_hbox.add_child(slot) # Slots 0, 1, 2 are backline
+			row0_hbox.add_child(slot) # Slots 0, 1, 2 go to Row 0 (top)
 		else:
-			frontline_hbox.add_child(slot) # Slots 3, 4, 5 are frontline
+			row1_hbox.add_child(slot) # Slots 3, 4, 5 go to Row 1 (bottom)
 			
 		slots.append(slot)

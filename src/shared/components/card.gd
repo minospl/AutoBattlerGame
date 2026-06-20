@@ -1,6 +1,8 @@
 class_name Card
 extends PanelContainer
 
+signal hovered(card: Card, is_hovered: bool)
+
 @export var price: int
 
 @export var unit_instance: UnitInstance:
@@ -10,6 +12,14 @@ extends PanelContainer
 			price = unit_instance.data.price
 		if is_inside_tree():
 			update_ui()
+
+@onready var left_indicator: Panel = %TriggerTargetLeftIndicator
+@onready var right_indicator: Panel = %TriggerTargetRightIndicator
+@onready var top_indicator: Panel = %TriggerTargetTopIndicator
+@onready var bottom_indicator: Panel = %TriggerTargetBottomIndicator
+
+var is_highlighted: bool = false
+var is_targeted: bool = false
 
 func _ready() -> void:
 	update_ui()
@@ -27,8 +37,6 @@ func update_ui() -> void:
 	# Configure the pixel-art border shader on the card
 	var border_rect = get_node_or_null("BorderRect") as ShaderBorderDecorator
 	if border_rect:
-		border_rect.border_color = unit_instance.data.rarity.border_color if (unit_instance.data and unit_instance.data.rarity) else GameColors.BORDER_OUTER_DEFAULT
-		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 		border_rect.interior_color = GameColors.WHITE_COLOR
 		border_rect.update_shader_parameters()
 
@@ -72,6 +80,43 @@ func update_ui() -> void:
 		else:
 			%PortraitCharLabel.text = "?"
 			%PortraitCharLabel.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
+
+	# Update directional indicators based on modifiers' TargetType
+	if left_indicator:
+		left_indicator.visible = false
+		right_indicator.visible = false
+		top_indicator.visible = false
+		bottom_indicator.visible = false
+		
+		if unit_instance.data and unit_instance.data.modifiers:
+			for modifier in unit_instance.data.modifiers:
+				match modifier.target:
+					UnitModifier.TargetType.HORIZONTAL:
+						left_indicator.visible = true
+						right_indicator.visible = true
+					UnitModifier.TargetType.VERTICAL:
+						top_indicator.visible = true
+						bottom_indicator.visible = true
+					UnitModifier.TargetType.ADJACENT:
+						left_indicator.visible = true
+						right_indicator.visible = true
+						top_indicator.visible = true
+						bottom_indicator.visible = true
+					UnitModifier.TargetType.UP:
+						top_indicator.visible = true
+					UnitModifier.TargetType.DOWN:
+						bottom_indicator.visible = true
+					UnitModifier.TargetType.LEFT:
+						left_indicator.visible = true
+					UnitModifier.TargetType.RIGHT:
+						right_indicator.visible = true
+					UnitModifier.TargetType.ALL:
+						left_indicator.visible = true
+						right_indicator.visible = true
+						top_indicator.visible = true
+						bottom_indicator.visible = true
+
+	update_border_colors()
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Create a visual preview of what we are dragging
@@ -130,16 +175,29 @@ func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: 
 		border_rect.update_shader_parameters()
 
 func set_highlight(active: bool) -> void:
+	is_highlighted = active
+	update_border_colors()
+
+func set_target_highlight(active: bool) -> void:
+	is_targeted = active
+	update_border_colors()
+
+func update_border_colors() -> void:
 	var border_rect = get_node_or_null("BorderRect") as ShaderBorderDecorator
-	if border_rect:
-		if active:
-			border_rect.border_color = GameColors.SLOT_HOVER_OUTER_BORDER
-			border_rect.inner_border_color = GameColors.SLOT_HOVER_INNER_BORDER
-		else:
-			var rarity_color = unit_instance.data.rarity.border_color if (unit_instance and unit_instance.data and unit_instance.data.rarity) else GameColors.BORDER_OUTER_DEFAULT
-			border_rect.border_color = rarity_color
-			border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-		border_rect.update_shader_parameters()
+	if not border_rect:
+		return
+	
+	if is_highlighted:
+		border_rect.border_color = GameColors.SLOT_HOVER_OUTER_BORDER
+		border_rect.inner_border_color = GameColors.SLOT_HOVER_INNER_BORDER
+	elif is_targeted:
+		border_rect.border_color = Color(0.9, 0.15, 0.15, 1.0)
+		border_rect.inner_border_color = Color(0.5, 0.05, 0.05, 1.0)
+	else:
+		var rarity_color = unit_instance.data.rarity.border_color if (unit_instance and unit_instance.data and unit_instance.data.rarity) else GameColors.BORDER_OUTER_DEFAULT
+		border_rect.border_color = rarity_color
+		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
+	border_rect.update_shader_parameters()
 
 func _on_mouse_entered() -> void:
 	if DragManager.dragged_card:
@@ -147,8 +205,10 @@ func _on_mouse_entered() -> void:
 	var shop_scene = get_tree().current_scene
 	if shop_scene and shop_scene.has_method("set_preview_card"):
 		shop_scene.set_preview_card(self)
+	hovered.emit(self, true)
 
 func _on_mouse_exited() -> void:
 	var shop_scene = get_tree().current_scene
 	if shop_scene and shop_scene.has_method("clear_preview_card"):
 		shop_scene.clear_preview_card()
+	hovered.emit(self, false)

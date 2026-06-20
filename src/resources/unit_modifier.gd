@@ -65,11 +65,11 @@ func get_description() -> String:
 			target_phrase = "self"
 			target_possession = "your own"
 		TargetType.HORIZONTAL:
-			target_phrase = "adjacent horizontal units"
-			target_possession = "adjacent horizontal units'"
+			target_phrase = "horizontal units"
+			target_possession = "horizontal units'"
 		TargetType.VERTICAL:
-			target_phrase = "adjacent vertical units"
-			target_possession = "adjacent vertical units'"
+			target_phrase = "vertical units"
+			target_possession = "vertical units'"
 		TargetType.ADJACENT:
 			target_phrase = "adjacent units"
 			target_possession = "adjacent units'"

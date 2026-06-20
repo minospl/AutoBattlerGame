@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Resource_wolf_death"]
 script = ExtResource("5_modifier")
 trigger = 1
-target = 1
+target = 3
 effect = 0
 value = 1
 duration = 0

@@ -321,12 +321,52 @@ func set_preview_card(card: Control) -> void:
 	if "unit_instance" in card and card.unit_instance:
 		preview_tooltip.setup_for_unit(card.unit_instance)
 		preview_tooltip.visible = true
+		_on_card_hovered(card, true)
 	elif "item_name" in card:
 		preview_tooltip.setup_for_item(card)
 		preview_tooltip.visible = true
 
-func clear_preview_card(_card: Control = null) -> void:
+func clear_preview_card(card: Control = null) -> void:
 	if not preview_tooltip:
 		return
 		
 	preview_tooltip.visible = false
+	_on_card_hovered(card, false)
+
+func _on_card_hovered(card: Control, is_hovered: bool) -> void:
+	# Clear all target highlights first
+	for slot in active_slots:
+		slot.set_target_highlight(false)
+	for slot in bench_slots:
+		slot.set_target_highlight(false)
+		
+	if not is_hovered or card == null or not ("unit_instance" in card) or card.unit_instance == null:
+		return
+		
+	# Find which slot contains the hovered card
+	var source_slot: CardSlot = null
+	for slot in active_slots:
+		if slot.get_card() == card:
+			source_slot = slot
+			break
+	if not source_slot:
+		for slot in bench_slots:
+			if slot.get_card() == card:
+				source_slot = slot
+				break
+				
+	if not source_slot or not source_slot.is_active_team:
+		return # Card is in shop, bench, or not placed in active team
+		
+	var idx = source_slot.slot_index
+	
+	if card.unit_instance.data and card.unit_instance.data.modifiers:
+		for modifier in card.unit_instance.data.modifiers:
+			# Skip SELF target highlighting as we only want to highlight other targets
+			if modifier.target == UnitModifier.TargetType.SELF:
+				continue
+				
+			var target_indices = TargetResolver.get_target_indices(idx, modifier.target)
+			for t_idx in target_indices:
+				if t_idx < active_slots.size():
+					active_slots[t_idx].set_target_highlight(true)
