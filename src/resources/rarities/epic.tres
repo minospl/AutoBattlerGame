@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="MonsterRarity" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="Rarity" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://src/resources/monster_rarity.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/resources/rarity.gd" id="1_script"]
 
 [resource]
 script = ExtResource("1_script")

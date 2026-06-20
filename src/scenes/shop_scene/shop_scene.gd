@@ -8,15 +8,11 @@ signal team_state_changed
 @export var bench_slot_count: int = 8
 
 # Logic data structures representing team state
-var active_team: Array[MonsterInstance] = []
-var bench: Array[MonsterInstance] = []
-var monster_templates: Array[MonsterData] = []
+var active_team: Array[UnitInstance] = []
+var bench: Array[UnitInstance] = []
+var unit_templates: Array[UnitData] = []
 
-# Drag state tracking for selling
-var dragged_card: Control = null
-var dragged_card_original_slot: MonsterSlot = null
-
-@onready var shop_bar: ShopBar = %ShopBar
+@onready var shop_header_bar: ShopHeaderBar = %ShopHeaderBar
 @onready var bench_panel: BenchPanel = %BenchPanel
 @onready var team_panel: TeamPanel = %TeamPanel
 @onready var shop_panel: ShopPanel = %ShopPanel
@@ -27,13 +23,13 @@ var gold: int = 10:
 		if is_inside_tree() and shop_panel:
 			shop_panel.gold = gold
 
-var slot_scene = preload("res://src/shared/components/monster_slot.tscn")
+var slot_scene = preload("res://src/shared/components/card_slot.tscn")
 
-var active_slots: Array[MonsterSlot]:
+var active_slots: Array[CardSlot]:
 	get:
 		return team_panel.slots
 
-var bench_slots: Array[MonsterSlot]:
+var bench_slots: Array[CardSlot]:
 	get:
 		return bench_panel.slots
 
@@ -46,8 +42,8 @@ func _ready() -> void:
 	team_panel.slot_changed.connect(_on_slot_changed)
 	
 	# Connect control panel signals
-	shop_bar.add_monster_requested.connect(_on_add_monster_pressed)
-	shop_bar.restart_requested.connect(_on_restart_pressed)
+	shop_header_bar.add_monster_requested.connect(_on_add_monster_requested)
+	shop_header_bar.restart_requested.connect(_on_restart_requested)
 	
 	# Connect shop panel signals
 	shop_panel.roll_requested.connect(_on_roll_requested)
@@ -60,10 +56,10 @@ func _ready() -> void:
 	
 	# Load our pre-created templates
 	var paths = [
-		"res://src/resources/monsters/czerwony_smok.tres",
-		"res://src/resources/monsters/lesny_straznik.tres",
-		"res://src/resources/monsters/dziki_wilk.tres",
-		"res://src/resources/monsters/rzeczny_krab.tres"
+		"res://src/resources/units/red_dragon.tres",
+		"res://src/resources/units/forest_guardian.tres",
+		"res://src/resources/units/wild_wolf.tres",
+		"res://src/resources/units/river_crab.tres"
 	]
 	
 	for path in paths:
@@ -74,16 +70,16 @@ func _ready() -> void:
 		if template == null:
 			continue
 			
-		if not (template is MonsterData):
+		if not (template is UnitData):
 			continue
 			
-		monster_templates.append(template)
+		unit_templates.append(template)
 			
-	# Spawn initial monsters: 1 of each type that currently exists
-	for template in monster_templates:
-		var instance = MonsterInstance.new()
+	# Spawn initial units: 1 of each type that currently exists
+	for template in unit_templates:
+		var instance = UnitInstance.new()
 		instance.initialize(template)
-		add_monster_to_bench(instance)
+		add_unit_to_bench(instance)
 		
 	# Set initial gold and roll the shop for free
 	gold = 10
@@ -96,6 +92,7 @@ func _ready() -> void:
 	overlay.set_script(overlay_script)
 	overlay.parent_scene = self
 	add_child(overlay)
+
 func _apply_visual_styling() -> void:
 	# 1. Main Background Panel
 	var bg_panel = get_node("BackgroundPanel") as Panel
@@ -104,15 +101,13 @@ func _apply_visual_styling() -> void:
 		bg_style.texture = load("res://src/assets/ui/shop_background.jpg")
 		bg_style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
 		bg_style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
-		bg_style.modulate_color = Color(1.0, 1.0, 1.0, 1.0) # Full color for the classic Pokemon storage box tiled texture
+		bg_style.modulate_color = Color(1.0, 1.0, 1.0, 1.0)
 		bg_panel.add_theme_stylebox_override("panel", bg_style)
 	
 	# 2. Outer Border Color
 	var outer_border = %OuterBorder as ColorRect
 	if outer_border:
 		outer_border.color = GameColors.PANEL_BORDER_DEFAULT
-	
-
 
 ## Instantiate slot scenes and arrange them inside containers
 func create_slots() -> void:
@@ -120,23 +115,23 @@ func create_slots() -> void:
 	team_panel.create_slots(slot_scene, active_slot_count)
 	shop_panel.create_slots(slot_scene, 4)
 
-func _on_slot_changed(_slot: MonsterSlot) -> void:
+func _on_slot_changed(_slot: CardSlot) -> void:
 	sync_data_from_ui()
 	_on_team_state_changed()
 
 ## Rebuild runtime data arrays from current UI slot child structures
 func sync_data_from_ui() -> void:
 	for i in range(active_slot_count):
-		active_team[i] = active_slots[i].get_monster_instance()
+		active_team[i] = active_slots[i].get_unit_instance()
 		
 	for i in range(bench_slot_count):
-		bench[i] = bench_slots[i].get_monster_instance()
+		bench[i] = bench_slots[i].get_unit_instance()
 		
 	team_state_changed.emit()
 
 ## Populate the UI based on external changes to logic data structures
 func populate_ui() -> void:
-	var card_scene = load("res://src/shared/components/monster_card.tscn")
+	var card_scene = load("res://src/shared/components/card.tscn")
 	
 	# Clear existing cards immediately
 	for slot in active_slots:
@@ -155,23 +150,23 @@ func populate_ui() -> void:
 	for i in range(active_slot_count):
 		if i < active_team.size() and active_team[i] != null:
 			var card = card_scene.instantiate()
-			card.monster_instance = active_team[i]
+			card.unit_instance = active_team[i]
 			active_slots[i].add_card(card)
 			
 	for i in range(bench_slot_count):
 		if i < bench.size() and bench[i] != null:
 			var card = card_scene.instantiate()
-			card.monster_instance = bench[i]
+			card.unit_instance = bench[i]
 			bench_slots[i].add_card(card)
 
-## Add a monster to the first empty slot on the bench
-func add_monster_to_bench(monster: MonsterInstance) -> bool:
+## Add a unit to the first empty slot on the bench
+func add_unit_to_bench(unit: UnitInstance) -> bool:
 	for i in range(bench_slot_count):
 		if bench[i] == null:
-			bench[i] = monster
-			var card_scene = load("res://src/shared/components/monster_card.tscn")
+			bench[i] = unit
+			var card_scene = load("res://src/shared/components/card.tscn")
 			var card = card_scene.instantiate()
-			card.monster_instance = monster
+			card.unit_instance = unit
 			bench_slots[i].add_card(card)
 			sync_data_from_ui()
 			return true
@@ -195,34 +190,34 @@ func clear_all() -> void:
 			
 	sync_data_from_ui()
 
-func _on_add_monster_pressed() -> void:
-	if monster_templates.is_empty():
+func _on_add_monster_requested() -> void:
+	if unit_templates.is_empty():
 		return
 		
 	# Pick random template
-	var template = monster_templates[randi() % monster_templates.size()]
+	var template = unit_templates[randi() % unit_templates.size()]
 	
 	# Create runtime instance
-	var instance = MonsterInstance.new()
+	var instance = UnitInstance.new()
 	instance.initialize(template)
 	
 	# Try to add to bench
-	add_monster_to_bench(instance)
+	add_unit_to_bench(instance)
 
-func _on_restart_pressed() -> void:
+func _on_restart_requested() -> void:
 	# 1. Clear team and bench slots
 	clear_all()
 	
-	# 2. Reset shop bar values to starting position
-	shop_bar.lives = 10
-	shop_bar.day = 4
-	shop_bar.trophies = 3
+	# 2. Reset header bar values to starting position
+	shop_header_bar.lives = 10
+	shop_header_bar.day = 4
+	shop_header_bar.trophies = 3
 	
-	# 3. Spawn initial monsters: 1 of each type
-	for template in monster_templates:
-		var instance = MonsterInstance.new()
+	# 3. Spawn initial units: 1 of each type
+	for template in unit_templates:
+		var instance = UnitInstance.new()
 		instance.initialize(template)
-		add_monster_to_bench(instance)
+		add_unit_to_bench(instance)
 		
 	# 4. Reset gold to 10 and roll the shop for free
 	gold = 10
@@ -242,7 +237,7 @@ func _on_roll_requested() -> void:
 		gold -= 1
 		roll_shop(false)
 
-func _on_sell_card_requested(card: Control, original_slot: MonsterSlot) -> void:
+func _on_sell_card_requested(card: Control, original_slot: CardSlot) -> void:
 	var refund_gold = 1
 	if "price" in card:
 		refund_gold = card.price
@@ -251,15 +246,6 @@ func _on_sell_card_requested(card: Control, original_slot: MonsterSlot) -> void:
 	if original_slot:
 		original_slot.slot_changed.emit(original_slot)
 	gold += refund_gold
-
-func notify_drag_started(card: Control, original_slot: MonsterSlot) -> void:
-	dragged_card = card
-	dragged_card_original_slot = original_slot
-
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_DRAG_END:
-		dragged_card = null
-		dragged_card_original_slot = null
 
 func roll_shop(_free: bool = false) -> void:
 	for i in range(shop_panel.slots.size()):
@@ -288,30 +274,30 @@ func refill_shop_slot(slot_index: int) -> void:
 	if slot.has_node("%FreezeButton"):
 		(slot.get_node("%FreezeButton") as Button).button_pressed = false
 		
-	if slot_index < 3: # Monsters
-		if monster_templates.is_empty():
+	if slot_index < 3: # Units
+		if unit_templates.is_empty():
 			return
-		var template = monster_templates[randi() % monster_templates.size()]
-		var instance = MonsterInstance.new()
+		var template = unit_templates[randi() % unit_templates.size()]
+		var instance = UnitInstance.new()
 		instance.initialize(template)
 		
-		var card_scene = preload("res://src/shared/components/monster_card.tscn")
+		var card_scene = preload("res://src/shared/components/card.tscn")
 		var card = card_scene.instantiate()
-		card.monster_instance = instance
+		card.unit_instance = instance
 		slot.add_card(card)
-	else: # Food Item
-		var food_scene = preload("res://src/shared/components/food_item.tscn")
-		var food_card = food_scene.instantiate() as FoodItem
+	else: # Item Card
+		var item_scene = preload("res://src/shared/components/item_card.tscn")
+		var item_card = item_scene.instantiate() as ItemCard
 		if randf() < 0.5:
-			food_card.food_name = "Apple"
-			food_card.stat_boost_hp = 2
-			food_card.stat_boost_attack = 0
-			food_card.price = 2
+			item_card.item_name = "Apple"
+			item_card.stat_boost_hp = 2
+			item_card.stat_boost_attack = 0
+			item_card.price = 2
 		else:
-			food_card.food_name = "Sword"
-			food_card.stat_boost_hp = 0
-			food_card.stat_boost_attack = 2
-			food_card.price = 3
-		slot.add_card(food_card)
+			item_card.item_name = "Sword"
+			item_card.stat_boost_hp = 0
+			item_card.stat_boost_attack = 2
+			item_card.price = 3
+		slot.add_card(item_card)
 		
 	slot.update_placeholder()

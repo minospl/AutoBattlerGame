@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dcwm3m7vnavik" path="res://src/scenes/shop_scene/shop_scene.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://cx8g0ytsq24a" path="res://src/scenes/shop_scene/components/bench_panel.tscn" id="2_bench"]
 [ext_resource type="PackedScene" uid="uid://dm0yq7hsqt4l" path="res://src/scenes/shop_scene/components/team_panel.tscn" id="3_team"]
-[ext_resource type="PackedScene" uid="uid://dm0yq7hsqt4k" path="res://src/scenes/shop_scene/components/shop_bar.tscn" id="4_panel"]
+[ext_resource type="PackedScene" uid="uid://dm0yq7hsqt4k" path="res://src/scenes/shop_scene/components/shop_header_bar.tscn" id="4_panel"]
 [ext_resource type="PackedScene" uid="uid://b23tfd4ytmsc1" path="res://src/scenes/shop_scene/components/shop_panel.tscn" id="5_shop"]
 
 [node name="ShopScene" type="Control" unique_id=520390897]
@@ -39,19 +39,19 @@ theme_override_constants/separation = 32
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="ShopBar" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" unique_id=518349254 instance=ExtResource("4_panel")]
+[node name="ShopHeaderBar" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" unique_id=518349254 instance=ExtResource("4_panel")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ShopBarBorder" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" unique_id=677598013]
+[node name="HeaderBarBorder" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" unique_id=677598013]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="InnerBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/ShopBarBorder" unique_id=1310137001]
+[node name="InnerBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder" unique_id=1310137001]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
 
-[node name="OuterBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/ShopBarBorder" unique_id=1983801270]
+[node name="OuterBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder" unique_id=1983801270]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2

@@ -9,7 +9,7 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 
 func _process(_delta: float) -> void:
-	var is_dragging = parent_scene and parent_scene.dragged_card and parent_scene.dragged_card.has_method("apply_food_effect")
+	var is_dragging = DragManager.dragged_card and DragManager.dragged_card.has_method("apply_food_effect")
 	if is_dragging:
 		queue_redraw()
 		_was_dragging = true
@@ -18,8 +18,8 @@ func _process(_delta: float) -> void:
 		_was_dragging = false
 
 func _draw() -> void:
-	if parent_scene and parent_scene.dragged_card and parent_scene.dragged_card.has_method("apply_food_effect"):
-		var dragged_card = parent_scene.dragged_card
+	if DragManager.dragged_card and DragManager.dragged_card.has_method("apply_food_effect"):
+		var dragged_card = DragManager.dragged_card
 		
 		# Draw the Hearthstone-style food targeting line
 		var start_pos = dragged_card.global_position + dragged_card.size / 2.0

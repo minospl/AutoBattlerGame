@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://src/resources/unit_data.gd" id="1_data"]
+[ext_resource type="Resource" path="res://src/resources/types/plant.tres" id="2_type"]
+[ext_resource type="Resource" path="res://src/resources/rarities/epic.tres" id="3_rarity"]
+[ext_resource type="Texture2D" path="res://src/assets/units/forest_guardian.jpg" id="4_sprite"]
+
+[resource]
+script = ExtResource("1_data")
+unit_name = "Forest Guardian"
+price = 4
+max_health = 20
+attack = 2
+base_poison = 0
+types = [ExtResource("2_type")]
+rarity = ExtResource("3_rarity")
+description = "Protective spirit of the forest, regenerates strength."
+sprite = ExtResource("4_sprite")

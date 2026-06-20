@@ -1,0 +1,90 @@
+[gd_scene load_steps=3 format=3 uid="uid://c83s1177xrg27"]
+
+[ext_resource type="Script" path="res://src/shared/components/card_slot.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/shared/components/decorators/shader_border_decorator.gd" id="2_decorator"]
+
+[node name="CardSlot" type="Control" unique_id=1762162550]
+custom_minimum_size = Vector2(100, 135)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 100.0
+offset_bottom = 135.0
+script = ExtResource("1_script")
+
+[node name="CardContainer" type="PanelContainer" parent="." unique_id=1017449164]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 125)
+layout_mode = 0
+offset_top = 10.0
+offset_right = 100.0
+offset_bottom = 135.0
+mouse_filter = 1
+
+[node name="BorderRect" type="ColorRect" parent="CardContainer"]
+layout_mode = 2
+script = ExtResource("2_decorator")
+
+[node name="EmptyPlaceholderLabel" type="Label" parent="CardContainer" unique_id=374452659]
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 0.12)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HealthBarContainer" type="MarginContainer" parent="." unique_id=617978846]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 20)
+layout_mode = 0
+offset_top = 2.0
+offset_right = 100.0
+offset_bottom = 22.0
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="HealthBarRect" type="ColorRect" parent="HealthBarContainer" unique_id=197118016]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="HealthLabel" type="Label" parent="HealthBarContainer/HealthBarRect" unique_id=785910051]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 13
+text = "0/0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ShopControls" type="HBoxContainer" parent="." unique_id=1812831201]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_top = 138.0
+offset_right = 100.0
+offset_bottom = 158.0
+alignment = 1
+theme_override_constants/separation = 4
+
+[node name="PriceLabel" type="Label" parent="ShopControls" unique_id=193498101]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 11
+text = "3g"
+horizontal_alignment = 1
+
+[node name="FreezeButton" type="Button" parent="ShopControls" unique_id=98710291]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+toggle_mode = true
+text = "❄"

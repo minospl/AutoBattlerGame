@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/resources/unit_data.gd" id="1_data"]
+[ext_resource type="Resource" path="res://src/resources/types/water.tres" id="2_type_woda"]
+[ext_resource type="Resource" path="res://src/resources/types/beast.tres" id="3_type_bestia"]
+[ext_resource type="Resource" path="res://src/resources/rarities/rare.tres" id="4_rarity"]
+[ext_resource type="Texture2D" path="res://src/assets/units/river_crab.jpg" id="5_sprite"]
+
+[resource]
+script = ExtResource("1_data")
+unit_name = "River Crab"
+price = 3
+max_health = 12
+attack = 3
+base_poison = 3
+types = [ExtResource("2_type_woda"), ExtResource("3_type_bestia")]
+rarity = ExtResource("4_rarity")
+description = "Has a hard shell and sharp pincers."
+sprite = ExtResource("5_sprite")

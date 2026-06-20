@@ -1,11 +1,11 @@
 class_name BenchPanel
 extends PanelContainer
 
-signal slot_changed(slot: MonsterSlot)
+signal slot_changed(slot: CardSlot)
 
 @onready var bench_hbox: HBoxContainer = %BenchHBox
 
-var slots: Array[MonsterSlot] = []
+var slots: Array[CardSlot] = []
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 	for child in bench_hbox.get_children():
@@ -13,7 +13,7 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 	slots.clear()
 	
 	for i in range(slot_count):
-		var slot = slot_scene.instantiate() as MonsterSlot
+		var slot = slot_scene.instantiate() as CardSlot
 		slot.is_active_team = false
 		slot.slot_index = i
 		slot.slot_changed.connect(func(_slot): slot_changed.emit(_slot))
