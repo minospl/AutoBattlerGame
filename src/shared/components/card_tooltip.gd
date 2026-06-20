@@ -92,15 +92,26 @@ func _setup_unit_ui() -> void:
 		
 	# 5. Stats
 	stats_panel.visible = true
-	var stats_text = "%d HP   |   %d ATK" % [_unit_instance.get_max_health(), _unit_instance.get_attack()]
+	var stats_text = "%d HP   |   %d ATK   |   %.1fs" % [
+		_unit_instance.get_max_health(),
+		_unit_instance.get_attack(),
+		_unit_instance.get_cast_speed()
+	]
 	if _unit_instance.poison > 0:
 		stats_text += "   |   %d Poison" % _unit_instance.poison
 	stats_label.text = stats_text
 	
 	# 6. Description
-	if _unit_instance.data and not _unit_instance.data.description.is_empty():
+	var full_desc = ""
+	if _unit_instance.data:
+		for modifier in _unit_instance.data.modifiers:
+			if not full_desc.is_empty():
+				full_desc += "\n\n"
+			full_desc += modifier.get_description()
+			
+	if not full_desc.is_empty():
 		desc_panel.visible = true
-		desc_label.text = _unit_instance.data.description
+		desc_label.text = full_desc
 	else:
 		desc_panel.visible = false
 

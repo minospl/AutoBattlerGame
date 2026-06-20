@@ -18,12 +18,15 @@ extends Resource
 
 @export var max_health_bonus: int = 0
 
+@export var current_cast_speed: float
+
 ## Initialize the instance using a template
 func initialize(p_data: UnitData) -> void:
 	data = p_data
 	current_health = p_data.max_health
 	current_attack = p_data.attack
 	poison = p_data.base_poison
+	current_cast_speed = p_data.cast_speed
 
 func get_unit_name() -> String:
 	return data.unit_name if data else "Unknown"
@@ -39,3 +42,6 @@ func get_types() -> Array[UnitType]:
 
 func is_dead() -> bool:
 	return current_health <= 0
+
+func get_cast_speed() -> float:
+	return current_cast_speed

@@ -22,8 +22,11 @@ extends Resource
 ## Rarity of the unit (defines the card border color in UI)
 @export var rarity: Rarity
 
-## Short flavor text or ability description
-@export_multiline var description: String
+## How often the unit casts (in seconds)
+@export var cast_speed: float
+
+## List of modifiers (abilities) for this unit
+@export var modifiers: Array[UnitModifier] = []
 
 ## Optional custom texture/sprite for the unit artwork
 @export var sprite: Texture2D
