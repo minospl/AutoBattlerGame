@@ -1,8 +1,8 @@
 [gd_scene load_steps=3 format=3 uid="uid://dm0yq7hsqt4l"]
 
 [ext_resource type="Script" path="res://src/scenes/shop_scene/components/team_panel.gd" id="1_script"]
-[ext_resource type="Script" path="res://src/shared/components/panel_border_decorator.gd" id="2_decorator"]
-[ext_resource type="Script" path="res://src/shared/components/panel_header_decorator.gd" id="3_header_decorator"]
+[ext_resource type="Script" path="res://src/shared/components/decorators/panel_border_decorator.gd" id="2_decorator"]
+[ext_resource type="Script" path="res://src/shared/components/decorators/panel_header_decorator.gd" id="3_header_decorator"]
 
 [node name="TeamPanel" type="PanelContainer"]
 size_flags_horizontal = 4

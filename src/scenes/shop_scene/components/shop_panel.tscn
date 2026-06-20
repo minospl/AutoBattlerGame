@@ -1,11 +1,11 @@
 [gd_scene load_steps=8 format=3 uid="uid://b23tfd4ytmsc1"]
 
 [ext_resource type="Script" path="res://src/scenes/shop_scene/components/shop_panel.gd" id="1_script"]
-[ext_resource type="Script" path="res://src/shared/components/panel_border_decorator.gd" id="2_decorator"]
+[ext_resource type="Script" path="res://src/shared/components/decorators/panel_border_decorator.gd" id="2_decorator"]
 [ext_resource type="Script" path="res://src/scenes/shop_scene/components/sell_overlay.gd" id="4_sell"]
-[ext_resource type="Script" path="res://src/shared/components/panel_header_decorator.gd" id="5_header_decorator"]
+[ext_resource type="Script" path="res://src/shared/components/decorators/panel_header_decorator.gd" id="5_header_decorator"]
 [ext_resource type="Shader" path="res://src/shared/shaders/screen_blur.gdshader" id="6_blur"]
-[ext_resource type="Script" path="res://src/shared/components/game_button_decorator.gd" id="7_button_decorator"]
+[ext_resource type="Script" path="res://src/shared/components/decorators/game_button_decorator.gd" id="7_button_decorator"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_blur"]
 shader = ExtResource("6_blur")
