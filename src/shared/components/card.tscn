@@ -7,7 +7,7 @@
 custom_minimum_size = Vector2(100, 125)
 offset_right = 100.0
 offset_bottom = 125.0
-mouse_filter = 0
+mouse_filter = 1
 script = ExtResource("1_script")
 
 [node name="BorderRect" type="ColorRect" parent="."]
@@ -68,7 +68,7 @@ layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 0
 outer_border_width = 2
-border_indentation = 1
+border_indentation = 2
 
 [node name="AttackWrapper" type="Control" parent="MarginContainer/VBoxContainer/StatsHBox/AttackPanel"]
 layout_mode = 2
@@ -104,7 +104,7 @@ layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 0
 outer_border_width = 2
-border_indentation = 1
+border_indentation = 2
 
 [node name="PoisonWrapper" type="Control" parent="MarginContainer/VBoxContainer/StatsHBox/PoisonPanel"]
 layout_mode = 2

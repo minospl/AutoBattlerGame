@@ -9,7 +9,7 @@ enum BorderType { SINGLE, DOUBLE }
 @export var interior_color: Color = Color(0, 0, 0, 0)
 @export var outer_border_width: int = 3
 @export var inner_border_width: int = 3
-@export var border_indentation: int = 0
+@export var border_indentation: int = 3
 @export var corner_color: Color = Color(0, 0, 0, 0) # GameColors.TRANSPARENT
 
 func _ready() -> void:

@@ -51,9 +51,9 @@ func _setup_unit_ui() -> void:
 	
 	# 2. Main Outer Border (Double border Snapped)
 	if border_rect:
-		border_rect.border_color = rarity_color
+		border_rect.border_color = GameColors.PANEL_BORDER_DEFAULT
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-		border_rect.interior_color = GameColors.WHITE_COLOR
+		border_rect.interior_color = rarity_color
 		border_rect.update_shader_parameters()
 		
 	# 3. Sprite/Artwork
@@ -112,9 +112,9 @@ func _setup_item_ui() -> void:
 	
 	# 2. Main Outer Border
 	if border_rect:
-		border_rect.border_color = Color(0.9, 0.6, 0.1) # Golden orange for items
+		border_rect.border_color = GameColors.PANEL_BORDER_DEFAULT
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-		border_rect.interior_color = GameColors.WHITE_COLOR
+		border_rect.interior_color = Color(0.9, 0.6, 0.1) # Golden orange background for items
 		border_rect.update_shader_parameters()
 		
 	# 3. Sprite (Item fallback character icon)
