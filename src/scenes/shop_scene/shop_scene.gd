@@ -33,6 +33,8 @@ var bench_slots: Array[CardSlot]:
 	get:
 		return bench_panel.slots
 
+var preview_tooltip: Control
+
 func _ready() -> void:
 	active_team.resize(active_slot_count)
 	bench.resize(bench_slot_count)
@@ -48,6 +50,16 @@ func _ready() -> void:
 	# Connect shop panel signals
 	shop_panel.roll_requested.connect(_on_roll_requested)
 	shop_panel.sell_card_requested.connect(_on_sell_card_requested)
+	
+	# Setup the side preview panel
+	if has_node("%PreviewContainer"):
+		var tooltip_scene = load("res://src/shared/components/card_tooltip.tscn")
+		preview_tooltip = tooltip_scene.instantiate()
+		# Align the preview card to the top of the margin container (height of the bench)
+		preview_tooltip.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		preview_tooltip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		%PreviewContainer.add_child(preview_tooltip)
+		preview_tooltip.visible = false
 	
 	create_slots()
 	
@@ -301,3 +313,20 @@ func refill_shop_slot(slot_index: int) -> void:
 		slot.add_card(item_card)
 		
 	slot.update_placeholder()
+
+func set_preview_card(card: Control) -> void:
+	if not preview_tooltip:
+		return
+		
+	if "unit_instance" in card and card.unit_instance:
+		preview_tooltip.setup_for_unit(card.unit_instance)
+		preview_tooltip.visible = true
+	elif "item_name" in card:
+		preview_tooltip.setup_for_item(card)
+		preview_tooltip.visible = true
+
+func clear_preview_card(_card: Control = null) -> void:
+	if not preview_tooltip:
+		return
+		
+	preview_tooltip.visible = false

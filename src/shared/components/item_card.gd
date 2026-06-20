@@ -14,8 +14,10 @@ extends PanelContainer
 @onready var hp_panel: PanelContainer = %HpPanel
 
 func _ready() -> void:
-	tooltip_text = " "
 	update_ui()
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
+	tree_exiting.connect(_on_mouse_exited)
 
 func update_ui() -> void:
 	# Set border to golden-orange for items
@@ -96,8 +98,14 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		"original_slot": original_slot
 	}
 
-func _make_custom_tooltip(_for_text: String) -> Object:
-	var tooltip_scene = load("res://src/shared/components/card_tooltip.tscn")
-	var tooltip = tooltip_scene.instantiate()
-	tooltip.setup_for_item(self)
-	return tooltip
+func _on_mouse_entered() -> void:
+	if DragManager.dragged_card:
+		return
+	var shop_scene = get_tree().current_scene
+	if shop_scene and shop_scene.has_method("set_preview_card"):
+		shop_scene.set_preview_card(self)
+
+func _on_mouse_exited() -> void:
+	var shop_scene = get_tree().current_scene
+	if shop_scene and shop_scene.has_method("clear_preview_card"):
+		shop_scene.clear_preview_card(self)

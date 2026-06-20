@@ -39,6 +39,7 @@ layout_mode = 0
 offset_top = 2.0
 offset_right = 100.0
 offset_bottom = 22.0
+mouse_filter = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8
 
@@ -46,6 +47,7 @@ theme_override_constants/margin_right = 8
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="HealthLabel" type="Label" parent="HealthBarContainer/HealthBarRect" unique_id=785910051]
 unique_name_in_owner = true

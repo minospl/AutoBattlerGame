@@ -12,8 +12,10 @@ extends PanelContainer
 			update_ui()
 
 func _ready() -> void:
-	tooltip_text = " "
 	update_ui()
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
+	tree_exiting.connect(_on_mouse_exited)
 
 func update_ui() -> void:
 	if not unit_instance:
@@ -139,8 +141,14 @@ func set_highlight(active: bool) -> void:
 			border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 		border_rect.update_shader_parameters()
 
-func _make_custom_tooltip(_for_text: String) -> Object:
-	var tooltip_scene = load("res://src/shared/components/card_tooltip.tscn")
-	var tooltip = tooltip_scene.instantiate()
-	tooltip.setup_for_unit(unit_instance)
-	return tooltip
+func _on_mouse_entered() -> void:
+	if DragManager.dragged_card:
+		return
+	var shop_scene = get_tree().current_scene
+	if shop_scene and shop_scene.has_method("set_preview_card"):
+		shop_scene.set_preview_card(self)
+
+func _on_mouse_exited() -> void:
+	var shop_scene = get_tree().current_scene
+	if shop_scene and shop_scene.has_method("clear_preview_card"):
+		shop_scene.clear_preview_card()

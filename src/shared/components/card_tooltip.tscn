@@ -4,15 +4,14 @@
 [ext_resource type="Script" path="res://src/shared/components/decorators/shader_border_decorator.gd" id="2_decorator"]
 
 [node name="CardTooltip" type="PanelContainer"]
-custom_minimum_size = Vector2(260, 0)
-offset_right = 260.0
-offset_bottom = 200.0
+custom_minimum_size = Vector2(270, 0)
 mouse_filter = 1
 script = ExtResource("1_script")
 
 [node name="BorderRect" type="ColorRect" parent="."]
 layout_mode = 2
 script = ExtResource("2_decorator")
+border_indentation = 2
 
 [node name="Padding" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -33,14 +32,14 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.18, 0.18, 0.2, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 16
 text = "NAME"
 
 [node name="RarityLabel" type="Label" parent="Padding/VBox/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.18, 0.18, 0.2, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 16
 text = "COMMON"
 horizontal_alignment = 2
 
@@ -67,7 +66,7 @@ layout_mode = 2
 theme_override_constants/separation = 16
 
 [node name="SpriteFrame" type="PanelContainer" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox"]
-custom_minimum_size = Vector2(56, 56)
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 
 [node name="BorderRect" type="ColorRect" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox/SpriteFrame"]
@@ -83,7 +82,7 @@ layout_mode = 2
 
 [node name="SpriteRect" type="TextureRect" parent="Padding/VBox/ArtworkPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 40)
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
@@ -92,7 +91,7 @@ stretch_mode = 5
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.22, 1)
-theme_override_font_sizes/font_size = 28
+theme_override_font_sizes/font_size = 36
 text = "?"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -111,7 +110,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
 theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 14
 text = "TYPE"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -139,7 +138,7 @@ theme_override_constants/margin_bottom = 4
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.3, 0.32, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 14
 text = "10 HP | 4 ATK"
 horizontal_alignment = 1
 
@@ -166,7 +165,7 @@ theme_override_constants/margin_bottom = 8
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.22, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 13
 text = "Description goes here."
 horizontal_alignment = 1
 autowrap_mode = 2
@@ -192,6 +191,6 @@ theme_override_constants/margin_bottom = 3
 [node name="HelpLabel" type="Label" parent="Padding/VBox/HelpPanel/Margin"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.48, 0.48, 0.5, 1)
-theme_override_font_sizes/font_size = 11
-text = "SHIFT Hold to show more info"
+theme_override_font_sizes/font_size = 12
+text = "Hold SHIFT for more info"
 horizontal_alignment = 1
