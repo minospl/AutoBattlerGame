@@ -88,6 +88,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 
 [node name="StatsHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 0

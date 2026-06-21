@@ -117,21 +117,8 @@ func update_placeholder() -> void:
 	update_health_bar()
 
 func update_health_bar() -> void:
-	var card = get_card()
-	if card and "unit_instance" in card and card.unit_instance:
-		%HealthBarContainer.visible = true
-		var inst = card.unit_instance
-		var fill = float(inst.current_health) / float(inst.get_max_health())
-		var mat = %HealthBarRect.material as ShaderMaterial
-		if mat:
-			mat.set_shader_parameter("fill_percentage", fill)
-			var current_hp_size = %HealthBarRect.size
-			if current_hp_size.x == 0.0:
-				current_hp_size = Vector2(84, 20)
-			mat.set_shader_parameter("size", current_hp_size)
-		%HealthLabel.text = str(inst.current_health)
-	else:
-		%HealthBarContainer.visible = false
+	# HP bar is disabled in the shop scene to keep card visuals clean.
+	%HealthBarContainer.visible = false
 
 func _process(_delta: float) -> void:
 	if is_highlighted and get_viewport().gui_is_dragging():

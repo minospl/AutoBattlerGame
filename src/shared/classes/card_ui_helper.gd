@@ -4,10 +4,7 @@ extends Object
 ## Shared helper to configure card unit visuals (Attack, Poison, sprite, indicators)
 static func setup_card_visuals(
 	unit_instance: UnitInstance,
-	attack_label: Label,
-	attack_panel: PanelContainer,
-	poison_label: Label,
-	poison_panel: PanelContainer,
+	stats_hbox: HBoxContainer,
 	sprite_rect: TextureRect,
 	fallback_label: Label,
 	left_ind: Control = null,
@@ -18,63 +15,93 @@ static func setup_card_visuals(
 	if not unit_instance:
 		return
 		
-	var stat_size = Vector2(32, 16)
-	
-	# 1. Gather all active stats (Attack, Heal, Poison, Shield, Thorns, Vampirism, Burn, Electrocute)
-	var active_stats = []
+	# 1. Gather all active stats (Attack, Heal, Poison, Shield, Thorns, Burn, Electrocute)
+	var candidates = []
 	if unit_instance.get_attack() > 0:
-		active_stats.append({"value": str(unit_instance.get_attack()), "color": GameColors.STAT_ATTACK_BG})
+		candidates.append({
+			"name": "attack",
+			"value": unit_instance.get_attack(),
+			"color": GameColors.STAT_ATTACK_BG,
+			"priority": 0
+		})
 	if unit_instance.heal > 0:
-		active_stats.append({"value": str(unit_instance.heal), "color": Color(0.15, 0.6, 0.3)}) # Green for heal
-	if unit_instance.poison > 0:
-		active_stats.append({"value": str(unit_instance.poison), "color": GameColors.STAT_POISON_BG})
+		candidates.append({
+			"name": "heal",
+			"value": unit_instance.heal,
+			"color": Color(0.15, 0.6, 0.3),
+			"priority": 1
+		})
 	if unit_instance.shield > 0:
-		active_stats.append({"value": str(unit_instance.shield), "color": Color(0.2, 0.5, 0.8)}) # Light Blue for shield
-	if unit_instance.thorns > 0:
-		active_stats.append({"value": str(unit_instance.thorns), "color": Color(0.55, 0.45, 0.2)}) # Brown for thorns
+		candidates.append({
+			"name": "shield",
+			"value": unit_instance.shield,
+			"color": Color(0.5, 0.5, 0.5),
+			"priority": 2
+		})
+	if unit_instance.poison > 0:
+		candidates.append({
+			"name": "poison",
+			"value": unit_instance.poison,
+			"color": GameColors.STAT_POISON_BG,
+			"priority": 3
+		})
 	if unit_instance.burn > 0:
-		active_stats.append({"value": str(unit_instance.burn), "color": Color(0.9, 0.4, 0.1)}) # Orange for burn
+		candidates.append({
+			"name": "burn",
+			"value": unit_instance.burn,
+			"color": Color(0.9, 0.4, 0.1),
+			"priority": 4
+		})
 	if unit_instance.electrocute > 0:
-		active_stats.append({"value": str(unit_instance.electrocute), "color": Color(0.85, 0.75, 0.1)}) # Yellow for electrocute
+		candidates.append({
+			"name": "electrocute",
+			"value": unit_instance.electrocute,
+			"color": Color(0.85, 0.75, 0.1),
+			"priority": 5
+		})
+	if unit_instance.thorns > 0:
+		candidates.append({
+			"name": "thorns",
+			"value": unit_instance.thorns,
+			"color": Color(0.55, 0.45, 0.2),
+			"priority": 6
+		})
 
-	# Hide default panels initially
-	if attack_panel:
-		attack_panel.visible = false
-	if poison_panel:
-		poison_panel.visible = false
+	# Sort candidates: highest value first, tie break using priority index
+	candidates.sort_custom(func(a, b):
+		if a.value != b.value:
+			return a.value > b.value
+		return a.priority < b.priority
+	)
 
-	# Clean up any previously duplicated dynamic panels
-	var stats_hbox = attack_panel.get_parent() if attack_panel else null
+	# Keep only the top 3 stats for the card UI display
+	var active_stats = candidates.slice(0, 3)
+
+	var stat_size = Vector2(30, 16)
+		
+	var template_panel = stats_hbox.get_child(0) as PanelContainer if stats_hbox and stats_hbox.get_child_count() > 0 else null
+
 	if stats_hbox:
+		stats_hbox.visible = true
+		# Hide default template panels initially, clean up old dynamic ones
 		for child in stats_hbox.get_children():
-			if child.name.begins_with("DynamicStatPanel"):
+			if not child.has_meta("is_dynamic"):
+				child.visible = false
+			else:
 				child.free()
 
-	# Dynamically populate panels for all active stats
-	for i in range(active_stats.size()):
-		var stat = active_stats[i]
-		var panel: PanelContainer = null
-		var label: Label = null
-		
-		if i == 0:
-			panel = attack_panel
-			label = attack_label
-		elif i == 1:
-			panel = poison_panel
-			label = poison_label
-		else:
-			# If more than 2 stats are active, duplicate the poison panel dynamically
-			if stats_hbox and poison_panel:
-				panel = poison_panel.duplicate() as PanelContainer
-				panel.name = "DynamicStatPanel"
-				stats_hbox.add_child(panel)
-				label = panel.find_child("*Label", true, false) as Label
-				
-		if panel:
-			panel.visible = true
+	# Dynamically populate bottom panels for the top 3 active stats
+	for stat in active_stats:
+		if stats_hbox and template_panel:
+			var panel = template_panel.duplicate() as PanelContainer
+			panel.set_meta("is_dynamic", true)
+			stats_hbox.add_child(panel)
+			var label = panel.find_child("*Label", true, false) as Label
 			if label:
-				label.text = stat.value
+				label.text = str(stat.value)
+				
 			setup_stat_panel_shader(panel, stat.color, stat_size)
+			panel.visible = true
 			
 	# 2. Setup sprite / fallback portrait
 	if sprite_rect and fallback_label:
@@ -143,6 +170,8 @@ static func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat
 	if border_rect:
 		border_rect.border_color = bg_color.lightened(.2)
 		border_rect.interior_color = bg_color
+		border_rect.inner_border_width = 2
+		border_rect.border_indentation = 1
 		border_rect.update_shader_parameters()
 
 ## Shared helper to configure item card visuals

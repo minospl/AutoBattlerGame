@@ -26,11 +26,12 @@ func initialize_new_run(templates: Array[UnitData]) -> void:
 	var titan = find_template.call("Ancient Titan")
 	var spellweaver = find_template.call("Spellweaver")
 	var druid = find_template.call("Vitality Druid")
+	var crab = find_template.call("River Crab")
 
 	# Populate active team:
 	# Slot 0: Ancient Titan, Slot 1: Spellweaver, Slot 2: null
-	# Slot 3: Vitality Druid, Slot 4: null, Slot 5: null
-	var setup = [titan, spellweaver, null, druid, null, null]
+	# Slot 3: Vitality Druid, Slot 4: River Crab, Slot 5: null
+	var setup = [titan, spellweaver, null, druid, crab, null]
 	for i in range(6):
 		var temp = setup[i]
 		if temp:

@@ -34,10 +34,7 @@ func update_ui() -> void:
 	# Delegate visual rendering to shared helper
 	CardUIHelper.setup_card_visuals(
 		unit_instance,
-		%AttackLabel,
-		%AttackPanel,
-		%PoisonLabel,
-		%PoisonPanel,
+		%StatsHBox,
 		%SpriteRect,
 		%PortraitCharLabel,
 		left_indicator,
