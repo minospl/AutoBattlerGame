@@ -13,6 +13,9 @@ extends Resource
 ## Base attack power
 @export var attack: int
 
+## Base heal value (on cast)
+@export var base_heal: int = 0
+
 ## Base poison value
 @export var base_poison: int
 

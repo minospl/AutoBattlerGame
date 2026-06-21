@@ -94,11 +94,12 @@ func _setup_unit_ui() -> void:
 		
 	# 5. Stats
 	stats_panel.visible = true
-	var stats_text = "%d HP   |   %d ATK   |   %.1fs" % [
-		_unit_instance.get_max_health(),
-		_unit_instance.get_attack(),
-		_unit_instance.get_cast_speed()
-	]
+	var stats_text = "%d HP" % _unit_instance.get_max_health()
+	if _unit_instance.get_attack() > 0:
+		stats_text += "   |   %d ATK" % _unit_instance.get_attack()
+	if _unit_instance.heal > 0:
+		stats_text += "   |   %d Heal" % _unit_instance.heal
+	stats_text += "   |   %.1fs" % _unit_instance.get_cast_speed()
 	if _unit_instance.poison > 0:
 		stats_text += "   |   %d Poison" % _unit_instance.poison
 	stats_label.text = stats_text

@@ -13,6 +13,9 @@ extends Resource
 ## Current poison value of this specific instance
 @export var poison: int = 0
 
+## Heal value (on cast) of this specific instance
+@export var heal: int = 0
+
 ## Level/Stars of the unit (useful for future upgrades)
 @export var level: int = 1
 
@@ -27,6 +30,7 @@ func initialize(p_data: UnitData) -> void:
 	current_health = p_data.max_health
 	current_attack = p_data.attack
 	poison = p_data.base_poison
+	heal = p_data.base_heal if p_data else 0
 	current_cast_speed = p_data.cast_speed
 
 func get_unit_name() -> String:

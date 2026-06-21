@@ -17,9 +17,9 @@ func initialize_new_run(templates: Array[UnitData]) -> void:
 	state.max_trophies = 10
 	
 	# Find templates by unit name
-	var find_template = func(name: String) -> UnitData:
+	var find_template = func(p_name: String) -> UnitData:
 		for t in templates:
-			if t.unit_name.to_lower() == name.to_lower():
+			if t.unit_name.to_lower() == p_name.to_lower():
 				return t
 		return null
 

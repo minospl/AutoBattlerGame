@@ -145,6 +145,7 @@ func duplicate_unit_instance(inst: UnitInstance) -> UnitInstance:
 	new_inst.current_health = inst.current_health
 	new_inst.current_attack = inst.current_attack
 	new_inst.poison = inst.poison
+	new_inst.heal = inst.heal
 	new_inst.level = inst.level
 	new_inst.max_health_bonus = inst.max_health_bonus
 	new_inst.current_cast_speed = inst.current_cast_speed
@@ -225,14 +226,21 @@ func trigger_cast(source_idx: int) -> void:
 
 	# Attack practice dummy!
 	var dmg = unit.get_attack()
-	enemy_damage_taken += dmg
-	log_text("⚔️ [color=#ff6060]%s (slot %d) dealt %d damage to Enemy Dummy[/color] (Total Damage: %d)" % [unit.get_unit_name(), source_idx, dmg, enemy_damage_taken])
+	if dmg > 0:
+		enemy_damage_taken += dmg
+		log_text("⚔️ [color=#ff6060]%s (slot %d) dealt %d damage to Enemy Dummy[/color] (Total Damage: %d)" % [unit.get_unit_name(), source_idx, dmg, enemy_damage_taken])
 
 	# Apply poison if unit has poison value!
 	if unit.poison > 0:
 		enemy_poison += unit.poison
 		log_text("☠️ [color=#d050d0]%s (slot %d) applied %d Poison to Enemy Dummy[/color] (Poison Stack: %d)" % [unit.get_unit_name(), source_idx, unit.poison, enemy_poison])
 	
+	# Heal team if unit has heal value!
+	if unit.heal > 0:
+		team_health = min(team_health + unit.heal, team_max_health)
+		log_text("💚 [color=#20ff20]%s (slot %d) healed Team for %d HP[/color]" % [unit.get_unit_name(), source_idx, unit.heal])
+		update_team_health_bar()
+		
 	_update_enemy_ui()
 
 	# Perform ON_CAST action
@@ -279,7 +287,7 @@ func advance_simulation(delta: float) -> void:
 		if fatigue_tick_timer >= 1.0:
 			fatigue_tick_timer -= 1.0
 			fatigue_tick_count += 1
-			var stage = (fatigue_tick_count - 1) / 3 + 1
+			var stage = floori((fatigue_tick_count - 1) / 3.0) + 1
 			var dmg = get_fibonacci(stage + 1)
 			log_text("💀 [color=#ff3030]Fatigue ticks (Level %d, Tick %d): dealing %d damage to Team HP[/color]" % [stage, fatigue_tick_count, dmg])
 			

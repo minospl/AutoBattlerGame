@@ -18,29 +18,55 @@ static func setup_card_visuals(
 	if not unit_instance:
 		return
 		
-	# 1. Update stats labels
-	if attack_label:
-		attack_label.text = str(unit_instance.get_attack())
-	if poison_label:
-		poison_label.text = str(unit_instance.poison)
-		
 	var stat_size = Vector2(32, 16)
 	
-	# Style Attack Panel
+	# 1. Gather all active stats (Attack, Heal, Poison)
+	var active_stats = []
+	if unit_instance.get_attack() > 0:
+		active_stats.append({"value": str(unit_instance.get_attack()), "color": GameColors.STAT_ATTACK_BG})
+	if unit_instance.heal > 0:
+		active_stats.append({"value": str(unit_instance.heal), "color": Color(0.15, 0.6, 0.3)}) # Green for heal
+	if unit_instance.poison > 0:
+		active_stats.append({"value": str(unit_instance.poison), "color": GameColors.STAT_POISON_BG})
+
+	# Hide default panels initially
 	if attack_panel:
-		if unit_instance.current_attack > 0:
-			attack_panel.visible = true
-			setup_stat_panel_shader(attack_panel, GameColors.STAT_ATTACK_BG, stat_size)
-		else:
-			attack_panel.visible = false
-			
-	# Style Poison Panel
+		attack_panel.visible = false
 	if poison_panel:
-		if unit_instance.poison > 0:
-			poison_panel.visible = true
-			setup_stat_panel_shader(poison_panel, GameColors.STAT_POISON_BG, stat_size)
+		poison_panel.visible = false
+
+	# Clean up any previously duplicated dynamic panels
+	var stats_hbox = attack_panel.get_parent() if attack_panel else null
+	if stats_hbox:
+		for child in stats_hbox.get_children():
+			if child.name.begins_with("DynamicStatPanel"):
+				child.free()
+
+	# Dynamically populate panels for all active stats
+	for i in range(active_stats.size()):
+		var stat = active_stats[i]
+		var panel: PanelContainer = null
+		var label: Label = null
+		
+		if i == 0:
+			panel = attack_panel
+			label = attack_label
+		elif i == 1:
+			panel = poison_panel
+			label = poison_label
 		else:
-			poison_panel.visible = false
+			# If more than 2 stats are active, duplicate the poison panel dynamically
+			if stats_hbox and poison_panel:
+				panel = poison_panel.duplicate() as PanelContainer
+				panel.name = "DynamicStatPanel"
+				stats_hbox.add_child(panel)
+				label = panel.find_child("*Label", true, false) as Label
+				
+		if panel:
+			panel.visible = true
+			if label:
+				label.text = stat.value
+			setup_stat_panel_shader(panel, stat.color, stat_size)
 			
 	# 2. Setup sprite / fallback portrait
 	if sprite_rect and fallback_label:

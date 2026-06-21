@@ -21,6 +21,7 @@ unit_name = "River Crab"
 price = 3
 max_health = 12
 attack = 3
+base_heal = 1
 base_poison = 3
 cast_speed = 5.0
 types = [ExtResource("2_type_woda"), ExtResource("3_type_bestia")]
