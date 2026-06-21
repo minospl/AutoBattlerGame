@@ -23,13 +23,13 @@ var gold: int = 10:
 		if is_inside_tree() and shop_panel:
 			shop_panel.gold = gold
 
-var slot_scene = preload("res://src/shared/components/card_slot.tscn")
+var slot_scene = preload("res://src/shared/components/shop_card_slot.tscn")
 
-var active_slots: Array[CardSlot]:
+var active_slots: Array[ShopCardSlot]:
 	get:
 		return team_panel.slots
 
-var bench_slots: Array[CardSlot]:
+var bench_slots: Array[ShopCardSlot]:
 	get:
 		return bench_panel.slots
 
@@ -46,6 +46,7 @@ func _ready() -> void:
 	# Connect control panel signals
 	shop_header_bar.add_monster_requested.connect(_on_add_monster_requested)
 	shop_header_bar.restart_requested.connect(_on_restart_requested)
+	shop_header_bar.battle_requested.connect(_on_battle_requested)
 	
 	# Connect shop panel signals
 	shop_panel.roll_requested.connect(_on_roll_requested)
@@ -72,7 +73,9 @@ func _ready() -> void:
 		"res://src/resources/units/forest_guardian.tres",
 		"res://src/resources/units/wild_wolf.tres",
 		"res://src/resources/units/river_crab.tres",
-		"res://src/resources/units/spellweaver.tres"
+		"res://src/resources/units/spellweaver.tres",
+		"res://src/resources/units/vitality_druid.tres",
+		"res://src/resources/units/ancient_titan.tres"
 	]
 	
 	for path in paths:
@@ -88,15 +91,13 @@ func _ready() -> void:
 			
 		unit_templates.append(template)
 			
-	# Spawn initial units: 1 of each type that currently exists
-	for template in unit_templates:
-		var instance = UnitInstance.new()
-		instance.initialize(template)
-		add_unit_to_bench(instance)
-		
-	# Set initial gold and roll the shop for free
-	gold = 10
-	roll_shop(true)
+	# Initialize CurrentRun if empty, otherwise load it
+	if CurrentRun.state == null:
+		CurrentRun.initialize_new_run(unit_templates)
+		load_state_from_run()
+		roll_shop(true)
+	else:
+		load_state_from_run()
 	
 	# Instantiate and add the targeting line overlay to draw on top of everything
 	var overlay_script = load("res://src/scenes/shop_scene/components/targeting_line_overlay.gd")
@@ -128,7 +129,7 @@ func create_slots() -> void:
 	team_panel.create_slots(slot_scene, active_slot_count)
 	shop_panel.create_slots(slot_scene, 4)
 
-func _on_slot_changed(_slot: CardSlot) -> void:
+func _on_slot_changed(_slot: ShopCardSlot) -> void:
 	sync_data_from_ui()
 	_on_team_state_changed()
 
@@ -144,7 +145,7 @@ func sync_data_from_ui() -> void:
 
 ## Populate the UI based on external changes to logic data structures
 func populate_ui() -> void:
-	var card_scene = load("res://src/shared/components/card.tscn")
+	var card_scene = load("res://src/shared/components/shop_card.tscn")
 	
 	# Clear existing cards immediately
 	for slot in active_slots:
@@ -164,12 +165,14 @@ func populate_ui() -> void:
 		if i < active_team.size() and active_team[i] != null:
 			var card = card_scene.instantiate()
 			card.unit_instance = active_team[i]
+			_connect_card_signals(card)
 			active_slots[i].add_card(card)
 			
 	for i in range(bench_slot_count):
 		if i < bench.size() and bench[i] != null:
 			var card = card_scene.instantiate()
 			card.unit_instance = bench[i]
+			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
 
 ## Add a unit to the first empty slot on the bench
@@ -177,9 +180,10 @@ func add_unit_to_bench(unit: UnitInstance) -> bool:
 	for i in range(bench_slot_count):
 		if bench[i] == null:
 			bench[i] = unit
-			var card_scene = load("res://src/shared/components/card.tscn")
+			var card_scene = load("res://src/shared/components/shop_card.tscn")
 			var card = card_scene.instantiate()
 			card.unit_instance = unit
+			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
 			sync_data_from_ui()
 			return true
@@ -250,7 +254,7 @@ func _on_roll_requested() -> void:
 		gold -= 1
 		roll_shop(false)
 
-func _on_sell_card_requested(card: Control, original_slot: CardSlot) -> void:
+func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void:
 	var refund_gold = 1
 	if "price" in card:
 		refund_gold = card.price
@@ -294,23 +298,29 @@ func refill_shop_slot(slot_index: int) -> void:
 		var instance = UnitInstance.new()
 		instance.initialize(template)
 		
-		var card_scene = preload("res://src/shared/components/card.tscn")
+		var card_scene = preload("res://src/shared/components/shop_card.tscn")
 		var card = card_scene.instantiate()
 		card.unit_instance = instance
+		_connect_card_signals(card)
 		slot.add_card(card)
 	else: # Item Card
-		var item_scene = preload("res://src/shared/components/item_card.tscn")
-		var item_card = item_scene.instantiate() as ItemCard
+		var item_scene = preload("res://src/shared/components/shop_card_item.tscn")
+		var item_card = item_scene.instantiate() as ShopCardItem
+		
+		var item_inst = ShopItemInstance.new()
 		if randf() < 0.5:
-			item_card.item_name = "Apple"
-			item_card.stat_boost_hp = 2
-			item_card.stat_boost_attack = 0
-			item_card.price = 2
+			item_inst.item_name = "Apple"
+			item_inst.stat_boost_hp = 2
+			item_inst.stat_boost_attack = 0
+			item_inst.price = 2
 		else:
-			item_card.item_name = "Sword"
-			item_card.stat_boost_hp = 0
-			item_card.stat_boost_attack = 2
-			item_card.price = 3
+			item_inst.item_name = "Sword"
+			item_inst.stat_boost_hp = 0
+			item_inst.stat_boost_attack = 2
+			item_inst.price = 3
+			
+		item_card.item_instance = item_inst
+		_connect_card_signals(item_card)
 		slot.add_card(item_card)
 		
 	slot.update_placeholder()
@@ -319,19 +329,17 @@ func set_preview_card(card: Control) -> void:
 	if not preview_tooltip:
 		return
 		
-	if "unit_instance" in card and card.unit_instance:
-		preview_tooltip.setup_for_unit(card.unit_instance)
-		preview_tooltip.visible = true
+	if card is ShopCard and card.unit_instance:
+		CardUIHelper.show_tooltip(preview_tooltip, card.unit_instance)
 		_on_card_hovered(card, true)
-	elif "item_name" in card:
-		preview_tooltip.setup_for_item(card)
-		preview_tooltip.visible = true
+	elif card is ShopCardItem and card.item_instance:
+		CardUIHelper.show_item_tooltip(preview_tooltip, card.item_instance)
 
 func clear_preview_card(card: Control = null) -> void:
 	if not preview_tooltip:
 		return
 		
-	preview_tooltip.visible = false
+	CardUIHelper.hide_tooltip(preview_tooltip)
 	_on_card_hovered(card, false)
 
 func _on_card_hovered(card: Control, is_hovered: bool) -> void:
@@ -341,11 +349,11 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 	for slot in bench_slots:
 		slot.set_target_highlight(false)
 		
-	if not is_hovered or card == null or not ("unit_instance" in card) or card.unit_instance == null:
+	if not is_hovered or card == null or not (card is ShopCard) or card.unit_instance == null:
 		return
 		
 	# Find which slot contains the hovered card
-	var source_slot: CardSlot = null
+	var source_slot: ShopCardSlot = null
 	for slot in active_slots:
 		if slot.get_card() == card:
 			source_slot = slot
@@ -371,3 +379,93 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 			for t_idx in target_indices:
 				if t_idx < active_slots.size():
 					active_slots[t_idx].set_target_highlight(true)
+
+func _connect_card_signals(card: Control) -> void:
+	if card.has_signal("hovered"):
+		if not card.hovered.is_connected(_on_card_hover_changed):
+			card.hovered.connect(_on_card_hover_changed)
+
+func _on_card_hover_changed(card: Control, is_hovered: bool) -> void:
+	if is_hovered:
+		set_preview_card(card)
+	else:
+		clear_preview_card(card)
+
+func load_state_from_run() -> void:
+	if CurrentRun.state == null:
+		return
+		
+	gold = CurrentRun.state.gold
+	shop_header_bar.lives = CurrentRun.state.lives
+	shop_header_bar.day = CurrentRun.state.day
+	shop_header_bar.trophies = CurrentRun.state.trophies
+	
+	# Load active team and bench
+	active_team = CurrentRun.state.active_team.duplicate()
+	bench = CurrentRun.state.bench.duplicate()
+	
+	populate_ui()
+	
+	# Recreate cards in shop slots
+	for i in range(shop_panel.slots.size()):
+		var slot = shop_panel.slots[i]
+		
+		# Clear current card
+		var old_card = slot.get_card()
+		if old_card:
+			slot.remove_card(old_card)
+			old_card.queue_free()
+			
+		var item_or_unit = CurrentRun.state.shop_units[i]
+		var is_frozen = CurrentRun.state.shop_frozen_statuses[i]
+		
+		slot.is_frozen = is_frozen
+		if slot.has_node("%FreezeButton"):
+			(slot.get_node("%FreezeButton") as Button).button_pressed = is_frozen
+			
+		if item_or_unit != null:
+			if item_or_unit is UnitInstance:
+				var card_scene = load("res://src/shared/components/shop_card.tscn")
+				var card = card_scene.instantiate()
+				card.unit_instance = item_or_unit
+				_connect_card_signals(card)
+				slot.add_card(card)
+			elif item_or_unit is ShopItemInstance:
+				var item_scene = load("res://src/shared/components/shop_card_item.tscn")
+				var item_card = item_scene.instantiate() as ShopCardItem
+				item_card.item_instance = item_or_unit
+				_connect_card_signals(item_card)
+				slot.add_card(item_card)
+				
+		slot.update_placeholder()
+
+func sync_data_to_run_state() -> void:
+	if CurrentRun.state == null:
+		return
+		
+	sync_data_from_ui()
+	
+	CurrentRun.state.gold = gold
+	CurrentRun.state.lives = shop_header_bar.lives
+	CurrentRun.state.day = shop_header_bar.day
+	CurrentRun.state.trophies = shop_header_bar.trophies
+	
+	CurrentRun.state.active_team = active_team.duplicate()
+	CurrentRun.state.bench = bench.duplicate()
+	
+	for i in range(shop_panel.slots.size()):
+		var slot = shop_panel.slots[i]
+		var card = slot.get_card()
+		if card:
+			if card is ShopCard:
+				CurrentRun.state.shop_units[i] = card.unit_instance
+			elif card is ShopCardItem:
+				CurrentRun.state.shop_units[i] = card.item_instance
+		else:
+			CurrentRun.state.shop_units[i] = null
+			
+		CurrentRun.state.shop_frozen_statuses[i] = slot.is_frozen
+
+func _on_battle_requested() -> void:
+	sync_data_to_run_state()
+	get_tree().change_scene_to_file("res://src/scenes/battle_scene/battle_scene.tscn")

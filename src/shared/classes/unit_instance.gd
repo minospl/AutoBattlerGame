@@ -17,6 +17,7 @@ extends Resource
 @export var level: int = 1
 
 @export var max_health_bonus: int = 0
+var temp_max_health_bonus: int = 0
 
 @export var current_cast_speed: float
 
@@ -32,7 +33,7 @@ func get_unit_name() -> String:
 	return data.unit_name if data else "Unknown"
 
 func get_max_health() -> int:
-	return (data.max_health if data else 1) + max_health_bonus
+	return (data.max_health if data else 1) + max_health_bonus + temp_max_health_bonus
 
 func get_attack() -> int:
 	return current_attack

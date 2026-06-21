@@ -13,7 +13,7 @@ extends PanelContainer
 @onready var desc_label: RichTextLabel = %DescLabel
 
 var _unit_instance: UnitInstance
-var _item_card: ItemCard
+var _item_card: Resource
 
 func _ready() -> void:
 	print("--- CardTooltip _ready() called. Unit: ", _unit_instance.get_unit_name() if _unit_instance else "none", ", Item: ", _item_card.item_name if _item_card else "none")
@@ -28,11 +28,13 @@ func _ready() -> void:
 
 func setup_for_unit(unit_instance: UnitInstance) -> void:
 	_unit_instance = unit_instance
+	_item_card = null
 	if is_node_ready():
 		_setup_unit_ui()
 
-func setup_for_item(item_card: ItemCard) -> void:
+func setup_for_item(item_card: Resource) -> void:
 	_item_card = item_card
+	_unit_instance = null
 	if is_node_ready():
 		_setup_item_ui()
 

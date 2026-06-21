@@ -2,7 +2,7 @@ class_name ShopPanel
 extends PanelContainer
 
 signal roll_requested
-signal sell_card_requested(card: Control, original_slot: CardSlot)
+signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
 
 @onready var slots_hbox: HBoxContainer = %SlotsHBox
 @onready var refresh_shop_button: Button = %RefreshShopButton
@@ -17,7 +17,7 @@ signal sell_card_requested(card: Control, original_slot: CardSlot)
 		gold = val
 		_update_labels()
 
-var slots: Array[CardSlot] = []
+var slots: Array[ShopCardSlot] = []
 
 func _ready() -> void:
 	refresh_shop_button.pressed.connect(func(): roll_requested.emit())
@@ -36,7 +36,7 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 	slots.clear()
 	
 	for i in range(slot_count):
-		var slot = slot_scene.instantiate() as CardSlot
+		var slot = slot_scene.instantiate() as ShopCardSlot
 		slot.is_shop_slot = true
 		slot.slot_index = i
 		slots_hbox.add_child(slot)
@@ -46,18 +46,18 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	if sell_overlay and sell_overlay.visible:
 		if typeof(data) == TYPE_DICTIONARY and data.has("card"):
-			var original_slot = data["original_slot"] as CardSlot
+			var original_slot = data["original_slot"] as ShopCardSlot
 			# Can only sell if it comes from team or bench (not a shop slot)
 			if original_slot and not original_slot.is_shop_slot:
 				var card = data["card"]
 				# Only sell Card (units)
-				if card is Card:
+				if card is ShopCard:
 					return true
 	return false
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	var card = data["card"]
-	var original_slot = data["original_slot"] as CardSlot
+	var original_slot = data["original_slot"] as ShopCardSlot
 	sell_card_requested.emit(card, original_slot)
 
 func _notification(what: int) -> void:
@@ -65,7 +65,7 @@ func _notification(what: int) -> void:
 		# Check if the dragged item is sellable by querying DragManager's static variables
 		var card = DragManager.dragged_card
 		var original_slot = DragManager.dragged_card_original_slot
-		if card is Card and original_slot and not original_slot.is_shop_slot:
+		if card is ShopCard and original_slot and not original_slot.is_shop_slot:
 			if sell_label and "price" in card:
 				sell_label.text = "RELEASE TO SELL (+" + str(card.price) + "g)"
 			set_process(true)

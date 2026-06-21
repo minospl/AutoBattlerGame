@@ -1,8 +1,8 @@
-class_name CardSlot
+class_name ShopCardSlot
 extends Control
 
 ## Signal emitted when the card inside this slot changes (added, removed, swapped)
-signal slot_changed(slot: CardSlot)
+signal slot_changed(slot: ShopCardSlot)
 
 ## If true, this slot is part of the active combat team. If false, it is on the bench.
 @export var is_active_team: bool = false
@@ -20,6 +20,8 @@ var is_frozen: bool = false
 
 var is_highlighted: bool = false
 var is_targeted: bool = false
+
+@export var drag_drop_enabled: bool = true
 
 func _ready() -> void:
 	# Connect tree notifications to toggle placeholder visibility and border visibility
@@ -140,12 +142,15 @@ func _process(_delta: float) -> void:
 
 # Determine if we can drop a dragged item onto this slot
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
+	if not drag_drop_enabled:
+		return false
+		
 	if is_shop_slot:
 		return false # Cannot drop cards into shop slots!
 		
 	if typeof(data) == TYPE_DICTIONARY and data.has("card"):
 		var dragged_card = data["card"]
-		var original_slot = data["original_slot"] as CardSlot
+		var original_slot = data["original_slot"] as ShopCardSlot
 		
 		# Check if the player has enough gold for a purchase
 		if original_slot and original_slot.is_shop_slot:
@@ -179,7 +184,7 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	update_style(false)
 	
 	var dragged_card = data["card"]
-	var original_slot: CardSlot = data["original_slot"]
+	var original_slot: ShopCardSlot = data["original_slot"]
 	
 	if original_slot == self:
 		add_card(dragged_card)

@@ -47,20 +47,42 @@ static func apply_effect(t_idx: int, modifier: UnitModifier, team: Array[UnitIns
 		UnitModifier.EffectType.BUFF_ATTACK:
 			target_unit.current_attack += modifier.value
 		UnitModifier.EffectType.BUFF_HEALTH:
-			target_unit.max_health_bonus += modifier.value
-			target_unit.current_health += modifier.value
+			if modifier.duration == UnitModifier.Duration.PERMANENT:
+				target_unit.max_health_bonus += modifier.value
+				target_unit.current_health += modifier.value
+			else:
+				target_unit.temp_max_health_bonus += modifier.value
+				target_unit.current_health += modifier.value
+			var battle = get_battle_scene()
+			if battle:
+				battle.team_max_health += modifier.value
+				battle.team_health += modifier.value
+				battle.update_team_health_bar()
 		UnitModifier.EffectType.BUFF_HEAL:
 			target_unit.current_health = min(target_unit.current_health + modifier.value, target_unit.get_max_health())
+			var battle = get_battle_scene()
+			if battle:
+				battle.team_health = min(battle.team_health + modifier.value, battle.team_max_health)
+				battle.update_team_health_bar()
 		UnitModifier.EffectType.APPLY_POISON:
 			target_unit.poison += modifier.value
 		UnitModifier.EffectType.BUFF_SHIELD:
-			# Visual representation not fully implemented in UI, but logged for debugging
 			print("[ModifierEngine] Shield buff of %d applied to %s" % [modifier.value, target_unit.get_unit_name()])
+			var battle = get_battle_scene()
+			if battle:
+				battle.team_shield += modifier.value
+				battle.update_team_health_bar()
 		UnitModifier.EffectType.TRIGGER_MODIFIERS:
 			print("[ModifierEngine] Triggering modifiers of type '%s' on %s (slot %d)" % [
 				str(modifier.target_trigger), target_unit.get_unit_name(), t_idx
 			])
-			# Recursively trigger the target's modifiers matching the target_trigger condition
 			trigger_unit_modifiers(t_idx, team, modifier.target_trigger)
 		_:
 			print("[ModifierEngine] Effect type %s not supported in engine yet" % str(modifier.effect))
+
+static func get_battle_scene() -> Node:
+	var tree = Engine.get_main_loop() as SceneTree
+	if tree and tree.current_scene:
+		if tree.current_scene.has_method("update_team_health_bar"):
+			return tree.current_scene
+	return null

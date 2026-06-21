@@ -3,6 +3,7 @@ extends PanelContainer
 
 signal add_monster_requested
 signal restart_requested
+signal battle_requested
 
 @export var lives: int = 10:
 	set(value):
@@ -26,6 +27,7 @@ signal restart_requested
 
 @onready var add_btn: Button = %AddButton
 @onready var restart_btn: Button = %RestartButton
+@onready var battle_btn: Button = %BattleButton
 
 @onready var lives_label: Label = %LivesLabel
 
@@ -36,6 +38,7 @@ func _ready() -> void:
 	# Connect local button signals
 	add_btn.pressed.connect(func(): add_monster_requested.emit())
 	restart_btn.pressed.connect(func(): restart_requested.emit())
+	battle_btn.pressed.connect(func(): battle_requested.emit())
 	
 	# Apply visual styling programmatically to keep the presentation premium and clean
 	_apply_visual_styling()

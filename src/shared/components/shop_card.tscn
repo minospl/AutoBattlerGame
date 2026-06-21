@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://src/shared/components/card.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/shared/components/shop_card.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/shared/components/decorators/shader_border_decorator.gd" id="2_decorator"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_left"]
@@ -43,7 +43,7 @@ corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
 anti_aliasing = false
 
-[node name="Card" type="PanelContainer"]
+[node name="ShopCard" type="PanelContainer"]
 custom_minimum_size = Vector2(100, 125)
 offset_right = 100.0
 offset_bottom = 125.0
