@@ -71,7 +71,8 @@ func _ready() -> void:
 		"res://src/resources/units/red_dragon.tres",
 		"res://src/resources/units/forest_guardian.tres",
 		"res://src/resources/units/wild_wolf.tres",
-		"res://src/resources/units/river_crab.tres"
+		"res://src/resources/units/river_crab.tres",
+		"res://src/resources/units/spellweaver.tres"
 	]
 	
 	for path in paths:

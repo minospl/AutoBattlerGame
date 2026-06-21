@@ -32,6 +32,14 @@ const BTN_DARK_NORMAL = Color(0.10, 0.11, 0.13, 1) # Sleek dark
 const BTN_RED_HOVER = Color(0.15, 0.163, 0.189, 1.0) # Red tint on hover
 const BTN_RED_PRESSED = Color(0.173, 0.188, 0.217, 1.0)
 
-
 # Card portrait fallback text color
 const PORTRAIT_FALLBACK_TEXT = Color(0.2, 0.2, 0.2, 0.75)
+
+# Tooltip Description Formatting Colors (Hex Strings)
+const DESC_TRIGGER = "#f2b726"  # Standardized bright gold for all triggers
+const DESC_TARGET = "#0056b3"   # Standardized bright blue for all targets/directions
+const DESC_ATTACK = "#27ae60"   # Standardized green for Attack buffs
+const DESC_HEALTH = "#c0392b"   # Standardized dark red for Health buffs
+const DESC_SHIELD = "#2980b9"   # Standardized blue for Shield buffs
+const DESC_HEAL = "#27ae60"     # Standardized green for heals
+const DESC_POISON = "#8e44ad"   # Standardized purple for poison

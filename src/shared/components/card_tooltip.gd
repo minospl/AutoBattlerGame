@@ -10,7 +10,7 @@ extends PanelContainer
 @onready var stats_panel: PanelContainer = %StatsPanel
 @onready var stats_label: Label = %StatsLabel
 @onready var desc_panel: PanelContainer = %DescPanel
-@onready var desc_label: Label = %DescLabel
+@onready var desc_label: RichTextLabel = %DescLabel
 
 var _unit_instance: UnitInstance
 var _item_card: ItemCard
@@ -111,7 +111,7 @@ func _setup_unit_ui() -> void:
 			
 	if not full_desc.is_empty():
 		desc_panel.visible = true
-		desc_label.text = full_desc
+		desc_label.text = "[center]%s[/center]" % full_desc
 	else:
 		desc_panel.visible = false
 
@@ -166,7 +166,7 @@ func _setup_item_ui() -> void:
 		desc += "Give a unit +%d Health." % _item_card.stat_boost_hp
 		
 	desc_panel.visible = true
-	desc_label.text = desc
+	desc_label.text = "[center]%s[/center]" % desc
 
 func _update_sub_panel_borders(border_col: Color) -> void:
 	var panels = [

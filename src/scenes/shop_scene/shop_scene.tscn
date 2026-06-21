@@ -57,13 +57,13 @@ custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 color = Color(0.29, 0.251, 0.255, 1)
 
-[node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+[node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=830363032]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 24
 alignment = 1
 
-[node name="ContentMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox"]
+[node name="ContentMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox" unique_id=2118919358]
 layout_mode = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_bottom = 32
@@ -91,14 +91,13 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="PreviewContainer" type="MarginContainer" parent="."]
+[node name="PreviewContainer" type="MarginContainer" parent="." unique_id=25298775]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = 0
-offset_top = 76
+offset_top = 76.0
 offset_right = -16.0
 offset_bottom = 97.0
 grow_horizontal = 0

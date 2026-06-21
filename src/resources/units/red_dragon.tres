@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" path="res://src/assets/units/red_dragon.jpg" id="4_sprite"]
 [ext_resource type="Script" path="res://src/resources/unit_modifier.gd" id="5_modifier"]
 
-[sub_resource type="Resource" id="Resource_dragon_cast"]
+[sub_resource type="Resource" id="Resource_dragon_on_cast"]
 script = ExtResource("5_modifier")
 trigger = 0
 effect = 0
@@ -23,5 +23,5 @@ base_poison = 0
 cast_speed = 4.0
 types = [ExtResource("2_type")]
 rarity = ExtResource("3_rarity")
-modifiers = [SubResource("Resource_dragon_cast")]
+modifiers = [SubResource("Resource_dragon_on_cast")]
 sprite = ExtResource("4_sprite")

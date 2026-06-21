@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" path="res://src/assets/units/river_crab.jpg" id="5_sprite"]
 [ext_resource type="Script" path="res://src/resources/unit_modifier.gd" id="6_modifier"]
 
-[sub_resource type="Resource" id="Resource_crab_dmg"]
+[sub_resource type="Resource" id="Resource_crab_take_dmg"]
 script = ExtResource("6_modifier")
 trigger = 2
 target = 0
@@ -25,5 +25,5 @@ base_poison = 3
 cast_speed = 5.0
 types = [ExtResource("2_type_woda"), ExtResource("3_type_bestia")]
 rarity = ExtResource("4_rarity")
-modifiers = [SubResource("Resource_crab_dmg")]
+modifiers = [SubResource("Resource_crab_take_dmg")]
 sprite = ExtResource("5_sprite")

@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" path="res://src/assets/units/wild_wolf.jpg" id="4_sprite"]
 [ext_resource type="Script" path="res://src/resources/unit_modifier.gd" id="5_modifier"]
 
-[sub_resource type="Resource" id="Resource_wolf_death"]
+[sub_resource type="Resource" id="Resource_wolf_battle_start"]
 script = ExtResource("5_modifier")
 trigger = 1
 target = 3
@@ -24,5 +24,5 @@ base_poison = 0
 cast_speed = 3.0
 types = [ExtResource("2_type")]
 rarity = ExtResource("3_rarity")
-modifiers = [SubResource("Resource_wolf_death")]
+modifiers = [SubResource("Resource_wolf_battle_start")]
 sprite = ExtResource("4_sprite")
