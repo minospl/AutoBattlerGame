@@ -19,8 +19,6 @@ extends Resource
 ## Shield value (on cast) of this specific instance
 @export var shield: int = 0
 
-## Vampirism value of this specific instance
-@export var vampirism: int = 0
 
 ## Thorns value of this specific instance
 @export var thorns: int = 0
@@ -47,7 +45,6 @@ func initialize(p_data: UnitData) -> void:
 	poison = p_data.base_poison
 	heal = p_data.base_heal if p_data else 0
 	shield = p_data.base_shield if p_data else 0
-	vampirism = p_data.base_vampirism if p_data else 0
 	thorns = p_data.base_thorns if p_data else 0
 	burn = p_data.base_burn if p_data else 0
 	electrocute = p_data.base_electrocute if p_data else 0

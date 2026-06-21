@@ -16,7 +16,6 @@ var _unit_instance: UnitInstance
 var _item_card: Resource
 
 func _ready() -> void:
-	print("--- CardTooltip _ready() called. Unit: ", _unit_instance.get_unit_name() if _unit_instance else "none", ", Item: ", _item_card.item_name if _item_card else "none")
 	# Ensure the container panel is transparent so only the decorator shader draws the background
 	var transparent_style = StyleBoxEmpty.new()
 	add_theme_stylebox_override("panel", transparent_style)
@@ -103,8 +102,6 @@ func _setup_unit_ui() -> void:
 		stats_text += "   |   %d Shield" % _unit_instance.shield
 	if _unit_instance.thorns > 0:
 		stats_text += "   |   %d Thorns" % _unit_instance.thorns
-	if _unit_instance.vampirism > 0:
-		stats_text += "   |   %d%% Vamp" % _unit_instance.vampirism
 	if _unit_instance.burn > 0:
 		stats_text += "   |   %d Burn" % _unit_instance.burn
 	if _unit_instance.electrocute > 0:

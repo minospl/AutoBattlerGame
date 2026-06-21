@@ -21,7 +21,6 @@ price = 2
 max_health = 10
 attack = 4
 base_poison = 0
-base_vampirism = 30
 cast_speed = 3.0
 types = [ExtResource("2_type")]
 rarity = ExtResource("3_rarity")

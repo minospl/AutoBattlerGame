@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/scenes/battle_scene/battle_scene.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://src/scenes/battle_scene/components/battle_card_slot.tscn" id="2_slot"]
 [ext_resource type="Script" path="res://src/shared/components/decorators/game_button_decorator.gd" id="3_button_decorator"]
 [ext_resource type="Script" path="res://src/shared/components/decorators/panel_border_decorator.gd" id="4_border_decorator"]
+[ext_resource type="Script" path="res://src/scenes/battle_scene/components/status_badge.gd" id="5_status_badge"]
 
 [node name="BattleScene" type="Control"]
 layout_mode = 3
@@ -115,7 +116,6 @@ color_normal = Color(0.7, 0.4, 0.1, 1)
 color_hover = Color(0.8, 0.5, 0.15, 1)
 color_pressed = Color(0.9, 0.6, 0.2, 1)
 
-
 [node name="ResetButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -127,18 +127,6 @@ script = ExtResource("3_button_decorator")
 color_normal = Color(0.6, 0.15, 0.15, 1)
 color_hover = Color(0.75, 0.2, 0.2, 1)
 color_pressed = Color(0.9, 0.25, 0.25, 1)
-
-[node name="ToggleLogButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "📋 Show Log"
-
-[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/ToggleLogButton"]
-script = ExtResource("3_button_decorator")
-color_normal = Color(0.3, 0.3, 0.35, 1)
-color_hover = Color(0.4, 0.4, 0.45, 1)
-color_pressed = Color(0.5, 0.5, 0.55, 1)
 
 [node name="SpeedButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
 unique_name_in_owner = true
@@ -166,35 +154,41 @@ custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 color = Color(0.29, 0.251, 0.255, 1)
 
-[node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+[node name="BattleAreaVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="HealthBarsHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
 theme_override_constants/separation = 32
 alignment = 1
 
-[node name="GridMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox"]
+[node name="TeamHealthBarMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 32
-theme_override_constants/margin_bottom = 32
 
-[node name="GridVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin"]
+[node name="LeftHeaderColumn" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin"]
+custom_minimum_size = Vector2(368, 0)
 layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
 
-[node name="TeamHealthBarContainer" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox"]
+[node name="TeamHealthBarContainer" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_right = 18
 
-[node name="TeamHealthBarRect" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox/TeamHealthBarContainer"]
+[node name="TeamHealthBarRect" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamHealthBarContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(368, 32)
 layout_mode = 2
+size_flags_horizontal = 4
 
-[node name="TeamHealthLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox/TeamHealthBarContainer/TeamHealthBarRect"]
+[node name="TeamHealthLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamHealthBarContainer/TeamHealthBarRect"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -213,160 +207,157 @@ text = "Team Health: 0 / 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Row0HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="Slot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Slot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Slot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Row1HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="Slot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Slot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Slot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="LogMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox"]
+[node name="EnemyHealthBarMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox"]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
 theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 32
 
-[node name="RightColumn" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin"]
+[node name="RightHeaderColumn" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin"]
+custom_minimum_size = Vector2(368, 0)
 layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="EnemyPanelContainer" type="PanelContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="PanelBorderDecorator" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer"]
-layout_mode = 2
-script = ExtResource("4_border_decorator")
-
-[node name="Margin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="VBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin"]
-layout_mode = 2
+size_flags_horizontal = 4
 theme_override_constants/separation = 8
 
-[node name="EnemyTitleLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
-theme_override_font_sizes/font_size = 16
-text = "🎯 PRACTICE DUMMY"
-
-[node name="StatsHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin/VBox"]
-layout_mode = 2
-theme_override_constants/separation = 20
-
-[node name="DamageLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin/VBox/StatsHBox"]
+[node name="EnemyHealthBarContainer" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_font_sizes/font_size = 14
-text = "Damage Taken: 0"
 
-[node name="PoisonVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin/VBox/StatsHBox"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="PoisonLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin/VBox/StatsHBox/PoisonVBox"]
+[node name="EnemyHealthBarRect" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyHealthBarContainer"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(368, 32)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.5, 0.15, 0.6, 1)
-theme_override_font_sizes/font_size = 14
-text = "☠️ Poison: 0"
+size_flags_horizontal = 4
 
-[node name="PoisonCooldownBar" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin/VBox/StatsHBox/PoisonVBox"]
+[node name="EnemyHealthLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyHealthBarContainer/EnemyHealthBarRect"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 6)
-layout_mode = 2
-
-[node name="BarBg" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin/VBox/StatsHBox/PoisonVBox/PoisonCooldownBar"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1, 0.1, 0.1, 0.5)
-
-[node name="BarFill" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/EnemyPanelContainer/Margin/VBox/StatsHBox/PoisonVBox/PoisonCooldownBar"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 0.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.68, 0.28, 0.78, 0.85)
-
-[node name="LogPanelContainer" type="PanelContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="PanelBorderDecorator" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/LogPanelContainer"]
-layout_mode = 2
-script = ExtResource("4_border_decorator")
-
-[node name="Margin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/LogPanelContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="VBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/LogPanelContainer/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="LogTitleLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/LogPanelContainer/Margin/VBox"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 0.85)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.4)
+theme_override_constants/outline_size = 6
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
 theme_override_font_sizes/font_size = 16
-text = "BATTLE LOG"
+text = "Damage Taken: 0"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="BattleLogScroll" type="ScrollContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/LogPanelContainer/Margin/VBox"]
+[node name="EnemyStatusHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 3
+theme_override_constants/separation = 12
 
-[node name="BattleLogLabel" type="RichTextLabel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/LogMargin/RightColumn/LogPanelContainer/Margin/VBox/BattleLogScroll"]
+
+[node name="PoisonBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-bbcode_enabled = true
-text = ""
+script = ExtResource("5_status_badge")
+type = "poison"
+
+[node name="BurnBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = "burn"
+
+[node name="ElectrocuteBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = "electrocute"
+
+[node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox"]
+layout_mode = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="GridMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="GridVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Row0HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Slot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Row1HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Slot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemyMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="RightColumn" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EnemyRow0HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EnemySlot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+layout_mode = 2
+
+[node name="EnemySlot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+layout_mode = 2
+
+[node name="EnemySlot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+layout_mode = 2
+
+[node name="EnemyRow1HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EnemySlot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+layout_mode = 2
+
+[node name="EnemySlot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+layout_mode = 2
+
+[node name="EnemySlot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+layout_mode = 2
 
 [node name="PreviewContainer" type="MarginContainer" parent="."]
 unique_name_in_owner = true

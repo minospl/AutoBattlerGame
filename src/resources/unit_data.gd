@@ -22,8 +22,6 @@ extends Resource
 ## Base shield value (on cast)
 @export var base_shield: int = 0
 
-## Base vampirism percentage (on cast)
-@export var base_vampirism: int = 0
 
 ## Base thorns value (retaliate on hit)
 @export var base_thorns: int = 0

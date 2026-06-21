@@ -46,6 +46,12 @@ static func apply_effect(t_idx: int, modifier: UnitModifier, team: Array[UnitIns
 	match modifier.effect:
 		UnitModifier.EffectType.BUFF_ATTACK:
 			target_unit.current_attack += modifier.value
+			var battle = get_battle_scene()
+			if battle and battle.slots.size() > t_idx:
+				var slot = battle.slots[t_idx]
+				if slot:
+					var spawn_pos = slot.global_position + slot.size / 2.0
+					battle.spawn_floating_text("+" + str(modifier.value) + " ATK", Color(1.0, 0.85, 0.2), spawn_pos)
 		UnitModifier.EffectType.BUFF_HEALTH:
 			if modifier.duration == UnitModifier.Duration.PERMANENT:
 				target_unit.max_health_bonus += modifier.value
@@ -58,31 +64,54 @@ static func apply_effect(t_idx: int, modifier: UnitModifier, team: Array[UnitIns
 				battle.team_max_health += modifier.value
 				battle.team_health += modifier.value
 				battle.update_team_health_bar()
+				if battle.slots.size() > t_idx:
+					var slot = battle.slots[t_idx]
+					if slot:
+						var spawn_pos = slot.global_position + slot.size / 2.0
+						battle.spawn_floating_text("+" + str(modifier.value) + " HP", Color(1.0, 0.3, 0.3), spawn_pos)
 		UnitModifier.EffectType.BUFF_HEAL:
 			target_unit.current_health = min(target_unit.current_health + modifier.value, target_unit.get_max_health())
 			var battle = get_battle_scene()
 			if battle:
+				var health_before = battle.team_health
 				battle.team_health = min(battle.team_health + modifier.value, battle.team_max_health)
 				battle.update_team_health_bar()
+				var actual_heal = battle.team_health - health_before
+				if actual_heal > 0 and battle.slots.size() > t_idx:
+					var slot = battle.slots[t_idx]
+					if slot:
+						var spawn_pos = slot.global_position + slot.size / 2.0
+						battle.spawn_floating_text("+" + str(actual_heal), Color(0.2, 0.9, 0.2), spawn_pos)
 		UnitModifier.EffectType.APPLY_POISON:
 			target_unit.poison += modifier.value
+			var battle = get_battle_scene()
+			if battle and battle.slots.size() > t_idx:
+				var slot = battle.slots[t_idx]
+				if slot:
+					var spawn_pos = slot.global_position + slot.size / 2.0
+					battle.spawn_floating_text("+" + str(modifier.value) + " Poison", Color(0.7, 0.3, 0.8), spawn_pos)
 		UnitModifier.EffectType.BUFF_SHIELD:
-			print("[ModifierEngine] Shield buff of %d applied to %s" % [modifier.value, target_unit.get_unit_name()])
+			target_unit.shield += modifier.value
 			var battle = get_battle_scene()
 			if battle:
-				battle.team_shield += modifier.value
-				battle.update_team_health_bar()
+				if battle.slots.size() > t_idx:
+					var slot = battle.slots[t_idx]
+					if slot:
+						var spawn_pos = slot.global_position + slot.size / 2.0
+						battle.spawn_floating_text("+" + str(modifier.value) + " Shield", Color(0.7, 0.7, 0.7), spawn_pos)
 		UnitModifier.EffectType.TRIGGER_MODIFIERS:
-			print("[ModifierEngine] Triggering modifiers of type '%s' on %s (slot %d)" % [
-				str(modifier.target_trigger), target_unit.get_unit_name(), t_idx
-			])
 			trigger_unit_modifiers(t_idx, team, modifier.target_trigger)
 		_:
-			print("[ModifierEngine] Effect type %s not supported in engine yet" % str(modifier.effect))
+			pass
 
 static func get_battle_scene() -> Node:
 	var tree = Engine.get_main_loop() as SceneTree
-	if tree and tree.current_scene:
-		if tree.current_scene.has_method("update_team_health_bar"):
-			return tree.current_scene
+	if not tree:
+		return null
+	if tree.current_scene and tree.current_scene.has_method("update_team_health_bar"):
+		return tree.current_scene
+	if tree.root:
+		for child in tree.root.get_children():
+			if child.has_method("update_team_health_bar"):
+				return child
 	return null

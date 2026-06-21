@@ -46,9 +46,6 @@ func _ready() -> void:
 	%PlayButton.pressed.connect(_on_play_pressed)
 	%PauseButton.pressed.connect(_on_pause_pressed)
 	%ResetButton.pressed.connect(_on_reset_pressed)
-	%ToggleLogButton.pressed.connect(_on_toggle_log_pressed)
-	%LogPanelContainer.visible = false
-	%ToggleLogButton.text = "📋 Show Log"
 	%SpeedButton.pressed.connect(_on_speed_pressed)
 
 	# Fetch slots
@@ -79,6 +76,23 @@ func _ready() -> void:
 		if initial_hp_size.x == 0.0:
 			initial_hp_size = Vector2(340, 32)
 		%TeamHealthBarRect.material.set_shader_parameter("size", initial_hp_size)
+
+	# Assign shader material to the enemy health bar (damage bar)
+	var enemy_hp_material = ShaderMaterial.new()
+	enemy_hp_material.shader = hp_shader
+	enemy_hp_material.set_shader_parameter("fill_percentage", 1.0)
+	%EnemyHealthBarRect.material = enemy_hp_material
+	
+	%EnemyHealthBarRect.resized.connect(func():
+		if %EnemyHealthBarRect.material:
+			%EnemyHealthBarRect.material.set_shader_parameter("size", %EnemyHealthBarRect.size)
+	)
+	
+	if %EnemyHealthBarRect.material:
+		var initial_enemy_size = %EnemyHealthBarRect.size
+		if initial_enemy_size.x == 0.0:
+			initial_enemy_size = Vector2(340, 32)
+		%EnemyHealthBarRect.material.set_shader_parameter("size", initial_enemy_size)
 	
 	# Apply visual styling
 	_apply_visual_styling()
@@ -108,37 +122,7 @@ func _apply_visual_styling() -> void:
 	if outer_border:
 		outer_border.color = GameColors.PANEL_BORDER_DEFAULT
 		
-	# Enemy panel background style
-	var enemy_panel = %EnemyPanelContainer as PanelContainer
-	if enemy_panel:
-		var style = StyleBoxFlat.new()
-		style.bg_color = Color(0.12, 0.08, 0.08, 0.85) # Reddish dark bg
-		style.border_width_left = 2
-		style.border_width_top = 2
-		style.border_width_right = 2
-		style.border_width_bottom = 2
-		style.border_color = Color(0.8, 0.2, 0.2, 1.0)
-		style.corner_radius_top_left = 6
-		style.corner_radius_top_right = 6
-		style.corner_radius_bottom_left = 6
-		style.corner_radius_bottom_right = 6
-		enemy_panel.add_theme_stylebox_override("panel", style)
-		
-	# Log background style
-	var log_panel = %LogPanelContainer as PanelContainer
-	if log_panel:
-		var style = StyleBoxFlat.new()
-		style.bg_color = Color(0.08, 0.08, 0.1, 0.85)
-		style.border_width_left = 2
-		style.border_width_top = 2
-		style.border_width_right = 2
-		style.border_width_bottom = 2
-		style.border_color = GameColors.PANEL_BORDER_DEFAULT
-		style.corner_radius_top_left = 6
-		style.corner_radius_top_right = 6
-		style.corner_radius_bottom_left = 6
-		style.corner_radius_bottom_right = 6
-		log_panel.add_theme_stylebox_override("panel", style)
+
 
 func duplicate_unit_instance(inst: UnitInstance) -> UnitInstance:
 	if not inst:
@@ -150,7 +134,6 @@ func duplicate_unit_instance(inst: UnitInstance) -> UnitInstance:
 	new_inst.poison = inst.poison
 	new_inst.heal = inst.heal
 	new_inst.shield = inst.shield
-	new_inst.vampirism = inst.vampirism
 	new_inst.thorns = inst.thorns
 	new_inst.burn = inst.burn
 	new_inst.electrocute = inst.electrocute
@@ -172,7 +155,6 @@ func load_battle_team() -> void:
 	current_team.resize(6)
 
 	if CurrentRun.state == null:
-		log_text("No active run found. Returning to shop.")
 		return
 
 	# Copy team and make backup
@@ -214,15 +196,12 @@ func load_battle_team() -> void:
 		%TimerLabel.text = "⏳ 30.0s"
 
 func trigger_battle_start() -> void:
-	log_text("[color=#ffff40]=== BATTLE STARTED ===[/color]")
+	# Wait one frame to let Godot layout engine calculate slot positions
+	await get_tree().process_frame
 	
 	for i in range(6):
 		if current_team[i]:
-			var results = ModifierEngine.trigger_unit_modifiers(i, current_team, UnitModifier.Trigger.ON_BATTLE_START)
-			for mod in results:
-				var affected = results[mod]
-				if not affected.is_empty():
-					log_modifier(i, mod, affected)
+			ModifierEngine.trigger_unit_modifiers(i, current_team, UnitModifier.Trigger.ON_BATTLE_START)
 					
 	# Update all health and stat overlays
 	_update_all_card_uis()
@@ -237,54 +216,51 @@ func trigger_cast(source_idx: int) -> void:
 	if dmg > 0:
 		if enemy_electrocute > 0:
 			dmg += enemy_electrocute
-			log_text("⚡ [color=#ffff40]Attack amplified by +%d Electrocute![/color]" % enemy_electrocute)
 		enemy_damage_taken += dmg
-		log_text("⚔️ [color=#ff6060]%s (slot %d) dealt %d damage to Enemy Dummy[/color] (Total Damage: %d)" % [unit.get_unit_name(), source_idx, dmg, enemy_damage_taken])
 		
-		# Vampirism / Lifesteal on physical attack
-		if unit.vampirism > 0:
-			var heal_amt = int(dmg * (unit.vampirism / 100.0))
-			if heal_amt > 0:
-				team_health = min(team_health + heal_amt, team_max_health)
-				log_text("🧛 [color=#ff4040]%s (slot %d) leeched %d HP for the Team[/color]" % [unit.get_unit_name(), source_idx, heal_amt])
-				update_team_health_bar()
+		if %EnemyHealthBarRect:
+			var enemy_bar = %EnemyHealthBarRect as Control
+			var spawn_pos = enemy_bar.global_position + enemy_bar.size / 2.0
+			spawn_floating_text("-" + str(dmg), Color(1.0, 1.0, 1.0), spawn_pos)
+		
 
 	# Apply poison if unit has poison value!
 	if unit.poison > 0:
 		enemy_poison += unit.poison
-		log_text("☠️ [color=#d050d0]%s (slot %d) applied %d Poison to Enemy Dummy[/color] (Poison Stack: %d)" % [unit.get_unit_name(), source_idx, unit.poison, enemy_poison])
 	
 	# Heal team if unit has heal value!
 	if unit.heal > 0:
+		var health_before = team_health
 		team_health = min(team_health + unit.heal, team_max_health)
-		log_text("💚 [color=#20ff20]%s (slot %d) healed Team for %d HP[/color]" % [unit.get_unit_name(), source_idx, unit.heal])
-		update_team_health_bar()
+		var actual_heal = team_health - health_before
+		if actual_heal > 0:
+			update_team_health_bar()
+			if %TeamHealthBarRect:
+				var hp_bar = %TeamHealthBarRect as Control
+				var spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
+				spawn_floating_text("+" + str(actual_heal), Color(0.2, 0.9, 0.2), spawn_pos)
 		
 	# Shield team if unit has shield value!
 	if unit.shield > 0:
 		team_shield += unit.shield
-		log_text("🛡️ [color=#40a0ff]%s (slot %d) added %d Shield to the Team[/color]" % [unit.get_unit_name(), source_idx, unit.shield])
 		update_team_health_bar()
+		if %TeamHealthBarRect:
+			var hp_bar = %TeamHealthBarRect as Control
+			var spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
+			spawn_floating_text("+" + str(unit.shield), Color(0.7, 0.7, 0.7), spawn_pos)
 
 	# Apply burn if unit has burn value!
 	if unit.burn > 0:
 		enemy_burn += unit.burn
-		log_text("🔥 [color=#ff8020]%s (slot %d) applied %d Burn to Enemy Dummy[/color] (Burn Stack: %d)" % [unit.get_unit_name(), source_idx, unit.burn, enemy_burn])
 
 	# Apply electrocute if unit has electrocute value!
 	if unit.electrocute > 0:
 		enemy_electrocute += unit.electrocute
-		log_text("⚡ [color=#ffff40]%s (slot %d) applied %d Electrocute to Enemy Dummy[/color] (Electrocute Stack: %d)" % [unit.get_unit_name(), source_idx, unit.electrocute, enemy_electrocute])
 		
 	_update_enemy_ui()
 
 	# Perform ON_CAST action
-	log_text("[color=#40a0ff]%s (slot %d) casts![/color]" % [unit.get_unit_name(), source_idx])
-	var cast_results = ModifierEngine.trigger_unit_modifiers(source_idx, current_team, UnitModifier.Trigger.ON_CAST)
-	for mod in cast_results:
-		var affected = cast_results[mod]
-		if not affected.is_empty():
-			log_modifier(source_idx, mod, affected)
+	ModifierEngine.trigger_unit_modifiers(source_idx, current_team, UnitModifier.Trigger.ON_CAST)
 			
 	# Update all visuals
 	_update_all_card_uis()
@@ -313,7 +289,6 @@ func advance_simulation(delta: float) -> void:
 			match_timer = 0.0
 			if has_node("%TimerContainer"):
 				%TimerContainer.visible = false
-			log_text("⚠️ [color=#ffaa00]Sudden Death! Fatigue damage is now active![/color]")
 		if has_node("%TimerLabel"):
 			%TimerLabel.text = "⏳ %.1fs" % match_timer
 	else:
@@ -324,7 +299,11 @@ func advance_simulation(delta: float) -> void:
 			fatigue_tick_count += 1
 			var stage = floori((fatigue_tick_count - 1) / 3.0) + 1
 			var dmg = get_fibonacci(stage + 1)
-			log_text("💀 [color=#ff3030]Fatigue ticks (Level %d, Tick %d): dealing %d damage to Team HP[/color]" % [stage, fatigue_tick_count, dmg])
+			
+			if %TeamHealthBarRect:
+				var hp_bar = %TeamHealthBarRect as Control
+				var spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
+				spawn_floating_text("-" + str(dmg), Color(1.0, 0.3, 0.3), spawn_pos)
 			
 			var team_took_dmg = false
 			if team_shield >= dmg:
@@ -349,7 +328,10 @@ func advance_simulation(delta: float) -> void:
 			enemy_poison_timer -= 1.0
 			enemy_damage_taken += enemy_poison
 			enemy_poison_damage_dealt += enemy_poison
-			log_text("[color=#d050d0]☠️ Enemy Dummy took %d poison damage (Total Damage: %d)[/color]" % [enemy_poison, enemy_damage_taken])
+			if %EnemyHealthBarRect:
+				var enemy_bar = %EnemyHealthBarRect as Control
+				var spawn_pos = enemy_bar.global_position + enemy_bar.size / 2.0
+				spawn_floating_text("-" + str(enemy_poison), Color(0.7, 0.3, 0.8), spawn_pos)
 			_update_enemy_ui()
 	else:
 		enemy_poison_timer = 0.0
@@ -360,7 +342,10 @@ func advance_simulation(delta: float) -> void:
 		if enemy_burn_timer >= 0.5:
 			enemy_burn_timer -= 0.5
 			enemy_damage_taken += enemy_burn
-			log_text("🔥 [color=#ff8020]Enemy Dummy took %d burn damage[/color] (Total Damage: %d)" % [enemy_burn, enemy_damage_taken])
+			if %EnemyHealthBarRect:
+				var enemy_bar = %EnemyHealthBarRect as Control
+				var spawn_pos = enemy_bar.global_position + enemy_bar.size / 2.0
+				spawn_floating_text("-" + str(enemy_burn), Color(0.9, 0.4, 0.1), spawn_pos)
 			enemy_burn = max(0, enemy_burn - 1)
 			_update_enemy_ui()
 	else:
@@ -380,49 +365,24 @@ func advance_simulation(delta: float) -> void:
 		else:
 			slots[i].set_cast_progress(0.0)
 
-func log_modifier(source_idx: int, modifier: UnitModifier, affected_indices: Array[int]) -> void:
-	var source_unit = current_team[source_idx]
-	if not source_unit:
-		return
-		
-	var source_name = source_unit.get_unit_name()
-	var target_names = []
-	for idx in affected_indices:
-		var target_unit = current_team[idx]
-		if target_unit:
-			target_names.append("%s (slot %d)" % [target_unit.get_unit_name(), idx])
-			
-	var targets_str = ", ".join(target_names)
-	if targets_str.is_empty():
-		return
-		
-	var effect_desc = ""
-	match modifier.effect:
-		UnitModifier.EffectType.BUFF_ATTACK:
-			effect_desc = "[color=#f2b726]buffed Attack by +%d[/color]" % modifier.value
-		UnitModifier.EffectType.BUFF_HEALTH:
-			effect_desc = "[color=#10ff10]buffed Health by +%d[/color]" % modifier.value
-		UnitModifier.EffectType.BUFF_HEAL:
-			effect_desc = "[color=#10ff50]healed by +%d[/color]" % modifier.value
-		UnitModifier.EffectType.APPLY_POISON:
-			effect_desc = "[color=#d050d0]applied %d Poison[/color]" % modifier.value
-		UnitModifier.EffectType.BUFF_SHIELD:
-			effect_desc = "[color=#30c0ff]shielded by %d[/color]" % modifier.value
-		UnitModifier.EffectType.TRIGGER_MODIFIERS:
-			effect_desc = "[color=#ff80ff]triggered modifiers[/color]"
-			
-	var msg = "   > [color=#f0d060]%s (slot %d)[/color] %s on %s" % [source_name, source_idx, effect_desc, targets_str]
-	log_text(msg)
 
-func log_text(msg: String) -> void:
-	if %BattleLogLabel:
-		%BattleLogLabel.text = msg + "\n" + %BattleLogLabel.text
-		call_deferred("_scroll_log_to_top")
-
-func _scroll_log_to_top() -> void:
-	var scroll = %BattleLogScroll as ScrollContainer
-	if scroll:
-		scroll.scroll_vertical = 0
+func spawn_floating_text(value_text: String, text_color: Color, start_pos: Vector2) -> void:
+	var f_text = Label.new()
+	f_text.set_script(load("res://src/scenes/battle_scene/components/floating_text.gd"))
+	f_text.text = value_text
+	f_text.add_theme_color_override("font_color", text_color)
+	f_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	f_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	f_text.add_theme_font_size_override("font_size", 20)
+	f_text.custom_minimum_size = Vector2(100, 30)
+	
+	# Add a random offset to prevent overlaps when ticks happen close together
+	var offset_x = randf_range(-30.0, 30.0)
+	var offset_y = randf_range(-20.0, 20.0)
+	var final_pos = start_pos + Vector2(offset_x, offset_y) - Vector2(50, 15)
+	
+	f_text.global_position = final_pos
+	add_child(f_text)
 
 func set_playing(play: bool) -> void:
 	if play:
@@ -443,7 +403,6 @@ func _on_pause_pressed() -> void:
 
 
 func _on_reset_pressed() -> void:
-	log_text("[color=#ffff40]=== SIMULATION RESET ===[/color]")
 	set_playing(false)
 	
 	# Reset Enemy Stats
@@ -503,18 +462,20 @@ func _on_exit_pressed() -> void:
 	# Save updated stats back to CurrentRun.state
 	if CurrentRun.state != null:
 		for i in range(6):
-			if current_team[i]:
-				var persistent_unit = CurrentRun.state.active_team[i]
-				if persistent_unit:
-					# Reset temporary health bonus first
-					persistent_unit.temp_max_health_bonus = 0
-					current_team[i].temp_max_health_bonus = 0
-					# Restore health to max when safely returning to shop
-					persistent_unit.max_health_bonus = current_team[i].max_health_bonus
-					persistent_unit.current_health = persistent_unit.get_max_health()
-					persistent_unit.current_attack = current_team[i].current_attack
-					persistent_unit.poison = current_team[i].poison
-					persistent_unit.current_cast_speed = current_team[i].current_cast_speed
+			var persistent_unit = CurrentRun.state.active_team[i]
+			var backup = initial_team_backup[i]
+			if persistent_unit and backup:
+				# Revert temporary combat-specific stats back to shop/backup state
+				persistent_unit.max_health_bonus = current_team[i].max_health_bonus
+				persistent_unit.temp_max_health_bonus = 0
+				
+				persistent_unit.current_health = persistent_unit.get_max_health() # Reset health to max when returning to shop
+				persistent_unit.current_attack = backup.current_attack
+				persistent_unit.poison = backup.poison
+				persistent_unit.shield = backup.shield
+				persistent_unit.burn = backup.burn
+				persistent_unit.electrocute = backup.electrocute
+				persistent_unit.current_cast_speed = backup.current_cast_speed
 			else:
 				CurrentRun.state.active_team[i] = null
 				
@@ -535,23 +496,27 @@ func _clear_slot_target_highlights() -> void:
 		slot.set_target_highlight(false)
 
 func _update_enemy_ui() -> void:
-	if has_node("%DamageLabel"):
-		%DamageLabel.text = "Damage Taken: " + str(enemy_damage_taken)
-	if has_node("%PoisonLabel"):
-		var text = "☠️ Poison: %d (Total Dmg: %d)" % [enemy_poison, enemy_poison_damage_dealt]
-		if enemy_burn > 0:
-			text += "   |   🔥 Burn: %d" % enemy_burn
-		if enemy_electrocute > 0:
-			text += "   |   ⚡ Electro: %d" % enemy_electrocute
-		%PoisonLabel.text = text
+	if has_node("%EnemyHealthLabel"):
+		%EnemyHealthLabel.text = "Damage Taken: " + str(enemy_damage_taken)
+	
+	if has_node("%PoisonBadge"):
+		%PoisonBadge.value = enemy_poison
+	if has_node("%BurnBadge"):
+		%BurnBadge.value = enemy_burn
+	if has_node("%ElectrocuteBadge"):
+		%ElectrocuteBadge.value = enemy_electrocute
+		
+	# Toggle visibility of the status container based on active statuses
+	var has_statuses = enemy_poison > 0 or enemy_burn > 0 or enemy_electrocute > 0
+	if has_node("%EnemyStatusHBox"):
+		%EnemyStatusHBox.visible = has_statuses
 
 func _update_poison_cooldown_progress() -> void:
-	var bar_fill = get_node_or_null("%BarFill") as ColorRect
-	if bar_fill:
+	if has_node("%PoisonBadge"):
 		var ratio = 0.0
 		if enemy_poison > 0:
 			ratio = clamp(enemy_poison_timer / 1.0, 0.0, 1.0)
-		bar_fill.anchor_right = ratio
+		%PoisonBadge.cooldown_ratio = ratio
 
 func update_team_health_bar() -> void:
 	var fill_pct: float = 0.0
@@ -570,13 +535,7 @@ func update_team_health_bar() -> void:
 	if team_max_health > 0 and team_health <= 0:
 		call_deferred("_on_team_defeat")
 
-func _on_toggle_log_pressed() -> void:
-	if %LogPanelContainer and %ToggleLogButton:
-		%LogPanelContainer.visible = not %LogPanelContainer.visible
-		if %LogPanelContainer.visible:
-			%ToggleLogButton.text = "📋 Hide Log"
-		else:
-			%ToggleLogButton.text = "📋 Show Log"
+
 
 func _on_speed_pressed() -> void:
 	if game_speed == 1.0:
@@ -590,7 +549,6 @@ func _on_speed_pressed() -> void:
 		%SpeedButton.text = "⚡ Speed: %dx" % int(game_speed)
 
 func _on_team_defeat() -> void:
-	log_text("💀 [color=#ff3333]Your team has been defeated![/color]")
 	set_playing(false)
 	
 	# # Deduct a life
@@ -626,5 +584,4 @@ func trigger_thorns() -> void:
 			total_thorns += unit.thorns
 	if total_thorns > 0:
 		enemy_damage_taken += total_thorns
-		log_text("🌵 [color=#20c020]Thorns reflected %d damage to Enemy Dummy[/color] (Total Damage: %d)" % [total_thorns, enemy_damage_taken])
 		_update_enemy_ui()

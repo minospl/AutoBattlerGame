@@ -4,7 +4,6 @@ extends Node
 var state: RunState
 
 func initialize_new_run(templates: Array[UnitData]) -> void:
-	print("[CurrentRun] Initializing new run state.")
 	state = RunState.new()
 	state.active_team.resize(6)
 	state.bench.resize(8)
