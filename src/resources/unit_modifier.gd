@@ -62,32 +62,32 @@ func get_description() -> String:
 	var target_possession = ""
 	match target:
 		TargetType.SELF:
-			target_phrase = "[color=%s]self[/color]" % GameColors.DESC_TARGET
-			target_possession = "your [color=%s]own[/color]" % GameColors.DESC_TARGET
+			target_phrase = "[color=%s]SELF[/color]" % GameColors.DESC_TARGET
+			target_possession = "your [color=%s]OWN[/color]" % GameColors.DESC_TARGET
 		TargetType.HORIZONTAL:
-			target_phrase = "[color=%s]horizontal[/color] allies" % GameColors.DESC_TARGET
-			target_possession = "[color=%s]horizontal[/color] allies'" % GameColors.DESC_TARGET
+			target_phrase = "[color=%s]HORIZONTAL[/color] allies" % GameColors.DESC_TARGET
+			target_possession = "[color=%s]HORIZONTAL[/color] allies'" % GameColors.DESC_TARGET
 		TargetType.VERTICAL:
-			target_phrase = "[color=%s]vertical[/color] allies" % GameColors.DESC_TARGET
-			target_possession = "[color=%s]vertical[/color] allies'" % GameColors.DESC_TARGET
+			target_phrase = "[color=%s]VERTICAL[/color] allies" % GameColors.DESC_TARGET
+			target_possession = "[color=%s]VERTICAL[/color] allies'" % GameColors.DESC_TARGET
 		TargetType.ADJACENT:
-			target_phrase = "[color=%s]adjacent[/color] allies" % GameColors.DESC_TARGET
-			target_possession = "[color=%s]adjacent[/color] allies'" % GameColors.DESC_TARGET
+			target_phrase = "[color=%s]ADJACENT[/color] allies" % GameColors.DESC_TARGET
+			target_possession = "[color=%s]ADJACENT[/color] allies'" % GameColors.DESC_TARGET
 		TargetType.UP:
-			target_phrase = "the ally [color=%s]above[/color]" % GameColors.DESC_TARGET
+			target_phrase = "the ally [color=%s]ABOVE[/color]" % GameColors.DESC_TARGET
 			target_possession = "the ally [color=%s]ABOVE[/color]" % GameColors.DESC_TARGET
 		TargetType.DOWN:
-			target_phrase = "the ally [color=%s]below[/color]" % GameColors.DESC_TARGET
+			target_phrase = "the ally [color=%s]BELOW[/color]" % GameColors.DESC_TARGET
 			target_possession = "the ally [color=%s]BELOW[/color]" % GameColors.DESC_TARGET
 		TargetType.LEFT:
-			target_phrase = "the ally to the [color=%s]left[/color]" % GameColors.DESC_TARGET
+			target_phrase = "the ally to the [color=%s]LEFT[/color]" % GameColors.DESC_TARGET
 			target_possession = "the ally to the [color=%s]LEFT[/color]" % GameColors.DESC_TARGET
 		TargetType.RIGHT:
-			target_phrase = "the ally to the [color=%s]right[/color]" % GameColors.DESC_TARGET
+			target_phrase = "the ally to the [color=%s]RIGHT[/color]" % GameColors.DESC_TARGET
 			target_possession = "the ally to the [color=%s]RIGHT[/color]" % GameColors.DESC_TARGET
 		TargetType.ALL:
-			target_phrase = "[color=%s]all[/color] allies" % GameColors.DESC_TARGET
-			target_possession = "[color=%s]all[/color] allies'" % GameColors.DESC_TARGET
+			target_phrase = "[color=%s]ALL[/color] allies" % GameColors.DESC_TARGET
+			target_possession = "[color=%s]ALL[/color] allies'" % GameColors.DESC_TARGET
 
 	# Resolve duration terms
 	var dur_str = ""

@@ -37,7 +37,7 @@ const PORTRAIT_FALLBACK_TEXT = Color(0.2, 0.2, 0.2, 0.75)
 
 # Tooltip Description Formatting Colors (Hex Strings)
 const DESC_TRIGGER = "#f2b726"  # Standardized bright gold for all triggers
-const DESC_TARGET = "#0056b3"   # Standardized bright blue for all targets/directions
+const DESC_TARGET = "#ffffff"   # Standardized bright blue for all targets/directions
 const DESC_ATTACK = "#27ae60"   # Standardized green for Attack buffs
 const DESC_HEALTH = "#c0392b"   # Standardized dark red for Health buffs
 const DESC_SHIELD = "#2980b9"   # Standardized blue for Shield buffs
