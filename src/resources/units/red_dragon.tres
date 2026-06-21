@@ -19,6 +19,7 @@ unit_name = "Red Dragon"
 price = 5
 max_health = 15
 attack = 5
+base_burn = 5
 base_poison = 0
 cast_speed = 4.0
 types = [ExtResource("2_type")]

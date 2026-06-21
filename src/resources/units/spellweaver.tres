@@ -21,6 +21,7 @@ unit_name = "Spellweaver"
 price = 3
 max_health = 10
 attack = 2
+base_electrocute = 6
 base_poison = 0
 cast_speed = 2.0
 types = [ExtResource("2_type")]

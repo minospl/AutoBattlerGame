@@ -19,6 +19,21 @@ extends Resource
 ## Base poison value
 @export var base_poison: int
 
+## Base shield value (on cast)
+@export var base_shield: int = 0
+
+## Base vampirism percentage (on cast)
+@export var base_vampirism: int = 0
+
+## Base thorns value (retaliate on hit)
+@export var base_thorns: int = 0
+
+## Base burn value (on cast)
+@export var base_burn: int = 0
+
+## Base electrocute value (on cast)
+@export var base_electrocute: int = 0
+
 ## List of types associated with this unit (e.g. Beast, Dragon)
 @export var types: Array[UnitType]
 

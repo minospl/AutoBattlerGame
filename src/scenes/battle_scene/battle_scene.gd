@@ -22,6 +22,9 @@ var enemy_damage_taken: int = 0
 var enemy_poison: int = 0
 var enemy_poison_timer: float = 0.0
 var enemy_poison_damage_dealt: int = 0
+var enemy_burn: int = 0
+var enemy_burn_timer: float = 0.0
+var enemy_electrocute: int = 0
 
 # Countdown Timer & Fatigue
 var match_timer: float = 30.0
@@ -146,6 +149,11 @@ func duplicate_unit_instance(inst: UnitInstance) -> UnitInstance:
 	new_inst.current_attack = inst.current_attack
 	new_inst.poison = inst.poison
 	new_inst.heal = inst.heal
+	new_inst.shield = inst.shield
+	new_inst.vampirism = inst.vampirism
+	new_inst.thorns = inst.thorns
+	new_inst.burn = inst.burn
+	new_inst.electrocute = inst.electrocute
 	new_inst.level = inst.level
 	new_inst.max_health_bonus = inst.max_health_bonus
 	new_inst.current_cast_speed = inst.current_cast_speed
@@ -227,8 +235,19 @@ func trigger_cast(source_idx: int) -> void:
 	# Attack practice dummy!
 	var dmg = unit.get_attack()
 	if dmg > 0:
+		if enemy_electrocute > 0:
+			dmg += enemy_electrocute
+			log_text("⚡ [color=#ffff40]Attack amplified by +%d Electrocute![/color]" % enemy_electrocute)
 		enemy_damage_taken += dmg
 		log_text("⚔️ [color=#ff6060]%s (slot %d) dealt %d damage to Enemy Dummy[/color] (Total Damage: %d)" % [unit.get_unit_name(), source_idx, dmg, enemy_damage_taken])
+		
+		# Vampirism / Lifesteal on physical attack
+		if unit.vampirism > 0:
+			var heal_amt = int(dmg * (unit.vampirism / 100.0))
+			if heal_amt > 0:
+				team_health = min(team_health + heal_amt, team_max_health)
+				log_text("🧛 [color=#ff4040]%s (slot %d) leeched %d HP for the Team[/color]" % [unit.get_unit_name(), source_idx, heal_amt])
+				update_team_health_bar()
 
 	# Apply poison if unit has poison value!
 	if unit.poison > 0:
@@ -240,6 +259,22 @@ func trigger_cast(source_idx: int) -> void:
 		team_health = min(team_health + unit.heal, team_max_health)
 		log_text("💚 [color=#20ff20]%s (slot %d) healed Team for %d HP[/color]" % [unit.get_unit_name(), source_idx, unit.heal])
 		update_team_health_bar()
+		
+	# Shield team if unit has shield value!
+	if unit.shield > 0:
+		team_shield += unit.shield
+		log_text("🛡️ [color=#40a0ff]%s (slot %d) added %d Shield to the Team[/color]" % [unit.get_unit_name(), source_idx, unit.shield])
+		update_team_health_bar()
+
+	# Apply burn if unit has burn value!
+	if unit.burn > 0:
+		enemy_burn += unit.burn
+		log_text("🔥 [color=#ff8020]%s (slot %d) applied %d Burn to Enemy Dummy[/color] (Burn Stack: %d)" % [unit.get_unit_name(), source_idx, unit.burn, enemy_burn])
+
+	# Apply electrocute if unit has electrocute value!
+	if unit.electrocute > 0:
+		enemy_electrocute += unit.electrocute
+		log_text("⚡ [color=#ffff40]%s (slot %d) applied %d Electrocute to Enemy Dummy[/color] (Electrocute Stack: %d)" % [unit.get_unit_name(), source_idx, unit.electrocute, enemy_electrocute])
 		
 	_update_enemy_ui()
 
@@ -291,14 +326,21 @@ func advance_simulation(delta: float) -> void:
 			var dmg = get_fibonacci(stage + 1)
 			log_text("💀 [color=#ff3030]Fatigue ticks (Level %d, Tick %d): dealing %d damage to Team HP[/color]" % [stage, fatigue_tick_count, dmg])
 			
+			var team_took_dmg = false
 			if team_shield >= dmg:
 				team_shield -= dmg
+				team_took_dmg = true
 			else:
 				var remaining_dmg = dmg - team_shield
+				if team_shield > 0 or remaining_dmg > 0:
+					team_took_dmg = true
 				team_shield = 0
 				team_health -= remaining_dmg
 				
 			_update_all_card_uis()
+			
+			if team_took_dmg:
+				trigger_thorns()
 
 	# Tick enemy poison status every second!
 	if enemy_poison > 0:
@@ -311,6 +353,18 @@ func advance_simulation(delta: float) -> void:
 			_update_enemy_ui()
 	else:
 		enemy_poison_timer = 0.0
+
+	# Tick enemy burn status every 0.5 seconds (2x faster than poison)!
+	if enemy_burn > 0:
+		enemy_burn_timer += delta
+		if enemy_burn_timer >= 0.5:
+			enemy_burn_timer -= 0.5
+			enemy_damage_taken += enemy_burn
+			log_text("🔥 [color=#ff8020]Enemy Dummy took %d burn damage[/color] (Total Damage: %d)" % [enemy_burn, enemy_damage_taken])
+			enemy_burn = max(0, enemy_burn - 1)
+			_update_enemy_ui()
+	else:
+		enemy_burn_timer = 0.0
 
 	for i in range(6):
 		if current_team[i]:
@@ -397,6 +451,9 @@ func _on_reset_pressed() -> void:
 	enemy_poison = 0
 	enemy_poison_timer = 0.0
 	enemy_poison_damage_dealt = 0
+	enemy_burn = 0
+	enemy_burn_timer = 0.0
+	enemy_electrocute = 0
 	_update_enemy_ui()
 
 	# Reset Countdown Timer & Fatigue
@@ -481,7 +538,12 @@ func _update_enemy_ui() -> void:
 	if has_node("%DamageLabel"):
 		%DamageLabel.text = "Damage Taken: " + str(enemy_damage_taken)
 	if has_node("%PoisonLabel"):
-		%PoisonLabel.text = "☠️ Poison: %d (Total Dmg: %d)" % [enemy_poison, enemy_poison_damage_dealt]
+		var text = "☠️ Poison: %d (Total Dmg: %d)" % [enemy_poison, enemy_poison_damage_dealt]
+		if enemy_burn > 0:
+			text += "   |   🔥 Burn: %d" % enemy_burn
+		if enemy_electrocute > 0:
+			text += "   |   ⚡ Electro: %d" % enemy_electrocute
+		%PoisonLabel.text = text
 
 func _update_poison_cooldown_progress() -> void:
 	var bar_fill = get_node_or_null("%BarFill") as ColorRect
@@ -556,3 +618,13 @@ func get_fibonacci(n: int) -> int:
 		a = b
 		b = temp
 	return b
+
+func trigger_thorns() -> void:
+	var total_thorns = 0
+	for unit in current_team:
+		if unit:
+			total_thorns += unit.thorns
+	if total_thorns > 0:
+		enemy_damage_taken += total_thorns
+		log_text("🌵 [color=#20c020]Thorns reflected %d damage to Enemy Dummy[/color] (Total Damage: %d)" % [total_thorns, enemy_damage_taken])
+		_update_enemy_ui()

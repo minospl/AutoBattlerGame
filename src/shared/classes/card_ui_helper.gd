@@ -20,7 +20,7 @@ static func setup_card_visuals(
 		
 	var stat_size = Vector2(32, 16)
 	
-	# 1. Gather all active stats (Attack, Heal, Poison)
+	# 1. Gather all active stats (Attack, Heal, Poison, Shield, Thorns, Vampirism, Burn, Electrocute)
 	var active_stats = []
 	if unit_instance.get_attack() > 0:
 		active_stats.append({"value": str(unit_instance.get_attack()), "color": GameColors.STAT_ATTACK_BG})
@@ -28,6 +28,14 @@ static func setup_card_visuals(
 		active_stats.append({"value": str(unit_instance.heal), "color": Color(0.15, 0.6, 0.3)}) # Green for heal
 	if unit_instance.poison > 0:
 		active_stats.append({"value": str(unit_instance.poison), "color": GameColors.STAT_POISON_BG})
+	if unit_instance.shield > 0:
+		active_stats.append({"value": str(unit_instance.shield), "color": Color(0.2, 0.5, 0.8)}) # Light Blue for shield
+	if unit_instance.thorns > 0:
+		active_stats.append({"value": str(unit_instance.thorns), "color": Color(0.55, 0.45, 0.2)}) # Brown for thorns
+	if unit_instance.burn > 0:
+		active_stats.append({"value": str(unit_instance.burn), "color": Color(0.9, 0.4, 0.1)}) # Orange for burn
+	if unit_instance.electrocute > 0:
+		active_stats.append({"value": str(unit_instance.electrocute), "color": Color(0.85, 0.75, 0.1)}) # Yellow for electrocute
 
 	# Hide default panels initially
 	if attack_panel:

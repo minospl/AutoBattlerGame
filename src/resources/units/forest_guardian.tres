@@ -20,6 +20,7 @@ unit_name = "Forest Guardian"
 price = 4
 max_health = 20
 attack = 2
+base_shield = 4
 base_poison = 0
 cast_speed = 3.0
 types = [ExtResource("2_type")]
