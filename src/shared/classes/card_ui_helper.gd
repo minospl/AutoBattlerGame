@@ -98,8 +98,7 @@ static func setup_card_visuals(
 			stats_hbox.add_child(panel)
 			var label = panel.find_child("*Label", true, false) as Label
 			if label:
-				label.text = str(stat.value)
-				
+				label.text = format_large_number(stat.value)
 			setup_stat_panel_shader(panel, stat.color, stat_size)
 			panel.visible = true
 			
@@ -241,3 +240,20 @@ static func show_item_tooltip(tooltip: Control, item_card: Resource) -> void:
 static func hide_tooltip(tooltip: Control) -> void:
 	if tooltip:
 		tooltip.visible = false
+
+## Helper to format large numbers (e.g. 15029 -> 15k, 1000 -> 1k, 1500000 -> 1.5M)
+static func format_large_number(val: int) -> String:
+	if val < 1000:
+		return str(val)
+	elif val < 1000000:
+		var k_val = val / 1000.0
+		var formatted = "%.1fk" % k_val
+		if formatted.ends_with(".0k"):
+			formatted = str(roundi(k_val)) + "k"
+		return formatted
+	else:
+		var m_val = val / 1000000.0
+		var formatted = "%.1fM" % m_val
+		if formatted.ends_with(".0M"):
+			formatted = str(roundi(m_val)) + "M"
+		return formatted
