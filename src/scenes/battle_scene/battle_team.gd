@@ -9,6 +9,8 @@ signal cast_progress_changed(slot_idx: int, ratio: float)
 signal floating_text_requested(text: String, color: Color, is_on_slot: bool, slot_idx: int)
 signal team_defeated()
 
+const MAX_TEAM_SIZE = 6
+
 # Combat State
 var units: Array[UnitInstance] = []
 var cast_timers: Array[float] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
@@ -30,7 +32,7 @@ func initialize(p_is_enemy: bool = false) -> void:
 	is_enemy = p_is_enemy
 	
 	units.clear()
-	units.resize(6)
+	units.resize(MAX_TEAM_SIZE)
 	cast_timers = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 func load_team_units(new_units: Array[UnitInstance]) -> void:
@@ -44,9 +46,10 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 	health = 0
 	max_health = 0
 	
-	for i in range(6):
-		var inst := new_units[i]
-		if inst:
+	var num_units: int = mini(MAX_TEAM_SIZE, new_units.size())
+	for i in range(MAX_TEAM_SIZE):
+		if i < num_units and new_units[i]:
+			var inst := new_units[i]
 			units[i] = inst
 			health += inst.current_health
 			max_health += inst.get_max_health()
@@ -193,7 +196,7 @@ func tick_statuses(delta: float) -> void:
 			status_changed.emit("burn", 0, 0.0)
 
 func tick_casts(delta: float, game_speed: float, cast_callback: Callable) -> void:
-	for i in range(6):
+	for i in range(MAX_TEAM_SIZE):
 		if units[i]:
 			cast_timers[i] += delta * game_speed
 			var speed := units[i].get_cast_speed()
@@ -204,8 +207,6 @@ func tick_casts(delta: float, game_speed: float, cast_callback: Callable) -> voi
 			if cast_timers[i] >= speed:
 				cast_timers[i] = 0.0
 				cast_callback.call(i)
-		else:
-			cast_progress_changed.emit(i, 0.0)
 
 func reset(backup_units: Array[UnitInstance]) -> void:
 	shield = 0
@@ -218,9 +219,10 @@ func reset(backup_units: Array[UnitInstance]) -> void:
 	health = 0
 	max_health = 0
 	
-	for i in range(6):
-		var backup := backup_units[i]
-		if backup:
+	var num_backup: int = mini(MAX_TEAM_SIZE, backup_units.size())
+	for i in range(MAX_TEAM_SIZE):
+		if i < num_backup and backup_units[i]:
+			var backup := backup_units[i]
 			units[i] = backup.clone()
 			health += units[i].current_health
 			max_health += units[i].get_max_health()
@@ -234,10 +236,6 @@ func reset(backup_units: Array[UnitInstance]) -> void:
 	status_changed.emit("poison", poison, 0.0)
 	status_changed.emit("burn", burn, 0.0)
 	status_changed.emit("electrocute", electrocute, 0.0)
-
-func update_cooldown_ratios() -> void:
-	if poison > 0:
-		status_changed.emit("poison", poison, clampf(poison_timer / 1.0, 0.0, 1.0))
 
 func spawn_floating_text_on_slot(t_idx: int, text: String, color: Color) -> void:
 	floating_text_requested.emit(text, color, true, t_idx)

@@ -1,6 +1,8 @@
 class_name CardUIHelper
 extends Object
 
+const CHROMA_KEY_SHADER = preload("res://src/shared/shaders/chroma_key.gdshader")
+
 ## Shared helper to configure card unit visuals (Attack, Poison, sprite, indicators)
 static func setup_card_visuals(
 	unit_instance: UnitInstance,
@@ -110,9 +112,8 @@ static func setup_card_visuals(
 			sprite_rect.texture = unit_instance.data.sprite
 			
 			if not sprite_rect.material:
-				var shader = load("res://src/shared/shaders/chroma_key.gdshader")
-				var mat = ShaderMaterial.new()
-				mat.shader = shader
+				var mat := ShaderMaterial.new()
+				mat.shader = CHROMA_KEY_SHADER
 				sprite_rect.material = mat
 		else:
 			sprite_rect.visible = false

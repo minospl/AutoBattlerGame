@@ -4,7 +4,7 @@ extends Object
 ## Triggers modifiers of a unit at source_idx in the team matching a specific trigger type.
 ## Returns a dictionary of { modifier: Array[int] } mapping each modifier to its affected target indices.
 static func trigger_unit_modifiers(source_idx: int, team_obj: BattleTeam, trigger_type: UnitModifier.Trigger) -> Dictionary:
-	var results = {}
+	var results: Dictionary[UnitModifier, Array] = {}
 	var unit = team_obj.units[source_idx]
 	if not unit or not unit.data or not unit.data.modifiers:
 		return results

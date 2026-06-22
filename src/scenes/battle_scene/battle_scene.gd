@@ -1,6 +1,15 @@
 class_name BattleScene
 extends Control
 
+# Static Preloads
+const CARD_TOOLTIP_SCENE = preload("res://src/shared/components/card_tooltip.tscn")
+const HP_BORDER_SHADER = preload("res://src/shared/shaders/hp_border.gdshader")
+const SHOP_BACKGROUND_TEXTURE = preload("res://src/assets/ui/shop_background.jpg")
+const RIVER_CRAB_RES = preload("res://src/resources/units/river_crab.tres")
+const BATTLE_CARD_SCENE = preload("res://src/scenes/battle_scene/components/battle_card.tscn")
+
+const MAX_TEAM_SIZE = 6
+
 enum State { PLAYING, PAUSED }
 var simulation_state: State = State.PAUSED
 
@@ -22,29 +31,55 @@ var fatigue_tick_count: int = 0
 var player_slots: Array[BattleCardSlot] = []
 var enemy_slots: Array[BattleCardSlot] = []
 
+# Cached Node References
+@onready var exit_button: Button = %ExitButton
+@onready var play_button: Button = %PlayButton
+@onready var pause_button: Button = %PauseButton
+@onready var reset_button: Button = %ResetButton
+@onready var speed_button: Button = %SpeedButton
+@onready var preview_container: Control = %PreviewContainer
+@onready var outer_border: ColorRect = %OuterBorder
+@onready var timer_container: Control = %TimerContainer
+@onready var timer_label: Label = %TimerLabel
+
+@onready var team_health_bar_rect: Control = %TeamHealthBarRect
+@onready var enemy_health_bar_rect: Control = %EnemyHealthBarRect
+@onready var team_health_label: Label = %TeamHealthLabel
+@onready var enemy_health_label: Label = %EnemyHealthLabel
+
+@onready var team_status_hbox: Control = %TeamStatusHBox
+@onready var enemy_status_hbox: Control = %EnemyStatusHBox
+
+@onready var team_poison_badge: StatusBadge = %TeamPoisonBadge
+@onready var team_burn_badge: StatusBadge = %TeamBurnBadge
+@onready var team_electrocute_badge: StatusBadge = %TeamElectrocuteBadge
+
+@onready var enemy_poison_badge: StatusBadge = %PoisonBadge
+@onready var enemy_burn_badge: StatusBadge = %BurnBadge
+@onready var enemy_electrocute_badge: StatusBadge = %ElectrocuteBadge
+
 func _ready() -> void:
 	# Add the tooltip instance to PreviewContainer
-	if has_node("%PreviewContainer"):
-		var tooltip_scene := load("res://src/shared/components/card_tooltip.tscn") as PackedScene
-		preview_tooltip = tooltip_scene.instantiate() as Control
+	if preview_container:
+		preview_tooltip = CARD_TOOLTIP_SCENE.instantiate() as Control
 		preview_tooltip.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		preview_tooltip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		%PreviewContainer.add_child(preview_tooltip)
+		preview_container.add_child(preview_tooltip)
 		preview_tooltip.visible = false
 
 	# Setup buttons
-	%ExitButton.pressed.connect(_on_exit_pressed)
-	%PlayButton.pressed.connect(_on_play_pressed)
-	%PauseButton.pressed.connect(_on_pause_pressed)
-	%ResetButton.pressed.connect(_on_reset_pressed)
-	%SpeedButton.pressed.connect(_on_speed_pressed)
+	if exit_button: exit_button.pressed.connect(_on_exit_pressed)
+	if play_button: play_button.pressed.connect(_on_play_pressed)
+	if pause_button: pause_button.pressed.connect(_on_pause_pressed)
+	if reset_button: reset_button.pressed.connect(_on_reset_pressed)
+	if speed_button: speed_button.pressed.connect(_on_speed_pressed)
 
 	# Fetch slots
 	player_slots = [
 		%Slot0, %Slot1, %Slot2,
 		%Slot3, %Slot4, %Slot5
 	]
-	for i in range(6):
+	for i in range(MAX_TEAM_SIZE):
 		player_slots[i].slot_index = i
 
 	# Fetch enemy slots
@@ -52,32 +87,46 @@ func _ready() -> void:
 		%EnemySlot0, %EnemySlot1, %EnemySlot2,
 		%EnemySlot3, %EnemySlot4, %EnemySlot5
 	]
-	for i in range(6):
+	for i in range(MAX_TEAM_SIZE):
 		enemy_slots[i].slot_index = i
 
 	# Configure HP border shaders
-	_configure_hp_bar_shader(%TeamHealthBarRect)
-	_configure_hp_bar_shader(%EnemyHealthBarRect)
+	_configure_hp_bar_shader(team_health_bar_rect)
+	_configure_hp_bar_shader(enemy_health_bar_rect)
 
 	# Create BattleTeam instances
 	player_team = BattleTeam.new()
 	enemy_team = BattleTeam.new()
 	
 	# Connect signals from player_team
-	player_team.team_units_loaded.connect(_on_player_units_loaded)
-	player_team.health_changed.connect(_on_player_health_changed)
-	player_team.status_changed.connect(_on_player_status_changed)
-	player_team.cast_progress_changed.connect(_on_player_cast_progress_changed)
+	player_team.team_units_loaded.connect(_on_units_loaded.bind(player_slots))
+	player_team.health_changed.connect(_on_health_changed.bind(team_health_bar_rect, team_health_label))
+	player_team.status_changed.connect(_on_status_changed.bind(
+		{
+			"poison": team_poison_badge,
+			"burn": team_burn_badge,
+			"electrocute": team_electrocute_badge
+		},
+		team_status_hbox
+	))
+	player_team.cast_progress_changed.connect(_on_cast_progress_changed.bind(player_slots))
 	player_team.floating_text_requested.connect(func(text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
 		_on_floating_text_requested(false, text, color, is_on_slot, slot_idx)
 	)
 	player_team.team_defeated.connect(_on_team_defeat)
 
 	# Connect signals from enemy_team
-	enemy_team.team_units_loaded.connect(_on_enemy_units_loaded)
-	enemy_team.health_changed.connect(_on_enemy_health_changed)
-	enemy_team.status_changed.connect(_on_enemy_status_changed)
-	enemy_team.cast_progress_changed.connect(_on_enemy_cast_progress_changed)
+	enemy_team.team_units_loaded.connect(_on_units_loaded.bind(enemy_slots))
+	enemy_team.health_changed.connect(_on_health_changed.bind(enemy_health_bar_rect, enemy_health_label))
+	enemy_team.status_changed.connect(_on_status_changed.bind(
+		{
+			"poison": enemy_poison_badge,
+			"burn": enemy_burn_badge,
+			"electrocute": enemy_electrocute_badge
+		},
+		enemy_status_hbox
+	))
+	enemy_team.cast_progress_changed.connect(_on_cast_progress_changed.bind(enemy_slots))
 	enemy_team.floating_text_requested.connect(func(text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
 		_on_floating_text_requested(true, text, color, is_on_slot, slot_idx)
 	)
@@ -98,9 +147,8 @@ func _ready() -> void:
 func _configure_hp_bar_shader(hp_bar: Control) -> void:
 	if not hp_bar:
 		return
-	var hp_shader := load("res://src/shared/shaders/hp_border.gdshader") as Shader
 	var hp_material := ShaderMaterial.new()
-	hp_material.shader = hp_shader
+	hp_material.shader = HP_BORDER_SHADER
 	hp_material.set_shader_parameter("fill_percentage", 1.0)
 	hp_bar.material = hp_material
 	
@@ -119,14 +167,13 @@ func _apply_visual_styling() -> void:
 	var bg_panel := get_node_or_null("BackgroundPanel") as Panel
 	if bg_panel:
 		var bg_style := StyleBoxTexture.new()
-		bg_style.texture = load("res://src/assets/ui/shop_background.jpg") as Texture2D
+		bg_style.texture = SHOP_BACKGROUND_TEXTURE
 		bg_style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
 		bg_style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
 		bg_style.modulate_color = Color(0.3, 0.3, 0.3, 1.0) # Modulate darker for battle focus
 		bg_panel.add_theme_stylebox_override("panel", bg_style)
 		
 	# Outer border coloring
-	var outer_border := %OuterBorder as ColorRect
 	if outer_border:
 		outer_border.color = GameColors.PANEL_BORDER_DEFAULT
 
@@ -138,7 +185,7 @@ func load_battle_team() -> void:
 
 	# Copy team and make backup
 	var player_units: Array[UnitInstance] = []
-	for i in range(6):
+	for i in range(MAX_TEAM_SIZE):
 		var inst := CurrentRun.state.active_team[i] as UnitInstance
 		if inst:
 			inst.temp_max_health_bonus = 0
@@ -153,22 +200,21 @@ func load_battle_team() -> void:
 	match_timer = 30.0
 	fatigue_tick_timer = 0.0
 	fatigue_tick_count = 0
-	if has_node("%TimerContainer"):
-		%TimerContainer.visible = true
-	if has_node("%TimerLabel"):
-		%TimerLabel.text = "⏳ 30.0s"
+	if timer_container:
+		timer_container.visible = true
+	if timer_label:
+		timer_label.text = "⏳ 30.0s"
 		
 	load_enemy_team()
 
 func load_enemy_team() -> void:
 	var enemy_units: Array[UnitInstance] = []
-	enemy_units.resize(6)
+	enemy_units.resize(MAX_TEAM_SIZE)
 
 	# Load River Crab into Slot 0
-	var crab_data := load("res://src/resources/units/river_crab.tres") as Resource
-	if crab_data:
+	if RIVER_CRAB_RES:
 		var crab_instance := UnitInstance.new()
-		crab_instance.initialize(crab_data)
+		crab_instance.initialize(RIVER_CRAB_RES)
 		# Override health and attack
 		crab_instance.max_health_bonus = 999  # base health is 1, so 1 + 999 = 1000
 		crab_instance.current_health = 1000
@@ -185,7 +231,7 @@ func trigger_battle_start() -> void:
 	# Wait one frame to let Godot layout engine calculate slot positions
 	await get_tree().process_frame
 	
-	for i in range(6):
+	for i in range(MAX_TEAM_SIZE):
 		if player_team.units[i]:
 			ModifierEngine.trigger_unit_modifiers(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
 					
@@ -201,7 +247,7 @@ func trigger_enemy_cast(source_idx: int) -> void:
 	_update_all_card_uis()
 
 func _update_all_card_uis() -> void:
-	for i in range(6):
+	for i in range(MAX_TEAM_SIZE):
 		var slot := player_slots[i]
 		var card := slot.get_card()
 		if card and player_team.units[i]:
@@ -209,7 +255,7 @@ func _update_all_card_uis() -> void:
 		else:
 			slot.update_placeholder()
 			
-	for i in range(6):
+	for i in range(MAX_TEAM_SIZE):
 		var slot := enemy_slots[i]
 		var card := slot.get_card()
 		if card and enemy_team.units[i]:
@@ -220,8 +266,6 @@ func _update_all_card_uis() -> void:
 func _process(delta: float) -> void:
 	if simulation_state == State.PLAYING:
 		advance_simulation(delta * game_speed)
-	player_team.update_cooldown_ratios()
-	enemy_team.update_cooldown_ratios()
 
 func advance_simulation(delta: float) -> void:
 	# Update match timer
@@ -229,10 +273,10 @@ func advance_simulation(delta: float) -> void:
 		match_timer -= delta
 		if match_timer <= 0.0:
 			match_timer = 0.0
-			if has_node("%TimerContainer"):
-				%TimerContainer.visible = false
-		if has_node("%TimerLabel"):
-			%TimerLabel.text = "⏳ %.1fs" % match_timer
+			if timer_container:
+				timer_container.visible = false
+		if timer_label:
+			timer_label.text = "⏳ %.1fs" % match_timer
 	else:
 		# Fatigue damage active
 		fatigue_tick_timer += delta
@@ -276,12 +320,12 @@ func _on_team_defeat() -> void:
 func set_playing(play: bool) -> void:
 	if play:
 		simulation_state = State.PLAYING
-		%PlayButton.visible = false
-		%PauseButton.visible = true
+		if play_button: play_button.visible = false
+		if pause_button: pause_button.visible = true
 	else:
 		simulation_state = State.PAUSED
-		%PlayButton.visible = true
-		%PauseButton.visible = false
+		if play_button: play_button.visible = true
+		if pause_button: pause_button.visible = false
 
 func _on_play_pressed() -> void:
 	set_playing(true)
@@ -296,10 +340,10 @@ func _on_reset_pressed() -> void:
 	match_timer = 30.0
 	fatigue_tick_timer = 0.0
 	fatigue_tick_count = 0
-	if has_node("%TimerContainer"):
-		%TimerContainer.visible = true
-	if has_node("%TimerLabel"):
-		%TimerLabel.text = "⏳ 30.0s"
+	if timer_container:
+		timer_container.visible = true
+	if timer_label:
+		timer_label.text = "⏳ 30.0s"
 		
 	# Reset both teams
 	player_team.reset(initial_team_backup)
@@ -311,10 +355,10 @@ func _on_reset_pressed() -> void:
 func _on_exit_pressed() -> void:
 	# Save updated stats back to CurrentRun.state
 	if CurrentRun.state != null:
-		for i in range(6):
+		for i in range(MAX_TEAM_SIZE):
 			var persistent_unit := CurrentRun.state.active_team[i] as UnitInstance
 			var backup := initial_team_backup[i] as UnitInstance
-			if persistent_unit and backup:
+			if persistent_unit and backup and player_team.units[i]:
 				# Revert temporary combat-specific stats back to shop/backup state
 				persistent_unit.max_health_bonus = player_team.units[i].max_health_bonus
 				persistent_unit.temp_max_health_bonus = 0
@@ -353,8 +397,8 @@ func _on_speed_pressed() -> void:
 	else:
 		game_speed = 1.0
 		
-	if %SpeedButton:
-		%SpeedButton.text = "⚡ Speed: %dx" % int(game_speed)
+	if speed_button:
+		speed_button.text = "⚡ Speed: %dx" % int(game_speed)
 
 func get_fibonacci(n: int) -> int:
 	if n <= 0:
@@ -383,109 +427,50 @@ func _update_team_slots_ui(slots_arr: Array[BattleCardSlot], loaded_units: Array
 			slot.remove_card(old_card)
 			old_card.queue_free()
 			
-	var card_scene := load("res://src/scenes/battle_scene/components/battle_card.tscn") as PackedScene
-	for i in range(6):
+	for i in range(MAX_TEAM_SIZE):
 		var inst := loaded_units[i]
 		if inst:
-			var card := card_scene.instantiate() as BattleCard
+			var card := BATTLE_CARD_SCENE.instantiate() as BattleCard
 			card.unit_instance = inst
 			card.hovered.connect(func(c: Control, h: bool) -> void: _on_card_hovered(c, h))
 			slots_arr[i].add_card(card)
 		else:
 			slots_arr[i].update_placeholder()
 
-func _on_player_units_loaded(loaded_units: Array[UnitInstance]) -> void:
-	_update_team_slots_ui(player_slots, loaded_units)
+func _on_units_loaded(loaded_units: Array[UnitInstance], slots: Array[BattleCardSlot]) -> void:
+	_update_team_slots_ui(slots, loaded_units)
 
-func _on_enemy_units_loaded(loaded_units: Array[UnitInstance]) -> void:
-	_update_team_slots_ui(enemy_slots, loaded_units)
-
-func _on_player_health_changed(current_health: int, max_health: int, shield: int) -> void:
+func _on_health_changed(current_health: int, max_health: int, shield: int, bar: Control, label: Label) -> void:
 	var fill_pct := 0.0
 	if max_health > 0:
 		fill_pct = float(max(0, current_health)) / float(max_health)
 		
-	var hp_bar := %TeamHealthBarRect as Control
-	if hp_bar and hp_bar.material:
-		hp_bar.material.set_shader_parameter("fill_percentage", fill_pct)
+	if bar and bar.material:
+		bar.material.set_shader_parameter("fill_percentage", fill_pct)
 		
-	var hp_label := %TeamHealthLabel as Label
-	if hp_label:
+	if label:
 		if shield > 0:
-			hp_label.text = "Team Health: %d / %d (🛡️ %d)" % [max(0, current_health), max_health, shield]
+			label.text = "%d / %d (🛡️ %d)" % [max(0, current_health), max_health, shield]
 		else:
-			hp_label.text = "Team Health: %d / %d" % [max(0, current_health), max_health]
+			label.text = "%d / %d" % [max(0, current_health), max_health]
 
-func _on_enemy_health_changed(current_health: int, max_health: int, shield: int) -> void:
-	var fill_pct := 0.0
-	if max_health > 0:
-		fill_pct = float(max(0, current_health)) / float(max_health)
-		
-	var hp_bar := %EnemyHealthBarRect as Control
-	if hp_bar and hp_bar.material:
-		hp_bar.material.set_shader_parameter("fill_percentage", fill_pct)
-		
-	var hp_label := %EnemyHealthLabel as Label
-	if hp_label:
-		var damage_taken := max_health - current_health
-		if shield > 0:
-			hp_label.text = "Damage Taken: %d (🛡️ %d)" % [damage_taken, shield]
-		else:
-			hp_label.text = "Damage Taken: %d" % damage_taken
-
-func _on_player_status_changed(status_type: String, amount: int, cooldown_ratio: float) -> void:
-	var badge: StatusBadge = null
-	match status_type:
-		"poison": badge = %TeamPoisonBadge as StatusBadge
-		"burn": badge = %TeamBurnBadge as StatusBadge
-		"electrocute": badge = %TeamElectrocuteBadge as StatusBadge
-		
-	if badge:
-		badge.value = amount
-		badge.cooldown_ratio = cooldown_ratio
+func _on_status_changed(status_type: String, amount: int, cooldown_ratio: float, badges: Dictionary, status_hbox: Control) -> void:
+	if status_type in badges and badges[status_type]:
+		badges[status_type].value = amount
+		badges[status_type].cooldown_ratio = cooldown_ratio
 		
 	var has_statuses := false
-	var poison_badge := %TeamPoisonBadge as StatusBadge
-	var burn_badge := %TeamBurnBadge as StatusBadge
-	var electrocute_badge := %TeamElectrocuteBadge as StatusBadge
-	if poison_badge and poison_badge.value > 0: has_statuses = true
-	if burn_badge and burn_badge.value > 0: has_statuses = true
-	if electrocute_badge and electrocute_badge.value > 0: has_statuses = true
-	
-	var status_hbox := %TeamStatusHBox as Control
+	for badge in badges.values():
+		if badge and badge.value > 0:
+			has_statuses = true
+			break
+			
 	if status_hbox:
 		status_hbox.visible = has_statuses
 
-func _on_enemy_status_changed(status_type: String, amount: int, cooldown_ratio: float) -> void:
-	var badge: StatusBadge = null
-	match status_type:
-		"poison": badge = %PoisonBadge as StatusBadge
-		"burn": badge = %BurnBadge as StatusBadge
-		"electrocute": badge = %ElectrocuteBadge as StatusBadge
-		
-	if badge:
-		badge.value = amount
-		badge.cooldown_ratio = cooldown_ratio
-		
-	var has_statuses := false
-	var poison_badge := %PoisonBadge as StatusBadge
-	var burn_badge := %BurnBadge as StatusBadge
-	var electrocute_badge := %ElectrocuteBadge as StatusBadge
-	if poison_badge and poison_badge.value > 0: has_statuses = true
-	if burn_badge and burn_badge.value > 0: has_statuses = true
-	if electrocute_badge and electrocute_badge.value > 0: has_statuses = true
-	
-	var status_hbox := %EnemyStatusHBox as Control
-	if status_hbox:
-		status_hbox.visible = has_statuses
-
-func _on_player_cast_progress_changed(slot_idx: int, ratio: float) -> void:
-	if slot_idx >= 0 and slot_idx < player_slots.size():
-		player_slots[slot_idx].set_cast_progress(ratio)
-
-func _on_enemy_cast_progress_changed(slot_idx: int, ratio: float) -> void:
-	if slot_idx >= 0 and slot_idx < enemy_slots.size():
-		enemy_slots[slot_idx].set_cast_progress(ratio)
+func _on_cast_progress_changed(slot_idx: int, ratio: float, slots: Array[BattleCardSlot]) -> void:
+	if slot_idx >= 0 and slot_idx < slots.size():
+		slots[slot_idx].set_cast_progress(ratio)
 
 func _on_floating_text_requested(is_enemy_team: bool, text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
 	var spawn_pos := Vector2.ZERO
@@ -493,7 +478,8 @@ func _on_floating_text_requested(is_enemy_team: bool, text: String, color: Color
 		var slot := enemy_slots[slot_idx] if is_enemy_team else player_slots[slot_idx]
 		spawn_pos = slot.global_position + slot.size / 2.0
 	else:
-		var hp_bar := %EnemyHealthBarRect if is_enemy_team else %TeamHealthBarRect
-		spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
+		var hp_bar := enemy_health_bar_rect if is_enemy_team else team_health_bar_rect
+		if hp_bar:
+			spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
 		
 	spawn_floating_text(text, color, spawn_pos)
