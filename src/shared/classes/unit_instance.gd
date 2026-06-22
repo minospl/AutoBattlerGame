@@ -67,3 +67,20 @@ func is_dead() -> bool:
 
 func get_cast_speed() -> float:
 	return current_cast_speed
+
+func clone() -> UnitInstance:
+	var new_inst = UnitInstance.new()
+	new_inst.data = data
+	new_inst.current_health = current_health
+	new_inst.current_attack = current_attack
+	new_inst.poison = poison
+	new_inst.heal = heal
+	new_inst.shield = shield
+	new_inst.thorns = thorns
+	new_inst.burn = burn
+	new_inst.electrocute = electrocute
+	new_inst.level = level
+	new_inst.max_health_bonus = max_health_bonus
+	new_inst.current_cast_speed = current_cast_speed
+	return new_inst
+

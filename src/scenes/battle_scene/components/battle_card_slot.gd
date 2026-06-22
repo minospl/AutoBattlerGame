@@ -6,6 +6,7 @@ extends Control
 
 @onready var card_container: PanelContainer = %CardContainer
 @onready var cooldown_fill: ColorRect = %CooldownFill
+@onready var empty_border_rect: ShaderBorderDecorator = %EmptyBorderRect
 
 var is_targeted: bool = false
 
@@ -21,26 +22,24 @@ func set_cast_progress(ratio: float) -> void:
 
 func set_target_highlight(active: bool) -> void:
 	is_targeted = active
-	var border_rect = get_node_or_null("%EmptyBorderRect") as ShaderBorderDecorator
-	if border_rect:
+	if empty_border_rect:
 		if is_targeted:
-			border_rect.visible = true
-			border_rect.border_color = Color(0.9, 0.15, 0.15, 1.0)
-			border_rect.inner_border_color = Color(0.5, 0.05, 0.05, 1.0)
-			border_rect.interior_color = Color(0, 0, 0, 0)
-			border_rect.update_shader_parameters()
+			empty_border_rect.visible = true
+			empty_border_rect.border_color = Color(0.9, 0.15, 0.15, 1.0)
+			empty_border_rect.inner_border_color = Color(0.5, 0.05, 0.05, 1.0)
+			empty_border_rect.interior_color = Color(0.0, 0.0, 0.0, 0.0)
+			empty_border_rect.update_shader_parameters()
 		else:
-			border_rect.visible = is_empty()
-			border_rect.border_color = GameColors.BORDER_OUTER_DEFAULT
-			border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-			border_rect.interior_color = GameColors.WHITE_COLOR
-			border_rect.update_shader_parameters()
+			empty_border_rect.visible = is_empty()
+			empty_border_rect.border_color = GameColors.BORDER_OUTER_DEFAULT
+			empty_border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
+			empty_border_rect.interior_color = GameColors.WHITE_COLOR
+			empty_border_rect.update_shader_parameters()
 
 func update_placeholder() -> void:
-	var empty = is_empty()
-	var border_rect = get_node_or_null("%EmptyBorderRect") as ShaderBorderDecorator
-	if border_rect:
-		border_rect.visible = empty
+	var empty := is_empty()
+	if empty_border_rect:
+		empty_border_rect.visible = empty
 		
 	if empty:
 		set_cast_progress(0.0)
@@ -60,14 +59,14 @@ func get_card() -> BattleCard:
 		return null
 	for child in card_container.get_children():
 		if child is BattleCard:
-			return child
+			return child as BattleCard
 	return null
 
 func is_empty() -> bool:
 	return get_card() == null
 
 func get_unit_instance() -> UnitInstance:
-	var card = get_card()
+	var card := get_card()
 	if card:
 		return card.unit_instance
 	return null
