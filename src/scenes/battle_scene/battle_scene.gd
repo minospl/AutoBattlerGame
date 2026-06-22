@@ -17,6 +17,14 @@ var team_health: int = 0
 var team_max_health: int = 0
 var team_shield: int = 0
 
+# Team Status Effects
+var team_poison: int = 0
+var team_poison_timer: float = 0.0
+var team_burn: int = 0
+var team_burn_timer: float = 0.0
+var team_electrocute: int = 0
+
+
 # Enemy Stats for practice dummy
 var enemy_damage_taken: int = 0
 var enemy_poison: int = 0
@@ -25,6 +33,11 @@ var enemy_poison_damage_dealt: int = 0
 var enemy_burn: int = 0
 var enemy_burn_timer: float = 0.0
 var enemy_electrocute: int = 0
+
+# Enemy Team Cards
+var enemy_team: Array[UnitInstance] = []
+var enemy_slots: Array[BattleCardSlot] = []
+var enemy_cast_timers: Array[float] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 # Countdown Timer & Fatigue
 var match_timer: float = 30.0
@@ -55,6 +68,14 @@ func _ready() -> void:
 	]
 	for i in range(6):
 		slots[i].slot_index = i
+
+	# Fetch enemy slots
+	enemy_slots = [
+		%EnemySlot0, %EnemySlot1, %EnemySlot2,
+		%EnemySlot3, %EnemySlot4, %EnemySlot5
+	]
+	for i in range(6):
+		enemy_slots[i].slot_index = i
 
 	# Load state and backup
 	load_battle_team()
@@ -182,6 +203,13 @@ func load_battle_team() -> void:
 	team_health = 0
 	team_max_health = 0
 	team_shield = 0
+	team_poison = 0
+	team_poison_timer = 0.0
+	team_burn = 0
+	team_burn_timer = 0.0
+	team_electrocute = 0
+	_update_team_status_ui()
+
 	for unit in current_team:
 		if unit:
 			team_health += unit.current_health
@@ -194,6 +222,48 @@ func load_battle_team() -> void:
 		%TimerContainer.visible = true
 	if has_node("%TimerLabel"):
 		%TimerLabel.text = "⏳ 30.0s"
+		
+	load_enemy_team()
+
+func load_enemy_team() -> void:
+	# Clear enemy slots
+	for slot in enemy_slots:
+		var old_card = slot.get_card()
+		if old_card:
+			slot.remove_card(old_card)
+			old_card.queue_free()
+
+	enemy_team.clear()
+	enemy_team.resize(6)
+
+	# Load River Crab into Slot 0
+	var crab_data = load("res://src/resources/units/river_crab.tres")
+	if crab_data:
+		var crab_instance = UnitInstance.new()
+		crab_instance.initialize(crab_data)
+		# Override health and attack
+		crab_instance.max_health_bonus = 999  # base health is 1, so 1 + 999 = 1000
+		crab_instance.current_health = 1000
+		crab_instance.current_attack = 10
+		
+		# Ignore thorns per user request
+		crab_instance.thorns = 0
+		
+		enemy_team[0] = crab_instance
+		
+		var card_scene = load("res://src/scenes/battle_scene/components/battle_card.tscn")
+		var card = card_scene.instantiate()
+		card.unit_instance = crab_instance
+		card.hovered.connect(func(c, h): _on_card_hovered(c, h))
+		enemy_slots[0].add_card(card)
+	
+	for i in range(6):
+		enemy_slots[i].update_placeholder()
+
+	enemy_cast_timers = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+	for slot in enemy_slots:
+		slot.set_cast_progress(0.0)
+
 
 func trigger_battle_start() -> void:
 	# Wait one frame to let Godot layout engine calculate slot positions
@@ -351,6 +421,56 @@ func advance_simulation(delta: float) -> void:
 	else:
 		enemy_burn_timer = 0.0
 
+	# Tick team poison status every second!
+	if team_poison > 0:
+		team_poison_timer += delta
+		if team_poison_timer >= 1.0:
+			team_poison_timer -= 1.0
+			
+			var dmg = team_poison
+			if team_shield >= dmg:
+				team_shield -= dmg
+			else:
+				var remaining_dmg = dmg - team_shield
+				team_shield = 0
+				team_health -= remaining_dmg
+				
+			if %TeamHealthBarRect:
+				var hp_bar = %TeamHealthBarRect as Control
+				var spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
+				spawn_floating_text("-" + str(dmg), Color(0.7, 0.3, 0.8), spawn_pos)
+				
+			update_team_health_bar()
+			_update_team_status_ui()
+	else:
+		team_poison_timer = 0.0
+
+	# Tick team burn status every 0.5 seconds (2x faster than poison)!
+	if team_burn > 0:
+		team_burn_timer += delta
+		if team_burn_timer >= 0.5:
+			team_burn_timer -= 0.5
+			
+			var dmg = team_burn
+			if team_shield >= dmg:
+				team_shield -= dmg
+			else:
+				var remaining_dmg = dmg - team_shield
+				team_shield = 0
+				team_health -= remaining_dmg
+				
+			if %TeamHealthBarRect:
+				var hp_bar = %TeamHealthBarRect as Control
+				var spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
+				spawn_floating_text("-" + str(dmg), Color(0.9, 0.4, 0.1), spawn_pos)
+				
+			team_burn = max(0, team_burn - 1)
+			update_team_health_bar()
+			_update_team_status_ui()
+	else:
+		team_burn_timer = 0.0
+
+
 	for i in range(6):
 		if current_team[i]:
 			cast_timers[i] += delta
@@ -364,6 +484,22 @@ func advance_simulation(delta: float) -> void:
 				trigger_cast(i)
 		else:
 			slots[i].set_cast_progress(0.0)
+
+	# Enemy cast loop
+	for i in range(6):
+		if enemy_team[i]:
+			enemy_cast_timers[i] += delta
+			var speed = enemy_team[i].get_cast_speed()
+			if speed <= 0.0: speed = 1.0
+			
+			enemy_slots[i].set_cast_progress(enemy_cast_timers[i] / speed)
+			
+			if enemy_cast_timers[i] >= speed:
+				enemy_cast_timers[i] = 0.0
+				trigger_enemy_cast(i)
+		else:
+			enemy_slots[i].set_cast_progress(0.0)
+
 
 
 func spawn_floating_text(value_text: String, text_color: Color, start_pos: Vector2) -> void:
@@ -383,6 +519,57 @@ func spawn_floating_text(value_text: String, text_color: Color, start_pos: Vecto
 	
 	f_text.global_position = final_pos
 	add_child(f_text)
+
+func trigger_enemy_cast(source_idx: int) -> void:
+	var unit = enemy_team[source_idx]
+	if not unit:
+		return
+		
+	var dmg = unit.get_attack()
+	if dmg > 0:
+		if team_electrocute > 0:
+			dmg += team_electrocute
+		# Apply shield absorption
+		if team_shield >= dmg:
+			team_shield -= dmg
+		else:
+			var remaining_dmg = dmg - team_shield
+			team_shield = 0
+			team_health -= remaining_dmg
+			
+		update_team_health_bar()
+		
+		if %TeamHealthBarRect:
+			var hp_bar = %TeamHealthBarRect as Control
+			var spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
+			spawn_floating_text("-" + str(dmg), Color(1.0, 0.3, 0.3), spawn_pos)
+			
+	# Apply poison to player team
+	if unit.poison > 0:
+		team_poison += unit.poison
+		
+	# Apply burn to player team
+	if unit.burn > 0:
+		team_burn += unit.burn
+		
+	# Apply electrocute to player team
+	if unit.electrocute > 0:
+		team_electrocute += unit.electrocute
+		
+	_update_team_status_ui()
+			
+	if unit.heal > 0:
+		enemy_damage_taken = max(0, enemy_damage_taken - unit.heal)
+		_update_enemy_ui()
+		if %EnemyHealthBarRect:
+			var enemy_bar = %EnemyHealthBarRect as Control
+			var spawn_pos = enemy_bar.global_position + enemy_bar.size / 2.0
+			spawn_floating_text("+" + str(unit.heal), Color(0.2, 0.9, 0.2), spawn_pos)
+			
+	_update_all_card_uis()
+
+func _on_enemy_defeat() -> void:
+	set_playing(false)
 
 func set_playing(play: bool) -> void:
 	if play:
@@ -433,6 +620,12 @@ func _on_reset_pressed() -> void:
 			
 	# Re-create duplicates from backup
 	team_shield = 0
+	team_poison = 0
+	team_poison_timer = 0.0
+	team_burn = 0
+	team_burn_timer = 0.0
+	team_electrocute = 0
+	_update_team_status_ui()
 	team_health = 0
 	team_max_health = 0
 	for i in range(6):
@@ -454,6 +647,8 @@ func _on_reset_pressed() -> void:
 	cast_timers = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 	for slot in slots:
 		slot.set_cast_progress(0.0)
+		
+	load_enemy_team()
 		
 	# Trigger start of battle again
 	trigger_battle_start()
@@ -496,8 +691,18 @@ func _clear_slot_target_highlights() -> void:
 		slot.set_target_highlight(false)
 
 func _update_enemy_ui() -> void:
+	var max_enemy_hp = 1000
+	if enemy_team.size() > 0 and enemy_team[0]:
+		max_enemy_hp = enemy_team[0].get_max_health()
+		
 	if has_node("%EnemyHealthLabel"):
 		%EnemyHealthLabel.text = "Damage Taken: " + str(enemy_damage_taken)
+		
+	# Update bar shader fill percentage
+	var current_enemy_hp = max(0, max_enemy_hp - enemy_damage_taken)
+	var fill_pct = float(current_enemy_hp) / float(max_enemy_hp)
+	if %EnemyHealthBarRect and %EnemyHealthBarRect.material:
+		%EnemyHealthBarRect.material.set_shader_parameter("fill_percentage", fill_pct)
 	
 	if has_node("%PoisonBadge"):
 		%PoisonBadge.value = enemy_poison
@@ -511,12 +716,33 @@ func _update_enemy_ui() -> void:
 	if has_node("%EnemyStatusHBox"):
 		%EnemyStatusHBox.visible = has_statuses
 
+	if enemy_damage_taken >= max_enemy_hp:
+		call_deferred("_on_enemy_defeat")
+
+func _update_team_status_ui() -> void:
+	if has_node("%TeamPoisonBadge"):
+		%TeamPoisonBadge.value = team_poison
+	if has_node("%TeamBurnBadge"):
+		%TeamBurnBadge.value = team_burn
+	if has_node("%TeamElectrocuteBadge"):
+		%TeamElectrocuteBadge.value = team_electrocute
+		
+	var has_statuses = team_poison > 0 or team_burn > 0 or team_electrocute > 0
+	if has_node("%TeamStatusHBox"):
+		%TeamStatusHBox.visible = has_statuses
+
 func _update_poison_cooldown_progress() -> void:
 	if has_node("%PoisonBadge"):
 		var ratio = 0.0
 		if enemy_poison > 0:
 			ratio = clamp(enemy_poison_timer / 1.0, 0.0, 1.0)
 		%PoisonBadge.cooldown_ratio = ratio
+	if has_node("%TeamPoisonBadge"):
+		var ratio = 0.0
+		if team_poison > 0:
+			ratio = clamp(team_poison_timer / 1.0, 0.0, 1.0)
+		%TeamPoisonBadge.cooldown_ratio = ratio
+
 
 func update_team_health_bar() -> void:
 	var fill_pct: float = 0.0

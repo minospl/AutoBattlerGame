@@ -207,6 +207,29 @@ text = "Team Health: 0 / 0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="TeamStatusHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TeamPoisonBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = "poison"
+
+[node name="TeamBurnBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = "burn"
+
+[node name="TeamElectrocuteBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = "electrocute"
+
 [node name="EnemyHealthBarMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox"]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
@@ -337,12 +360,15 @@ theme_override_constants/separation = 16
 alignment = 1
 
 [node name="EnemySlot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="EnemySlot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="EnemySlot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="EnemyRow1HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn"]
@@ -351,13 +377,17 @@ theme_override_constants/separation = 16
 alignment = 1
 
 [node name="EnemySlot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="EnemySlot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="EnemySlot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
 layout_mode = 2
+
 
 [node name="PreviewContainer" type="MarginContainer" parent="."]
 unique_name_in_owner = true
