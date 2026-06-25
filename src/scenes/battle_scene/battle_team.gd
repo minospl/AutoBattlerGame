@@ -90,8 +90,8 @@ func execute_cast(source_idx: int, opponent: BattleTeam) -> void:
 	if unit.shield > 0:
 		add_shield(unit.shield)
 		
-	# Trigger ON_CAST modifiers
-	ModifierEngine.trigger_unit_modifiers(source_idx, self, UnitModifier.Trigger.ON_CAST)
+	# Trigger ON_CAST modifier
+	ModifierEngine.trigger_unit_modifier(source_idx, self, UnitModifier.Trigger.ON_CAST)
 
 func take_damage(amount: int, damage_type: String = "physical") -> void:
 	if amount <= 0:
@@ -208,34 +208,8 @@ func tick_casts(delta: float, game_speed: float, cast_callback: Callable) -> voi
 				cast_timers[i] = 0.0
 				cast_callback.call(i)
 
-func reset(backup_units: Array[UnitInstance]) -> void:
-	shield = 0
-	poison = 0
-	poison_timer = 0.0
-	burn = 0
-	burn_timer = 0.0
-	electrocute = 0
-	
-	health = 0
-	max_health = 0
-	
-	var num_backup: int = mini(MAX_TEAM_SIZE, backup_units.size())
-	for i in range(MAX_TEAM_SIZE):
-		if i < num_backup and backup_units[i]:
-			var backup := backup_units[i]
-			units[i] = backup.clone()
-			health += units[i].current_health
-			max_health += units[i].get_max_health()
-		else:
-			units[i] = null
-			
-	cast_timers = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-	
-	team_units_loaded.emit(units)
-	health_changed.emit(health, max_health, shield)
-	status_changed.emit("poison", poison, 0.0)
-	status_changed.emit("burn", burn, 0.0)
-	status_changed.emit("electrocute", electrocute, 0.0)
+
+
 
 func spawn_floating_text_on_slot(t_idx: int, text: String, color: Color) -> void:
 	floating_text_requested.emit(text, color, true, t_idx)

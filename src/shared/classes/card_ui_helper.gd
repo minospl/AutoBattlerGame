@@ -135,33 +135,33 @@ static func setup_card_visuals(
 	if bottom_ind:
 		bottom_ind.visible = false
 		
-	if unit_instance.data and unit_instance.data.modifiers:
-		for modifier in unit_instance.data.modifiers:
-			match modifier.target:
-				UnitModifier.TargetType.HORIZONTAL:
-					if left_ind: left_ind.visible = true
-					if right_ind: right_ind.visible = true
-				UnitModifier.TargetType.VERTICAL:
-					if top_ind: top_ind.visible = true
-					if bottom_ind: bottom_ind.visible = true
-				UnitModifier.TargetType.ADJACENT:
-					if left_ind: left_ind.visible = true
-					if right_ind: right_ind.visible = true
-					if top_ind: top_ind.visible = true
-					if bottom_ind: bottom_ind.visible = true
-				UnitModifier.TargetType.UP:
-					if top_ind: top_ind.visible = true
-				UnitModifier.TargetType.DOWN:
-					if bottom_ind: bottom_ind.visible = true
-				UnitModifier.TargetType.LEFT:
-					if left_ind: left_ind.visible = true
-				UnitModifier.TargetType.RIGHT:
-					if right_ind: right_ind.visible = true
-				UnitModifier.TargetType.ALL:
-					if left_ind: left_ind.visible = true
-					if right_ind: right_ind.visible = true
-					if top_ind: top_ind.visible = true
-					if bottom_ind: bottom_ind.visible = true
+	if unit_instance.data and unit_instance.data.modifier:
+		var modifier: UnitModifier = unit_instance.data.modifier
+		match modifier.target:
+			UnitModifier.TargetType.HORIZONTAL:
+				if left_ind: left_ind.visible = true
+				if right_ind: right_ind.visible = true
+			UnitModifier.TargetType.VERTICAL:
+				if top_ind: top_ind.visible = true
+				if bottom_ind: bottom_ind.visible = true
+			UnitModifier.TargetType.ADJACENT:
+				if left_ind: left_ind.visible = true
+				if right_ind: right_ind.visible = true
+				if top_ind: top_ind.visible = true
+				if bottom_ind: bottom_ind.visible = true
+			UnitModifier.TargetType.UP:
+				if top_ind: top_ind.visible = true
+			UnitModifier.TargetType.DOWN:
+				if bottom_ind: bottom_ind.visible = true
+			UnitModifier.TargetType.LEFT:
+				if left_ind: left_ind.visible = true
+			UnitModifier.TargetType.RIGHT:
+				if right_ind: right_ind.visible = true
+			UnitModifier.TargetType.ALL:
+				if left_ind: left_ind.visible = true
+				if right_ind: right_ind.visible = true
+				if top_ind: top_ind.visible = true
+				if bottom_ind: bottom_ind.visible = true
 
 ## Setup background shaders for stats labels
 static func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: Vector2) -> void:

@@ -42,7 +42,7 @@ enum Duration {
 @export var custom_description: String = ""
 
 func get_description() -> String:
-	var trigger_str = ""
+	var trigger_str : String = ""
 	match trigger:
 		Trigger.ON_CAST:
 			trigger_str = "[color=%s]On Cast[/color]" % GameColors.DESC_TRIGGER
@@ -53,13 +53,13 @@ func get_description() -> String:
 
 	# 1. Custom Description Override (with {value} placeholder support)
 	if not custom_description.is_empty():
-		var formatted_text = custom_description.format({"value": str(value)})
+		var formatted_text : String = custom_description.format({"value": str(value)})
 		return "%s\n%s" % [trigger_str, formatted_text]
 
 	# 2. Auto-generated Description
 	# Resolve targeting terms
-	var target_phrase = ""
-	var target_possession = ""
+	var target_phrase : String = ""
+	var target_possession : String = ""
 	match target:
 		TargetType.SELF:
 			target_phrase = "[color=%s]SELF[/color]" % GameColors.DESC_TARGET
@@ -90,14 +90,14 @@ func get_description() -> String:
 			target_possession = "[color=%s]ALL[/color] allies'" % GameColors.DESC_TARGET
 
 	# Resolve duration terms
-	var dur_str = ""
+	var dur_str : String = ""
 	match duration:
 		Duration.BATTLE:
 			dur_str = "for this battle"
 		Duration.PERMANENT:
 			dur_str = "permanently"
 
-	var effect_str = ""
+	var effect_str : String = ""
 	match effect:
 		EffectType.BUFF_ATTACK:
 			if target == TargetType.SELF:
@@ -125,7 +125,7 @@ func get_description() -> String:
 			else:
 				effect_str = "Apply [color=%s]%d Poison[/color] to %s" % [GameColors.DESC_POISON, value, target_phrase]
 		EffectType.TRIGGER_MODIFIERS:
-			var target_trig_str = ""
+			var target_trig_str : String = ""
 			match target_trigger:
 				Trigger.ON_CAST:
 					target_trig_str = "[b][color=%s]On Cast[/color][/b]" % GameColors.DESC_TRIGGER

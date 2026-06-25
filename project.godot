@@ -18,6 +18,15 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 
 CurrentRun="*res://src/shared/classes/current_run.gd"
 
+[debug]
+
+gdscript/warnings/untyped_declaration=1
+gdscript/warnings/inferred_declaration=1
+gdscript/warnings/unsafe_property_access=1
+gdscript/warnings/unsafe_method_access=1
+gdscript/warnings/unsafe_cast=1
+gdscript/warnings/unsafe_call_argument=1
+
 [display]
 
 window/size/viewport_width=1280
@@ -32,6 +41,5 @@ theme/custom="res://src/shared/theme/game_theme.tres"
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
-renderer/rendering_method="mobile"
 2d/snap/snap_2d_transforms_to_pixel=true
 2d/snap/snap_vertices_to_pixel=true

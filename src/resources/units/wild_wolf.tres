@@ -1,13 +1,13 @@
 [gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://src/resources/unit_data.gd" id="1_data"]
-[ext_resource type="Resource" path="res://src/resources/types/beast.tres" id="2_type"]
-[ext_resource type="Resource" path="res://src/resources/rarities/common.tres" id="3_rarity"]
-[ext_resource type="Texture2D" path="res://src/assets/units/wild_wolf.jpg" id="4_sprite"]
-[ext_resource type="Script" path="res://src/resources/unit_modifier.gd" id="5_modifier"]
+[ext_resource type="Script" path="res://src/resources/unit_data.gd" id="unit_data"]
+[ext_resource type="Resource" path="res://src/resources/types/beast.tres" id="unit_type"]
+[ext_resource type="Resource" path="res://src/resources/rarities/common.tres" id="unit_rarity"]
+[ext_resource type="Script" path="res://src/resources/unit_modifier.gd" id="unit_modifier"]
+[ext_resource type="Texture2D" path="res://src/assets/units/wild_wolf.jpg" id="sprite"]
 
 [sub_resource type="Resource" id="Resource_wolf_battle_start"]
-script = ExtResource("5_modifier")
+script = ExtResource("unit_modifier")
 trigger = 1
 target = 3
 effect = 0
@@ -15,14 +15,14 @@ value = 1
 duration = 0
 
 [resource]
-script = ExtResource("1_data")
+script = ExtResource("unit_data")
 unit_name = "Wild Wolf"
 price = 2
 max_health = 10
 attack = 4
 base_poison = 0
 cast_speed = 3.0
-types = [ExtResource("2_type")]
-rarity = ExtResource("3_rarity")
-modifiers = [SubResource("Resource_wolf_battle_start")]
-sprite = ExtResource("4_sprite")
+types = [ExtResource("unit_type")]
+rarity = ExtResource("unit_rarity")
+modifier = SubResource("Resource_wolf_battle_start")
+sprite = ExtResource("sprite")

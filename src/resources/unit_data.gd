@@ -14,23 +14,22 @@ extends Resource
 @export var attack: int
 
 ## Base heal value (on cast)
-@export var base_heal: int = 0
+@export var base_heal: int
 
 ## Base poison value
 @export var base_poison: int
 
 ## Base shield value (on cast)
-@export var base_shield: int = 0
-
+@export var base_shield: int
 
 ## Base thorns value (retaliate on hit)
-@export var base_thorns: int = 0
+@export var base_thorns: int
 
 ## Base burn value (on cast)
-@export var base_burn: int = 0
+@export var base_burn: int
 
 ## Base electrocute value (on cast)
-@export var base_electrocute: int = 0
+@export var base_electrocute: int
 
 ## List of types associated with this unit (e.g. Beast, Dragon)
 @export var types: Array[UnitType]
@@ -41,8 +40,8 @@ extends Resource
 ## How often the unit casts (in seconds)
 @export var cast_speed: float
 
-## List of modifiers (abilities) for this unit
-@export var modifiers: Array[UnitModifier] = []
+## List of modifier (abilities) for this unit
+@export var modifier: UnitModifier
 
 ## Optional custom texture/sprite for the unit artwork
 @export var sprite: Texture2D

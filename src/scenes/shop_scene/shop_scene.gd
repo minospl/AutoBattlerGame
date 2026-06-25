@@ -68,7 +68,7 @@ func _ready() -> void:
 	_apply_visual_styling()
 	
 	# Load our pre-created templates
-	var paths = [
+	var paths : Array[String] = [
 		"res://src/resources/units/red_dragon.tres",
 		"res://src/resources/units/forest_guardian.tres",
 		"res://src/resources/units/wild_wolf.tres",
@@ -369,12 +369,10 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 		
 	var idx = source_slot.slot_index
 	
-	if card.unit_instance.data and card.unit_instance.data.modifiers:
-		for modifier in card.unit_instance.data.modifiers:
-			# Skip SELF target highlighting as we only want to highlight other targets
-			if modifier.target == UnitModifier.TargetType.SELF:
-				continue
-				
+	if card.unit_instance.data and card.unit_instance.data.modifier:
+		var modifier: UnitModifier = card.unit_instance.data.modifier
+		# Skip SELF target highlighting as we only want to highlight other targets
+		if modifier.target != UnitModifier.TargetType.SELF:
 			var target_indices = TargetResolver.get_target_indices(idx, modifier.target)
 			for t_idx in target_indices:
 				if t_idx < active_slots.size():

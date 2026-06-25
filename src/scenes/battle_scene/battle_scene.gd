@@ -19,7 +19,7 @@ var enemy_team: BattleTeam
 var game_speed: float = 1.0
 var preview_tooltip: Control
 
-# Backup for reset
+# Backup for exiting battle (reverting temp stats)
 var initial_team_backup: Array[UnitInstance] = []
 
 # Countdown Timer & Fatigue
@@ -35,7 +35,6 @@ var enemy_slots: Array[BattleCardSlot] = []
 @onready var exit_button: Button = %ExitButton
 @onready var play_button: Button = %PlayButton
 @onready var pause_button: Button = %PauseButton
-@onready var reset_button: Button = %ResetButton
 @onready var speed_button: Button = %SpeedButton
 @onready var preview_container: Control = %PreviewContainer
 @onready var outer_border: ColorRect = %OuterBorder
@@ -67,11 +66,9 @@ func _ready() -> void:
 		preview_container.add_child(preview_tooltip)
 		preview_tooltip.visible = false
 
-	# Setup buttons
 	if exit_button: exit_button.pressed.connect(_on_exit_pressed)
 	if play_button: play_button.pressed.connect(_on_play_pressed)
 	if pause_button: pause_button.pressed.connect(_on_pause_pressed)
-	if reset_button: reset_button.pressed.connect(_on_reset_pressed)
 	if speed_button: speed_button.pressed.connect(_on_speed_pressed)
 
 	# Fetch slots
@@ -233,7 +230,7 @@ func trigger_battle_start() -> void:
 	
 	for i in range(MAX_TEAM_SIZE):
 		if player_team.units[i]:
-			ModifierEngine.trigger_unit_modifiers(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
+			ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
 					
 	# Update all health and stat overlays
 	_update_all_card_uis()
@@ -332,25 +329,6 @@ func _on_play_pressed() -> void:
 
 func _on_pause_pressed() -> void:
 	set_playing(false)
-
-func _on_reset_pressed() -> void:
-	set_playing(false)
-	
-	# Reset Countdown Timer & Fatigue
-	match_timer = 30.0
-	fatigue_tick_timer = 0.0
-	fatigue_tick_count = 0
-	if timer_container:
-		timer_container.visible = true
-	if timer_label:
-		timer_label.text = "⏳ 30.0s"
-		
-	# Reset both teams
-	player_team.reset(initial_team_backup)
-	load_enemy_team()
-	
-	# Trigger start of battle again
-	trigger_battle_start()
 
 func _on_exit_pressed() -> void:
 	# Save updated stats back to CurrentRun.state
