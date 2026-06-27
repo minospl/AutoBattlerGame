@@ -14,20 +14,15 @@ func _ready() -> void:
 	_go_to_shop()
 
 func _load_unit_templates() -> void:
-	var paths = [
-		"res://src/features/units/templates/red_dragon.tres",
-		"res://src/features/units/templates/forest_guardian.tres",
-		"res://src/features/units/templates/wild_wolf.tres",
-		"res://src/features/units/templates/river_crab.tres",
-		"res://src/features/units/templates/spellweaver.tres",
-		"res://src/features/units/templates/vitality_druid.tres",
-		"res://src/features/units/templates/ancient_titan.tres"
+	unit_templates = [
+		preload("res://src/features/units/templates/red_dragon.tres"),
+		preload("res://src/features/units/templates/forest_guardian.tres"),
+		preload("res://src/features/units/templates/wild_wolf.tres"),
+		preload("res://src/features/units/templates/river_crab.tres"),
+		preload("res://src/features/units/templates/spellweaver.tres"),
+		preload("res://src/features/units/templates/vitality_druid.tres"),
+		preload("res://src/features/units/templates/ancient_titan.tres")
 	]
-	for path in paths:
-		if ResourceLoader.exists(path):
-			var template = load(path) as UnitData
-			if template:
-				unit_templates.append(template)
 
 func _initialize_new_run() -> void:
 	run_state = RunState.new()
@@ -37,8 +32,8 @@ func _initialize_new_run() -> void:
 	run_state.shop_frozen_statuses = [false, false, false, false]
 	run_state.gold = 10
 	run_state.lives = 10
-	run_state.day = 4
-	run_state.trophies = 3
+	run_state.day = 1
+	run_state.trophies = 0
 	run_state.max_trophies = 10
 	
 	# Find templates by unit name

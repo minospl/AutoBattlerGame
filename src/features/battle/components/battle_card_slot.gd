@@ -57,8 +57,9 @@ func remove_card(card: BattleCard) -> void:
 func get_card() -> BattleCard:
 	if not card_container:
 		return null
-	for child: BattleCard in card_container.get_children():
-		return child as BattleCard
+	for child: Node in card_container.get_children():
+		if child is BattleCard:
+			return child as BattleCard
 	return null
 
 func is_empty() -> bool:

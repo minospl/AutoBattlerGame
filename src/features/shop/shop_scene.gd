@@ -388,12 +388,49 @@ func _connect_card_signals(card: Control) -> void:
 	if card.has_signal("hovered"):
 		if not card.hovered.is_connected(_on_card_hover_changed):
 			card.hovered.connect(_on_card_hover_changed)
+	if card.has_signal("clicked"):
+		if not card.clicked.is_connected(_on_card_clicked):
+			card.clicked.connect(_on_card_clicked)
 
 func _on_card_hover_changed(card: Control, is_hovered: bool) -> void:
 	if is_hovered:
 		set_preview_card(card)
 	else:
 		clear_preview_card(card)
+
+func _on_card_clicked(card: ShopCard) -> void:
+	var original_slot: ShopCardSlot = card.slot
+	if not original_slot or not original_slot.is_shop_slot:
+		return
+		
+	# Check gold
+	if gold < original_slot.price:
+		return
+		
+	# Find target slot (team first, then bench)
+	var target_slot: ShopCardSlot = null
+	for s: ShopCardSlot in active_slots:
+		if s.is_empty():
+			target_slot = s
+			break
+	if not target_slot:
+		for s in bench_slots:
+			if s.is_empty():
+				target_slot = s
+				break
+				
+	if not target_slot:
+		return # No room
+		
+	# Purchase
+	original_slot.remove_card(card)
+	target_slot.add_card(card)
+	
+	deduct_gold(original_slot.price)
+	refill_shop_slot(original_slot.slot_index)
+	
+	original_slot.slot_changed.emit(original_slot)
+	target_slot.slot_changed.emit(target_slot)
 
 func load_state_from_run() -> void:
 	if run_state == null:

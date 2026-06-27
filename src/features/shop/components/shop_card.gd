@@ -2,6 +2,7 @@ class_name ShopCard
 extends PanelContainer
 
 signal hovered(card: ShopCard, is_hovered: bool)
+signal clicked(card: ShopCard)
 
 @export var price: int
 
@@ -35,9 +36,9 @@ func update_ui() -> void:
 	# Delegate visual rendering to shared helper
 	CardUIHelper.setup_card_visuals(
 		unit_instance,
-		%StatsHBox,
-		%SpriteRect,
-		%PortraitCharLabel,
+		%StatsHBox as HBoxContainer,
+		%SpriteRect as TextureRect,
+		%PortraitCharLabel as Label,
 		left_indicator,
 		right_indicator,
 		top_indicator,
@@ -86,6 +87,9 @@ func _on_mouse_exited() -> void:
 	hovered.emit(self, false)
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
+	if slot and slot.is_shop_slot:
+		return null
+		
 	# Create a visual preview of what we are dragging
 	var preview_scene = load("res://src/features/shop/components/shop_card.tscn")
 	var preview = preview_scene.instantiate()
@@ -113,8 +117,8 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Notify about the drag starting using DragManager
 	DragManager.notify_drag_started(self, original_slot)
 		
-	var viewport = get_viewport()
-	preview_wrapper.tree_exiting.connect(func():
+	var viewport: Viewport = get_viewport()
+	preview_wrapper.tree_exiting.connect(func() -> void:
 		# If the drag was not successful, return the card to its original slot
 		if viewport and not viewport.gui_is_drag_successful():
 			if original_slot:
@@ -127,3 +131,10 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		"card": self,
 		"original_slot": original_slot
 	}
+
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			if slot and slot.is_shop_slot:
+				clicked.emit(self)
+				accept_event()
