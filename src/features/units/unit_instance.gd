@@ -19,8 +19,6 @@ extends Resource
 ## Shield value (on cast) of this specific instance
 @export var shield: int = 0
 
-## Thorns value of this specific instance
-@export var thorns: int = 0
 
 ## Burn value of this specific instance
 @export var burn: int = 0
@@ -42,7 +40,6 @@ func initialize(p_data: UnitData) -> void:
 	poison = p_data.base_poison if p_data else 0
 	heal = p_data.base_heal if p_data else 0
 	shield = p_data.base_shield if p_data else 0
-	thorns = p_data.base_thorns if p_data else 0
 	burn = p_data.base_burn if p_data else 0
 	electrocute = p_data.base_electrocute if p_data else 0
 	cast_speed = p_data.cast_speed if p_data else 1.0
@@ -70,7 +67,6 @@ func clone() -> UnitInstance:
 	new_inst.poison = poison
 	new_inst.heal = heal
 	new_inst.shield = shield
-	new_inst.thorns = thorns
 	new_inst.burn = burn
 	new_inst.electrocute = electrocute
 	new_inst.level = level

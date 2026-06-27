@@ -246,10 +246,3 @@ func apply_modifier_effect(t_idx: int, effect_type: UnitModifier.EffectType, val
 			shield += value
 			health_changed.emit(health, max_health, shield)
 			spawn_floating_text_on_slot(t_idx, "+" + str(value) + " Shield", Color(0.7, 0.7, 0.7))
-
-func get_total_thorns() -> int:
-	var total_thorns := 0
-	for unit in units:
-		if unit:
-			total_thorns += unit.thorns
-	return total_thorns

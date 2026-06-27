@@ -22,8 +22,6 @@ extends Resource
 ## Base shield value (on cast)
 @export var base_shield: int
 
-## Base thorns value (retaliate on hit)
-@export var base_thorns: int
 
 ## Base burn value (on cast)
 @export var base_burn: int

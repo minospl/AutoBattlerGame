@@ -17,7 +17,7 @@ static func setup_card_visuals(
 	if not unit_instance:
 		return
 		
-	# 1. Gather all active stats (Attack, Heal, Poison, Shield, Thorns, Burn, Electrocute)
+	# 1. Gather all active stats (Attack, Heal, Poison, Shield, Burn, Electrocute)
 	var candidates = []
 	if unit_instance.get_attack() > 0:
 		candidates.append({
@@ -60,13 +60,6 @@ static func setup_card_visuals(
 			"value": unit_instance.electrocute,
 			"color": Color(0.85, 0.75, 0.1),
 			"priority": 5
-		})
-	if unit_instance.thorns > 0:
-		candidates.append({
-			"name": "thorns",
-			"value": unit_instance.thorns,
-			"color": Color(0.55, 0.45, 0.2),
-			"priority": 6
 		})
 
 	# Sort candidates: highest value first, tie break using priority index

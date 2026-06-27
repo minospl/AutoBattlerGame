@@ -99,8 +99,6 @@ func _setup_unit_ui() -> void:
 		stats_text += "   |   %d Heal" % _unit_instance.heal
 	if _unit_instance.shield > 0:
 		stats_text += "   |   %d Shield" % _unit_instance.shield
-	if _unit_instance.thorns > 0:
-		stats_text += "   |   %d Thorns" % _unit_instance.thorns
 	if _unit_instance.burn > 0:
 		stats_text += "   |   %d Burn" % _unit_instance.burn
 	if _unit_instance.electrocute > 0:

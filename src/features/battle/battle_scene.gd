@@ -218,9 +218,6 @@ func load_enemy_team() -> void:
 		crab_instance.health = 1000
 		crab_instance.attack = 10
 		
-		# Ignore thorns per user request
-		crab_instance.thorns = 0
-		
 		enemy_units[0] = crab_instance
 		
 	enemy_team.load_team_units(enemy_units)
@@ -284,12 +281,7 @@ func advance_simulation(delta: float) -> void:
 			var stage := floori((fatigue_tick_count - 1) / 3.0) + 1
 			var dmg := get_fibonacci(stage + 1)
 			
-			var hp_before := player_team.health
 			player_team.take_damage(dmg)
-			var took_damage := player_team.health < hp_before or player_team.shield > 0
-			if took_damage:
-				trigger_thorns()
-				
 			_update_all_card_uis()
 
 	# Tick statuses
@@ -383,10 +375,6 @@ func get_fibonacci(n: int) -> int:
 		b = temp
 	return b
 
-func trigger_thorns() -> void:
-	var total_thorns := player_team.get_total_thorns()
-	if total_thorns > 0:
-		enemy_team.take_damage(total_thorns)
 
 # UI Team Handler Methods
 

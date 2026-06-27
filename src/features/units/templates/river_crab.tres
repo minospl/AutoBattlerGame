@@ -22,7 +22,6 @@ attack = 1
 base_heal = 1
 base_poison = 1
 base_shield = 1
-base_thorns = 1
 base_burn = 1
 base_electrocute = 1
 types = Array[ExtResource("unit_type")]([ExtResource("type_water"), ExtResource("type_beast")])
