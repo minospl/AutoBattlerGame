@@ -28,26 +28,28 @@ var gold_provider: Callable
 var gold_deductor: Callable
 var shop_refiller: Callable
 
+@onready var card_container: Control = $CardContainer
+
 func _ready() -> void:
 	# Connect tree notifications to toggle placeholder visibility and border visibility
-	$CardContainer.child_entered_tree.connect(func(_node): update_placeholder.call_deferred())
-	$CardContainer.child_exiting_tree.connect(func(_node): update_placeholder.call_deferred())
+	card_container.child_entered_tree.connect(func(_node: Node) -> void: update_placeholder.call_deferred())
+	card_container.child_exiting_tree.connect(func(_node: Node) -> void: update_placeholder.call_deferred())
 	
 	# Load and assign the health bar shader material
-	var hp_shader = load("res://src/shared/shaders/hp_border.gdshader")
-	var hp_material = ShaderMaterial.new()
+	var hp_shader: Shader = load("res://src/shared/shaders/hp_border.gdshader") as Shader
+	var hp_material: ShaderMaterial = ShaderMaterial.new()
 	hp_material.shader = hp_shader
 	hp_material.set_shader_parameter("fill_percentage", 1.0)
 	%HealthBarRect.material = hp_material
 	
-	%HealthBarRect.resized.connect(func():
+	%HealthBarRect.resized.connect(func() -> void:
 		if %HealthBarRect.material:
 			%HealthBarRect.material.set_shader_parameter("size", %HealthBarRect.size)
 	)
 	
 	# Set initial size uniform to actual size or fallback to custom minimum size
 	if %HealthBarRect.material:
-		var initial_hp_size = %HealthBarRect.size
+		var initial_hp_size: Vector2 = %HealthBarRect.size
 		if initial_hp_size.x == 0.0:
 			initial_hp_size = Vector2(84, 20)
 		%HealthBarRect.material.set_shader_parameter("size", initial_hp_size)
@@ -73,7 +75,7 @@ func _ready() -> void:
 func _update_freeze_button_style() -> void:
 	if not has_node("%FreezeButton"):
 		return
-	var btn = %FreezeButton as Button
+	var btn: Button = %FreezeButton as Button
 	if is_frozen:
 		btn.add_theme_color_override("font_color", Color(0.3, 0.7, 1.0)) # Ice blue
 		btn.text = "❄"
@@ -83,14 +85,14 @@ func _update_freeze_button_style() -> void:
 
 func update_style(is_hovered: bool = false) -> void:
 	is_highlighted = is_hovered
-	var card = get_card()
+	var card: Control = get_card()
 	if card:
 		if card.has_method("set_highlight"):
-			card.set_highlight(is_hovered)
+			card.call("set_highlight", is_hovered)
 		if card.has_method("set_target_highlight"):
-			card.set_target_highlight(is_targeted)
+			card.call("set_target_highlight", is_targeted)
 		
-	var border_rect = $CardContainer.get_node_or_null("BorderRect") as ShaderBorderDecorator
+	var border_rect: ShaderBorderDecorator = card_container.get_node_or_null("BorderRect") as ShaderBorderDecorator
 	if not border_rect:
 		return
 		
@@ -110,11 +112,11 @@ func set_target_highlight(active: bool) -> void:
 	update_style(is_highlighted)
 
 func update_placeholder() -> void:
-	var empty = is_empty()
-	if $CardContainer.has_node("EmptyPlaceholderLabel"):
-		$CardContainer.get_node("EmptyPlaceholderLabel").visible = empty
+	var empty: bool = is_empty()
+	if card_container.has_node("EmptyPlaceholderLabel"):
+		card_container.get_node("EmptyPlaceholderLabel").visible = empty
 		
-	var border_rect = $CardContainer.get_node_or_null("BorderRect")
+	var border_rect: ShaderBorderDecorator = card_container.get_node_or_null("BorderRect") as ShaderBorderDecorator
 	if border_rect:
 		border_rect.visible = empty
 		
@@ -127,8 +129,8 @@ func update_health_bar() -> void:
 
 func _process(_delta: float) -> void:
 	if is_highlighted and get_viewport().gui_is_dragging():
-		var mouse_pos = $CardContainer.get_local_mouse_position()
-		var rect = Rect2(Vector2.ZERO, $CardContainer.size)
+		var mouse_pos: Vector2 = card_container.get_local_mouse_position()
+		var rect: Rect2 = Rect2(Vector2.ZERO, card_container.size)
 		if not rect.has_point(mouse_pos):
 			update_style(false)
 
@@ -141,20 +143,20 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		return false # Cannot drop cards into shop slots!
 		
 	if typeof(data) == TYPE_DICTIONARY and data.has("card"):
-		var dragged_card = data["card"]
-		var original_slot = data["original_slot"] as ShopCardSlot
+		var dragged_card: Control = data["card"] as Control
+		var original_slot: ShopCardSlot = data["original_slot"] as ShopCardSlot
 		
 		# Check if the player has enough gold for a purchase
 		if original_slot and original_slot.is_shop_slot:
 			if gold_provider.is_valid():
-				var current_gold = gold_provider.call()
+				var current_gold: int = gold_provider.call() as int
 				if current_gold < original_slot.price:
 					return false # Cannot afford this card
 		
 		# If the dragged card is food:
 		if dragged_card.has_method("apply_food_effect"):
 			# Food can ONLY be dropped onto an occupied unit slot to consume it
-			var target_card = get_card()
+			var target_card: Control = get_card()
 			if target_card and "unit_instance" in target_card:
 				update_style(true)
 				return true
@@ -175,15 +177,15 @@ func _notification(what: int) -> void:
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	update_style(false)
 	
-	var dragged_card = data["card"]
-	var original_slot: ShopCardSlot = data["original_slot"]
+	var dragged_card: Control = data["card"] as Control
+	var original_slot: ShopCardSlot = data["original_slot"] as ShopCardSlot
 	
 	if original_slot == self:
 		add_card(dragged_card)
 		slot_changed.emit(self)
 		return
 		
-	var current_card = get_card()
+	var current_card: Control = get_card()
 	
 	# 1. If dragged card is food:
 	if dragged_card.has_method("apply_food_effect"):
@@ -234,25 +236,25 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 
 func add_card(card: Control) -> void:
 	if has_node("CardContainer"):
-		$CardContainer.add_child(card)
+		card_container.add_child(card)
 		if "slot" in card:
-			card.slot = self
+			card.set("slot", self)
 		if is_shop_slot and "price" in card:
-			price = card.price
+			price = card.get("price") as int
 
 func remove_card(card: Control) -> void:
 	if has_node("CardContainer"):
-		$CardContainer.remove_child(card)
+		card_container.remove_child(card)
 		if "slot" in card:
-			card.slot = null
+			card.set("slot", null)
 
 ## Returns the Card child node of this slot, if any. Otherwise returns null.
 func get_card() -> Control:
 	if not has_node("CardContainer"):
 		return null
-	for child in $CardContainer.get_children():
+	for child: Node in card_container.get_children():
 		if child.has_method("update_ui"):
-			return child
+			return child as Control
 	return null
 
 ## Check if slot is empty
@@ -261,7 +263,7 @@ func is_empty() -> bool:
 
 ## Returns the UnitInstance from the card in this slot, or null
 func get_unit_instance() -> UnitInstance:
-	var card = get_card()
+	var card: Control = get_card()
 	if card and "unit_instance" in card:
-		return card.unit_instance
+		return card.get("unit_instance") as UnitInstance
 	return null

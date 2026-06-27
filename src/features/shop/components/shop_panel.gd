@@ -9,7 +9,7 @@ signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
 @onready var gold_label: RichTextLabel = %GoldLabel
 @onready var sell_overlay: MarginContainer = %SellOverlay
 @onready var sell_panel: PanelContainer = %SellPanel
-@onready var sell_label: Label = $SellOverlay/SellPanel/Center/SellLabel
+@onready var sell_label: Label = %SellLabel
 @onready var border_decorator: PanelBorderDecorator = $PanelBorderDecorator
 
 @export var gold: int = 10:
@@ -23,7 +23,7 @@ func _ready() -> void:
 	refresh_shop_button.pressed.connect(func(): roll_requested.emit())
 		
 	# Sell Overlay styling
-	var sell_style = StyleBoxFlat.new()
+	var sell_style: StyleBoxFlat = StyleBoxFlat.new()
 	sell_style.bg_color = Color(0.292, 0.245, 0.092, 0.85)
 	sell_panel.add_theme_stylebox_override("panel", sell_style)
 	
@@ -31,12 +31,12 @@ func _ready() -> void:
 	set_process(false)
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
-	for child in slots_hbox.get_children():
+	for child: Node in slots_hbox.get_children():
 		child.queue_free()
 	slots.clear()
 	
-	for i in range(slot_count):
-		var slot = slot_scene.instantiate() as ShopCardSlot
+	for i: int in range(slot_count):
+		var slot: ShopCardSlot = slot_scene.instantiate() as ShopCardSlot
 		slot.is_shop_slot = true
 		slot.slot_index = i
 		slots_hbox.add_child(slot)
@@ -46,25 +46,25 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	if sell_overlay and sell_overlay.visible:
 		if typeof(data) == TYPE_DICTIONARY and data.has("card"):
-			var original_slot = data["original_slot"] as ShopCardSlot
+			var original_slot: ShopCardSlot = data["original_slot"] as ShopCardSlot
 			# Can only sell if it comes from team or bench (not a shop slot)
 			if original_slot and not original_slot.is_shop_slot:
-				var card = data["card"]
+				var card: Control = data["card"] as Control
 				# Only sell Card (units)
 				if card is ShopCard:
 					return true
 	return false
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
-	var card = data["card"]
-	var original_slot = data["original_slot"] as ShopCardSlot
+	var card: Control = data["card"] as Control
+	var original_slot: ShopCardSlot = data["original_slot"] as ShopCardSlot
 	sell_card_requested.emit(card, original_slot)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_BEGIN:
 		# Check if the dragged item is sellable by querying DragManager's static variables
-		var card = DragManager.dragged_card
-		var original_slot = DragManager.dragged_card_original_slot
+		var card: Control = DragManager.dragged_card
+		var original_slot: ShopCardSlot = DragManager.dragged_card_original_slot as ShopCardSlot
 		if card is ShopCard and original_slot and not original_slot.is_shop_slot:
 			if sell_label and "price" in card:
 				sell_label.text = "RELEASE TO SELL (+" + str(card.price) + "g)"
@@ -77,8 +77,8 @@ func _notification(what: int) -> void:
 			border_decorator.set_border_color(GameColors.PANEL_BORDER_DEFAULT)
 
 func _process(_delta: float) -> void:
-	var mouse_pos = get_global_mouse_position()
-	var is_inside = get_global_rect().has_point(mouse_pos)
+	var mouse_pos: Vector2 = get_global_mouse_position()
+	var is_inside: bool = get_global_rect().has_point(mouse_pos)
 	if is_inside:
 		if sell_overlay and not sell_overlay.visible:
 			sell_overlay.visible = true

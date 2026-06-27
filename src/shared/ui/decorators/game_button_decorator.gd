@@ -37,7 +37,7 @@ func _ready() -> void:
 	parent_button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 		
 	# 1. Przezroczyste styleboxy przycisku z odpowiednimi marginesami
-	var transparent_style = StyleBoxFlat.new()
+	var transparent_style: StyleBoxFlat = StyleBoxFlat.new()
 	transparent_style.bg_color = Color(0, 0, 0, 0)
 	transparent_style.content_margin_left = margin_left
 	transparent_style.content_margin_right = margin_right
@@ -77,7 +77,7 @@ func _ready() -> void:
 	border_rect.material = mat
 	
 	# Podpięcie zmiany rozmiaru samej ramki (która automatycznie śledzi rodzica dzięki kotwicom)
-	border_rect.resized.connect(func():
+	border_rect.resized.connect(func() -> void:
 		if mat:
 			mat.set_shader_parameter("size", border_rect.size)
 	)
@@ -86,7 +86,7 @@ func _ready() -> void:
 	parent_button.mouse_entered.connect(_on_hover)
 	parent_button.mouse_exited.connect(_on_normal)
 	parent_button.button_down.connect(_on_pressed)
-	parent_button.button_up.connect(func():
+	parent_button.button_up.connect(func() -> void:
 		if parent_button.get_global_rect().has_point(parent_button.get_global_mouse_position()):
 			_on_hover()
 		else:
@@ -114,9 +114,9 @@ func _deferred_setup() -> void:
 		mat.set_shader_parameter("size", border_rect.size if border_rect.size != Vector2.ZERO else parent_button.size)
 		
 	# Upewnienie się, że inne elementy potomne (np. RichTextLabel z tekstem) nie przechwytują myszy
-	for child in parent_button.get_children():
+	for child: Node in parent_button.get_children():
 		if child is Control and child != border_rect:
-			child.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			(child as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 func _on_normal() -> void:
 	if mat:

@@ -1,29 +1,25 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=6 format=3]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://lbqju156xxbs"]
 
-[ext_resource type="Script" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="unit_type"]
+[ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_t5wx4"]
+[ext_resource type="Texture2D" uid="uid://dtae5ytho35q1" path="res://src/assets/units/vitality_druid.jpg" id="sprite"]
+[ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
+[ext_resource type="Script" uid="uid://ccq4g7hka5jvf" path="res://src/features/units/unit_modifier.gd" id="unit_modifier"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/rare.tres" id="unit_rarity"]
-[ext_resource type="Script" path="res://src/features/units/unit_modifier.gd" id="unit_modifier"]
-[ext_resource type="Texture2D" path="res://src/assets/units/vitality_druid.jpg" id="sprite"]
+[ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="unit_type"]
 
 [sub_resource type="Resource" id="Resource_druid_on_cast"]
 script = ExtResource("unit_modifier")
-trigger = 0
-target = 0
 effect = 1
 value = 3
-duration = 0
 
 [resource]
 script = ExtResource("unit_data")
 unit_name = "Vitality Druid"
 price = 3
 max_health = 12
-attack = 0
 base_heal = 4
-base_poison = 0
-cast_speed = 3.0
-types = [ExtResource("unit_type")]
+types = Array[ExtResource("5_t5wx4")]([ExtResource("unit_type")])
 rarity = ExtResource("unit_rarity")
+cast_speed = 3.0
 modifier = SubResource("Resource_druid_on_cast")
 sprite = ExtResource("sprite")

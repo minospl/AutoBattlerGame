@@ -41,10 +41,10 @@ func update_ui() -> void:
 		get_node_or_null("BorderRect") as ShaderBorderDecorator
 	)
 
-func apply_food_effect(card: BattleCard) -> void:
+func apply_food_effect(card: Control) -> void:
 	if not item_instance:
 		return
-	var inst: UnitInstance = card.unit_instance
+	var inst: UnitInstance = card.get("unit_instance") as UnitInstance
 	if inst:
 		inst.attack += item_instance.stat_boost_attack
 		inst.health += item_instance.stat_boost_hp

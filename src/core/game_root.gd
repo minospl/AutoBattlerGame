@@ -37,22 +37,22 @@ func _initialize_new_run() -> void:
 	run_state.max_trophies = 10
 	
 	# Find templates by unit name
-	var find_template = func(p_name: String) -> UnitData:
-		for t in unit_templates:
+	var find_template: Callable = func(p_name: String) -> UnitData:
+		for t: UnitData in unit_templates:
 			if t.unit_name.to_lower() == p_name.to_lower():
 				return t
 		return null
 
-	var titan = find_template.call("Ancient Titan")
-	var spellweaver = find_template.call("Spellweaver")
-	var druid = find_template.call("Vitality Druid")
-	var crab = find_template.call("River Crab")
+	var titan: UnitData = find_template.call("Ancient Titan")
+	var spellweaver: UnitData = find_template.call("Spellweaver")
+	var druid: UnitData = find_template.call("Vitality Druid")
+	var crab: UnitData = find_template.call("River Crab")
 
-	var setup = [titan, spellweaver, null, druid, crab, null]
-	for i in range(6):
-		var temp = setup[i]
+	var setup: Array[UnitData] = [titan, spellweaver, null, druid, crab, null]
+	for i: int in range(6):
+		var temp: UnitData = setup[i]
 		if temp:
-			var instance = UnitInstance.new()
+			var instance: UnitInstance = UnitInstance.new()
 			instance.initialize(temp)
 			run_state.active_team[i] = instance
 		else:
@@ -63,7 +63,7 @@ func _change_scene(scene_path: String, setup_callable: Callable) -> void:
 		current_scene.queue_free()
 		current_scene = null
 		
-	var scene_resource = load(scene_path) as PackedScene
+	var scene_resource: PackedScene = load(scene_path) as PackedScene
 	if not scene_resource:
 		printerr("Failed to load scene: ", scene_path)
 		return
@@ -75,7 +75,7 @@ func _change_scene(scene_path: String, setup_callable: Callable) -> void:
 
 func _go_to_shop() -> void:
 	_change_scene(shop_scene_path, func(shop_node: Node) -> void:
-		var shop = shop_node as ShopScene
+		var shop: ShopScene = shop_node as ShopScene
 		if shop:
 			shop.setup(run_state, unit_templates)
 			shop.battle_requested.connect(_on_battle_requested)
@@ -83,7 +83,7 @@ func _go_to_shop() -> void:
 
 func _go_to_battle() -> void:
 	_change_scene(battle_scene_path, func(battle_node: Node) -> void:
-		var battle = battle_node as BattleScene
+		var battle: BattleScene = battle_node as BattleScene
 		if battle:
 			battle.setup(run_state)
 			battle.battle_finished.connect(_on_battle_finished)

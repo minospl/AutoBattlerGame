@@ -13,11 +13,11 @@ enum BorderType { SINGLE, DOUBLE }
 @export var corner_color: Color = Color(0, 0, 0, 0) # GameColors.TRANSPARENT
 
 func _ready() -> void:
-	var parent = get_parent()
+	var parent: Node = get_parent()
 	if parent and parent is Control:
 		# Make parent panel background stylebox transparent
-		var empty_style = StyleBoxEmpty.new()
-		parent.add_theme_stylebox_override("panel", empty_style)
+		var empty_style: StyleBoxEmpty = StyleBoxEmpty.new()
+		(parent as Control).add_theme_stylebox_override("panel", empty_style)
 		
 		# Set full rect anchors
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -28,13 +28,13 @@ func _ready() -> void:
 		offset_bottom = 0
 		
 		# Load the proper shader
-		var shader
+		var shader: Shader = null
 		if border_type == BorderType.SINGLE:
-			shader = load("res://src/shared/shaders/single_border.gdshader")
+			shader = load("res://src/shared/shaders/single_border.gdshader") as Shader
 		else:
-			shader = load("res://src/shared/shaders/double_border.gdshader")
+			shader = load("res://src/shared/shaders/double_border.gdshader") as Shader
 			
-		var mat = ShaderMaterial.new()
+		var mat: ShaderMaterial = ShaderMaterial.new()
 		mat.shader = shader
 		material = mat
 		
@@ -42,7 +42,7 @@ func _ready() -> void:
 		update_shader_parameters()
 		
 		# Connect resized signal to follow size changes dynamically
-		resized.connect(func():
+		resized.connect(func() -> void:
 			if material:
 				material.set_shader_parameter("size", size)
 		)
@@ -52,14 +52,17 @@ func _ready() -> void:
 
 func _setup_initial_size() -> void:
 	if material:
-		var parent = get_parent()
-		var initial_size = size if size != Vector2.ZERO else (parent.size if parent.size != Vector2.ZERO else parent.custom_minimum_size)
+		var parent: Node = get_parent()
+		var parent_ctrl: Control = parent as Control
+		var initial_size: Vector2 = size
+		if initial_size == Vector2.ZERO and parent_ctrl:
+			initial_size = parent_ctrl.size if parent_ctrl.size != Vector2.ZERO else parent_ctrl.custom_minimum_size
 		material.set_shader_parameter("size", initial_size)
 
 func update_shader_parameters() -> void:
 	if not material:
 		return
-	var mat = material as ShaderMaterial
+	var mat: ShaderMaterial = material as ShaderMaterial
 	if border_type == BorderType.SINGLE:
 		mat.set_shader_parameter("border_color", border_color)
 		mat.set_shader_parameter("border_width", outer_border_width)

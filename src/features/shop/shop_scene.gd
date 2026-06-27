@@ -82,7 +82,7 @@ func setup(p_state: RunState, p_templates: Array[UnitData]) -> void:
 	
 	# If this is a fresh setup with empty shop units, let's roll it!
 	var has_shop_units: bool = false
-	for u in run_state.shop_units:
+	for u: Resource in run_state.shop_units:
 		if u != null:
 			has_shop_units = true
 			break
@@ -90,26 +90,26 @@ func setup(p_state: RunState, p_templates: Array[UnitData]) -> void:
 		roll_shop(true)
 	
 	# Instantiate and add the targeting line overlay to draw on top of everything
-	var overlay_script = load("res://src/features/shop/components/targeting_line_overlay.gd")
-	var overlay = Control.new()
+	var overlay_script: Script = load("res://src/features/shop/components/targeting_line_overlay.gd") as Script
+	var overlay: Control = Control.new()
 	overlay.name = "TargetingLineOverlay"
 	overlay.set_script(overlay_script)
-	overlay.parent_scene = self
+	overlay.set("parent_scene", self)
 	add_child(overlay)
 
 func _apply_visual_styling() -> void:
 	# 1. Main Background Panel
-	var bg_panel = get_node("BackgroundPanel") as Panel
+	var bg_panel: Panel = get_node("BackgroundPanel") as Panel
 	if bg_panel:
-		var bg_style = StyleBoxTexture.new()
-		bg_style.texture = load("res://src/assets/ui/shop_background.jpg")
+		var bg_style: StyleBoxTexture = StyleBoxTexture.new()
+		bg_style.texture = load("res://src/assets/ui/shop_background.jpg") as Texture2D
 		bg_style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
 		bg_style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
 		bg_style.modulate_color = Color(1.0, 1.0, 1.0, 1.0)
 		bg_panel.add_theme_stylebox_override("panel", bg_style)
 	
 	# 2. Outer Border Color
-	var outer_border = %OuterBorder as ColorRect
+	var outer_border: ColorRect = %OuterBorder as ColorRect
 	if outer_border:
 		outer_border.color = GameColors.PANEL_BORDER_DEFAULT
 
@@ -120,16 +120,16 @@ func create_slots() -> void:
 	shop_panel.create_slots(slot_scene, 4)
 	
 	# Bind dependency injection Callables for slots
-	var get_gold_fn := func() -> int: return get_gold()
-	var deduct_gold_fn := func(amount: int) -> void: deduct_gold(amount)
-	var refill_slot_fn := func(idx: int) -> void: refill_shop_slot(idx)
+	var get_gold_fn: Callable = func() -> int: return get_gold()
+	var deduct_gold_fn: Callable = func(amount: int) -> void: deduct_gold(amount)
+	var refill_slot_fn: Callable = func(idx: int) -> void: refill_shop_slot(idx)
 	
 	var all_slots: Array[ShopCardSlot] = []
 	all_slots.append_array(active_slots)
 	all_slots.append_array(bench_slots)
 	all_slots.append_array(shop_panel.slots)
 	
-	for slot in all_slots:
+	for slot: ShopCardSlot in all_slots:
 		slot.gold_provider = get_gold_fn
 		slot.gold_deductor = deduct_gold_fn
 		slot.shop_refiller = refill_slot_fn
@@ -141,53 +141,53 @@ func _on_slot_changed(_slot: ShopCardSlot) -> void:
 
 ## Rebuild runtime data arrays from current UI slot child structures
 func sync_data_from_ui() -> void:
-	for i in range(active_slot_count):
+	for i: int in range(active_slot_count):
 		active_team[i] = active_slots[i].get_unit_instance()
 		
-	for i in range(bench_slot_count):
+	for i: int in range(bench_slot_count):
 		bench[i] = bench_slots[i].get_unit_instance()
 		
 	team_state_changed.emit()
 
 ## Populate the UI based on external changes to logic data structures
 func populate_ui() -> void:
-	var card_scene = load("res://src/features/shop/components/shop_card.tscn")
+	var card_scene: PackedScene = load("res://src/features/shop/components/shop_card.tscn") as PackedScene
 	
 	# Clear existing cards immediately
-	for slot in active_slots:
-		var card = slot.get_card()
+	for slot: ShopCardSlot in active_slots:
+		var card: Control = slot.get_card()
 		if card:
 			slot.remove_card(card)
 			card.queue_free()
 			
-	for slot in bench_slots:
-		var card = slot.get_card()
+	for slot: ShopCardSlot in bench_slots:
+		var card: Control = slot.get_card()
 		if card:
 			slot.remove_card(card)
 			card.queue_free()
 			
 	# Instantiate cards according to the data state
-	for i in range(active_slot_count):
+	for i: int in range(active_slot_count):
 		if i < active_team.size() and active_team[i] != null:
-			var card = card_scene.instantiate()
+			var card: ShopCard = card_scene.instantiate() as ShopCard
 			card.unit_instance = active_team[i]
 			_connect_card_signals(card)
 			active_slots[i].add_card(card)
 			
-	for i in range(bench_slot_count):
+	for i: int in range(bench_slot_count):
 		if i < bench.size() and bench[i] != null:
-			var card = card_scene.instantiate()
+			var card: ShopCard = card_scene.instantiate() as ShopCard
 			card.unit_instance = bench[i]
 			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
 
 ## Add a unit to the first empty slot on the bench
 func add_unit_to_bench(unit: UnitInstance) -> bool:
-	for i in range(bench_slot_count):
+	for i: int in range(bench_slot_count):
 		if bench[i] == null:
 			bench[i] = unit
-			var card_scene = load("res://src/features/shop/components/shop_card.tscn")
-			var card = card_scene.instantiate()
+			var card_scene: PackedScene = load("res://src/features/shop/components/shop_card.tscn") as PackedScene
+			var card: ShopCard = card_scene.instantiate() as ShopCard
 			card.unit_instance = unit
 			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
@@ -197,16 +197,16 @@ func add_unit_to_bench(unit: UnitInstance) -> bool:
 
 ## Empty all team and bench slots
 func clear_all() -> void:
-	for i in range(active_slot_count):
+	for i: int in range(active_slot_count):
 		active_team[i] = null
-		var card = active_slots[i].get_card()
+		var card: Control = active_slots[i].get_card()
 		if card:
 			active_slots[i].remove_card(card)
 			card.queue_free()
 			
-	for i in range(bench_slot_count):
+	for i: int in range(bench_slot_count):
 		bench[i] = null
-		var card = bench_slots[i].get_card()
+		var card: Control = bench_slots[i].get_card()
 		if card:
 			bench_slots[i].remove_card(card)
 			card.queue_free()
@@ -218,10 +218,10 @@ func _on_add_monster_requested() -> void:
 		return
 		
 	# Pick random template
-	var template = unit_templates[randi() % unit_templates.size()]
+	var template: UnitData = unit_templates[randi() % unit_templates.size()]
 	
 	# Create runtime instance
-	var instance = UnitInstance.new()
+	var instance: UnitInstance = UnitInstance.new()
 	instance.initialize(template)
 	
 	# Try to add to bench
@@ -237,8 +237,8 @@ func _on_restart_requested() -> void:
 	shop_header_bar.trophies = 3
 	
 	# 3. Spawn initial units: 1 of each type
-	for template in unit_templates:
-		var instance = UnitInstance.new()
+	for template: UnitData in unit_templates:
+		var instance: UnitInstance = UnitInstance.new()
 		instance.initialize(template)
 		add_unit_to_bench(instance)
 		
@@ -261,9 +261,9 @@ func _on_roll_requested() -> void:
 		roll_shop(false)
 
 func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void:
-	var refund_gold = 1
+	var refund_gold: int = 1
 	if "price" in card:
-		refund_gold = card.price
+		refund_gold = card.get("price") as int
 		
 	card.queue_free()
 	if original_slot:
@@ -271,8 +271,8 @@ func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void
 	gold += refund_gold
 
 func roll_shop(_free: bool = false) -> void:
-	for i in range(shop_panel.slots.size()):
-		var slot = shop_panel.slots[i]
+	for i: int in range(shop_panel.slots.size()):
+		var slot: ShopCardSlot = shop_panel.slots[i] as ShopCardSlot
 		
 		# If the slot is frozen and is NOT empty, keep it
 		if slot.is_frozen and not slot.is_empty():
@@ -284,10 +284,10 @@ func refill_shop_slot(slot_index: int) -> void:
 	if slot_index < 0 or slot_index >= shop_panel.slots.size():
 		return
 		
-	var slot = shop_panel.slots[slot_index]
+	var slot: ShopCardSlot = shop_panel.slots[slot_index] as ShopCardSlot
 	
 	# Clear current card
-	var old_card = slot.get_card()
+	var old_card: Control = slot.get_card()
 	if old_card:
 		slot.remove_card(old_card)
 		old_card.queue_free()
@@ -300,20 +300,20 @@ func refill_shop_slot(slot_index: int) -> void:
 	if slot_index < 3: # Units
 		if unit_templates.is_empty():
 			return
-		var template = unit_templates[randi() % unit_templates.size()]
-		var instance = UnitInstance.new()
+		var template: UnitData = unit_templates[randi() % unit_templates.size()]
+		var instance: UnitInstance = UnitInstance.new()
 		instance.initialize(template)
 		
-		var card_scene = preload("res://src/features/shop/components/shop_card.tscn")
-		var card = card_scene.instantiate()
+		var card_scene: PackedScene = preload("res://src/features/shop/components/shop_card.tscn") as PackedScene
+		var card: ShopCard = card_scene.instantiate() as ShopCard
 		card.unit_instance = instance
 		_connect_card_signals(card)
 		slot.add_card(card)
 	else: # Item Card
-		var item_scene = preload("res://src/features/shop/components/shop_card_item.tscn")
-		var item_card = item_scene.instantiate() as ShopCardItem
+		var item_scene: PackedScene = preload("res://src/features/shop/components/shop_card_item.tscn") as PackedScene
+		var item_card: ShopCardItem = item_scene.instantiate() as ShopCardItem
 		
-		var item_inst = ShopItemInstance.new()
+		var item_inst: ShopItemInstance = ShopItemInstance.new()
 		if randf() < 0.5:
 			item_inst.item_name = "Apple"
 			item_inst.stat_boost_hp = 2
@@ -350,22 +350,22 @@ func clear_preview_card(card: Control = null) -> void:
 
 func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 	# Clear all target highlights first
-	for slot in active_slots:
+	for slot: ShopCardSlot in active_slots:
 		slot.set_target_highlight(false)
-	for slot in bench_slots:
+	for slot: ShopCardSlot in bench_slots:
 		slot.set_target_highlight(false)
 		
-	if not is_hovered or card == null or not (card is ShopCard) or card.unit_instance == null:
+	if not is_hovered or card == null or not (card is ShopCard) or (card as ShopCard).unit_instance == null:
 		return
 		
 	# Find which slot contains the hovered card
 	var source_slot: ShopCardSlot = null
-	for slot in active_slots:
+	for slot: ShopCardSlot in active_slots:
 		if slot.get_card() == card:
 			source_slot = slot
 			break
 	if not source_slot:
-		for slot in bench_slots:
+		for slot: ShopCardSlot in bench_slots:
 			if slot.get_card() == card:
 				source_slot = slot
 				break
@@ -373,14 +373,14 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 	if not source_slot or not source_slot.is_active_team:
 		return # Card is in shop, bench, or not placed in active team
 		
-	var idx = source_slot.slot_index
-	
-	if card.unit_instance.data and card.unit_instance.data.modifier:
-		var modifier: UnitModifier = card.unit_instance.data.modifier
+	var idx: int = source_slot.slot_index
+	var unit_card: ShopCard = card as ShopCard
+	if unit_card and unit_card.unit_instance and unit_card.unit_instance.data and unit_card.unit_instance.data.modifier:
+		var modifier: UnitModifier = unit_card.unit_instance.data.modifier
 		# Skip SELF target highlighting as we only want to highlight other targets
 		if modifier.target != UnitModifier.TargetType.SELF:
-			var target_indices = TargetResolver.get_target_indices(idx, modifier.target)
-			for t_idx in target_indices:
+			var target_indices: Array[int] = TargetResolver.get_target_indices(idx, modifier.target)
+			for t_idx: int in target_indices:
 				if t_idx < active_slots.size():
 					active_slots[t_idx].set_target_highlight(true)
 
@@ -414,7 +414,7 @@ func _on_card_clicked(card: ShopCard) -> void:
 			target_slot = s
 			break
 	if not target_slot:
-		for s in bench_slots:
+		for s: ShopCardSlot in bench_slots:
 			if s.is_empty():
 				target_slot = s
 				break
@@ -448,17 +448,17 @@ func load_state_from_run() -> void:
 	populate_ui()
 	
 	# Recreate cards in shop slots
-	for i in range(shop_panel.slots.size()):
-		var slot = shop_panel.slots[i]
+	for i: int in range(shop_panel.slots.size()):
+		var slot: ShopCardSlot = shop_panel.slots[i] as ShopCardSlot
 		
 		# Clear current card
-		var old_card = slot.get_card()
+		var old_card: Control = slot.get_card()
 		if old_card:
 			slot.remove_card(old_card)
 			old_card.queue_free()
 			
-		var item_or_unit = run_state.shop_units[i]
-		var is_frozen = run_state.shop_frozen_statuses[i]
+		var item_or_unit: Resource = run_state.shop_units[i]
+		var is_frozen: bool = run_state.shop_frozen_statuses[i]
 		
 		slot.is_frozen = is_frozen
 		if slot.has_node("%FreezeButton"):
@@ -466,14 +466,14 @@ func load_state_from_run() -> void:
 			
 		if item_or_unit != null:
 			if item_or_unit is UnitInstance:
-				var card_scene = load("res://src/features/shop/components/shop_card.tscn")
-				var card = card_scene.instantiate()
-				card.unit_instance = item_or_unit
+				var card_scene: PackedScene = load("res://src/features/shop/components/shop_card.tscn") as PackedScene
+				var card: ShopCard = card_scene.instantiate() as ShopCard
+				card.unit_instance = item_or_unit as UnitInstance
 				_connect_card_signals(card)
 				slot.add_card(card)
 			elif item_or_unit is ShopItemInstance:
-				var item_scene = load("res://src/features/shop/components/shop_card_item.tscn")
-				var item_card = item_scene.instantiate() as ShopCardItem
+				var item_scene: PackedScene = load("res://src/features/shop/components/shop_card_item.tscn") as PackedScene
+				var item_card: ShopCardItem = item_scene.instantiate() as ShopCardItem
 				item_card.item_instance = item_or_unit
 				_connect_card_signals(item_card)
 				slot.add_card(item_card)
@@ -494,14 +494,14 @@ func sync_data_to_run_state() -> void:
 	run_state.active_team = active_team.duplicate()
 	run_state.bench = bench.duplicate()
 	
-	for i in range(shop_panel.slots.size()):
-		var slot = shop_panel.slots[i]
-		var card = slot.get_card()
+	for i: int in range(shop_panel.slots.size()):
+		var slot: ShopCardSlot = shop_panel.slots[i] as ShopCardSlot
+		var card: Control = slot.get_card()
 		if card:
 			if card is ShopCard:
-				run_state.shop_units[i] = card.unit_instance
+				run_state.shop_units[i] = (card as ShopCard).unit_instance
 			elif card is ShopCardItem:
-				run_state.shop_units[i] = card.item_instance
+				run_state.shop_units[i] = (card as ShopCardItem).item_instance
 		else:
 			run_state.shop_units[i] = null
 			

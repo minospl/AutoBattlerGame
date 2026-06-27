@@ -46,7 +46,7 @@ func update_ui() -> void:
 	)
 	
 	# Set background styling to white inside the slot
-	var border_rect = get_node_or_null("BorderRect") as ShaderBorderDecorator
+	var border_rect: ShaderBorderDecorator = get_node_or_null("BorderRect") as ShaderBorderDecorator
 	if border_rect:
 		border_rect.interior_color = GameColors.WHITE_COLOR
 		border_rect.update_shader_parameters()
@@ -62,7 +62,7 @@ func set_target_highlight(active: bool) -> void:
 	update_border_colors()
 
 func update_border_colors() -> void:
-	var border_rect = get_node_or_null("BorderRect") as ShaderBorderDecorator
+	var border_rect: ShaderBorderDecorator = get_node_or_null("BorderRect") as ShaderBorderDecorator
 	if not border_rect:
 		return
 		
@@ -73,7 +73,7 @@ func update_border_colors() -> void:
 		border_rect.border_color = Color(0.9, 0.15, 0.15, 1.0)
 		border_rect.inner_border_color = Color(0.5, 0.05, 0.05, 1.0)
 	else:
-		var rarity_color = unit_instance.data.rarity.border_color if (unit_instance and unit_instance.data and unit_instance.data.rarity) else GameColors.BORDER_OUTER_DEFAULT
+		var rarity_color: Color = unit_instance.data.rarity.border_color if (unit_instance and unit_instance.data and unit_instance.data.rarity and unit_instance.data.rarity.border_color != null) else GameColors.BORDER_OUTER_DEFAULT
 		border_rect.border_color = rarity_color
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 	border_rect.update_shader_parameters()
@@ -91,8 +91,8 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		return null
 		
 	# Create a visual preview of what we are dragging
-	var preview_scene = load("res://src/features/shop/components/shop_card.tscn")
-	var preview = preview_scene.instantiate()
+	var preview_scene: PackedScene = load("res://src/features/shop/components/shop_card.tscn") as PackedScene
+	var preview: ShopCard = preview_scene.instantiate() as ShopCard
 	preview.unit_instance = unit_instance
 	preview.custom_minimum_size = custom_minimum_size
 	
@@ -100,14 +100,14 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	preview.modulate.a = 0.7
 	
 	# Create a wrapper control to center the preview under the mouse cursor
-	var preview_wrapper = Control.new()
+	var preview_wrapper: Control = Control.new()
 	preview_wrapper.add_child(preview)
 	preview.position = -custom_minimum_size / 2.0
 	
 	set_drag_preview(preview_wrapper)
 	
 	# Find original CardSlot ancestor using the slot reference
-	var original_slot := slot
+	var original_slot: ShopCardSlot = slot as ShopCardSlot
 		
 	# Temporarily remove the card from the original slot
 	if original_slot:

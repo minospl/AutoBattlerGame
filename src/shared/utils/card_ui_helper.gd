@@ -18,7 +18,7 @@ static func setup_card_visuals(
 		return
 		
 	# 1. Gather all active stats (Attack, Heal, Poison, Shield, Burn, Electrocute)
-	var candidates = []
+	var candidates: Array[Dictionary] = []
 	if unit_instance.get_attack() > 0:
 		candidates.append({
 			"name": "attack",
@@ -63,38 +63,39 @@ static func setup_card_visuals(
 		})
 
 	# Sort candidates: highest value first, tie break using priority index
-	candidates.sort_custom(func(a, b):
+	candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		if a.value != b.value:
 			return a.value > b.value
 		return a.priority < b.priority
 	)
 
 	# Keep only the top 3 stats for the card UI display
-	var active_stats = candidates.slice(0, 3)
+	var active_stats: Array[Dictionary] = []
+	active_stats.assign(candidates.slice(0, 3))
 
-	var stat_size = Vector2(30, 16)
+	var stat_size: Vector2 = Vector2(30, 16)
 		
-	var template_panel = stats_hbox.get_child(0) as PanelContainer if stats_hbox and stats_hbox.get_child_count() > 0 else null
+	var template_panel: PanelContainer = stats_hbox.get_child(0) as PanelContainer if stats_hbox and stats_hbox.get_child_count() > 0 else null
 
 	if stats_hbox:
 		stats_hbox.visible = true
 		# Hide default template panels initially, clean up old dynamic ones
-		for child in stats_hbox.get_children():
+		for child: Node in stats_hbox.get_children():
 			if not child.has_meta("is_dynamic"):
-				child.visible = false
+				(child as Control).visible = false
 			else:
-				child.free()
+				child.queue_free()
 
 	# Dynamically populate bottom panels for the top 3 active stats
-	for stat in active_stats:
+	for stat: Dictionary in active_stats:
 		if stats_hbox and template_panel:
-			var panel = template_panel.duplicate() as PanelContainer
+			var panel: PanelContainer = template_panel.duplicate() as PanelContainer
 			panel.set_meta("is_dynamic", true)
 			stats_hbox.add_child(panel)
-			var label = panel.find_child("*Label", true, false) as Label
+			var label: Label = panel.find_child("*Label", true, false) as Label
 			if label:
-				label.text = format_large_number(stat.value)
-			setup_stat_panel_shader(panel, stat.color, stat_size)
+				label.text = format_large_number(stat.value as int)
+			setup_stat_panel_shader(panel, stat.color as Color, stat_size)
 			panel.visible = true
 			
 	# 2. Setup sprite / fallback portrait
@@ -105,7 +106,7 @@ static func setup_card_visuals(
 			sprite_rect.texture = unit_instance.data.sprite
 			
 			if not sprite_rect.material:
-				var mat := ShaderMaterial.new()
+				var mat: ShaderMaterial = ShaderMaterial.new()
 				mat.shader = CHROMA_KEY_SHADER
 				sprite_rect.material = mat
 		else:
@@ -159,7 +160,7 @@ static func setup_card_visuals(
 ## Setup background shaders for stats labels
 static func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: Vector2) -> void:
 	panel.custom_minimum_size = stat_size
-	var border_rect = panel.get_node_or_null("BorderRect") as ShaderBorderDecorator
+	var border_rect: ShaderBorderDecorator = panel.get_node_or_null("BorderRect") as ShaderBorderDecorator
 	if border_rect:
 		border_rect.border_color = bg_color.lightened(.2)
 		border_rect.interior_color = bg_color
@@ -201,7 +202,7 @@ static func setup_item_visuals(
 			portrait_label.text = "🎁"
 			
 	# 3. Stats display
-	var stat_size = Vector2(32, 16)
+	var stat_size: Vector2 = Vector2(32, 16)
 	if attack_panel and attack_label:
 		if stat_boost_attack > 0:
 			attack_panel.visible = true
@@ -240,14 +241,14 @@ static func format_large_number(val: int) -> String:
 	if val < 1000:
 		return str(val)
 	elif val < 1000000:
-		var k_val = val / 1000.0
-		var formatted = "%.1fk" % k_val
+		var k_val: float = val / 1000.0
+		var formatted: String = "%.1fk" % k_val
 		if formatted.ends_with(".0k"):
 			formatted = str(roundi(k_val)) + "k"
 		return formatted
 	else:
-		var m_val = val / 1000000.0
-		var formatted = "%.1fM" % m_val
+		var m_val: float = val / 1000000.0
+		var formatted: String = "%.1fM" % m_val
 		if formatted.ends_with(".0M"):
 			formatted = str(roundi(m_val)) + "M"
 		return formatted

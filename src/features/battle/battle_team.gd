@@ -47,9 +47,9 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 	max_health = 0
 	
 	var num_units: int = mini(MAX_TEAM_SIZE, new_units.size())
-	for i in range(MAX_TEAM_SIZE):
+	for i: int in range(MAX_TEAM_SIZE):
 		if i < num_units and new_units[i]:
-			var inst := new_units[i]
+			var inst: UnitInstance = new_units[i]
 			units[i] = inst
 			health += inst.get_max_health()
 			max_health += inst.get_max_health()
@@ -65,12 +65,12 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 	status_changed.emit("electrocute", electrocute, 0.0)
 
 func execute_cast(source_idx: int, opponent: BattleTeam) -> void:
-	var unit := units[source_idx]
+	var unit: UnitInstance = units[source_idx]
 	if not unit:
 		return
 		
 	# Attack opponent team!
-	var dmg := unit.get_attack()
+	var dmg: int = unit.get_attack()
 	if dmg > 0:
 		if opponent.electrocute > 0:
 			dmg += opponent.electrocute
@@ -97,8 +97,8 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 	if amount <= 0:
 		return
 		
-	var actual_dmg := amount
-	var text_color := Color(1.0, 0.3, 0.3) # default red
+	var actual_dmg: int = amount
+	var text_color: Color = Color(1.0, 0.3, 0.3) # default red
 	
 	if damage_type == "poison":
 		text_color = Color(0.7, 0.3, 0.8) # purple
@@ -115,7 +115,7 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 	if shield >= actual_dmg:
 		shield -= actual_dmg
 	else:
-		var remaining_dmg := actual_dmg - shield
+		var remaining_dmg: int = actual_dmg - shield
 		shield = 0
 		health -= remaining_dmg
 		
@@ -128,9 +128,9 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 func heal(amount: int) -> void:
 	if amount <= 0:
 		return
-	var health_before := health
+	var health_before: int = health
 	health = min(health + amount, max_health)
-	var actual_heal := health - health_before
+	var actual_heal: int = health - health_before
 	
 	health_changed.emit(health, max_health, shield)
 	
@@ -196,10 +196,10 @@ func tick_statuses(delta: float) -> void:
 			status_changed.emit("burn", 0, 0.0)
 
 func tick_casts(delta: float, game_speed: float, cast_callback: Callable) -> void:
-	for i in range(MAX_TEAM_SIZE):
+	for i: int in range(MAX_TEAM_SIZE):
 		if units[i]:
 			cast_timers[i] += delta * game_speed
-			var speed := units[i].get_cast_speed()
+			var speed: float = units[i].get_cast_speed()
 			if speed <= 0.0: speed = 1.0
 			
 			cast_progress_changed.emit(i, cast_timers[i] / speed)
@@ -219,7 +219,7 @@ func apply_modifier_effect(t_idx: int, effect_type: UnitModifier.EffectType, val
 	if t_idx < 0 or t_idx >= units.size() or not units[t_idx]:
 		return
 		
-	var target_unit := units[t_idx]
+	var target_unit: UnitInstance = units[t_idx]
 	match effect_type:
 		UnitModifier.EffectType.BUFF_ATTACK:
 			target_unit.attack += value
@@ -232,10 +232,10 @@ func apply_modifier_effect(t_idx: int, effect_type: UnitModifier.EffectType, val
 			health_changed.emit(health, max_health, shield)
 			spawn_floating_text_on_slot(t_idx, "+" + str(value) + " HP", Color(1.0, 0.3, 0.3))
 		UnitModifier.EffectType.BUFF_HEAL:
-			var health_before := health
+			var health_before: int = health
 			health = min(health + value, max_health)
 			health_changed.emit(health, max_health, shield)
-			var actual_heal := health - health_before
+			var actual_heal: int = health - health_before
 			if actual_heal > 0:
 				spawn_floating_text_on_slot(t_idx, "+" + str(actual_heal), Color(0.2, 0.9, 0.2))
 		UnitModifier.EffectType.APPLY_POISON:

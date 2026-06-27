@@ -66,7 +66,12 @@ Walka odbywa się automatycznie w czasie rzeczywistym:
 ## 4. Wytyczne i Dobre Praktyki dla Asystenta AI (Antigravity)
 Podczas edycji lub rozbudowy tego projektu muszę przestrzegać następujących reguł:
 
-1.  **Ścisłe typowanie (Static Typing):** W pliku `project.godot` włączone są ostrzeżenia dotyczące braku typowania (`untyped_declaration=1`, `unsafe_property_access=1` itp.). Każda zmienna, funkcja, wartość zwracana oraz elementy tablic muszą mieć jawnie określony typ (np. `var x: int = 5`, `var team: Array[UnitInstance] = []`, `func foo() -> void`).
+1.  **Ścisłe typowanie (Static Typing):** W pliku `project.godot` włączone są restrykcyjne ostrzeżenia kompilatora GDScript (`untyped_declaration=1`, `unsafe_property_access=1`, `inferred_declaration=1` itp.). Należy przestrzegać następujących zasad:
+    *   **Brak wnioskowania typów (Inferred Types):** Nie używaj operatora wnioskowania `:=` (np. `var x := 5` lub `var inst := run_state.active_team[i]`). Wszystkie zmienne muszą mieć w pełni i jawnie zadeklarowany typ (np. `var x: int = 5`, `var inst: UnitInstance = ...`).
+    *   **Typowanie iteratorów pętli:** Każdy iterator w pętli `for` musi mieć zadeklarowany typ (np. `for i: int in range(6):` lub `for slot: ShopCardSlot in slots:`).
+    *   **Typowanie lambd/funkcji anonimowych:** Wszystkie lambdy przypisywane do zmiennych lub przekazywane jako Callables muszą mieć otypowane parametry oraz określony typ zwracany (np. `var find_template: Callable = func(p_name: String) -> UnitData:`).
+    *   **Bezpieczny dostęp (Unsafe Access):** Unikaj ostrzeżeń `unsafe_property_access`. Rzutuj dynamicznie pobierane obiekty na ich konkretną klasę przed dostępem do ich pól (np. `var card: ShopCard = slots[i].get_card() as ShopCard`), lub w przypadku ogólnych kontrolek używaj metod bezpiecznych typu `card.get("unit_instance") as UnitInstance` lub `card.set("slot", self)`.
+    *   **Jawne rzutowanie typów:** Podczas wczytywania scen, skryptów lub zasobów zawsze rzutuj załadowany zasób (np. `load(path) as PackedScene` or `load(path) as Script`).
 2.  **Dobre praktyki Godot 4.x & GDScript:**
     *   **Konwencje Nazewnictwa:** Klasy w PascalCase (`class_name MyClass`), zmienne i funkcje w snake_case (`func load_game()`), stałe w UPPER_SNAKE_CASE (`const MAX_SIZE = 6`).
     *   **Referencje do węzłów:** Do pobierania węzłów z drzewa sceny używaj mechanizmu unikalnych nazw (`%UniqueNodeName`) oraz słowa kluczowego `@onready` (np. `@onready var play_button = %PlayButton`). Zapobiega to psuciu się referencji po zmianie struktury sceny.

@@ -11,19 +11,19 @@ var bg_rect: ColorRect
 var border_rect: ColorRect
 
 func _ready() -> void:
-	var parent = get_parent()
+	var parent: Node = get_parent()
 	if not parent or not (parent is Control):
 		push_error("PanelBorderDecorator musi być dzieckiem węzła typu Control!")
 		return
 		
 	# 1. Automatyczne uczynienie tła rodzica przezroczystym, aby ramka z shaderem przejęła rysowanie
-	var transparent_style = StyleBoxFlat.new()
+	var transparent_style: StyleBoxFlat = StyleBoxFlat.new()
 	transparent_style.bg_color = Color(0, 0, 0, 0)
-	parent.add_theme_stylebox_override("panel", transparent_style)
+	(parent as Control).add_theme_stylebox_override("panel", transparent_style)
 	
 	# Wczytanie uniwersalnych shaderów
-	var single_shader = load("res://src/shared/shaders/single_border.gdshader")
-	var double_shader = load("res://src/shared/shaders/double_border.gdshader")
+	var single_shader: Shader = load("res://src/shared/shaders/single_border.gdshader") as Shader
+	var double_shader: Shader = load("res://src/shared/shaders/double_border.gdshader") as Shader
 	
 	# 2. Warstwa Tła (single_border, spód - indeks 0)
 	bg_rect = ColorRect.new()
@@ -35,7 +35,7 @@ func _ready() -> void:
 	bg_rect.offset_right = 0
 	bg_rect.offset_bottom = 0
 	
-	var bg_mat = ShaderMaterial.new()
+	var bg_mat: ShaderMaterial = ShaderMaterial.new()
 	bg_mat.shader = single_shader
 	bg_mat.set_shader_parameter("border_color", GameColors.WHITE_COLOR)
 	bg_mat.set_shader_parameter("border_width", outer_width)
@@ -45,7 +45,7 @@ func _ready() -> void:
 	bg_rect.material = bg_mat
 	
 	# Po dodaniu do drzewa, automatycznie synchronizuj rozmiar shadera przy każdej zmianie wymiarów
-	bg_rect.resized.connect(func():
+	bg_rect.resized.connect(func() -> void:
 		if bg_rect.material:
 			bg_rect.material.set_shader_parameter("size", bg_rect.size)
 	)
@@ -60,7 +60,7 @@ func _ready() -> void:
 	border_rect.offset_right = 0
 	border_rect.offset_bottom = 0
 	
-	var border_mat = ShaderMaterial.new()
+	var border_mat: ShaderMaterial = ShaderMaterial.new()
 	border_mat.shader = double_shader
 	border_mat.set_shader_parameter("outer_border_color", border_color)
 	border_mat.set_shader_parameter("inner_border_color", GameColors.WHITE_COLOR)
@@ -73,7 +73,7 @@ func _ready() -> void:
 	border_rect.material = border_mat
 	
 	# Po dodaniu do drzewa, automatycznie synchronizuj rozmiar shadera przy każdej zmianie wymiarów
-	border_rect.resized.connect(func():
+	border_rect.resized.connect(func() -> void:
 		if border_rect.material:
 			border_rect.material.set_shader_parameter("size", border_rect.size)
 	)
@@ -82,7 +82,7 @@ func _ready() -> void:
 	call_deferred("_deferred_setup")
 
 func _deferred_setup() -> void:
-	var parent = get_parent()
+	var parent: Node = get_parent()
 	if not parent or not (parent is Control):
 		return
 		

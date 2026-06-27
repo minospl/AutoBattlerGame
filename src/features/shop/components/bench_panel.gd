@@ -8,14 +8,14 @@ signal slot_changed(slot: ShopCardSlot)
 var slots: Array[ShopCardSlot] = []
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
-	for child in bench_hbox.get_children():
+	for child: Node in bench_hbox.get_children():
 		child.queue_free()
 	slots.clear()
 	
-	for i in range(slot_count):
-		var slot = slot_scene.instantiate() as ShopCardSlot
+	for i: int in range(slot_count):
+		var slot: ShopCardSlot = slot_scene.instantiate() as ShopCardSlot
 		slot.is_active_team = false
 		slot.slot_index = i
-		slot.slot_changed.connect(func(_slot): slot_changed.emit(_slot))
+		slot.slot_changed.connect(func(_slot: ShopCardSlot) -> void: slot_changed.emit(_slot))
 		bench_hbox.add_child(slot)
 		slots.append(slot)

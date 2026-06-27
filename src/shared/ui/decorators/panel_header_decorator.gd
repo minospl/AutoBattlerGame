@@ -7,13 +7,13 @@ extends Node
 @export var outline_size: int = 5
 
 func _ready() -> void:
-	var parent = get_parent()
+	var parent: Node = get_parent()
 	if not parent or not (parent is PanelContainer):
 		push_error("PanelHeaderDecorator musi być bezpośrednim dzieckiem PanelContainer!")
 		return
 		
 	# 1. Tworzenie i przypisanie stylu tła nagłówka
-	var header_style = StyleBoxFlat.new()
+	var header_style: StyleBoxFlat = StyleBoxFlat.new()
 	header_style.bg_color = header_color
 	header_style.border_width_bottom = border_width_bottom
 	header_style.border_color = header_color.lightened(0.5)
@@ -30,5 +30,5 @@ func _apply_label_styles(node: Node) -> void:
 		node.add_theme_constant_override("outline_size", outline_size)
 	
 	# Rekurencyjne przeszukanie dzieci (np. w HBox, MarginContainer itp.)
-	for child in node.get_children():
+	for child: Node in node.get_children():
 		_apply_label_styles(child)

@@ -78,7 +78,7 @@ func _ready() -> void:
 		%Slot0, %Slot1, %Slot2,
 		%Slot3, %Slot4, %Slot5
 	]
-	for i in range(MAX_TEAM_SIZE):
+	for i: int in range(MAX_TEAM_SIZE):
 		player_slots[i].slot_index = i
 
 	# Fetch enemy slots
@@ -86,7 +86,7 @@ func _ready() -> void:
 		%EnemySlot0, %EnemySlot1, %EnemySlot2,
 		%EnemySlot3, %EnemySlot4, %EnemySlot5
 	]
-	for i in range(MAX_TEAM_SIZE):
+	for i: int in range(MAX_TEAM_SIZE):
 		enemy_slots[i].slot_index = i
 
 	# Configure HP border shaders
@@ -151,7 +151,7 @@ func setup(p_state: RunState) -> void:
 func _configure_hp_bar_shader(hp_bar: Control) -> void:
 	if not hp_bar:
 		return
-	var hp_material := ShaderMaterial.new()
+	var hp_material: ShaderMaterial = ShaderMaterial.new()
 	hp_material.shader = HP_BORDER_SHADER
 	hp_material.set_shader_parameter("fill_percentage", 1.0)
 	hp_bar.material = hp_material
@@ -161,16 +161,16 @@ func _configure_hp_bar_shader(hp_bar: Control) -> void:
 			hp_bar.material.set_shader_parameter("size", hp_bar.size)
 	)
 	
-	var initial_hp_size := hp_bar.size
+	var initial_hp_size: Vector2 = hp_bar.size
 	if initial_hp_size.x == 0.0:
 		initial_hp_size = Vector2(340.0, 32.0)
 	hp_bar.material.set_shader_parameter("size", initial_hp_size)
 
 func _apply_visual_styling() -> void:
 	# Background style
-	var bg_panel := get_node_or_null("BackgroundPanel") as Panel
+	var bg_panel: Panel = get_node_or_null("BackgroundPanel") as Panel
 	if bg_panel:
-		var bg_style := StyleBoxTexture.new()
+		var bg_style: StyleBoxTexture = StyleBoxTexture.new()
 		bg_style.texture = SHOP_BACKGROUND_TEXTURE
 		bg_style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
 		bg_style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
@@ -187,8 +187,8 @@ func load_battle_team() -> void:
 
 	# Copy team and make clones for the battle scene simulation
 	var player_units: Array[UnitInstance] = []
-	for i in range(MAX_TEAM_SIZE):
-		var inst := run_state.active_team[i] as UnitInstance
+	for i: int in range(MAX_TEAM_SIZE):
+		var inst: UnitInstance = run_state.active_team[i] as UnitInstance
 		if inst:
 			player_units.append(inst.clone())
 		else:
@@ -212,7 +212,7 @@ func load_enemy_team() -> void:
 
 	# Load River Crab into Slot 0
 	if RIVER_CRAB_RES:
-		var crab_instance := UnitInstance.new()
+		var crab_instance: UnitInstance = UnitInstance.new()
 		crab_instance.initialize(RIVER_CRAB_RES)
 		# Override health and attack
 		crab_instance.health = 1000
@@ -226,7 +226,7 @@ func trigger_battle_start() -> void:
 	# Wait one frame to let Godot layout engine calculate slot positions
 	await get_tree().process_frame
 	
-	for i in range(MAX_TEAM_SIZE):
+	for i: int in range(MAX_TEAM_SIZE):
 		if player_team.units[i]:
 			ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
 					
@@ -242,17 +242,17 @@ func trigger_enemy_cast(source_idx: int) -> void:
 	_update_all_card_uis()
 
 func _update_all_card_uis() -> void:
-	for i in range(MAX_TEAM_SIZE):
-		var slot := player_slots[i]
-		var card := slot.get_card()
+	for i: int in range(MAX_TEAM_SIZE):
+		var slot: BattleCardSlot = player_slots[i] as BattleCardSlot
+		var card: Control = slot.get_card()
 		if card and player_team.units[i]:
 			card.update_ui()
 		else:
 			slot.update_placeholder()
 			
-	for i in range(MAX_TEAM_SIZE):
-		var slot := enemy_slots[i]
-		var card := slot.get_card()
+	for i: int in range(MAX_TEAM_SIZE):
+		var slot: BattleCardSlot = enemy_slots[i] as BattleCardSlot
+		var card: Control = slot.get_card()
 		if card and enemy_team.units[i]:
 			card.update_ui()
 		else:
@@ -278,8 +278,8 @@ func advance_simulation(delta: float) -> void:
 		if fatigue_tick_timer >= 1.0:
 			fatigue_tick_timer -= 1.0
 			fatigue_tick_count += 1
-			var stage := floori((fatigue_tick_count - 1) / 3.0) + 1
-			var dmg := get_fibonacci(stage + 1)
+			var stage: int = floori((fatigue_tick_count - 1) / 3.0) + 1
+			var dmg: int = get_fibonacci(stage + 1)
 			
 			player_team.take_damage(dmg)
 			_update_all_card_uis()
@@ -293,11 +293,11 @@ func advance_simulation(delta: float) -> void:
 	enemy_team.tick_casts(delta, 1.0, trigger_enemy_cast)
 
 func spawn_floating_text(value_text: String, text_color: Color, start_pos: Vector2) -> void:
-	var offset_x := randf_range(-30.0, 30.0)
-	var offset_y := randf_range(-20.0, 20.0)
-	var final_pos := start_pos + Vector2(offset_x, offset_y) - Vector2(50.0, 15.0)
+	var offset_x: float = randf_range(-30.0, 30.0)
+	var offset_y: float = randf_range(-20.0, 20.0)
+	var final_pos: Vector2 = start_pos + Vector2(offset_x, offset_y) - Vector2(50.0, 15.0)
 	
-	var f_text := FloatingText.new()
+	var f_text: FloatingText = FloatingText.new()
 	add_child(f_text)
 	f_text.setup(value_text, text_color, final_pos)
 
@@ -326,9 +326,9 @@ func _on_pause_pressed() -> void:
 func _on_exit_pressed() -> void:
 	# Save updated stats back to run_state
 	if run_state != null:
-		for i in range(MAX_TEAM_SIZE):
-			var persistent_unit := run_state.active_team[i] as UnitInstance
-			var battle_unit := player_team.units[i] as UnitInstance
+		for i: int in range(MAX_TEAM_SIZE):
+			var persistent_unit: UnitInstance = run_state.active_team[i] as UnitInstance
+			var battle_unit: UnitInstance = player_team.units[i] as UnitInstance
 			if persistent_unit and battle_unit:
 				# Copy only unified health property
 				persistent_unit.health = battle_unit.health
@@ -348,7 +348,7 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 		CardUIHelper.hide_tooltip(preview_tooltip)
 
 func _clear_slot_target_highlights() -> void:
-	for slot in player_slots:
+	for slot: BattleCardSlot in player_slots:
 		slot.set_target_highlight(false)
 
 func _on_speed_pressed() -> void:
@@ -367,10 +367,10 @@ func get_fibonacci(n: int) -> int:
 		return 0
 	if n == 1 or n == 2:
 		return 1
-	var a := 1
-	var b := 1
-	for i in range(3, n + 1):
-		var temp := a + b
+	var a: int = 1
+	var b: int = 1
+	for i: int in range(3, n + 1):
+		var temp: int = a + b
 		a = b
 		b = temp
 	return b
@@ -379,16 +379,16 @@ func get_fibonacci(n: int) -> int:
 # UI Team Handler Methods
 
 func _update_team_slots_ui(slots_arr: Array[BattleCardSlot], loaded_units: Array[UnitInstance]) -> void:
-	for slot in slots_arr:
-		var old_card := slot.get_card()
+	for slot: BattleCardSlot in slots_arr:
+		var old_card: Control = slot.get_card()
 		if old_card:
 			slot.remove_card(old_card)
 			old_card.queue_free()
 			
-	for i in range(MAX_TEAM_SIZE):
-		var inst := loaded_units[i]
+	for i: int in range(MAX_TEAM_SIZE):
+		var inst: UnitInstance = loaded_units[i]
 		if inst:
-			var card := BATTLE_CARD_SCENE.instantiate() as BattleCard
+			var card: BattleCard = BATTLE_CARD_SCENE.instantiate() as BattleCard
 			card.unit_instance = inst
 			card.hovered.connect(func(c: Control, h: bool) -> void: _on_card_hovered(c, h))
 			slots_arr[i].add_card(card)
@@ -399,7 +399,7 @@ func _on_units_loaded(loaded_units: Array[UnitInstance], slots: Array[BattleCard
 	_update_team_slots_ui(slots, loaded_units)
 
 func _on_health_changed(current_health: int, max_health: int, shield: int, bar: Control, label: Label) -> void:
-	var fill_pct := 0.0
+	var fill_pct: float = 0.0
 	if max_health > 0:
 		fill_pct = float(max(0, current_health)) / float(max_health)
 		
@@ -417,8 +417,8 @@ func _on_status_changed(status_type: String, amount: int, cooldown_ratio: float,
 		badges[status_type].value = amount
 		badges[status_type].cooldown_ratio = cooldown_ratio
 		
-	var has_statuses := false
-	for badge in badges.values():
+	var has_statuses: bool = false
+	for badge: StatusBadge in badges.values():
 		if badge and badge.value > 0:
 			has_statuses = true
 			break
@@ -431,12 +431,12 @@ func _on_cast_progress_changed(slot_idx: int, ratio: float, slots: Array[BattleC
 		slots[slot_idx].set_cast_progress(ratio)
 
 func _on_floating_text_requested(is_enemy_team: bool, text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
-	var spawn_pos := Vector2.ZERO
+	var spawn_pos: Vector2 = Vector2.ZERO
 	if is_on_slot:
-		var slot := enemy_slots[slot_idx] if is_enemy_team else player_slots[slot_idx]
+		var slot: BattleCardSlot = (enemy_slots[slot_idx] if is_enemy_team else player_slots[slot_idx]) as BattleCardSlot
 		spawn_pos = slot.global_position + slot.size / 2.0
 	else:
-		var hp_bar := enemy_health_bar_rect if is_enemy_team else team_health_bar_rect
+		var hp_bar: Control = enemy_health_bar_rect if is_enemy_team else team_health_bar_rect
 		if hp_bar:
 			spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
 		
