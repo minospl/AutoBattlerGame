@@ -45,9 +45,8 @@ func apply_food_effect(card: Control) -> void:
 		return
 	var inst = card.unit_instance
 	if inst:
-		inst.current_attack += item_instance.stat_boost_attack
-		inst.max_health_bonus += item_instance.stat_boost_hp
-		inst.current_health += item_instance.stat_boost_hp
+		inst.attack += item_instance.stat_boost_attack
+		inst.health += item_instance.stat_boost_hp
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Keep the card in place but dim it visually

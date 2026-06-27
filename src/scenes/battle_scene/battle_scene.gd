@@ -19,8 +19,7 @@ var enemy_team: BattleTeam
 var game_speed: float = 1.0
 var preview_tooltip: Control
 
-# Backup for exiting battle (reverting temp stats)
-var initial_team_backup: Array[UnitInstance] = []
+
 
 # Countdown Timer & Fatigue
 var match_timer: float = 30.0
@@ -175,21 +174,16 @@ func _apply_visual_styling() -> void:
 		outer_border.color = GameColors.PANEL_BORDER_DEFAULT
 
 func load_battle_team() -> void:
-	initial_team_backup.clear()
-
 	if CurrentRun.state == null:
 		return
 
-	# Copy team and make backup
+	# Copy team and make clones for the battle scene simulation
 	var player_units: Array[UnitInstance] = []
 	for i in range(MAX_TEAM_SIZE):
 		var inst := CurrentRun.state.active_team[i] as UnitInstance
 		if inst:
-			inst.temp_max_health_bonus = 0
-			initial_team_backup.append(inst.clone())
-			player_units.append(inst)
+			player_units.append(inst.clone())
 		else:
-			initial_team_backup.append(null)
 			player_units.append(null)
 
 	player_team.load_team_units(player_units)
@@ -213,9 +207,8 @@ func load_enemy_team() -> void:
 		var crab_instance := UnitInstance.new()
 		crab_instance.initialize(RIVER_CRAB_RES)
 		# Override health and attack
-		crab_instance.max_health_bonus = 999  # base health is 1, so 1 + 999 = 1000
-		crab_instance.current_health = 1000
-		crab_instance.current_attack = 10
+		crab_instance.health = 1000
+		crab_instance.attack = 10
 		
 		# Ignore thorns per user request
 		crab_instance.thorns = 0
@@ -335,19 +328,10 @@ func _on_exit_pressed() -> void:
 	if CurrentRun.state != null:
 		for i in range(MAX_TEAM_SIZE):
 			var persistent_unit := CurrentRun.state.active_team[i] as UnitInstance
-			var backup := initial_team_backup[i] as UnitInstance
-			if persistent_unit and backup and player_team.units[i]:
-				# Revert temporary combat-specific stats back to shop/backup state
-				persistent_unit.max_health_bonus = player_team.units[i].max_health_bonus
-				persistent_unit.temp_max_health_bonus = 0
-				
-				persistent_unit.current_health = persistent_unit.get_max_health()
-				persistent_unit.current_attack = backup.current_attack
-				persistent_unit.poison = backup.poison
-				persistent_unit.shield = backup.shield
-				persistent_unit.burn = backup.burn
-				persistent_unit.electrocute = backup.electrocute
-				persistent_unit.current_cast_speed = backup.current_cast_speed
+			var battle_unit := player_team.units[i] as UnitInstance
+			if persistent_unit and battle_unit:
+				# Copy only unified health property
+				persistent_unit.health = battle_unit.health
 			else:
 				CurrentRun.state.active_team[i] = null
 				

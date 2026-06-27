@@ -51,7 +51,7 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 		if i < num_units and new_units[i]:
 			var inst := new_units[i]
 			units[i] = inst
-			health += inst.current_health
+			health += inst.get_max_health()
 			max_health += inst.get_max_health()
 		else:
 			units[i] = null
@@ -222,22 +222,17 @@ func apply_modifier_effect(t_idx: int, effect_type: UnitModifier.EffectType, val
 	var target_unit := units[t_idx]
 	match effect_type:
 		UnitModifier.EffectType.BUFF_ATTACK:
-			target_unit.current_attack += value
+			target_unit.attack += value
 			spawn_floating_text_on_slot(t_idx, "+" + str(value) + " ATK", Color(1.0, 0.85, 0.2))
 		UnitModifier.EffectType.BUFF_HEALTH:
 			if duration == UnitModifier.Duration.PERMANENT:
-				target_unit.max_health_bonus += value
-				target_unit.current_health += value
-			else:
-				target_unit.temp_max_health_bonus += value
-				target_unit.current_health += value
+				target_unit.health += value
 			max_health += value
 			health += value
 			health_changed.emit(health, max_health, shield)
 			spawn_floating_text_on_slot(t_idx, "+" + str(value) + " HP", Color(1.0, 0.3, 0.3))
 		UnitModifier.EffectType.BUFF_HEAL:
 			var health_before := health
-			target_unit.current_health = min(target_unit.current_health + value, target_unit.get_max_health())
 			health = min(health + value, max_health)
 			health_changed.emit(health, max_health, shield)
 			var actual_heal := health - health_before
