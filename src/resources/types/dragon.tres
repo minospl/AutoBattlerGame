@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="UnitType" load_steps=2 format=3]
-
-[ext_resource type="Script" path="res://src/resources/unit_type.gd" id="unit_type"]
-
-[resource]
-script = ExtResource("unit_type")
-type_name = "Dragon"
-color = Color(0.9, 0.2, 0.2, 1)

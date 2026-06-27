@@ -1,0 +1,388 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://src/features/battle/battle_scene.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/features/battle/components/battle_card_slot.tscn" id="2_slot"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="3_button_decorator"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/panel_border_decorator.gd" id="4_border_decorator"]
+[ext_resource type="Script" path="res://src/features/battle/components/status_badge.gd" id="5_status_badge"]
+
+[node name="BattleScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="HeaderVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TopBarContainer" type="PanelContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin"]
+layout_mode = 2
+
+[node name="ExitButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "🚪 Exit to Shop"
+
+[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ExitButton"]
+script = ExtResource("3_button_decorator")
+color_normal = Color(0.12, 0.45, 0.22, 1)
+color_hover = Color(0.15, 0.55, 0.27, 1)
+color_pressed = Color(0.18, 0.65, 0.32, 1)
+
+[node name="LeftSpacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TimerContainer" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TimerLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/TimerContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "⏳ 30.0s"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RightSpacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ControlsHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PlayButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "▶ Play"
+
+[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/PlayButton"]
+script = ExtResource("3_button_decorator")
+color_normal = Color(0.1, 0.35, 0.6, 1)
+color_hover = Color(0.15, 0.45, 0.75, 1)
+color_pressed = Color(0.2, 0.55, 0.9, 1)
+
+[node name="PauseButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "⏸ Pause"
+
+[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/PauseButton"]
+script = ExtResource("3_button_decorator")
+color_normal = Color(0.7, 0.4, 0.1, 1)
+color_hover = Color(0.8, 0.5, 0.15, 1)
+color_pressed = Color(0.9, 0.6, 0.2, 1)
+
+[node name="SpeedButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "⚡ Speed: 1x"
+
+[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/SpeedButton"]
+script = ExtResource("3_button_decorator")
+color_normal = Color(0.4, 0.2, 0.6, 1)
+color_hover = Color(0.5, 0.25, 0.7, 1)
+color_pressed = Color(0.6, 0.3, 0.8, 1)
+
+[node name="HeaderBarBorder" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="InnerBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+
+[node name="OuterBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+color = Color(0.29, 0.251, 0.255, 1)
+
+[node name="BattleAreaVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="HealthBarsHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="TeamHealthBarMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+
+[node name="LeftHeaderColumn" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin"]
+custom_minimum_size = Vector2(368, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="TeamHealthBarContainer" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TeamHealthBarRect" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamHealthBarContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(368, 32)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="TeamHealthLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamHealthBarContainer/TeamHealthBarRect"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.4)
+theme_override_constants/outline_size = 6
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TeamStatusHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TeamPoisonBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = 0
+
+[node name="TeamBurnBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = 1
+
+[node name="TeamElectrocuteBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = 2
+
+[node name="EnemyHealthBarMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/margin_right = 32
+
+[node name="RightHeaderColumn" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin"]
+custom_minimum_size = Vector2(368, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="EnemyHealthBarContainer" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemyHealthBarRect" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyHealthBarContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(368, 32)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="EnemyHealthLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyHealthBarContainer/EnemyHealthBarRect"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.4)
+theme_override_constants/outline_size = 6
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyStatusHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+
+[node name="PoisonBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = 0
+
+[node name="BurnBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = 1
+
+[node name="ElectrocuteBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("5_status_badge")
+type = 2
+
+[node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox"]
+layout_mode = 2
+theme_override_constants/separation = 32
+alignment = 1
+
+[node name="GridMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="GridVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Row0HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Slot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Row1HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Slot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemyMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="RightColumn" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EnemyRow0HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EnemySlot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemySlot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemySlot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemyRow1HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="EnemySlot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemySlot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemySlot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+
+[node name="PreviewContainer" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_top = 76.0
+offset_right = -16.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_constants/margin_right = 16

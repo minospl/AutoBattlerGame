@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://bb7tf4ytmscoh"]
+
+[ext_resource type="Script" uid="uid://dcwm3m7vnavik" path="res://src/features/shop/shop_scene.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://cx8g0ytsq24a" path="res://src/features/shop/components/bench_panel.tscn" id="2_bench"]
+[ext_resource type="PackedScene" uid="uid://dm0yq7hsqt4l" path="res://src/features/shop/components/team_panel.tscn" id="3_team"]
+[ext_resource type="PackedScene" uid="uid://dm0yq7hsqt4k" path="res://src/features/shop/components/shop_header_bar.tscn" id="4_panel"]
+[ext_resource type="PackedScene" uid="uid://b23tfd4ytmsc1" path="res://src/features/shop/components/shop_panel.tscn" id="5_shop"]
+
+[node name="ShopScene" type="Control" unique_id=520390897]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BackgroundPanel" type="Panel" parent="." unique_id=2073420315]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel" unique_id=1875125863]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer" unique_id=2033298553]
+layout_mode = 2
+theme_override_constants/separation = 32
+
+[node name="HeaderVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=1673930287]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ShopHeaderBar" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" unique_id=518349254 instance=ExtResource("4_panel")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HeaderBarBorder" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" unique_id=677598013]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="InnerBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder" unique_id=1310137001]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+
+[node name="OuterBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder" unique_id=1983801270]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+color = Color(0.29, 0.251, 0.255, 1)
+
+[node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=830363032]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="ContentMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox" unique_id=2118919358]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="ContentVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin" unique_id=511004923]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="BenchPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox" unique_id=1666675467 instance=ExtResource("2_bench")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BottomRowHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox" unique_id=98317822]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="TeamPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox/BottomRowHBox" unique_id=2049561967 instance=ExtResource("3_team")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ShopPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox/BottomRowHBox" unique_id=89234812 instance=ExtResource("5_shop")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PreviewContainer" type="MarginContainer" parent="." unique_id=25298775]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_top = 76.0
+offset_right = -16.0
+offset_bottom = 97.0
+grow_horizontal = 0

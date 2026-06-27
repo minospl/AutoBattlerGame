@@ -1,0 +1,131 @@
+[gd_scene format=3 uid="uid://dm0yq7hsqt4k"]
+
+[ext_resource type="Script" path="res://src/features/shop/components/shop_header_bar.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/heart_icon.png" id="2_heart"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/trophy_icon.png" id="3_trophy"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="4_button_decorator"]
+
+[node name="ShopHeaderBar" type="PanelContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+script = ExtResource("1_script")
+
+[node name="SideMarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 8
+
+[node name="SideHBox" type="HBoxContainer" parent="SideMarginContainer"]
+layout_mode = 2
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="SideMarginContainer/SideHBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AddButton" type="Button" parent="SideMarginContainer/SideHBox/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Add Random Unit"
+
+[node name="GameButtonDecorator" type="Node" parent="SideMarginContainer/SideHBox/ButtonsContainer/AddButton"]
+script = ExtResource("4_button_decorator")
+
+[node name="RestartButton" type="Button" parent="SideMarginContainer/SideHBox/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Restart"
+
+[node name="GameButtonDecorator" type="Node" parent="SideMarginContainer/SideHBox/ButtonsContainer/RestartButton"]
+script = ExtResource("4_button_decorator")
+color_normal = Color(0.1, 0.11, 0.13, 1)
+color_hover = Color(0.15, 0.163, 0.189, 1)
+color_pressed = Color(0.173, 0.188, 0.217, 1)
+
+[node name="BattleButton" type="Button" parent="SideMarginContainer/SideHBox/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "To Battle"
+
+[node name="GameButtonDecorator" type="Node" parent="SideMarginContainer/SideHBox/ButtonsContainer/BattleButton"]
+script = ExtResource("4_button_decorator")
+color_normal = Color(0.12, 0.45, 0.22, 1)
+color_hover = Color(0.15, 0.55, 0.27, 1)
+color_pressed = Color(0.18, 0.65, 0.32, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="CenterHBox" type="HBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="LivesContainer" type="HBoxContainer" parent="CenterContainer/CenterHBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="HeartIcon" type="TextureRect" parent="CenterContainer/CenterHBox/LivesContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("2_heart")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LivesLabel" type="Label" parent="CenterContainer/CenterHBox/LivesContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "10"
+vertical_alignment = 1
+
+
+
+[node name="DayLabel" type="Label" parent="CenterContainer/CenterHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 36
+text = "DAY 4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TrophiesContainer" type="HBoxContainer" parent="CenterContainer/CenterHBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="TrophyIcon" type="TextureRect" parent="CenterContainer/CenterHBox/TrophiesContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+texture = ExtResource("3_trophy")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TrophiesLabel" type="Label" parent="CenterContainer/CenterHBox/TrophiesContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 24
+text = "3/10"
+vertical_alignment = 1

@@ -1,0 +1,73 @@
+[gd_scene load_steps=3 format=3 uid="uid://dm0yq7hsqt4l"]
+
+[ext_resource type="Script" path="res://src/features/shop/components/team_panel.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/panel_border_decorator.gd" id="2_decorator"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/panel_header_decorator.gd" id="3_header_decorator"]
+
+[node name="TeamPanel" type="PanelContainer"]
+size_flags_horizontal = 4
+script = ExtResource("1_script")
+
+[node name="PanelBorderDecorator" type="Control" parent="."]
+layout_mode = 2
+script = ExtResource("2_decorator")
+
+[node name="TeamOuterMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 3
+theme_override_constants/margin_right = 3
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_bottom = 0
+
+[node name="VBox" type="VBoxContainer" parent="TeamOuterMargin"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TeamHeader" type="PanelContainer" parent="TeamOuterMargin/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PanelHeaderDecorator" type="Node" parent="TeamOuterMargin/VBox/TeamHeader"]
+script = ExtResource("3_header_decorator")
+header_color = Color(0.89, 0.31, 0.44, 1)
+
+[node name="Margin" type="MarginContainer" parent="TeamOuterMargin/VBox/TeamHeader"]
+layout_mode = 2
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+
+[node name="TeamLabel" type="Label" parent="TeamOuterMargin/VBox/TeamHeader/Margin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "TEAM"
+
+[node name="TeamMargin" type="MarginContainer" parent="TeamOuterMargin/VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="TeamRows" type="VBoxContainer" parent="TeamOuterMargin/VBox/TeamMargin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Row0Align" type="CenterContainer" parent="TeamOuterMargin/VBox/TeamMargin/TeamRows"]
+layout_mode = 2
+
+[node name="Row0HBox" type="HBoxContainer" parent="TeamOuterMargin/VBox/TeamMargin/TeamRows/Row0Align"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
+
+[node name="Row1Align" type="CenterContainer" parent="TeamOuterMargin/VBox/TeamMargin/TeamRows"]
+layout_mode = 2
+
+[node name="Row1HBox" type="HBoxContainer" parent="TeamOuterMargin/VBox/TeamMargin/TeamRows/Row1Align"]
+unique_name_in_owner = true
+layout_mode = 2
+alignment = 1
