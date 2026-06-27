@@ -13,12 +13,11 @@ extends PanelContainer
 @onready var desc_label: RichTextLabel = %DescLabel
 
 var _unit_instance: UnitInstance
-var _item_card: Resource
+var _item_card: ShopItemInstance
 
 func _ready() -> void:
 	# Ensure the container panel is transparent so only the decorator shader draws the background
-	var transparent_style = StyleBoxEmpty.new()
-	add_theme_stylebox_override("panel", transparent_style)
+	add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	
 	if _unit_instance:
 		_setup_unit_ui()
@@ -31,7 +30,7 @@ func setup_for_unit(unit_instance: UnitInstance) -> void:
 	if is_node_ready():
 		_setup_unit_ui()
 
-func setup_for_item(item_card: Resource) -> void:
+func setup_for_item(item_card: ShopItemInstance) -> void:
 	_item_card = item_card
 	_unit_instance = null
 	if is_node_ready():
@@ -43,8 +42,8 @@ func _setup_unit_ui() -> void:
 		
 	# 1. Header
 	name_label.text = _unit_instance.get_unit_name().to_upper()
-	var rarity_name = "COMMON"
-	var rarity_color = GameColors.BORDER_OUTER_DEFAULT
+	var rarity_name: String = "COMMON"
+	var rarity_color: Color = GameColors.BORDER_OUTER_DEFAULT
 	if _unit_instance.data and _unit_instance.data.rarity:
 		rarity_name = _unit_instance.data.rarity.rarity_name.to_upper()
 		rarity_color = _unit_instance.data.rarity.border_color
@@ -65,8 +64,8 @@ func _setup_unit_ui() -> void:
 		fallback_label.visible = false
 		sprite_rect.texture = _unit_instance.data.sprite
 		if not sprite_rect.material:
-			var shader = load("res://src/shared/shaders/chroma_key.gdshader")
-			var mat = ShaderMaterial.new()
+			var shader: Shader = load("res://src/shared/shaders/chroma_key.gdshader")
+			var mat: ShaderMaterial = ShaderMaterial.new()
 			mat.shader = shader
 			sprite_rect.material = mat
 	else:
@@ -75,13 +74,13 @@ func _setup_unit_ui() -> void:
 		fallback_label.text = _unit_instance.get_unit_name().left(1).to_upper()
 		
 	# 4. Badge (Type)
-	var types = _unit_instance.get_types()
+	var types: Array[UnitType] = _unit_instance.get_types()
 	if not types.is_empty():
 		badge_panel.visible = true
-		var first_type = types[0]
+		var first_type: UnitType = types[0]
 		badge_label.text = first_type.type_name.to_upper()
 		
-		var flat_style = StyleBoxFlat.new()
+		var flat_style: StyleBoxFlat = StyleBoxFlat.new()
 		flat_style.bg_color = first_type.color
 		flat_style.content_margin_left = 8
 		flat_style.content_margin_right = 8
@@ -93,7 +92,7 @@ func _setup_unit_ui() -> void:
 		
 	# 5. Stats
 	stats_panel.visible = true
-	var stats_text = "%d HP" % _unit_instance.get_max_health()
+	var stats_text: String = "%d HP" % _unit_instance.get_max_health()
 	if _unit_instance.get_attack() > 0:
 		stats_text += "   |   %d ATK" % _unit_instance.get_attack()
 	if _unit_instance.heal > 0:
@@ -112,7 +111,7 @@ func _setup_unit_ui() -> void:
 	stats_label.text = stats_text
 	
 	# 6. Description
-	var full_desc : String = ""
+	var full_desc: String = ""
 	if _unit_instance.data:
 		var modifier: UnitModifier = _unit_instance.data.modifier
 		if not full_desc.is_empty():
@@ -155,7 +154,7 @@ func _setup_item_ui() -> void:
 	# 4. Badge
 	badge_panel.visible = true
 	badge_label.text = "ITEM"
-	var flat_style = StyleBoxFlat.new()
+	var flat_style: StyleBoxFlat = StyleBoxFlat.new()
 	flat_style.bg_color = Color(0.35, 0.65, 0.55) # Teal/greyish green matching reference item label bg
 	flat_style.content_margin_left = 8
 	flat_style.content_margin_right = 8
@@ -167,7 +166,7 @@ func _setup_item_ui() -> void:
 	stats_panel.visible = false
 	
 	# 6. Description
-	var desc = ""
+	var desc: String = ""
 	if _item_card.stat_boost_attack > 0:
 		desc += "Give a unit +%d Attack." % _item_card.stat_boost_attack
 	if _item_card.stat_boost_hp > 0:
@@ -179,15 +178,15 @@ func _setup_item_ui() -> void:
 	desc_label.text = "[center]%s[/center]" % desc
 
 func _update_sub_panel_borders(border_col: Color) -> void:
-	var panels = [
+	var panels: Array[ShaderBorderDecorator] = [
 		%PortraitBorderRect,
 		%SpriteBorderRect,
 		%StatsBorderRect,
 		%DescBorderRect,
 		%HelpBorderRect
 	]
-	for rect in panels:
-		if rect and rect is ShaderBorderDecorator:
-			rect.border_color = border_col
-			rect.interior_color = Color(1, 1, 1, 1)
-			rect.update_shader_parameters()
+
+	for rect: ShaderBorderDecorator in panels:
+		rect.border_color = border_col
+		rect.interior_color = Color(1, 1, 1, 1)
+		rect.update_shader_parameters()

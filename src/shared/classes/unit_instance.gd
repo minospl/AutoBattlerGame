@@ -19,7 +19,6 @@ extends Resource
 ## Shield value (on cast) of this specific instance
 @export var shield: int = 0
 
-
 ## Thorns value of this specific instance
 @export var thorns: int = 0
 
@@ -69,7 +68,7 @@ func get_cast_speed() -> float:
 	return current_cast_speed
 
 func clone() -> UnitInstance:
-	var new_inst = UnitInstance.new()
+	var new_inst: UnitInstance = UnitInstance.new()
 	new_inst.data = data
 	new_inst.current_health = current_health
 	new_inst.current_attack = current_attack
@@ -83,4 +82,3 @@ func clone() -> UnitInstance:
 	new_inst.max_health_bonus = max_health_bonus
 	new_inst.current_cast_speed = current_cast_speed
 	return new_inst
-
