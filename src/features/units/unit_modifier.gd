@@ -21,10 +21,10 @@ enum TargetType {
 
 @export var trigger: Trigger
 @export var target: TargetType = TargetType.SELF
-@export var custom_description: String = ""
 
 func _apply_modifier(_source_idx: int, _team_obj: BattleTeam) -> void:
-	pass
+	push_error("Abstract method _apply_modifier() must be overridden in subclass of UnitModifier!")
+	assert(false, "Subclass must override _apply_modifier()")
 
 func get_trigger_name(p_trigger: Trigger = trigger) -> String:
 	var name: String = "???"
@@ -39,6 +39,6 @@ func get_trigger_name(p_trigger: Trigger = trigger) -> String:
 	return "[color=%s]%s[/color]" % [GameColors.DESC_TRIGGER, name]
 
 func get_description() -> String:
-	if not custom_description.is_empty():
-		return custom_description
+	push_error("Abstract method get_description() must be overridden in subclass of UnitModifier!")
+	assert(false, "Subclass must override get_description()")
 	return ""
