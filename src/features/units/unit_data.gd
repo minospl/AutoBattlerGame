@@ -22,7 +22,6 @@ extends Resource
 ## Base shield value (on cast)
 @export var base_shield: int
 
-
 ## Base burn value (on cast)
 @export var base_burn: int
 

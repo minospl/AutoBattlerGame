@@ -113,9 +113,10 @@ func _setup_unit_ui() -> void:
 	var full_desc: String = ""
 	if _unit_instance.data:
 		var modifier: UnitModifier = _unit_instance.data.modifier
-		if not full_desc.is_empty():
-			full_desc += "\n\n"
-		full_desc += modifier.get_description()
+		if modifier:
+			if not full_desc.is_empty():
+				full_desc += "\n\n"
+			full_desc += modifier.get_description()
 			
 	if not full_desc.is_empty():
 		desc_panel.visible = true

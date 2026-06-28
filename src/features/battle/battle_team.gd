@@ -50,9 +50,11 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 	for i: int in range(MAX_TEAM_SIZE):
 		if i < num_units and new_units[i]:
 			var inst: UnitInstance = new_units[i]
-			units[i] = inst
-			health += inst.get_max_health()
-			max_health += inst.get_max_health()
+			var battle_inst: BattleUnitInstance = BattleUnitInstance.new()
+			battle_inst.initialize_battle_unit(inst)
+			units[i] = battle_inst
+			health += battle_inst.get_max_health()
+			max_health += battle_inst.get_max_health()
 		else:
 			units[i] = null
 			
@@ -125,7 +127,7 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 	if max_health > 0 and health <= 0:
 		team_defeated.emit()
 
-func heal(amount: int) -> void:
+func heal(amount: int, source_slot_idx: int = -1) -> void:
 	if amount <= 0:
 		return
 	var health_before: int = health
@@ -135,7 +137,10 @@ func heal(amount: int) -> void:
 	health_changed.emit(health, max_health, shield)
 	
 	if actual_heal > 0:
-		floating_text_requested.emit("+" + str(actual_heal), Color(0.2, 0.9, 0.2), false, 0)
+		if source_slot_idx != -1:
+			spawn_floating_text_on_slot(source_slot_idx, "+" + str(actual_heal), Color(0.2, 0.9, 0.2))
+		else:
+			floating_text_requested.emit("+" + str(actual_heal), Color(0.2, 0.9, 0.2), false, 0)
 
 func add_shield(amount: int) -> void:
 	if amount <= 0:
@@ -214,35 +219,87 @@ func tick_casts(delta: float, game_speed: float, cast_callback: Callable) -> voi
 func spawn_floating_text_on_slot(t_idx: int, text: String, color: Color) -> void:
 	floating_text_requested.emit(text, color, true, t_idx)
 
-# Consolidated Modifier Application Method
-func apply_modifier_effect(t_idx: int, effect_type: UnitModifier.EffectType, value: int, duration: UnitModifier.Duration) -> void:
-	if t_idx < 0 or t_idx >= units.size() or not units[t_idx]:
+func buff_unit_attack(slot_idx: int, amount: int, permanent: bool = false) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
 		return
-		
-	var target_unit: UnitInstance = units[t_idx]
-	match effect_type:
-		UnitModifier.EffectType.BUFF_ATTACK:
-			target_unit.attack += value
-			spawn_floating_text_on_slot(t_idx, "+" + str(value) + " ATK", Color(1.0, 0.85, 0.2))
-		UnitModifier.EffectType.BUFF_HEALTH:
-			if duration == UnitModifier.Duration.PERMANENT:
-				target_unit.health += value
-			max_health += value
-			health += value
-			health_changed.emit(health, max_health, shield)
-			spawn_floating_text_on_slot(t_idx, "+" + str(value) + " HP", Color(1.0, 0.3, 0.3))
-		UnitModifier.EffectType.BUFF_HEAL:
-			var health_before: int = health
-			health = min(health + value, max_health)
-			health_changed.emit(health, max_health, shield)
-			var actual_heal: int = health - health_before
-			if actual_heal > 0:
-				spawn_floating_text_on_slot(t_idx, "+" + str(actual_heal), Color(0.2, 0.9, 0.2))
-		UnitModifier.EffectType.APPLY_POISON:
-			target_unit.poison += value
-			spawn_floating_text_on_slot(t_idx, "+" + str(value) + " Poison", Color(0.7, 0.3, 0.8))
-		UnitModifier.EffectType.BUFF_SHIELD:
-			target_unit.shield += value
-			shield += value
-			health_changed.emit(health, max_health, shield)
-			spawn_floating_text_on_slot(t_idx, "+" + str(value) + " Shield", Color(0.7, 0.7, 0.7))
+	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
+	if b_unit:
+		b_unit.attack += amount
+		if permanent and b_unit.base_unit:
+			b_unit.base_unit.attack += amount
+	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " ATK", Color(1.0, 0.85, 0.2))
+
+func buff_unit_max_health(slot_idx: int, amount: int, permanent: bool = false) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
+		return
+	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
+	if b_unit:
+		b_unit.health += amount
+		if permanent and b_unit.base_unit:
+			b_unit.base_unit.health += amount
+	max_health += amount
+	health += amount
+	health_changed.emit(health, max_health, shield)
+	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " HP", Color(1.0, 0.3, 0.3))
+
+func add_unit_shield(slot_idx: int, amount: int, permanent: bool = false) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
+		return
+	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
+	if b_unit:
+		b_unit.shield += amount
+		if permanent and b_unit.base_unit:
+			b_unit.base_unit.shield += amount
+	shield += amount
+	health_changed.emit(health, max_health, shield)
+	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Shield", Color(0.7, 0.7, 0.7))
+
+func buff_unit_poison(slot_idx: int, amount: int, permanent: bool = false) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
+		return
+	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
+	if b_unit:
+		b_unit.poison += amount
+		if permanent and b_unit.base_unit:
+			b_unit.base_unit.poison += amount
+	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Poison", Color(0.7, 0.3, 0.8))
+
+func buff_unit_burn(slot_idx: int, amount: int, permanent: bool = false) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
+		return
+	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
+	if b_unit:
+		b_unit.burn += amount
+		if permanent and b_unit.base_unit:
+			b_unit.base_unit.burn += amount
+	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Burn", Color(0.9, 0.4, 0.1))
+
+func buff_unit_electrocute(slot_idx: int, amount: int, permanent: bool = false) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
+		return
+	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
+	if b_unit:
+		b_unit.electrocute += amount
+		if permanent and b_unit.base_unit:
+			b_unit.base_unit.electrocute += amount
+	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Electrocute", Color(0.3, 0.7, 1.0))
+
+func buff_unit_heal_power(slot_idx: int, amount: int, permanent: bool = false) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
+		return
+	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
+	if b_unit:
+		b_unit.heal += amount
+		if permanent and b_unit.base_unit:
+			b_unit.base_unit.heal += amount
+	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Heal Power", Color(0.2, 0.9, 0.2))
+
+func buff_unit_cast_speed(slot_idx: int, amount: float, permanent: bool = false) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
+		return
+	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
+	if b_unit:
+		b_unit.cast_speed = maxf(0.1, b_unit.cast_speed - amount)
+		if permanent and b_unit.base_unit:
+			b_unit.base_unit.cast_speed = maxf(0.1, b_unit.base_unit.cast_speed - amount)
+	spawn_floating_text_on_slot(slot_idx, "-" + str(amount) + "s CD", Color(0.5, 0.8, 1.0))

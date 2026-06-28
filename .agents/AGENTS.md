@@ -61,6 +61,21 @@ Walka odbywa się automatycznie w czasie rzeczywistym:
 ### Zmęczenie (Fatigue)
 *   Czas trwania walki wynosi 30 sekund. Po tym czasie co 1 sekundę obie drużyny otrzymują obrażenia fatigue, które rosną z każdym krokiem zgodnie z ciągiem Fibonacciego.
 
+### Wspólne punkty życia drużyny (Shared Team Health)
+W fazie walki jednostki nie otrzymują obrażeń indywidualnie:
+*   **Sumowanie Zdrowia:** Przy starcie walki (`load_team_units()`), punkty zdrowia (`health`) wszystkich aktywnych jednostek w drużynie są sumowane w jedną wspólną pulę zdrowia drużyny (`health` oraz `max_health` klasy `BattleTeam`).
+*   **Aplikowanie Obrażeń:** Wszystkie otrzymywane obrażenia (zarówno ataki fizyczne, jak i obrażenia od statusów Trucizny czy Oparzenia) są odejmowane bezpośrednio od wspólnej puli zdrowia/tarczy całej drużyny. Statystyki zdrowia poszczególnych potworów (`UnitInstance.health`) pozostają w trakcie walki nienaruszone przez otrzymywane obrażenia.
+*   **Modyfikatory Statystyk:** Efekty modyfikatorów w walce (np. `BUFF_HEALTH`) mogą modyfikować statystyki konkretnej jednostki (`UnitInstance.health`) – jeśli zmiana ta ma charakter permanentny (`UnitModifier.Duration.PERMANENT`), to po zakończeniu walki zaktualizowana wartość zdrowia jednostki jest przepisywana z powrotem do stanu gry (`RunState`).
+*   **Warunek Porażki:** Drużyna zostaje pokonana, a sygnał `team_defeated` wyemitowany, gdy wspólne zdrowie drużyny (`health`) spadnie do `0` lub poniżej.
+
+### Obiektowy System Modyfikatorów (Modular Unit Modifiers)
+Każda jednostka z unikalną zdolnością posiada przypisany modyfikator dziedziczący po klasie bazowej `UnitModifier` (`src/features/units/unit_modifier.gd`):
+*   **Modułowość i Hermetyzacja**: Zamiast jednego centralnego silnika z instrukcją `match`, zachowanie modyfikatora (akcja w walce) definiuje się w dedykowanym skrypcie w folderze `src/features/units/templates/modifiers/` poprzez nadpisanie metody `_apply_modifier(source_idx: int, team_obj: BattleTeam) -> void`.
+*   **Dynamiczny Opis**: Modyfikatory nadpisują metodę `get_description() -> String` zwracającą sformatowany tekst tooltipu. Aby zachować spójność wizualną, do formatowania nazwy momentu aktywacji używa się metody klasy bazowej `get_trigger_name(p_trigger: Trigger = trigger) -> String` (np. `get_trigger_name()` lub `get_trigger_name(Trigger.ON_BATTLE_START)`).
+*   **Zmienne Eksportowane (@export)**: Wszelkie wartości liczbowe modyfikatora (np. siła leczenia, wartość buffu) powinny być deklarowane jako `@export` klasy modyfikatora (np. `@export var health_buff: int = 5`). Umożliwia to łatwe zarządzanie nimi bezpośrednio z poziomu inspektora Godota w plikach szablonów `.tres`.
+
+
+
 ---
 
 ## 4. Wytyczne i Dobre Praktyki dla Asystenta AI (Antigravity)

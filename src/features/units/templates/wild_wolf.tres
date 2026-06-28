@@ -3,15 +3,14 @@
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_mbm7u"]
 [ext_resource type="Texture2D" uid="uid://dxbv827eab23l" path="res://src/assets/units/wild_wolf.jpg" id="sprite"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Script" uid="uid://ccq4g7hka5jvf" path="res://src/features/units/unit_modifier.gd" id="unit_modifier"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/beast.tres" id="unit_type"]
+[ext_resource type="Script" uid="uid://dudrwxj46gl82" path="res://src/features/units/templates/modifiers/wild_wolf_modifier.gd" id="wild_wolf_modifier"]
 
 [sub_resource type="Resource" id="Resource_wolf_battle_start"]
-script = ExtResource("unit_modifier")
+script = ExtResource("wild_wolf_modifier")
 trigger = 1
 target = 3
-value = 1
 
 [resource]
 script = ExtResource("unit_data")

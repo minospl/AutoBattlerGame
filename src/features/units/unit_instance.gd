@@ -19,7 +19,6 @@ extends Resource
 ## Shield value (on cast) of this specific instance
 @export var shield: int = 0
 
-
 ## Burn value of this specific instance
 @export var burn: int = 0
 

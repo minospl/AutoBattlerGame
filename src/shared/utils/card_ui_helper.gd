@@ -240,15 +240,16 @@ static func hide_tooltip(tooltip: CardTooltip) -> void:
 static func format_large_number(val: int) -> String:
 	if val < 1000:
 		return str(val)
-	elif val < 1000000:
+		
+	if val < 1000000:
 		var k_val: float = val / 1000.0
 		var formatted: String = "%.1fk" % k_val
 		if formatted.ends_with(".0k"):
 			formatted = str(roundi(k_val)) + "k"
 		return formatted
-	else:
-		var m_val: float = val / 1000000.0
-		var formatted: String = "%.1fM" % m_val
-		if formatted.ends_with(".0M"):
-			formatted = str(roundi(m_val)) + "M"
-		return formatted
+	
+	var m_val: float = val / 1000000.0
+	var formatted_m: String = "%.1fM" % m_val
+	if formatted_m.ends_with(".0M"):
+		formatted_m = str(roundi(m_val)) + "M"
+	return formatted_m

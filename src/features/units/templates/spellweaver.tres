@@ -1,25 +1,22 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://cmgbmupa23d77"]
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_r15g0"]
+[ext_resource type="Script" uid="uid://c47iimbtxmm8n" path="res://src/features/units/templates/modifiers/spellweaver_modifier.gd" id="spellweaver_modifier"]
 [ext_resource type="Texture2D" uid="uid://slb7o5k78a8l" path="res://src/assets/units/spellweaver.jpg" id="sprite"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Script" uid="uid://ccq4g7hka5jvf" path="res://src/features/units/unit_modifier.gd" id="unit_modifier"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/rare.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/water.tres" id="unit_type"]
 
 [sub_resource type="Resource" id="Resource_spellweaver_on_cast"]
-script = ExtResource("unit_modifier")
+script = ExtResource("spellweaver_modifier")
+trigger = 0
 target = 6
-effect = 5
-target_trigger = 1
 
 [resource]
 script = ExtResource("unit_data")
 unit_name = "Spellweaver"
 price = 3
 max_health = 10
-attack = 2
-base_electrocute = 6
 types = Array[ExtResource("5_r15g0")]([ExtResource("unit_type")])
 rarity = ExtResource("unit_rarity")
 cast_speed = 2.0

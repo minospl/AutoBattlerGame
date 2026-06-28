@@ -1,18 +1,15 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://b3xk18dbjokir"]
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_leg82"]
+[ext_resource type="Script" uid="uid://boffntwppcp1i" path="res://src/features/units/templates/modifiers/ancient_titan_modifier.gd" id="ancient_titan_modifier"]
 [ext_resource type="Texture2D" uid="uid://dse6x7xr1yaxh" path="res://src/assets/units/ancient_titan.jpg" id="sprite"]
 [ext_resource type="Resource" path="res://src/features/units/types/water.tres" id="type_water"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Script" uid="uid://ccq4g7hka5jvf" path="res://src/features/units/unit_modifier.gd" id="unit_modifier"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/epic.tres" id="unit_rarity"]
 
 [sub_resource type="Resource" id="Resource_titan_battle_start"]
-script = ExtResource("unit_modifier")
+script = ExtResource("ancient_titan_modifier")
 trigger = 1
-effect = 1
-value = 5
-duration = 1
 
 [resource]
 script = ExtResource("unit_data")
