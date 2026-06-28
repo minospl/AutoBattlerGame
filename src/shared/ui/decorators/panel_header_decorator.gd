@@ -7,8 +7,8 @@ extends Node
 @export var outline_size: int = 5
 
 func _ready() -> void:
-	var parent: Node = get_parent()
-	if not parent or not (parent is PanelContainer):
+	var parent: PanelContainer = get_parent() as PanelContainer
+	if not parent:
 		push_error("PanelHeaderDecorator musi być bezpośrednim dzieckiem PanelContainer!")
 		return
 		
@@ -26,8 +26,9 @@ func _ready() -> void:
 
 func _apply_label_styles(node: Node) -> void:
 	if node is Label:
-		node.add_theme_color_override("font_outline_color", GameColors.LABEL_OUTLINE)
-		node.add_theme_constant_override("outline_size", outline_size)
+		var label: Label = node
+		label.add_theme_color_override("font_outline_color", GameColors.LABEL_OUTLINE)
+		label.add_theme_constant_override("outline_size", outline_size)
 	
 	# Rekurencyjne przeszukanie dzieci (np. w HBox, MarginContainer itp.)
 	for child: Node in node.get_children():

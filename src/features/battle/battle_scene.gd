@@ -5,13 +5,13 @@ signal battle_finished
 var run_state: RunState
 
 # Static Preloads
-const CARD_TOOLTIP_SCENE = preload("res://src/shared/ui/components/card_tooltip.tscn")
-const HP_BORDER_SHADER = preload("res://src/shared/shaders/hp_border.gdshader")
-const SHOP_BACKGROUND_TEXTURE = preload("res://src/assets/ui/shop_background.jpg")
-const RIVER_CRAB_RES = preload("res://src/features/units/templates/river_crab.tres")
-const BATTLE_CARD_SCENE = preload("res://src/features/battle/components/battle_card.tscn")
+const CARD_TOOLTIP_SCENE: PackedScene = preload("res://src/shared/ui/components/card_tooltip.tscn")
+const HP_BORDER_SHADER: Shader = preload("res://src/shared/shaders/hp_border.gdshader")
+const SHOP_BACKGROUND_TEXTURE: Texture2D = preload("res://src/assets/ui/shop_background.jpg")
+const RIVER_CRAB_RES: UnitData = preload("res://src/features/units/templates/river_crab.tres")
+const BATTLE_CARD_SCENE: PackedScene = preload("res://src/features/battle/components/battle_card.tscn")
 
-const MAX_TEAM_SIZE = 6
+const MAX_TEAM_SIZE: int = 6
 
 enum State { PLAYING, PAUSED }
 var simulation_state: State = State.PAUSED
@@ -20,7 +20,9 @@ var player_team: BattleTeam
 var enemy_team: BattleTeam
 
 var game_speed: float = 1.0
-var preview_tooltip: Control
+var preview_tooltip: CardTooltip
+var team_hp_material: ShaderMaterial
+var enemy_hp_material: ShaderMaterial
 
 
 
@@ -62,7 +64,7 @@ var enemy_slots: Array[BattleCardSlot] = []
 func _ready() -> void:
 	# Add the tooltip instance to PreviewContainer
 	if preview_container:
-		preview_tooltip = CARD_TOOLTIP_SCENE.instantiate() as Control
+		preview_tooltip = CARD_TOOLTIP_SCENE.instantiate() as CardTooltip
 		preview_tooltip.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		preview_tooltip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		preview_container.add_child(preview_tooltip)
@@ -90,8 +92,8 @@ func _ready() -> void:
 		enemy_slots[i].slot_index = i
 
 	# Configure HP border shaders
-	_configure_hp_bar_shader(team_health_bar_rect)
-	_configure_hp_bar_shader(enemy_health_bar_rect)
+	team_hp_material = _configure_hp_bar_shader(team_health_bar_rect)
+	enemy_hp_material = _configure_hp_bar_shader(enemy_health_bar_rect)
 
 	# Create BattleTeam instances
 	player_team = BattleTeam.new()
@@ -99,7 +101,7 @@ func _ready() -> void:
 	
 	# Connect signals from player_team
 	player_team.team_units_loaded.connect(_on_units_loaded.bind(player_slots))
-	player_team.health_changed.connect(_on_health_changed.bind(team_health_bar_rect, team_health_label))
+	player_team.health_changed.connect(_on_health_changed.bind(team_hp_material, team_health_label))
 	player_team.status_changed.connect(_on_status_changed.bind(
 		{
 			"poison": team_poison_badge,
@@ -116,7 +118,7 @@ func _ready() -> void:
 
 	# Connect signals from enemy_team
 	enemy_team.team_units_loaded.connect(_on_units_loaded.bind(enemy_slots))
-	enemy_team.health_changed.connect(_on_health_changed.bind(enemy_health_bar_rect, enemy_health_label))
+	enemy_team.health_changed.connect(_on_health_changed.bind(enemy_hp_material, enemy_health_label))
 	enemy_team.status_changed.connect(_on_status_changed.bind(
 		{
 			"poison": enemy_poison_badge,
@@ -148,23 +150,24 @@ func setup(p_state: RunState) -> void:
 	# Start battle start modifiers immediately
 	trigger_battle_start()
 
-func _configure_hp_bar_shader(hp_bar: Control) -> void:
+func _configure_hp_bar_shader(hp_bar: Control) -> ShaderMaterial:
 	if not hp_bar:
-		return
+		return null
 	var hp_material: ShaderMaterial = ShaderMaterial.new()
 	hp_material.shader = HP_BORDER_SHADER
 	hp_material.set_shader_parameter("fill_percentage", 1.0)
 	hp_bar.material = hp_material
 	
 	hp_bar.resized.connect(func() -> void:
-		if hp_bar.material:
-			hp_bar.material.set_shader_parameter("size", hp_bar.size)
+		if hp_material:
+			hp_material.set_shader_parameter("size", hp_bar.size)
 	)
 	
 	var initial_hp_size: Vector2 = hp_bar.size
 	if initial_hp_size.x == 0.0:
 		initial_hp_size = Vector2(340.0, 32.0)
-	hp_bar.material.set_shader_parameter("size", initial_hp_size)
+	hp_material.set_shader_parameter("size", initial_hp_size)
+	return hp_material
 
 func _apply_visual_styling() -> void:
 	# Background style
@@ -188,7 +191,7 @@ func load_battle_team() -> void:
 	# Copy team and make clones for the battle scene simulation
 	var player_units: Array[UnitInstance] = []
 	for i: int in range(MAX_TEAM_SIZE):
-		var inst: UnitInstance = run_state.active_team[i] as UnitInstance
+		var inst: UnitInstance = run_state.active_team[i]
 		if inst:
 			player_units.append(inst.clone())
 		else:
@@ -245,16 +248,18 @@ func _update_all_card_uis() -> void:
 	for i: int in range(MAX_TEAM_SIZE):
 		var slot: BattleCardSlot = player_slots[i] as BattleCardSlot
 		var card: Control = slot.get_card()
-		if card and player_team.units[i]:
-			card.update_ui()
+		if card is BattleCard and player_team.units[i]:
+			var b_card: BattleCard = card
+			b_card.update_ui()
 		else:
 			slot.update_placeholder()
 			
 	for i: int in range(MAX_TEAM_SIZE):
 		var slot: BattleCardSlot = enemy_slots[i] as BattleCardSlot
 		var card: Control = slot.get_card()
-		if card and enemy_team.units[i]:
-			card.update_ui()
+		if card is BattleCard and enemy_team.units[i]:
+			var b_card: BattleCard = card
+			b_card.update_ui()
 		else:
 			slot.update_placeholder()
 
@@ -327,8 +332,8 @@ func _on_exit_pressed() -> void:
 	# Save updated stats back to run_state
 	if run_state != null:
 		for i: int in range(MAX_TEAM_SIZE):
-			var persistent_unit: UnitInstance = run_state.active_team[i] as UnitInstance
-			var battle_unit: UnitInstance = player_team.units[i] as UnitInstance
+			var persistent_unit: UnitInstance = run_state.active_team[i]
+			var battle_unit: UnitInstance = player_team.units[i]
 			if persistent_unit and battle_unit:
 				# Copy only unified health property
 				persistent_unit.health = battle_unit.health
@@ -342,8 +347,10 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 		return
 		
 	if is_hovered:
-		if card is BattleCard and card.unit_instance:
-			CardUIHelper.show_tooltip(preview_tooltip, card.unit_instance)
+		if card is BattleCard:
+			var b_card: BattleCard = card
+			if b_card.unit_instance:
+				CardUIHelper.show_tooltip(preview_tooltip, b_card.unit_instance)
 	else:
 		CardUIHelper.hide_tooltip(preview_tooltip)
 
@@ -381,9 +388,10 @@ func get_fibonacci(n: int) -> int:
 func _update_team_slots_ui(slots_arr: Array[BattleCardSlot], loaded_units: Array[UnitInstance]) -> void:
 	for slot: BattleCardSlot in slots_arr:
 		var old_card: Control = slot.get_card()
-		if old_card:
-			slot.remove_card(old_card)
-			old_card.queue_free()
+		if old_card is BattleCard:
+			var old_b_card: BattleCard = old_card
+			slot.remove_card(old_b_card)
+			old_b_card.queue_free()
 			
 	for i: int in range(MAX_TEAM_SIZE):
 		var inst: UnitInstance = loaded_units[i]
@@ -398,13 +406,14 @@ func _update_team_slots_ui(slots_arr: Array[BattleCardSlot], loaded_units: Array
 func _on_units_loaded(loaded_units: Array[UnitInstance], slots: Array[BattleCardSlot]) -> void:
 	_update_team_slots_ui(slots, loaded_units)
 
-func _on_health_changed(current_health: int, max_health: int, shield: int, bar: Control, label: Label) -> void:
+func _on_health_changed(current_health: int, max_health: int, shield: int, mat: ShaderMaterial, label: Label) -> void:
 	var fill_pct: float = 0.0
 	if max_health > 0:
-		fill_pct = float(max(0, current_health)) / float(max_health)
+		var health_clamped: int = max(0, current_health)
+		fill_pct = float(health_clamped) / float(max_health)
 		
-	if bar and bar.material:
-		bar.material.set_shader_parameter("fill_percentage", fill_pct)
+	if mat:
+		mat.set_shader_parameter("fill_percentage", fill_pct)
 		
 	if label:
 		if shield > 0:

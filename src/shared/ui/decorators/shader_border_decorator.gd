@@ -12,6 +12,8 @@ enum BorderType { SINGLE, DOUBLE }
 @export var border_indentation: int = 3
 @export var corner_color: Color = Color(0, 0, 0, 0) # GameColors.TRANSPARENT
 
+var shader_material: ShaderMaterial
+
 func _ready() -> void:
 	var parent: Node = get_parent()
 	if parent and parent is Control:
@@ -34,47 +36,46 @@ func _ready() -> void:
 		else:
 			shader = load("res://src/shared/shaders/double_border.gdshader") as Shader
 			
-		var mat: ShaderMaterial = ShaderMaterial.new()
-		mat.shader = shader
-		material = mat
+		shader_material = ShaderMaterial.new()
+		shader_material.shader = shader
+		material = shader_material
 		
 		# Set parameters
 		update_shader_parameters()
 		
 		# Connect resized signal to follow size changes dynamically
 		resized.connect(func() -> void:
-			if material:
-				material.set_shader_parameter("size", size)
+			if shader_material:
+				shader_material.set_shader_parameter("size", size)
 		)
 		
 		# Set initial size uniform
 		call_deferred("_setup_initial_size")
 
 func _setup_initial_size() -> void:
-	if material:
+	if shader_material:
 		var parent: Node = get_parent()
 		var parent_ctrl: Control = parent as Control
 		var initial_size: Vector2 = size
 		if initial_size == Vector2.ZERO and parent_ctrl:
 			initial_size = parent_ctrl.size if parent_ctrl.size != Vector2.ZERO else parent_ctrl.custom_minimum_size
-		material.set_shader_parameter("size", initial_size)
+		shader_material.set_shader_parameter("size", initial_size)
 
 func update_shader_parameters() -> void:
-	if not material:
+	if not shader_material:
 		return
-	var mat: ShaderMaterial = material as ShaderMaterial
 	if border_type == BorderType.SINGLE:
-		mat.set_shader_parameter("border_color", border_color)
-		mat.set_shader_parameter("border_width", outer_border_width)
-		mat.set_shader_parameter("border_indentation", border_indentation)
-		mat.set_shader_parameter("interior_color", interior_color)
-		mat.set_shader_parameter("corner_color", corner_color)
+		shader_material.set_shader_parameter("border_color", border_color)
+		shader_material.set_shader_parameter("border_width", outer_border_width)
+		shader_material.set_shader_parameter("border_indentation", border_indentation)
+		shader_material.set_shader_parameter("interior_color", interior_color)
+		shader_material.set_shader_parameter("corner_color", corner_color)
 	else:
-		mat.set_shader_parameter("outer_border_color", border_color)
-		mat.set_shader_parameter("inner_border_color", inner_border_color)
-		mat.set_shader_parameter("outer_border_width", outer_border_width)
-		mat.set_shader_parameter("outer_border_indentation", border_indentation)
-		mat.set_shader_parameter("inner_border_width", inner_border_width)
-		mat.set_shader_parameter("inner_border_indentation", border_indentation)
-		mat.set_shader_parameter("interior_color", interior_color)
-		mat.set_shader_parameter("corner_color", corner_color)
+		shader_material.set_shader_parameter("outer_border_color", border_color)
+		shader_material.set_shader_parameter("inner_border_color", inner_border_color)
+		shader_material.set_shader_parameter("outer_border_width", outer_border_width)
+		shader_material.set_shader_parameter("outer_border_indentation", border_indentation)
+		shader_material.set_shader_parameter("inner_border_width", inner_border_width)
+		shader_material.set_shader_parameter("inner_border_indentation", border_indentation)
+		shader_material.set_shader_parameter("interior_color", interior_color)
+		shader_material.set_shader_parameter("corner_color", corner_color)

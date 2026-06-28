@@ -4,7 +4,8 @@ extends MarginContainer
 func _can_drop_data(at_position: Vector2, data: Variant) -> bool:
 	var parent: Node = get_parent()
 	if parent and parent.has_method("_can_drop_data"):
-		return parent.call("_can_drop_data", at_position, data) as bool
+		var result: bool = parent.call("_can_drop_data", at_position, data)
+		return result
 	return false
 
 func _drop_data(at_position: Vector2, data: Variant) -> void:

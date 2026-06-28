@@ -20,7 +20,7 @@ signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
 var slots: Array[ShopCardSlot] = []
 
 func _ready() -> void:
-	refresh_shop_button.pressed.connect(func(): roll_requested.emit())
+	refresh_shop_button.pressed.connect(func() -> void: roll_requested.emit())
 		
 	# Sell Overlay styling
 	var sell_style: StyleBoxFlat = StyleBoxFlat.new()
@@ -45,29 +45,37 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 # Drag and drop logic for selling
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	if sell_overlay and sell_overlay.visible:
-		if typeof(data) == TYPE_DICTIONARY and data.has("card"):
-			var original_slot: ShopCardSlot = data["original_slot"] as ShopCardSlot
-			# Can only sell if it comes from team or bench (not a shop slot)
-			if original_slot and not original_slot.is_shop_slot:
-				var card: Control = data["card"] as Control
-				# Only sell Card (units)
-				if card is ShopCard:
-					return true
+		if typeof(data) == TYPE_DICTIONARY:
+			var dict: Dictionary = data
+			if dict.has("original_slot") and dict.has("card"):
+				var original_slot: ShopCardSlot = dict["original_slot"]
+				# Can only sell if it comes from team or bench (not a shop slot)
+				if original_slot and not original_slot.is_shop_slot:
+					var card: Control = dict["card"]
+					# Only sell Card (units)
+					if card is ShopCard:
+						return true
 	return false
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
-	var card: Control = data["card"] as Control
-	var original_slot: ShopCardSlot = data["original_slot"] as ShopCardSlot
-	sell_card_requested.emit(card, original_slot)
+	if typeof(data) == TYPE_DICTIONARY:
+		var dict: Dictionary = data
+		if dict.has("card") and dict.has("original_slot"):
+			var card: Control = dict["card"]
+			var original_slot: ShopCardSlot = dict["original_slot"]
+			sell_card_requested.emit(card, original_slot)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_BEGIN:
 		# Check if the dragged item is sellable by querying DragManager's static variables
 		var card: Control = DragManager.dragged_card
-		var original_slot: ShopCardSlot = DragManager.dragged_card_original_slot as ShopCardSlot
+		var original_slot: ShopCardSlot = null
+		if DragManager.dragged_card_original_slot is ShopCardSlot:
+			original_slot = DragManager.dragged_card_original_slot
 		if card is ShopCard and original_slot and not original_slot.is_shop_slot:
-			if sell_label and "price" in card:
-				sell_label.text = "RELEASE TO SELL (+" + str(card.price) + "g)"
+			var shop_card: ShopCard = card
+			if sell_label:
+				sell_label.text = "RELEASE TO SELL (+" + str(shop_card.price) + "g)"
 			set_process(true)
 	elif what == NOTIFICATION_DRAG_END:
 		set_process(false)

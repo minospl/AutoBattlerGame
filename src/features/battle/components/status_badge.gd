@@ -2,7 +2,7 @@
 extends Control
 class_name StatusBadge
 
-const M5X7_FONT = preload("res://src/assets/fonts/m5x7.ttf")
+const M5X7_FONT: Font = preload("res://src/assets/fonts/m5x7.ttf")
 
 enum Type {
 	POISON,

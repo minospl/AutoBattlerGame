@@ -1,3 +1,4 @@
+class_name CardTooltip
 extends PanelContainer
 
 @onready var border_rect: ShaderBorderDecorator = $BorderRect

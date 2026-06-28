@@ -44,10 +44,12 @@ func update_ui() -> void:
 func apply_food_effect(card: Control) -> void:
 	if not item_instance:
 		return
-	var inst: UnitInstance = card.get("unit_instance") as UnitInstance
-	if inst:
-		inst.attack += item_instance.stat_boost_attack
-		inst.health += item_instance.stat_boost_hp
+	if card is ShopCard:
+		var shop_card: ShopCard = card
+		var inst: UnitInstance = shop_card.unit_instance
+		if inst:
+			inst.attack += item_instance.stat_boost_attack
+			inst.health += item_instance.stat_boost_hp
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Keep the card in place but dim it visually

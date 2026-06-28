@@ -26,7 +26,7 @@ var gold: int = 10:
 		if is_inside_tree() and shop_panel:
 			shop_panel.gold = gold
 
-var slot_scene = preload("res://src/features/shop/components/shop_card_slot.tscn")
+var slot_scene: PackedScene = preload("res://src/features/shop/components/shop_card_slot.tscn")
 
 var active_slots: Array[ShopCardSlot]:
 	get:
@@ -36,7 +36,7 @@ var bench_slots: Array[ShopCardSlot]:
 	get:
 		return bench_panel.slots
 
-var preview_tooltip: Control
+var preview_tooltip: CardTooltip
 
 func _ready() -> void:
 	active_team.resize(active_slot_count)
@@ -57,8 +57,8 @@ func _ready() -> void:
 	
 	# Setup the side preview panel
 	if has_node("%PreviewContainer"):
-		var tooltip_scene = load("res://src/shared/ui/components/card_tooltip.tscn")
-		preview_tooltip = tooltip_scene.instantiate()
+		var tooltip_scene: PackedScene = load("res://src/shared/ui/components/card_tooltip.tscn") as PackedScene
+		preview_tooltip = tooltip_scene.instantiate() as CardTooltip
 		# Align the preview card to the top of the margin container (height of the bench)
 		preview_tooltip.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		preview_tooltip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -263,7 +263,7 @@ func _on_roll_requested() -> void:
 func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void:
 	var refund_gold: int = 1
 	if "price" in card:
-		refund_gold = card.get("price") as int
+		refund_gold = card.get("price")
 		
 	card.queue_free()
 	if original_slot:
@@ -335,11 +335,15 @@ func set_preview_card(card: Control) -> void:
 	if not preview_tooltip:
 		return
 		
-	if card is ShopCard and card.unit_instance:
-		CardUIHelper.show_tooltip(preview_tooltip, card.unit_instance)
-		_on_card_hovered(card, true)
-	elif card is ShopCardItem and card.item_instance:
-		CardUIHelper.show_item_tooltip(preview_tooltip, card.item_instance)
+	if card is ShopCard:
+		var shop_card: ShopCard = card
+		if shop_card.unit_instance:
+			CardUIHelper.show_tooltip(preview_tooltip, shop_card.unit_instance)
+			_on_card_hovered(shop_card, true)
+	elif card is ShopCardItem:
+		var item_card: ShopCardItem = card
+		if item_card.item_instance:
+			CardUIHelper.show_item_tooltip(preview_tooltip, item_card.item_instance)
 
 func clear_preview_card(card: Control = null) -> void:
 	if not preview_tooltip:
@@ -385,12 +389,16 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 					active_slots[t_idx].set_target_highlight(true)
 
 func _connect_card_signals(card: Control) -> void:
-	if card.has_signal("hovered"):
-		if not card.hovered.is_connected(_on_card_hover_changed):
-			card.hovered.connect(_on_card_hover_changed)
-	if card.has_signal("clicked"):
-		if not card.clicked.is_connected(_on_card_clicked):
-			card.clicked.connect(_on_card_clicked)
+	if card is ShopCard:
+		var shop_card: ShopCard = card
+		if not shop_card.hovered.is_connected(_on_card_hover_changed):
+			shop_card.hovered.connect(_on_card_hover_changed)
+		if not shop_card.clicked.is_connected(_on_card_clicked):
+			shop_card.clicked.connect(_on_card_clicked)
+	elif card is ShopCardItem:
+		var item_card: ShopCardItem = card
+		if not item_card.hovered.is_connected(_on_card_hover_changed):
+			item_card.hovered.connect(_on_card_hover_changed)
 
 func _on_card_hover_changed(card: Control, is_hovered: bool) -> void:
 	if is_hovered:
@@ -468,7 +476,8 @@ func load_state_from_run() -> void:
 			if item_or_unit is UnitInstance:
 				var card_scene: PackedScene = load("res://src/features/shop/components/shop_card.tscn") as PackedScene
 				var card: ShopCard = card_scene.instantiate() as ShopCard
-				card.unit_instance = item_or_unit as UnitInstance
+				var unit_inst: UnitInstance = item_or_unit
+				card.unit_instance = unit_inst
 				_connect_card_signals(card)
 				slot.add_card(card)
 			elif item_or_unit is ShopItemInstance:

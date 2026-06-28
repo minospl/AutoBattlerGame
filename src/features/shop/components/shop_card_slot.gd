@@ -15,7 +15,8 @@ signal slot_changed(slot: ShopCardSlot)
 	set(val):
 		price = val
 		if has_node("%PriceLabel"):
-			%PriceLabel.text = str(price) + "g"
+			var label: Label = get_node("%PriceLabel")
+			label.text = str(price) + "g"
 var is_frozen: bool = false
 
 var is_highlighted: bool = false
@@ -35,47 +36,32 @@ func _ready() -> void:
 	card_container.child_entered_tree.connect(func(_node: Node) -> void: update_placeholder.call_deferred())
 	card_container.child_exiting_tree.connect(func(_node: Node) -> void: update_placeholder.call_deferred())
 	
-	# Load and assign the health bar shader material
-	var hp_shader: Shader = load("res://src/shared/shaders/hp_border.gdshader") as Shader
-	var hp_material: ShaderMaterial = ShaderMaterial.new()
-	hp_material.shader = hp_shader
-	hp_material.set_shader_parameter("fill_percentage", 1.0)
-	%HealthBarRect.material = hp_material
-	
-	%HealthBarRect.resized.connect(func() -> void:
-		if %HealthBarRect.material:
-			%HealthBarRect.material.set_shader_parameter("size", %HealthBarRect.size)
-	)
-	
-	# Set initial size uniform to actual size or fallback to custom minimum size
-	if %HealthBarRect.material:
-		var initial_hp_size: Vector2 = %HealthBarRect.size
-		if initial_hp_size.x == 0.0:
-			initial_hp_size = Vector2(84, 20)
-		%HealthBarRect.material.set_shader_parameter("size", initial_hp_size)
-	
 	update_placeholder()
 	
 	# Setup Shop Controls
 	if is_shop_slot:
 		custom_minimum_size.y = 160
 		if has_node("%ShopControls"):
-			%ShopControls.visible = true
-			%PriceLabel.text = str(price) + "g"
-			%FreezeButton.toggled.connect(func(pressed: bool):
+			var controls: Control = get_node("%ShopControls")
+			controls.visible = true
+			var price_lbl: Label = get_node("%PriceLabel")
+			price_lbl.text = str(price) + "g"
+			var freeze_btn: Button = get_node("%FreezeButton")
+			freeze_btn.toggled.connect(func(pressed: bool) -> void:
 				is_frozen = pressed
 				_update_freeze_button_style()
 			)
 			_update_freeze_button_style()
 	else:
 		if has_node("%ShopControls"):
-			%ShopControls.visible = false
+			var controls: Control = get_node("%ShopControls")
+			controls.visible = false
 		custom_minimum_size.y = 135
 
 func _update_freeze_button_style() -> void:
 	if not has_node("%FreezeButton"):
 		return
-	var btn: Button = %FreezeButton as Button
+	var btn: Button = get_node("%FreezeButton")
 	if is_frozen:
 		btn.add_theme_color_override("font_color", Color(0.3, 0.7, 1.0)) # Ice blue
 		btn.text = "❄"
@@ -114,18 +100,14 @@ func set_target_highlight(active: bool) -> void:
 func update_placeholder() -> void:
 	var empty: bool = is_empty()
 	if card_container.has_node("EmptyPlaceholderLabel"):
-		card_container.get_node("EmptyPlaceholderLabel").visible = empty
+		var lbl: Control = card_container.get_node("EmptyPlaceholderLabel")
+		lbl.visible = empty
 		
 	var border_rect: ShaderBorderDecorator = card_container.get_node_or_null("BorderRect") as ShaderBorderDecorator
 	if border_rect:
 		border_rect.visible = empty
 		
 	update_style()
-	update_health_bar()
-
-func update_health_bar() -> void:
-	# HP bar is disabled in the shop scene to keep card visuals clean.
-	%HealthBarContainer.visible = false
 
 func _process(_delta: float) -> void:
 	if is_highlighted and get_viewport().gui_is_dragging():
@@ -142,29 +124,32 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	if is_shop_slot:
 		return false # Cannot drop cards into shop slots!
 		
-	if typeof(data) == TYPE_DICTIONARY and data.has("card"):
-		var dragged_card: Control = data["card"] as Control
-		var original_slot: ShopCardSlot = data["original_slot"] as ShopCardSlot
+	if typeof(data) == TYPE_DICTIONARY:
+		var dict: Dictionary = data
+		if dict.has("card") and dict.has("original_slot"):
+			var dragged_card: Control = dict["card"]
+			var original_slot: ShopCardSlot = dict["original_slot"]
+			
+			# Check if the player has enough gold for a purchase
+			if original_slot and original_slot.is_shop_slot:
+				if gold_provider.is_valid():
+					var current_gold: int = gold_provider.call()
+					if current_gold < original_slot.price:
+						return false # Cannot afford this card
+			
+			# If the dragged card is food:
+			if dragged_card is ShopCardItem:
+				# Food can ONLY be dropped onto an occupied unit slot to consume it
+				var target_card: Control = get_card()
+				if target_card and "unit_instance" in target_card:
+					update_style(true)
+					return true
+				return false
 		
-		# Check if the player has enough gold for a purchase
-		if original_slot and original_slot.is_shop_slot:
-			if gold_provider.is_valid():
-				var current_gold: int = gold_provider.call() as int
-				if current_gold < original_slot.price:
-					return false # Cannot afford this card
-		
-		# If the dragged card is food:
-		if dragged_card.has_method("apply_food_effect"):
-			# Food can ONLY be dropped onto an occupied unit slot to consume it
-			var target_card: Control = get_card()
-			if target_card and "unit_instance" in target_card:
-				update_style(true)
-				return true
-			return false
-		else:
 			# Normal unit card
 			update_style(true)
 			return true
+			
 	return false
 
 # Handle cleanup when drag drops elsewhere, leaves the slot, or is canceled
@@ -173,66 +158,69 @@ func _notification(what: int) -> void:
 		# Restore proper style based on slot occupancy
 		update_style(false)
 
-# Handle drop execution
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	update_style(false)
 	
-	var dragged_card: Control = data["card"] as Control
-	var original_slot: ShopCardSlot = data["original_slot"] as ShopCardSlot
-	
-	if original_slot == self:
-		add_card(dragged_card)
-		slot_changed.emit(self)
-		return
-		
-	var current_card: Control = get_card()
-	
-	# 1. If dragged card is food:
-	if dragged_card.has_method("apply_food_effect"):
-		if current_card and "unit_instance" in current_card:
-			# Apply food stats directly to unit in this slot
-			dragged_card.apply_food_effect(current_card)
-			current_card.update_ui()
-			update_health_bar()
+	if typeof(data) == TYPE_DICTIONARY:
+		var dict: Dictionary = data
+		if dict.has("card") and dict.has("original_slot"):
+			var dragged_card: Control = dict["card"]
+			var original_slot: ShopCardSlot = dict["original_slot"]
 			
-			# Deduct gold if purchased
+			if original_slot == self:
+				add_card(dragged_card)
+				slot_changed.emit(self)
+				return
+				
+			var current_card: Control = get_card()
+			
+			# 1. If dragged card is food:
+			if dragged_card is ShopCardItem:
+				var food_card: ShopCardItem = dragged_card
+				if current_card is ShopCard:
+					var shop_card: ShopCard = current_card
+					# Apply food stats directly to unit in this slot
+					food_card.apply_food_effect(shop_card)
+					shop_card.update_ui()
+					
+					# Deduct gold if purchased
+					if original_slot and original_slot.is_shop_slot:
+						if gold_deductor.is_valid():
+							gold_deductor.call(original_slot.price)
+						if shop_refiller.is_valid():
+							shop_refiller.call(original_slot.slot_index)
+					
+					# Consume food item
+					if dragged_card.get_parent() != null:
+						dragged_card.get_parent().remove_child(dragged_card)
+					if not dragged_card.is_queued_for_deletion():
+						dragged_card.queue_free()
+					
+					slot_changed.emit(self)
+					if original_slot:
+						original_slot.slot_changed.emit(original_slot)
+					return
+					
+			# 2. Normal unit card move/swap:
+			if current_card:
+				# SWAP logic: Swap the parent slots of the two cards
+				remove_card(current_card)
+				add_card(dragged_card)
+				original_slot.add_card(current_card)
+			else:
+				# MOVE logic: Move card from original slot to this empty slot
+				add_card(dragged_card)
+				
+			# Deduct gold if purchased from the shop
 			if original_slot and original_slot.is_shop_slot:
 				if gold_deductor.is_valid():
 					gold_deductor.call(original_slot.price)
 				if shop_refiller.is_valid():
 					shop_refiller.call(original_slot.slot_index)
-			
-			# Consume food item
-			if dragged_card.get_parent() != null:
-				dragged_card.get_parent().remove_child(dragged_card)
-			if not dragged_card.is_queued_for_deletion():
-				dragged_card.queue_free()
-			
+					
+			# Emit signals
 			slot_changed.emit(self)
-			if original_slot:
-				original_slot.slot_changed.emit(original_slot)
-			return
-			
-	# 2. Normal unit card move/swap:
-	if current_card:
-		# SWAP logic: Swap the parent slots of the two cards
-		remove_card(current_card)
-		add_card(dragged_card)
-		original_slot.add_card(current_card)
-	else:
-		# MOVE logic: Move card from original slot to this empty slot
-		add_card(dragged_card)
-		
-	# Deduct gold if purchased from the shop
-	if original_slot and original_slot.is_shop_slot:
-		if gold_deductor.is_valid():
-			gold_deductor.call(original_slot.price)
-		if shop_refiller.is_valid():
-			shop_refiller.call(original_slot.slot_index)
-			
-	# Emit signals
-	slot_changed.emit(self)
-	original_slot.slot_changed.emit(original_slot)
+			original_slot.slot_changed.emit(original_slot)
 
 func add_card(card: Control) -> void:
 	if has_node("CardContainer"):
@@ -240,7 +228,7 @@ func add_card(card: Control) -> void:
 		if "slot" in card:
 			card.set("slot", self)
 		if is_shop_slot and "price" in card:
-			price = card.get("price") as int
+			price = card.get("price")
 
 func remove_card(card: Control) -> void:
 	if has_node("CardContainer"):
@@ -265,5 +253,6 @@ func is_empty() -> bool:
 func get_unit_instance() -> UnitInstance:
 	var card: Control = get_card()
 	if card and "unit_instance" in card:
-		return card.get("unit_instance") as UnitInstance
+		var inst: UnitInstance = card.get("unit_instance")
+		return inst
 	return null

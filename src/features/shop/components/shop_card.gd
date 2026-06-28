@@ -134,7 +134,8 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
-		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		var mouse_event: InputEventMouseButton = event
+		if mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
 			if slot and slot.is_shop_slot:
 				clicked.emit(self)
 				accept_event()

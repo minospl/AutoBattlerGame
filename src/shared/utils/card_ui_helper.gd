@@ -1,7 +1,7 @@
 class_name CardUIHelper
 extends Object
 
-const CHROMA_KEY_SHADER = preload("res://src/shared/shaders/chroma_key.gdshader")
+const CHROMA_KEY_SHADER: Shader = preload("res://src/shared/shaders/chroma_key.gdshader")
 
 ## Shared helper to configure card unit visuals (Attack, Poison, sprite, indicators)
 static func setup_card_visuals(
@@ -94,8 +94,10 @@ static func setup_card_visuals(
 			stats_hbox.add_child(panel)
 			var label: Label = panel.find_child("*Label", true, false) as Label
 			if label:
-				label.text = format_large_number(stat.value as int)
-			setup_stat_panel_shader(panel, stat.color as Color, stat_size)
+				var stat_val: int = stat.value
+				label.text = format_large_number(stat_val)
+			var stat_color: Color = stat.color
+			setup_stat_panel_shader(panel, stat_color, stat_size)
 			panel.visible = true
 			
 	# 2. Setup sprite / fallback portrait
@@ -220,19 +222,17 @@ static func setup_item_visuals(
 			hp_panel.visible = false
 
 ## Tooltip Display Manager helpers
-static func show_tooltip(tooltip: Control, unit_instance: UnitInstance) -> void:
+static func show_tooltip(tooltip: CardTooltip, unit_instance: UnitInstance) -> void:
 	if tooltip and unit_instance:
-		if tooltip.has_method("setup_for_unit"):
-			tooltip.setup_for_unit(unit_instance)
-			tooltip.visible = true
+		tooltip.setup_for_unit(unit_instance)
+		tooltip.visible = true
 
-static func show_item_tooltip(tooltip: Control, item_card: Resource) -> void:
+static func show_item_tooltip(tooltip: CardTooltip, item_card: ShopItemInstance) -> void:
 	if tooltip and item_card:
-		if tooltip.has_method("setup_for_item"):
-			tooltip.setup_for_item(item_card)
-			tooltip.visible = true
+		tooltip.setup_for_item(item_card)
+		tooltip.visible = true
 
-static func hide_tooltip(tooltip: Control) -> void:
+static func hide_tooltip(tooltip: CardTooltip) -> void:
 	if tooltip:
 		tooltip.visible = false
 

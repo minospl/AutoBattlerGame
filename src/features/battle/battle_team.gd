@@ -9,7 +9,7 @@ signal cast_progress_changed(slot_idx: int, ratio: float)
 signal floating_text_requested(text: String, color: Color, is_on_slot: bool, slot_idx: int)
 signal team_defeated()
 
-const MAX_TEAM_SIZE = 6
+const MAX_TEAM_SIZE: int = 6
 
 # Combat State
 var units: Array[UnitInstance] = []
