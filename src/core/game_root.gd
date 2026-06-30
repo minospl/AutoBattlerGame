@@ -96,7 +96,7 @@ func generate_enemy_team(p_day: int) -> Array[UnitInstance]:
 	var enemies: Array[UnitInstance] = []
 	enemies.resize(6)
 	
-	var team_size: int = clampi(1 + (p_day - 1) / 2, 1, 6)
+	var team_size: int = clampi(1 + floori((p_day - 1) / 2.0), 1, 6)
 	
 	var max_price_unlocked: int = 2
 	if p_day >= 3 and p_day <= 4:
@@ -117,7 +117,7 @@ func generate_enemy_team(p_day: int) -> Array[UnitInstance]:
 		var inst: UnitInstance = UnitInstance.new()
 		inst.initialize(template)
 		
-		var target_level: int = clampi(1 + (p_day - 1) / 3, 1, 3)
+		var target_level: int = clampi(1 + floori((p_day - 1) / 3.0), 1, 3)
 		while inst.level < target_level:
 			inst.level_up()
 			

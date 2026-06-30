@@ -21,3 +21,5 @@ func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
 func get_description(p_level: int = 1) -> String:
 	var amount: int = int(get_modifier_value(p_level))
 	return "%s\nGenerate [color=gold]%d Gold[/color] on cast" % [get_trigger_name(), amount]
+
+

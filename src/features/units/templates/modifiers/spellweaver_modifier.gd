@@ -28,3 +28,6 @@ func get_description(p_level: int = 1) -> String:
 			target_possession = "the ally to the [color=%s]LEFT[/color]'" % GameColors.DESC_TARGET
 			
 	return "%s\nTrigger %s %s effect" % [get_trigger_name(), target_possession, get_trigger_name(Trigger.ON_BATTLE_START)]
+
+func get_implied_keywords() -> Array[String]:
+	return ["trigger_battle_start"]

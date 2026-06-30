@@ -4,8 +4,8 @@ extends ColorRect
 enum BorderType { SINGLE, DOUBLE }
 
 @export var border_type: BorderType = BorderType.DOUBLE
-@export var border_color: Color = Color(0.29, 0.251, 0.255, 1.0) # GameColors.PANEL_BORDER_DEFAULT
-@export var inner_border_color: Color = Color(1.0, 1.0, 1.0, 1.0) # GameColors.WHITE_COLOR
+@export var border_color: Color = GameColors.PANEL_BORDER_DEFAULT
+@export var inner_border_color: Color = GameColors.BORDER_INNER_DEFAULT
 @export var interior_color: Color = Color(0, 0, 0, 0)
 @export var outer_border_width: int = 3
 @export var inner_border_width: int = 3

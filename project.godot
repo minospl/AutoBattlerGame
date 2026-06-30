@@ -34,6 +34,10 @@ window/stretch/aspect="expand"
 
 theme/custom="res://src/shared/ui/theme/game_theme.tres"
 
+[internationalization]
+
+locale/translations=PackedStringArray("res://src/shared/localization/game_strings.en.translation")
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

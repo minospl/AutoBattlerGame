@@ -53,11 +53,11 @@ func _ready() -> void:
 	add_child(_main_hbox)
 	
 	var children_to_move: Array[Node] = []
-	for child in get_children():
+	for child: Node in get_children():
 		if child != _main_hbox:
 			children_to_move.append(child)
 			
-	for child in children_to_move:
+	for child: Node in children_to_move:
 		remove_child(child)
 		_main_tooltip_wrapper.add_child(child)
 	
@@ -78,7 +78,7 @@ func _ready() -> void:
 func _set_mouse_filter_ignore_recursive(node: Node) -> void:
 	if node is Control:
 		(node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for child in node.get_children():
+	for child: Node in node.get_children():
 		_set_mouse_filter_ignore_recursive(child)
 
 func setup_for_unit(unit_instance: UnitInstance) -> void:
@@ -94,7 +94,7 @@ func setup_for_item(item_card: ShopItemInstance) -> void:
 	if is_node_ready():
 		_setup_item_ui()
 		if _keywords_vbox:
-			for child in _keywords_vbox.get_children():
+			for child: Node in _keywords_vbox.get_children():
 				child.queue_free()
 
 func _setup_unit_ui() -> void:
@@ -286,12 +286,12 @@ func _build_keywords() -> void:
 		return
 		
 	# Clear old nodes
-	for child in _keywords_vbox.get_children():
+	for child: Node in _keywords_vbox.get_children():
 		child.queue_free()
 		
-	var keywords: Array[Dictionary] = _get_relevant_keywords()
-	for kw in keywords:
-		var panel: PanelContainer = _create_keyword_panel(kw["title"], kw["desc"])
+	var keywords: Array[Dictionary] = KeywordDatabase.get_keywords_for_unit(_unit_instance, _unit_instance.level)
+	for kw: Dictionary in keywords:
+		var panel: PanelContainer = _create_keyword_panel(str(kw["title"]), str(kw["desc"]))
 		_keywords_vbox.add_child(panel)
 
 func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
@@ -300,11 +300,11 @@ func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
 	panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	
 	var border: ShaderBorderDecorator = ShaderBorderDecorator.new()
-	border.border_type = ShaderBorderDecorator.BorderType.SINGLE
-	border.border_color = Color(0.5, 0.55, 0.6) # Lighter steel grey border
+	border.border_type = ShaderBorderDecorator.BorderType.DOUBLE
+	# border.border_color = Color(0.5, 0.55, 0.6) # Lighter steel grey border
 	border.interior_color = Color(1.0, 1.0, 1.0) # Solid white background
 	border.outer_border_width = 2
-	border.inner_border_width = 0
+	border.inner_border_width = 2
 	border.border_indentation = 1
 	panel.add_child(border)
 	
@@ -343,96 +343,7 @@ func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
 	_set_mouse_filter_ignore_recursive(panel)
 	return panel
 
-func _get_relevant_keywords() -> Array[Dictionary]:
-	var list: Array[Dictionary] = []
-	if not _unit_instance:
-		return list
-		
-	# 1. Combat stats / status effects
-	if _unit_instance.shield > 0:
-		list.append({"title": "Shield", "desc": "Absorbs incoming damage before it affects the team health pool."})
-	if _unit_instance.heal > 0:
-		list.append({"title": "Heal", "desc": "Restores team health up to its maximum capacity."})
-	if _unit_instance.poison > 0:
-		list.append({"title": "Poison", "desc": "Deals damage equal to the number of stacks every 1.0 second."})
-	if _unit_instance.burn > 0:
-		list.append({"title": "Burn", "desc": "Deals damage equal to the number of stacks every 0.5 seconds, then decreases by 1 stack."})
-	if _unit_instance.electrocute > 0:
-		list.append({"title": "Electrocute", "desc": "Increases the next damage received by the team by the number of stacks."})
-		
-	# 2. Modifier properties
-	if _unit_instance.data and _unit_instance.data.modifier:
-		var mod: UnitModifier = _unit_instance.data.modifier
-		var lvl: int = _unit_instance.level
-		
-		# Trigger
-		match mod.trigger:
-			UnitModifier.Trigger.ON_CAST:
-				list.append({"title": "On Cast", "desc": "Triggers immediately after this unit performs its main action (cast timer reaches maximum)."})
-			UnitModifier.Trigger.ON_BATTLE_START:
-				list.append({"title": "On Battle Start", "desc": "Triggers once at the very beginning of the combat phase."})
-			UnitModifier.Trigger.ON_TAKE_DAMAGE:
-				list.append({"title": "On Take Damage", "desc": "Triggers whenever the team health pool takes damage."})
-				
-		# Target
-		var target_type: UnitModifier.TargetType = mod.get_target(lvl)
-		match target_type:
-			UnitModifier.TargetType.HORIZONTAL:
-				list.append({"title": "Horizontal", "desc": "Targets allies directly adjacent horizontally (left and right neighbors)."})
-			UnitModifier.TargetType.HORIZONTAL_PLUS:
-				list.append({"title": "Horizontal+", "desc": "Targets all other allies in the same row."})
-			UnitModifier.TargetType.VERTICAL:
-				list.append({"title": "Vertical", "desc": "Targets allies directly above or below this unit."})
-			UnitModifier.TargetType.ADJACENT:
-				list.append({"title": "Adjacent", "desc": "Targets all adjacent allies (left, right, up, down neighbors)."})
-			UnitModifier.TargetType.UP:
-				list.append({"title": "Up", "desc": "Targets the ally directly above this unit."})
-			UnitModifier.TargetType.DOWN:
-				list.append({"title": "Down", "desc": "Targets the ally directly below this unit."})
-			UnitModifier.TargetType.LEFT:
-				list.append({"title": "Left", "desc": "Targets the ally directly to the left."})
-			UnitModifier.TargetType.RIGHT:
-				list.append({"title": "Right", "desc": "Targets the ally directly to the right."})
-			UnitModifier.TargetType.LEFT_PLUS:
-				list.append({"title": "Left+", "desc": "Targets all allies to the left of this unit in the same row."})
-			UnitModifier.TargetType.RIGHT_PLUS:
-				list.append({"title": "Right+", "desc": "Targets all allies to the right of this unit in the same row."})
-			UnitModifier.TargetType.ALL:
-				list.append({"title": "All", "desc": "Targets all other allies in the team."})
 
-		# Duration
-		var is_perm: bool = false
-		if mod.has_method("is_permanent"):
-			is_perm = mod.is_permanent(lvl)
-		if is_perm:
-			list.append({"title": "Permanent", "desc": "Effects permanently modify the unit's base stats and persist across rounds."})
-		else:
-			list.append({"title": "For Battle", "desc": "Effects last only for the duration of the current combat phase and reset afterward."})
-			
-		# 3. Specific modifier script name checks for implied keywords
-		var mod_script_path: String = ""
-		var mod_script: Script = mod.get_script() as Script
-		if mod_script:
-			mod_script_path = mod_script.resource_path.get_file().to_lower()
-			
-		if ("forest_guardian" in mod_script_path or "river_crab" in mod_script_path) and not _has_keyword(list, "Shield"):
-			list.append({"title": "Shield", "desc": "Absorbs incoming damage before it affects the team health pool."})
-		if "wild_wolf" in mod_script_path and not _has_keyword(list, "Heal"):
-			list.append({"title": "Heal", "desc": "Restores team health up to its maximum capacity."})
-		if "red_dragon" in mod_script_path and not _has_keyword(list, "Burn"):
-			list.append({"title": "Burn", "desc": "Deals damage equal to the number of stacks every 0.5 seconds, then decreases by 1 stack."})
-		if ("chronomancer" in mod_script_path or "spellweaver" in mod_script_path) and not _has_keyword(list, "Cast Speed"):
-			list.append({"title": "Cast Speed", "desc": "The speed at which this unit charges its action bar to perform actions."})
-		if "golden_beetle" in mod_script_path and not _has_keyword(list, "Gold"):
-			list.append({"title": "Gold", "desc": "Currency used in the shop phase to buy, reroll, or upgrade units."})
-
-	return list
-
-func _has_keyword(list: Array[Dictionary], title: String) -> bool:
-	for item in list:
-		if item["title"] == title:
-			return true
-	return false
 
 func _update_keywords_visibility(show_keywords: bool) -> void:
 	if not _keywords_vbox:

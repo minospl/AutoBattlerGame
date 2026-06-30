@@ -29,3 +29,6 @@ func get_description(p_level: int = 1) -> String:
 	var reduction: float = get_modifier_value(p_level)
 	var target_phrase: String = "the ally to the [color=%s]RIGHT[/color]" % GameColors.DESC_TARGET if p_level < 3 else "[color=%s]HORIZONTAL[/color] allies" % GameColors.DESC_TARGET
 	return "%s\nReduce cast cooldown of %s by %.1fs for this battle" % [get_trigger_name(), target_phrase, reduction]
+
+func get_implied_keywords() -> Array[String]:
+	return ["cast_speed"]

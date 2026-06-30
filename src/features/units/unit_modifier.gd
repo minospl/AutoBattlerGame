@@ -53,3 +53,6 @@ func get_description(_p_level: int = 1) -> String:
 	push_error("Abstract method get_description() must be overridden in subclass of UnitModifier!")
 	assert(false, "Subclass must override get_description()")
 	return ""
+
+func get_implied_keywords() -> Array[String]:
+	return []

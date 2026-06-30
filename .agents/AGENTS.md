@@ -96,3 +96,5 @@ Podczas edycji lub rozbudowy tego projektu muszę przestrzegać następujących 
 3.  **Architektura bez Autoloadów (Singletons):** Stan gry (`RunState`) nie jest singletonem. Jest przekazywany bezpośrednio między scenami w funkcjach `setup()`. Należy unikać wprowadzania globalnych autoloadów, chyba że jest to absolutnie konieczne.
 4.  **Podział Logiki i UI:** Komponenty interfejsu (np. `ShopCardSlot`, `BattleCardSlot`) wizualizują stan logiczny obiektów typu `UnitInstance` i `ShopItemInstance`. Zmiany w UI muszą być synchronizowane z danymi w logicznych strukturach (funkcja `sync_data_from_ui()`).
 5.  **Zachowanie Premium UI:** Zmiany wizualne powinny zachowywać estetyczny, spójny styl gry (ciemne tła, dopasowane kolory zdefiniowane w `GameColors`, płynne przejścia).
+6.  **Minimalizacja halucynacji i weryfikacja kodu:** Zanim założysz istnienie jakiejkolwiek metody, zmiennej lub wartości enuma w klasach pomocniczych (np. `UnitModifier.Trigger`), ZAWSZE otwórz i przeanalizuj powiązane pliki źródłowe (.gd lub .tres) w celu weryfikacji ich rzeczywistej implementacji. Jeśli nie jesteś czegoś pewien, zbadaj bazę kodu zamiast zgadywać.
+

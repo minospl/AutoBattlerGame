@@ -1,0 +1,53 @@
+keys,en
+KEYWORD_SHIELD_TITLE,Shield
+KEYWORD_SHIELD_DESC,Absorbs incoming damage before it affects the team health pool.
+KEYWORD_HEAL_TITLE,Heal
+KEYWORD_HEAL_DESC,Restores team health up to its maximum capacity.
+KEYWORD_POISON_TITLE,Poison
+KEYWORD_POISON_DESC,Deals damage equal to the number of stacks every 1.0 second.
+KEYWORD_BURN_TITLE,Burn
+KEYWORD_BURN_DESC,"Deals damage equal to the number of stacks every 0.5 seconds, then decreases by 1 stack."
+KEYWORD_ELECTRO_TITLE,Electrocute
+KEYWORD_ELECTRO_DESC,Increases the next damage received by the team by the number of stacks.
+KEYWORD_CAST_SPEED_TITLE,Cast Speed
+KEYWORD_CAST_SPEED_DESC,The speed at which this unit charges its action bar to perform actions.
+KEYWORD_GOLD_TITLE,Gold
+KEYWORD_GOLD_DESC,Currency used in the shop phase to buy, reroll, or upgrade units.
+KEYWORD_TARGET_SELF_TITLE,Self
+KEYWORD_TARGET_SELF_DESC,Targets this unit itself.
+KEYWORD_TARGET_HORIZONTAL_TITLE,Horizontal
+KEYWORD_TARGET_HORIZONTAL_DESC,Targets allies directly adjacent horizontally (left and right neighbors).
+KEYWORD_TARGET_VERTICAL_TITLE,Vertical
+KEYWORD_TARGET_VERTICAL_DESC,Targets allies directly above or below this unit.
+KEYWORD_TARGET_UP_TITLE,Up
+KEYWORD_TARGET_UP_DESC,Targets the ally directly above this unit.
+KEYWORD_TARGET_DOWN_TITLE,Down
+KEYWORD_TARGET_DOWN_DESC,Targets the ally directly below this unit.
+KEYWORD_TARGET_HORIZONTAL_PLUS_TITLE,Horizontal+
+KEYWORD_TARGET_HORIZONTAL_PLUS_DESC,Targets all other allies in the same row.
+KEYWORD_TARGET_ADJACENT_TITLE,Adjacent
+KEYWORD_TARGET_ADJACENT_DESC,Targets all adjacent allies (left, right, above, and below).
+KEYWORD_TARGET_LEFT_TITLE,Left
+KEYWORD_TARGET_LEFT_DESC,Targets the ally directly to the left.
+KEYWORD_TARGET_RIGHT_TITLE,Right
+KEYWORD_TARGET_RIGHT_DESC,Targets the ally directly to the right.
+KEYWORD_TARGET_LEFT_PLUS_TITLE,Left+
+KEYWORD_TARGET_LEFT_PLUS_DESC,Targets all allies to the left of this unit in the same row.
+KEYWORD_TARGET_RIGHT_PLUS_TITLE,Right+
+KEYWORD_TARGET_RIGHT_PLUS_DESC,Targets all allies to the right of this unit in the same row.
+KEYWORD_TARGET_ALL_TITLE,All
+KEYWORD_TARGET_ALL_DESC,Targets all other allies in the team.
+KEYWORD_TRIGGER_BATTLE_START_TITLE,On Battle Start
+KEYWORD_TRIGGER_BATTLE_START_DESC,Triggers once at the start of the battle phase.
+KEYWORD_TRIGGER_CAST_TITLE,On Cast
+KEYWORD_TRIGGER_CAST_DESC,Triggers after the unit completes charging and performs an action.
+KEYWORD_TRIGGER_TAKE_DAMAGE_TITLE,On Take Damage
+KEYWORD_TRIGGER_TAKE_DAMAGE_DESC,Triggers whenever the team health pool takes damage.
+KEYWORD_TRIGGER_ALLY_DEFEATED_TITLE,On Ally Defeated
+KEYWORD_TRIGGER_ALLY_DEFEATED_DESC,Triggers whenever an ally unit is defeated.
+KEYWORD_TRIGGER_DEFEATED_TITLE,On Defeated
+KEYWORD_TRIGGER_DEFEATED_DESC,Triggers when this unit is defeated.
+KEYWORD_DURATION_PERMANENT_TITLE,Permanent
+KEYWORD_DURATION_PERMANENT_DESC,Effects permanently modify the unit's base stats and persist across rounds.
+KEYWORD_DURATION_BATTLE_TITLE,For Battle
+KEYWORD_DURATION_BATTLE_DESC,Effects last only for the duration of the current combat phase and reset afterward.
