@@ -8,6 +8,7 @@ signal status_changed(status_type: String, amount: int, cooldown_ratio: float)
 signal cast_progress_changed(slot_idx: int, ratio: float)
 signal floating_text_requested(text: String, color: Color, is_on_slot: bool, slot_idx: int)
 signal team_defeated()
+signal gold_generated(amount: int, slot_idx: int)
 
 const MAX_TEAM_SIZE: int = 6
 
@@ -55,6 +56,7 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 			units[i] = battle_inst
 			health += battle_inst.get_max_health()
 			max_health += battle_inst.get_max_health()
+			shield += battle_inst.shield
 		else:
 			units[i] = null
 			
@@ -299,7 +301,22 @@ func buff_unit_cast_speed(slot_idx: int, amount: float, permanent: bool = false)
 		return
 	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
 	if b_unit:
+		if b_unit.cast_speed <= 0.1:
+			return
+		var old_speed: float = b_unit.cast_speed
 		b_unit.cast_speed = maxf(0.1, b_unit.cast_speed - amount)
+		var actual_reduction: float = old_speed - b_unit.cast_speed
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.cast_speed = maxf(0.1, b_unit.base_unit.cast_speed - amount)
-	spawn_floating_text_on_slot(slot_idx, "-" + str(amount) + "s CD", Color(0.5, 0.8, 1.0))
+		if actual_reduction > 0.0:
+			var reduction_str: String = ""
+			if is_equal_approx(actual_reduction, roundf(actual_reduction)):
+				reduction_str = str(int(roundf(actual_reduction)))
+			else:
+				reduction_str = "%.1f" % actual_reduction
+			spawn_floating_text_on_slot(slot_idx, "-" + reduction_str + "s CD", Color(0.5, 0.8, 1.0))
+
+func add_unit_gold(slot_idx: int, amount: int) -> void:
+	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
+		return
+	gold_generated.emit(amount, slot_idx)

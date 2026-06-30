@@ -34,16 +34,32 @@ static func get_target_indices(source_idx: int, target_type: UnitModifier.Target
 			up = get_idx.call(row_up, col)
 		UnitModifier.TargetType.DOWN:
 			down = get_idx.call(row_down, col)
-		UnitModifier.TargetType.LEFT:
-			left = get_idx.call(row, col_left)
-		UnitModifier.TargetType.RIGHT:
-			right = get_idx.call(row, col_right)
 		UnitModifier.TargetType.VERTICAL:
 			up = get_idx.call(row_up, col)
 			down = get_idx.call(row_down, col)
+		UnitModifier.TargetType.LEFT:
+			left = get_idx.call(row, col_left)
+		UnitModifier.TargetType.LEFT_PLUS:
+			for c: int in range(col):
+				var target_idx: int = get_idx.call(row, c)
+				if target_idx != -1:
+					targets.append(target_idx)
+		UnitModifier.TargetType.RIGHT:
+			right = get_idx.call(row, col_right)
+		UnitModifier.TargetType.RIGHT_PLUS:
+			for c: int in range(col + 1, 3):
+				var target_idx: int = get_idx.call(row, c)
+				if target_idx != -1:
+					targets.append(target_idx)
 		UnitModifier.TargetType.HORIZONTAL:
 			left = get_idx.call(row, col_left)
 			right = get_idx.call(row, col_right)
+		UnitModifier.TargetType.HORIZONTAL_PLUS:
+			for c: int in range(3):
+				if c != col:
+					var target_idx: int = get_idx.call(row, c)
+					if target_idx != -1:
+						targets.append(target_idx)
 		UnitModifier.TargetType.ADJACENT:
 			left = get_idx.call(row, col_left)
 			right = get_idx.call(row, col_right)

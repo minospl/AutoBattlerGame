@@ -71,3 +71,16 @@ func clone() -> UnitInstance:
 	new_inst.level = level
 	new_inst.cast_speed = cast_speed
 	return new_inst
+
+func level_up() -> void:
+	if level >= 3:
+		return
+	level += 1
+	if data:
+		health += data.max_health
+		attack += data.attack
+		poison += data.base_poison
+		heal += data.base_heal
+		shield += data.base_shield
+		burn += data.base_burn
+		electrocute += data.base_electrocute

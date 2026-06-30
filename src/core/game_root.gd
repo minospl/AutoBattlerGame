@@ -21,7 +21,9 @@ func _load_unit_templates() -> void:
 		preload("res://src/features/units/templates/river_crab.tres"),
 		preload("res://src/features/units/templates/spellweaver.tres"),
 		preload("res://src/features/units/templates/vitality_druid.tres"),
-		preload("res://src/features/units/templates/ancient_titan.tres")
+		preload("res://src/features/units/templates/ancient_titan.tres"),
+		preload("res://src/features/units/templates/chronomancer.tres"),
+		preload("res://src/features/units/templates/golden_beetle.tres")
 	]
 
 func _initialize_new_run() -> void:
@@ -82,15 +84,76 @@ func _go_to_shop() -> void:
 	)
 
 func _go_to_battle() -> void:
+	var enemy_team_units: Array[UnitInstance] = generate_enemy_team(run_state.day)
 	_change_scene(battle_scene_path, func(battle_node: Node) -> void:
 		var battle: BattleScene = battle_node as BattleScene
 		if battle:
-			battle.setup(run_state)
+			battle.setup(run_state, enemy_team_units)
 			battle.battle_finished.connect(_on_battle_finished)
 	)
+
+func generate_enemy_team(p_day: int) -> Array[UnitInstance]:
+	var enemies: Array[UnitInstance] = []
+	enemies.resize(6)
+	
+	var team_size: int = clampi(1 + (p_day - 1) / 2, 1, 6)
+	
+	var max_price_unlocked: int = 2
+	if p_day >= 3 and p_day <= 4:
+		max_price_unlocked = 3
+	elif p_day >= 5:
+		max_price_unlocked = 4
+		
+	var pool: Array[UnitData] = []
+	for t: UnitData in unit_templates:
+		if t.price <= max_price_unlocked:
+			pool.append(t)
+			
+	if pool.is_empty():
+		return enemies
+		
+	for i: int in range(team_size):
+		var template: UnitData = pool[randi() % pool.size()]
+		var inst: UnitInstance = UnitInstance.new()
+		inst.initialize(template)
+		
+		var target_level: int = clampi(1 + (p_day - 1) / 3, 1, 3)
+		while inst.level < target_level:
+			inst.level_up()
+			
+		enemies[i] = inst
+		
+	return enemies
 
 func _on_battle_requested() -> void:
 	_go_to_battle()
 
-func _on_battle_finished() -> void:
-	_go_to_shop()
+func _on_battle_finished(p_outcome: String) -> void:
+	if p_outcome == "victory":
+		run_state.trophies += 1
+	elif p_outcome == "defeat":
+		run_state.lives -= 1
+	
+	if run_state.lives <= 0:
+		_show_game_over(false)
+	elif run_state.trophies >= run_state.max_trophies:
+		_show_game_over(true)
+	else:
+		run_state.day += 1
+		run_state.gold += 10
+		_go_to_shop()
+
+func _show_game_over(p_victory: bool) -> void:
+	if current_scene:
+		current_scene.queue_free()
+		current_scene = null
+		
+	var go_screen: GameOverScreen = GameOverScreen.new()
+	add_child(go_screen)
+	current_scene = go_screen
+	
+	go_screen.setup(p_victory, run_state.trophies, run_state.day)
+	go_screen.restart_requested.connect(func() -> void:
+		_initialize_new_run()
+		_go_to_shop()
+	)

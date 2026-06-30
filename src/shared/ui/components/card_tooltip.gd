@@ -42,7 +42,7 @@ func _setup_unit_ui() -> void:
 		return
 		
 	# 1. Header
-	name_label.text = _unit_instance.get_unit_name().to_upper()
+	name_label.text = _unit_instance.get_unit_name().to_upper() + " [Lvl %d]" % _unit_instance.level
 	var rarity_name: String = "COMMON"
 	var rarity_color: Color = GameColors.BORDER_OUTER_DEFAULT
 	if _unit_instance.data and _unit_instance.data.rarity:
@@ -116,7 +116,7 @@ func _setup_unit_ui() -> void:
 		if modifier:
 			if not full_desc.is_empty():
 				full_desc += "\n\n"
-			full_desc += modifier.get_description()
+			full_desc += modifier.get_description(_unit_instance.level)
 			
 	if not full_desc.is_empty():
 		desc_panel.visible = true

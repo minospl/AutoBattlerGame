@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="1_type"]
+[ext_resource type="Texture2D" path="res://src/assets/units/chronomancer.jpg" id="2_sprite"]
+[ext_resource type="Resource" path="res://src/features/units/types/water.tres" id="3_type_water"]
+[ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="4_data"]
+[ext_resource type="Script" uid="uid://ds3h00gybxhnb" path="res://src/features/units/templates/modifiers/chronomancer_modifier.gd" id="5_modifier"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/rare.tres" id="6_rarity"]
+
+[sub_resource type="Resource" id="Resource_chronomancer_modifier"]
+script = ExtResource("5_modifier")
+trigger = 0
+
+[resource]
+script = ExtResource("4_data")
+unit_name = "Chronomancer"
+price = 3
+max_health = 25
+types = Array[ExtResource("1_type")]([ExtResource("3_type_water")])
+rarity = ExtResource("6_rarity")
+cast_speed = 2.5
+modifier = SubResource("Resource_chronomancer_modifier")
+sprite = ExtResource("2_sprite")

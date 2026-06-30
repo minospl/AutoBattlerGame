@@ -17,7 +17,6 @@ script = ExtResource("unit_data")
 unit_name = "Forest Guardian"
 price = 4
 max_health = 20
-attack = 2
 base_shield = 4
 types = Array[ExtResource("5_h4lgg")]([ExtResource("unit_type")])
 rarity = ExtResource("unit_rarity")

@@ -131,10 +131,24 @@ static func setup_card_visuals(
 	if bottom_ind:
 		bottom_ind.visible = false
 		
+	var is_plus: bool = false
+	if unit_instance.data and unit_instance.data.modifier:
+		var target_type: UnitModifier.TargetType = unit_instance.data.modifier.get_target(unit_instance.level)
+		is_plus = (target_type == UnitModifier.TargetType.LEFT_PLUS or 
+				   target_type == UnitModifier.TargetType.RIGHT_PLUS or 
+				   target_type == UnitModifier.TargetType.HORIZONTAL_PLUS or
+				   target_type == UnitModifier.TargetType.ALL)
+
+	var target_color: Color = Color(1.0, 0.85, 0.2) if is_plus else Color(1.0, 1.0, 1.0)
+	if left_ind: left_ind.modulate = target_color
+	if right_ind: right_ind.modulate = target_color
+	if top_ind: top_ind.modulate = target_color
+	if bottom_ind: bottom_ind.modulate = target_color
+	
 	if unit_instance.data and unit_instance.data.modifier:
 		var modifier: UnitModifier = unit_instance.data.modifier
-		match modifier.target:
-			UnitModifier.TargetType.HORIZONTAL:
+		match modifier.get_target(unit_instance.level):
+			UnitModifier.TargetType.HORIZONTAL, UnitModifier.TargetType.HORIZONTAL_PLUS:
 				if left_ind: left_ind.visible = true
 				if right_ind: right_ind.visible = true
 			UnitModifier.TargetType.VERTICAL:
@@ -149,9 +163,9 @@ static func setup_card_visuals(
 				if top_ind: top_ind.visible = true
 			UnitModifier.TargetType.DOWN:
 				if bottom_ind: bottom_ind.visible = true
-			UnitModifier.TargetType.LEFT:
+			UnitModifier.TargetType.LEFT, UnitModifier.TargetType.LEFT_PLUS:
 				if left_ind: left_ind.visible = true
-			UnitModifier.TargetType.RIGHT:
+			UnitModifier.TargetType.RIGHT, UnitModifier.TargetType.RIGHT_PLUS:
 				if right_ind: right_ind.visible = true
 			UnitModifier.TargetType.ALL:
 				if left_ind: left_ind.visible = true

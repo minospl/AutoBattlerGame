@@ -137,7 +137,24 @@ func create_slots() -> void:
 
 func _on_slot_changed(_slot: ShopCardSlot) -> void:
 	sync_data_from_ui()
+	check_for_unit_merges()
 	_on_team_state_changed()
+
+func check_for_unit_merges() -> void:
+	if not run_state:
+		return
+	
+	run_state.active_team = active_team.duplicate()
+	run_state.bench = bench.duplicate()
+	
+	var merged: bool = false
+	while run_state.check_and_merge_units():
+		merged = true
+		
+	if merged:
+		active_team = run_state.active_team.duplicate()
+		bench = run_state.bench.duplicate()
+		populate_ui()
 
 ## Rebuild runtime data arrays from current UI slot child structures
 func sync_data_from_ui() -> void:
@@ -297,7 +314,8 @@ func refill_shop_slot(slot_index: int) -> void:
 	if slot.has_node("%FreezeButton"):
 		(slot.get_node("%FreezeButton") as Button).button_pressed = false
 		
-	if slot_index < 3: # Units
+	# Always spawn Unit Cards, items are disabled for now
+	if true:
 		if unit_templates.is_empty():
 			return
 		var template: UnitData = unit_templates[randi() % unit_templates.size()]
@@ -309,25 +327,6 @@ func refill_shop_slot(slot_index: int) -> void:
 		card.unit_instance = instance
 		_connect_card_signals(card)
 		slot.add_card(card)
-	else: # Item Card
-		var item_scene: PackedScene = preload("res://src/features/shop/components/shop_card_item.tscn") as PackedScene
-		var item_card: ShopCardItem = item_scene.instantiate() as ShopCardItem
-		
-		var item_inst: ShopItemInstance = ShopItemInstance.new()
-		if randf() < 0.5:
-			item_inst.item_name = "Apple"
-			item_inst.stat_boost_hp = 2
-			item_inst.stat_boost_attack = 0
-			item_inst.price = 2
-		else:
-			item_inst.item_name = "Sword"
-			item_inst.stat_boost_hp = 0
-			item_inst.stat_boost_attack = 2
-			item_inst.price = 3
-			
-		item_card.item_instance = item_inst
-		_connect_card_signals(item_card)
-		slot.add_card(item_card)
 		
 	slot.update_placeholder()
 
@@ -382,8 +381,9 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 	if unit_card and unit_card.unit_instance and unit_card.unit_instance.data and unit_card.unit_instance.data.modifier:
 		var modifier: UnitModifier = unit_card.unit_instance.data.modifier
 		# Skip SELF target highlighting as we only want to highlight other targets
-		if modifier.target != UnitModifier.TargetType.SELF:
-			var target_indices: Array[int] = TargetResolver.get_target_indices(idx, modifier.target)
+		var current_target: UnitModifier.TargetType = modifier.get_target(unit_card.unit_instance.level)
+		if current_target != UnitModifier.TargetType.SELF:
+			var target_indices: Array[int] = TargetResolver.get_target_indices(idx, current_target)
 			for t_idx: int in target_indices:
 				if t_idx < active_slots.size():
 					active_slots[t_idx].set_target_highlight(true)

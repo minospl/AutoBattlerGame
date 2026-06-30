@@ -1,7 +1,7 @@
 class_name BattleScene
 extends Control
 
-signal battle_finished
+signal battle_finished(outcome: String)
 var run_state: RunState
 
 # Static Preloads
@@ -23,6 +23,8 @@ var game_speed: float = 1.0
 var preview_tooltip: CardTooltip
 var team_hp_material: ShaderMaterial
 var enemy_hp_material: ShaderMaterial
+var enemy_units_to_load: Array[UnitInstance] = []
+var is_outcome_showing: bool = false
 
 
 
@@ -115,6 +117,7 @@ func _ready() -> void:
 		_on_floating_text_requested(false, text, color, is_on_slot, slot_idx)
 	)
 	player_team.team_defeated.connect(_on_team_defeat)
+	player_team.gold_generated.connect(_on_gold_generated)
 
 	# Connect signals from enemy_team
 	enemy_team.team_units_loaded.connect(_on_units_loaded.bind(enemy_slots))
@@ -139,8 +142,9 @@ func _ready() -> void:
 	if run_state:
 		setup(run_state)
 
-func setup(p_state: RunState) -> void:
+func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 	run_state = p_state
+	enemy_units_to_load = p_enemy_units
 	# Load state and backup
 	load_battle_team()
 	
@@ -213,15 +217,19 @@ func load_enemy_team() -> void:
 	var enemy_units: Array[UnitInstance] = []
 	enemy_units.resize(MAX_TEAM_SIZE)
 
-	# Load River Crab into Slot 0
-	if RIVER_CRAB_RES:
-		var crab_instance: UnitInstance = UnitInstance.new()
-		crab_instance.initialize(RIVER_CRAB_RES)
-		# Override health and attack
-		crab_instance.health = 1000
-		crab_instance.attack = 10
-		
-		enemy_units[0] = crab_instance
+	if not enemy_units_to_load.is_empty():
+		for i: int in range(MAX_TEAM_SIZE):
+			if i < enemy_units_to_load.size() and enemy_units_to_load[i] != null:
+				enemy_units[i] = enemy_units_to_load[i].clone()
+	else:
+		# Fallback just in case
+		if RIVER_CRAB_RES:
+			var crab_instance: UnitInstance = UnitInstance.new()
+			crab_instance.initialize(RIVER_CRAB_RES)
+			# Override health and attack
+			crab_instance.health = 1000
+			crab_instance.attack = 10
+			enemy_units[0] = crab_instance
 		
 	enemy_team.load_team_units(enemy_units)
 
@@ -307,10 +315,102 @@ func spawn_floating_text(value_text: String, text_color: Color, start_pos: Vecto
 	f_text.setup(value_text, text_color, final_pos)
 
 func _on_enemy_defeat() -> void:
-	set_playing(false)
+	show_battle_outcome("victory")
 
 func _on_team_defeat() -> void:
+	show_battle_outcome("defeat")
+
+func show_battle_outcome(p_outcome: String) -> void:
+	if is_outcome_showing:
+		return
+	is_outcome_showing = true
 	set_playing(false)
+	
+	var overlay: ColorRect = ColorRect.new()
+	overlay.color = Color(0, 0, 0, 0.7)
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(overlay)
+	
+	var popup: PanelContainer = PanelContainer.new()
+	popup.custom_minimum_size = Vector2(400, 220)
+	
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color(0.12, 0.12, 0.16, 1.0)
+	style.border_width_left = 3
+	style.border_width_top = 3
+	style.border_width_right = 3
+	style.border_width_bottom = 3
+	style.corner_radius_top_left = 8
+	style.corner_radius_top_right = 8
+	style.corner_radius_bottom_left = 8
+	style.corner_radius_bottom_right = 8
+	
+	var title_text: String = "BATTLE ENDED"
+	var title_color: Color = Color(1.0, 1.0, 1.0)
+	var desc_text: String = ""
+	
+	match p_outcome:
+		"victory":
+			title_text = "VICTORY"
+			title_color = Color(1.0, 0.85, 0.2)
+			desc_text = "The enemy team has been defeated!"
+			style.border_color = Color(1.0, 0.85, 0.2)
+		"defeat":
+			title_text = "DEFEAT"
+			title_color = Color(1.0, 0.3, 0.3)
+			desc_text = "Your active team was wiped out!"
+			style.border_color = Color(1.0, 0.3, 0.3)
+		"draw":
+			title_text = "DRAW"
+			title_color = Color(0.8, 0.8, 0.8)
+			desc_text = "Both teams collapsed simultaneously!"
+			style.border_color = Color(0.6, 0.6, 0.6)
+			
+	popup.add_theme_stylebox_override("panel", style)
+	
+	var margin: MarginContainer = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 20)
+	margin.add_theme_constant_override("margin_top", 20)
+	margin.add_theme_constant_override("margin_right", 20)
+	margin.add_theme_constant_override("margin_bottom", 20)
+	popup.add_child(margin)
+	
+	var vbox: VBoxContainer = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 15)
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	margin.add_child(vbox)
+	
+	var title_lbl: Label = Label.new()
+	title_lbl.text = title_text
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.add_theme_color_override("font_color", title_color)
+	title_lbl.add_theme_font_size_override("font_size", 24)
+	vbox.add_child(title_lbl)
+	
+	var desc_lbl: Label = Label.new()
+	desc_lbl.text = desc_text
+	desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
+	desc_lbl.add_theme_font_size_override("font_size", 14)
+	vbox.add_child(desc_lbl)
+	
+	var btn: Button = Button.new()
+	btn.text = "Continue"
+	btn.custom_minimum_size = Vector2(120, 36)
+	btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	btn.pressed.connect(func() -> void:
+		sync_stats_to_run_state()
+		battle_finished.emit(p_outcome)
+	)
+	vbox.add_child(btn)
+	
+	overlay.add_child(popup)
+	popup.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+
+func _on_gold_generated(amount: int, slot_idx: int) -> void:
+	if run_state:
+		run_state.gold += amount
+	_on_floating_text_requested(false, "+" + str(amount) + " Gold", Color(1.0, 0.85, 0.2), true, slot_idx)
 
 func set_playing(play: bool) -> void:
 	if play:
@@ -328,8 +428,7 @@ func _on_play_pressed() -> void:
 func _on_pause_pressed() -> void:
 	set_playing(false)
 
-func _on_exit_pressed() -> void:
-	# Save updated stats back to run_state
+func sync_stats_to_run_state() -> void:
 	if run_state != null:
 		for i: int in range(MAX_TEAM_SIZE):
 			var persistent_unit: UnitInstance = run_state.active_team[i]
@@ -346,8 +445,10 @@ func _on_exit_pressed() -> void:
 				persistent_unit.cast_speed = battle_unit.cast_speed
 			else:
 				run_state.active_team[i] = null
-				
-	battle_finished.emit()
+
+func _on_exit_pressed() -> void:
+	sync_stats_to_run_state()
+	battle_finished.emit("draw")
 
 func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 	if not preview_tooltip:

@@ -1,10 +1,21 @@
 class_name AncientTitanModifier
 extends UnitModifier
 
-@export var health_buff: int = 5
+@export var value_1: int = 5
+@export var value_2: int = 10
+@export var value_3: int = 25
+
+func get_modifier_value(p_level: int = 1) -> float:
+	match p_level:
+		1: return float(value_1)
+		2: return float(value_2)
+		3: return float(value_3)
+	return float(value_1)
 
 func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
-	team_obj.buff_unit_max_health(source_idx, health_buff, true)
+	var unit: UnitInstance = team_obj.units[source_idx]
+	var current_level: int = unit.level if unit else 1
+	team_obj.buff_unit_max_health(source_idx, int(get_modifier_value(current_level)), true)
 
-func get_description() -> String:
-	return "%s\nGain [color=%s]+%d Health[/color] permanently" % [get_trigger_name(), GameColors.DESC_HEALTH, health_buff]
+func get_description(p_level: int = 1) -> String:
+	return "%s\nGain [color=%s]+%d Health[/color] permanently" % [get_trigger_name(), GameColors.DESC_HEALTH, int(get_modifier_value(p_level))]
