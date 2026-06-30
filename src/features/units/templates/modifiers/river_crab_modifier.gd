@@ -3,7 +3,7 @@ extends UnitModifier
 
 @export var attack_buff: int = 2
 
-func _apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
+func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
 	team_obj.buff_unit_attack(source_idx, attack_buff)
 
 func get_description() -> String:

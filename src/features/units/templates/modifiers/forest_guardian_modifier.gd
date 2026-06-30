@@ -3,7 +3,7 @@ extends UnitModifier
 
 @export var shield_buff: int = 5
 
-func _apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
+func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
 	for idx: int in TargetResolver.get_target_indices(source_idx, TargetType.HORIZONTAL):
 		team_obj.add_unit_shield(idx, shield_buff)
 

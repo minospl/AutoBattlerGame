@@ -3,7 +3,7 @@ extends UnitModifier
 
 @export var attack_buff: int = 2
 
-func _apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
+func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
 	for idx: int in TargetResolver.get_target_indices(source_idx, TargetType.ADJACENT):
 		team_obj.buff_unit_attack(idx, attack_buff, false)
 

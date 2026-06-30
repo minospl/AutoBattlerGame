@@ -10,4 +10,4 @@ static func trigger_unit_modifier(source_idx: int, team_obj: BattleTeam, trigger
 
 	var modifier: UnitModifier = unit.data.modifier
 	if modifier.trigger == trigger_type:
-		modifier._apply_modifier(source_idx, team_obj)
+		modifier.apply_modifier(source_idx, team_obj)

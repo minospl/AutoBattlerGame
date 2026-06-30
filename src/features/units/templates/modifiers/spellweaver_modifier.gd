@@ -1,7 +1,7 @@
 class_name SpellweaverModifier
 extends UnitModifier
 
-func _apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
+func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
 	for idx: int in TargetResolver.get_target_indices(source_idx, TargetType.LEFT):
 		if idx >= 0 and idx < team_obj.units.size() and team_obj.units[idx] != null:
 			ModifierEngine.trigger_unit_modifier(idx, team_obj, Trigger.ON_BATTLE_START)

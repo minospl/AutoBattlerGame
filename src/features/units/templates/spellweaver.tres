@@ -9,7 +9,6 @@
 
 [sub_resource type="Resource" id="Resource_spellweaver_on_cast"]
 script = ExtResource("spellweaver_modifier")
-trigger = 0
 target = 6
 
 [resource]
