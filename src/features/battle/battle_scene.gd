@@ -26,8 +26,6 @@ var enemy_hp_material: ShaderMaterial
 var enemy_units_to_load: Array[UnitInstance] = []
 var is_outcome_showing: bool = false
 
-
-
 # Countdown Timer & Fatigue
 var match_timer: float = 30.0
 var fatigue_tick_timer: float = 0.0
@@ -274,6 +272,9 @@ func _update_all_card_uis() -> void:
 func _process(delta: float) -> void:
 	if simulation_state == State.PLAYING:
 		advance_simulation(delta * game_speed)
+		
+	if preview_tooltip and preview_tooltip.visible:
+		preview_tooltip.update_stats()
 
 func advance_simulation(delta: float) -> void:
 	# Update match timer
