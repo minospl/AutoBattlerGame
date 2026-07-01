@@ -98,4 +98,9 @@ Podczas edycji lub rozbudowy tego projektu muszę przestrzegać następujących 
 4.  **Podział Logiki i UI:** Komponenty interfejsu (np. `ShopCardSlot`, `BattleCardSlot`) wizualizują stan logiczny obiektów typu `UnitInstance` i `ShopItemInstance`. Zmiany w UI muszą być synchronizowane z danymi w logicznych strukturach (funkcja `sync_data_from_ui()`).
 5.  **Zachowanie Premium UI:** Zmiany wizualne powinny zachowywać estetyczny, spójny styl gry (ciemne tła, dopasowane kolory zdefiniowane w `GameColors`, płynne przejścia).
 6.  **Minimalizacja halucynacji i weryfikacja kodu:** Zanim założysz istnienie jakiejkolwiek metody, zmiennej lub wartości enuma w klasach pomocniczych (np. `UnitModifier.Trigger`), ZAWSZE otwórz i przeanalizuj powiązane pliki źródłowe (.gd lub .tres) w celu weryfikacji ich rzeczywistej implementacji. Jeśli nie jesteś czegoś pewien, zbadaj bazę kodu zamiast zgadywać.
+7.  **Zasada Szerokiej Analizy i Walka z Tunnel Vision:**
+    *   **Analiza Konsekwencji:** Zanim wprowadzisz jakąś zmianę (np. ukryjesz panel lub zmodyfikujesz flagę), pomyśl o jej szerokich konsekwencjach. Czy powiązane zmienne, sygnatury metod pomocniczych lub węzły w scenach `.tscn` stają się niepotrzebne? Jeśli tak, usuń je zamiast pisać puste obejścia.
+    *   **Brak Ślepego Kopiowania (No Boilerplate):** Kopiując wzorce (np. z jednostek do przedmiotów), zawsze upewnij się, że obiekt docelowy potrzebuje wszystkich tych mechanik (np. przedmioty nie potrzebują skalowania poziomów i `get_modifier_value`).
+    *   **Zgodność Stylistyczna:** Wszystkie nowo generowane opisy, wartości i teksty UI muszą zachować formatowanie spójne z istniejącymi elementami (np. używanie kolorów BBCode `GameColors.DESC_HEALTH` w opisach).
+    *   **Ujednolicone Szablony UI:** Wszelkie generyczne węzły matryc w `.tscn` (np. powielane w pętli) muszą mieć ogólne nazwy typu `StatPanel` czy `LabelTemplate`, a nie konkretne `AttackPanel`.
 

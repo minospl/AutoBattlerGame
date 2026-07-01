@@ -13,6 +13,7 @@ signal battle_requested
 var active_team: Array[UnitInstance] = []
 var bench: Array[UnitInstance] = []
 var unit_templates: Array[UnitData] = []
+var item_templates: Array[ItemData] = []
 var run_state: RunState
 
 @onready var shop_header_bar: ShopHeaderBar = %ShopHeaderBar
@@ -27,6 +28,10 @@ var gold: int = 10:
 			shop_panel.gold = gold
 
 var slot_scene: PackedScene = preload("res://src/features/shop/components/shop_card_slot.tscn")
+var card_scene: PackedScene = preload("res://src/features/shop/components/shop_card.tscn")
+var item_card_scene: PackedScene = preload("res://src/features/shop/components/shop_card_item.tscn")
+var tooltip_scene: PackedScene = preload("res://src/shared/ui/components/card_tooltip.tscn")
+var overlay_script: Script = preload("res://src/features/shop/components/targeting_line_overlay.gd")
 
 var active_slots: Array[ShopCardSlot]:
 	get:
@@ -57,7 +62,6 @@ func _ready() -> void:
 	
 	# Setup the side preview panel
 	if has_node("%PreviewContainer"):
-		var tooltip_scene: PackedScene = load("res://src/shared/ui/components/card_tooltip.tscn") as PackedScene
 		preview_tooltip = tooltip_scene.instantiate() as CardTooltip
 		# Align the preview card to the top of the margin container (height of the bench)
 		preview_tooltip.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
@@ -74,23 +78,23 @@ func _ready() -> void:
 	if run_state:
 		load_state_from_run()
 
-func setup(p_state: RunState, p_templates: Array[UnitData]) -> void:
+func setup(p_state: RunState, p_templates: Array[UnitData], p_item_templates: Array[ItemData] = []) -> void:
 	run_state = p_state
 	unit_templates = p_templates
+	item_templates = p_item_templates
 	
 	load_state_from_run()
 	
 	# If this is a fresh setup with empty shop units, let's roll it!
-	var has_shop_units: bool = false
-	for u: Resource in run_state.shop_units:
+	var has_shop_cards: bool = false
+	for u: Resource in run_state.shop_cards:
 		if u != null:
-			has_shop_units = true
+			has_shop_cards = true
 			break
-	if not has_shop_units:
+	if not has_shop_cards:
 		roll_shop(true)
 	
 	# Instantiate and add the targeting line overlay to draw on top of everything
-	var overlay_script: Script = load("res://src/features/shop/components/targeting_line_overlay.gd") as Script
 	var overlay: Control = Control.new()
 	overlay.name = "TargetingLineOverlay"
 	overlay.set_script(overlay_script)
@@ -168,7 +172,6 @@ func sync_data_from_ui() -> void:
 
 ## Populate the UI based on external changes to logic data structures
 func populate_ui() -> void:
-	var card_scene: PackedScene = load("res://src/features/shop/components/shop_card.tscn") as PackedScene
 	
 	# Clear existing cards immediately
 	for slot: ShopCardSlot in active_slots:
@@ -203,7 +206,6 @@ func add_unit_to_bench(unit: UnitInstance) -> bool:
 	for i: int in range(bench_slot_count):
 		if bench[i] == null:
 			bench[i] = unit
-			var card_scene: PackedScene = load("res://src/features/shop/components/shop_card.tscn") as PackedScene
 			var card: ShopCard = card_scene.instantiate() as ShopCard
 			card.unit_instance = unit
 			_connect_card_signals(card)
@@ -314,15 +316,27 @@ func refill_shop_slot(slot_index: int) -> void:
 	if slot.has_node("%FreezeButton"):
 		(slot.get_node("%FreezeButton") as Button).button_pressed = false
 		
-	# Always spawn Unit Cards, items are disabled for now
-	if true:
+	# Roll 30% chance for an item card if templates are available, else 70% unit card
+	var spawn_item: bool = false
+	if not item_templates.is_empty() and randf() < 0.3:
+		spawn_item = true
+		
+	if spawn_item:
+		var template: ItemData = item_templates[randi() % item_templates.size()]
+		var instance: ItemInstance = ItemInstance.new()
+		instance.initialize(template)
+		
+		var card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
+		card.item_instance = instance
+		_connect_card_signals(card)
+		slot.add_card(card)
+	else:
 		if unit_templates.is_empty():
 			return
 		var template: UnitData = unit_templates[randi() % unit_templates.size()]
 		var instance: UnitInstance = UnitInstance.new()
 		instance.initialize(template)
 		
-		var card_scene: PackedScene = preload("res://src/features/shop/components/shop_card.tscn") as PackedScene
 		var card: ShopCard = card_scene.instantiate() as ShopCard
 		card.unit_instance = instance
 		_connect_card_signals(card)
@@ -465,7 +479,7 @@ func load_state_from_run() -> void:
 			slot.remove_card(old_card)
 			old_card.queue_free()
 			
-		var item_or_unit: Resource = run_state.shop_units[i]
+		var item_or_unit: Resource = run_state.shop_cards[i]
 		var is_frozen: bool = run_state.shop_frozen_statuses[i]
 		
 		slot.is_frozen = is_frozen
@@ -474,15 +488,13 @@ func load_state_from_run() -> void:
 			
 		if item_or_unit != null:
 			if item_or_unit is UnitInstance:
-				var card_scene: PackedScene = load("res://src/features/shop/components/shop_card.tscn") as PackedScene
 				var card: ShopCard = card_scene.instantiate() as ShopCard
 				var unit_inst: UnitInstance = item_or_unit
 				card.unit_instance = unit_inst
 				_connect_card_signals(card)
 				slot.add_card(card)
-			elif item_or_unit is ShopItemInstance:
-				var item_scene: PackedScene = load("res://src/features/shop/components/shop_card_item.tscn") as PackedScene
-				var item_card: ShopCardItem = item_scene.instantiate() as ShopCardItem
+			elif item_or_unit is ItemInstance:
+				var item_card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
 				item_card.item_instance = item_or_unit
 				_connect_card_signals(item_card)
 				slot.add_card(item_card)
@@ -508,11 +520,11 @@ func sync_data_to_run_state() -> void:
 		var card: Control = slot.get_card()
 		if card:
 			if card is ShopCard:
-				run_state.shop_units[i] = (card as ShopCard).unit_instance
+				run_state.shop_cards[i] = (card as ShopCard).unit_instance
 			elif card is ShopCardItem:
-				run_state.shop_units[i] = (card as ShopCardItem).item_instance
+				run_state.shop_cards[i] = (card as ShopCardItem).item_instance
 		else:
-			run_state.shop_units[i] = null
+			run_state.shop_cards[i] = null
 			
 		run_state.shop_frozen_statuses[i] = slot.is_frozen
  

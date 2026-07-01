@@ -3,7 +3,7 @@ extends PanelContainer
 
 signal hovered(card: ShopCardItem, is_hovered: bool)
 
-@export var item_instance: ShopItemInstance:
+@export var item_instance: ItemInstance:
 	set(val):
 		item_instance = val
 		if is_inside_tree():
@@ -11,10 +11,6 @@ signal hovered(card: ShopCardItem, is_hovered: bool)
 
 @onready var portrait_label: Label = %PortraitCharLabel
 @onready var sprite_rect: TextureRect = %SpriteRect
-@onready var attack_label: Label = %AttackLabel
-@onready var hp_label: Label = %HpLabel
-@onready var attack_panel: PanelContainer = %AttackPanel
-@onready var hp_panel: PanelContainer = %HpPanel
 var slot: ShopCardSlot = null
 
 func _ready() -> void:
@@ -24,32 +20,25 @@ func _ready() -> void:
 	tree_exiting.connect(_on_mouse_exited)
 
 func update_ui() -> void:
-	if not item_instance:
+	if not item_instance or not item_instance.data:
 		return
 		
 	# Delegate visual setup to shared CardUIHelper
 	CardUIHelper.setup_item_visuals(
-		item_instance.item_name,
-		item_instance.stat_boost_attack,
-		item_instance.stat_boost_hp,
+		item_instance,
 		portrait_label,
 		sprite_rect,
-		attack_panel,
-		attack_label,
-		hp_panel,
-		hp_label,
 		get_node_or_null("BorderRect") as ShaderBorderDecorator
 	)
 
 func apply_food_effect(card: Control) -> void:
-	if not item_instance:
+	if not item_instance or not item_instance.data:
 		return
 	if card is ShopCard:
 		var shop_card: ShopCard = card
 		var inst: UnitInstance = shop_card.unit_instance
-		if inst:
-			inst.attack += item_instance.stat_boost_attack
-			inst.health += item_instance.stat_boost_hp
+		if inst and item_instance.data.modifier:
+			item_instance.data.modifier.apply_unit_effect(inst)
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Keep the card in place but dim it visually

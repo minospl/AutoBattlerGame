@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/features/items/templates/modifiers/apple_modifier.gd" id="1_modifier"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="2_rarity"]
+[ext_resource type="Script" path="res://src/features/items/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_apple_modifier"]
+script = ExtResource("1_modifier")
+health_boost = 5
+
+[resource]
+script = ExtResource("3_data")
+item_name = "Apple"
+price = 2
+rarity = ExtResource("2_rarity")
+is_draggable = true
+is_clickable = false
+modifier = SubResource("Resource_apple_modifier")

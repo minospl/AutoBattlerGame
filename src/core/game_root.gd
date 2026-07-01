@@ -4,12 +4,23 @@ extends Node
 @export var shop_scene_path: String = "res://src/features/shop/shop_scene.tscn"
 @export var battle_scene_path: String = "res://src/features/battle/battle_scene.tscn"
 
+const MAX_ACTIVE_TEAM_SIZE: int = 6
+const MAX_BENCH_SIZE: int = 8
+const MAX_SHOP_CARDS_SIZE: int = 4
+const STARTING_GOLD: int = 10
+const STARTING_LIVES: int = 10
+const STARTING_DAY: int = 1
+const STARTING_TROPHIES: int = 0
+const MAX_TROPHIES: int = 10
+
 var run_state: RunState
 var unit_templates: Array[UnitData] = []
+var item_templates: Array[ItemData] = []
 var current_scene: Node = null
 
 func _ready() -> void:
 	_load_unit_templates()
+	_load_item_templates()
 	_initialize_new_run()
 	_go_to_shop()
 
@@ -26,17 +37,24 @@ func _load_unit_templates() -> void:
 		preload("res://src/features/units/templates/golden_beetle.tres")
 	]
 
+func _load_item_templates() -> void:
+	item_templates = [
+		preload("res://src/features/items/templates/apple.tres") as ItemData,
+		preload("res://src/features/items/templates/sword.tres") as ItemData
+	]
+
 func _initialize_new_run() -> void:
 	run_state = RunState.new()
-	run_state.active_team.resize(6)
-	run_state.bench.resize(8)
-	run_state.shop_units.resize(4)
-	run_state.shop_frozen_statuses = [false, false, false, false]
-	run_state.gold = 10
-	run_state.lives = 10
-	run_state.day = 1
-	run_state.trophies = 0
-	run_state.max_trophies = 10
+	run_state.active_team.resize(MAX_ACTIVE_TEAM_SIZE)
+	run_state.bench.resize(MAX_BENCH_SIZE)
+	run_state.shop_cards.resize(MAX_SHOP_CARDS_SIZE)
+	run_state.shop_frozen_statuses.resize(MAX_SHOP_CARDS_SIZE)
+	run_state.shop_frozen_statuses.fill(false)
+	run_state.gold = STARTING_GOLD
+	run_state.lives = STARTING_LIVES
+	run_state.day = STARTING_DAY
+	run_state.trophies = STARTING_TROPHIES
+	run_state.max_trophies = MAX_TROPHIES
 	
 	# Find templates by unit name
 	var find_template: Callable = func(p_name: String) -> UnitData:
@@ -51,7 +69,7 @@ func _initialize_new_run() -> void:
 	var crab: UnitData = find_template.call("River Crab")
 
 	var setup: Array[UnitData] = [titan, spellweaver, null, druid, crab, null]
-	for i: int in range(6):
+	for i: int in range(MAX_ACTIVE_TEAM_SIZE):
 		var temp: UnitData = setup[i]
 		if temp:
 			var instance: UnitInstance = UnitInstance.new()
@@ -79,7 +97,7 @@ func _go_to_shop() -> void:
 	_change_scene(shop_scene_path, func(shop_node: Node) -> void:
 		var shop: ShopScene = shop_node as ShopScene
 		if shop:
-			shop.setup(run_state, unit_templates)
+			shop.setup(run_state, unit_templates, item_templates)
 			shop.battle_requested.connect(_on_battle_requested)
 	)
 

@@ -184,22 +184,21 @@ static func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat
 		border_rect.border_indentation = 1
 		border_rect.update_shader_parameters()
 
-## Shared helper to configure item card visuals
 static func setup_item_visuals(
-	item_name: String,
-	stat_boost_attack: int,
-	stat_boost_hp: int,
+	item_instance: ItemInstance,
 	portrait_label: Label,
 	sprite_rect: TextureRect,
-	attack_panel: PanelContainer,
-	attack_label: Label,
-	hp_panel: PanelContainer,
-	hp_label: Label,
 	border_rect: ShaderBorderDecorator
 ) -> void:
-	# 1. Outer Border style
+	if not item_instance:
+		return
+		
+	# 1. Outer Border style based on rarity
 	if border_rect:
-		border_rect.border_color = Color(0.9, 0.6, 0.1) # Golden orange
+		var border_color: Color = Color(0.9, 0.6, 0.1) # Fallback to golden orange
+		if item_instance.rarity:
+			border_color = item_instance.rarity.border_color
+		border_rect.border_color = border_color
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 		border_rect.interior_color = GameColors.WHITE_COLOR
 		border_rect.update_shader_parameters()
@@ -210,30 +209,7 @@ static func setup_item_visuals(
 	if portrait_label:
 		portrait_label.visible = true
 		portrait_label.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
-		if item_name == "Apple":
-			portrait_label.text = "🍎"
-		elif item_name == "Sword":
-			portrait_label.text = "⚔️"
-		else:
-			portrait_label.text = "🎁"
-			
-	# 3. Stats display
-	var stat_size: Vector2 = Vector2(32, 16)
-	if attack_panel and attack_label:
-		if stat_boost_attack > 0:
-			attack_panel.visible = true
-			attack_label.text = "+" + str(stat_boost_attack)
-			setup_stat_panel_shader(attack_panel, Color(GameColors.DESC_ATTACK), stat_size)
-		else:
-			attack_panel.visible = false
-			
-	if hp_panel and hp_label:
-		if stat_boost_hp > 0:
-			hp_panel.visible = true
-			hp_label.text = "+" + str(stat_boost_hp)
-			setup_stat_panel_shader(hp_panel, Color(GameColors.DESC_HEALTH), stat_size)
-		else:
-			hp_panel.visible = false
+		portrait_label.text = "🎁"
 
 ## Tooltip Display Manager helpers
 static func show_tooltip(tooltip: CardTooltip, unit_instance: UnitInstance) -> void:
@@ -241,7 +217,7 @@ static func show_tooltip(tooltip: CardTooltip, unit_instance: UnitInstance) -> v
 		tooltip.setup_for_unit(unit_instance)
 		tooltip.visible = true
 
-static func show_item_tooltip(tooltip: CardTooltip, item_card: ShopItemInstance) -> void:
+static func show_item_tooltip(tooltip: CardTooltip, item_card: ItemInstance) -> void:
 	if tooltip and item_card:
 		tooltip.setup_for_item(item_card)
 		tooltip.visible = true

@@ -94,60 +94,24 @@ mouse_filter = 2
 theme_override_constants/separation = 0
 alignment = 1
 
-[node name="AttackPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/StatsHBox"]
+[node name="StatPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/StatsHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(30, 14)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="BorderRect" type="ColorRect" parent="MarginContainer/VBoxContainer/StatsHBox/AttackPanel"]
+[node name="BorderRect" type="ColorRect" parent="MarginContainer/VBoxContainer/StatsHBox/StatPanel"]
 layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 0
 outer_border_width = 2
 border_indentation = 2
 
-[node name="AttackWrapper" type="Control" parent="MarginContainer/VBoxContainer/StatsHBox/AttackPanel"]
+[node name="StatWrapper" type="Control" parent="MarginContainer/VBoxContainer/StatsHBox/StatPanel"]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="AttackLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsHBox/AttackPanel/AttackWrapper"]
-unique_name_in_owner = true
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.4)
-theme_override_constants/outline_size = 5
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 13
-text = "0"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="PoisonPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/StatsHBox"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(30, 14)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="BorderRect" type="ColorRect" parent="MarginContainer/VBoxContainer/StatsHBox/PoisonPanel"]
-layout_mode = 2
-script = ExtResource("2_decorator")
-border_type = 0
-outer_border_width = 2
-border_indentation = 2
-
-[node name="PoisonWrapper" type="Control" parent="MarginContainer/VBoxContainer/StatsHBox/PoisonPanel"]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="PoisonLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsHBox/PoisonPanel/PoisonWrapper"]
+[node name="StatLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsHBox/StatPanel/StatWrapper"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15

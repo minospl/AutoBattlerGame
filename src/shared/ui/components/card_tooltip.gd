@@ -23,7 +23,7 @@ extends MarginContainer
 @onready var help_border_rect: ShaderBorderDecorator = %HelpBorderRect
 
 var _unit_instance: UnitInstance
-var _item_card: ShopItemInstance
+var _item_card: ItemInstance
 var _rarity_name: String = "COMMON"
 var _rarity_color: Color = GameColors.BORDER_OUTER_DEFAULT
 
@@ -90,7 +90,7 @@ func setup_for_unit(unit_instance: UnitInstance) -> void:
 		_setup_unit_ui()
 		_build_keywords()
 
-func setup_for_item(item_card: ShopItemInstance) -> void:
+func setup_for_item(item_card: ItemInstance) -> void:
 	_item_card = item_card
 	_unit_instance = null
 	if is_node_ready():
@@ -125,56 +125,24 @@ func _setup_item_ui() -> void:
 	if not _item_card:
 		return
 		
-	# 1. Header
-	name_label.text = _item_card.item_name.to_upper()
-	rarity_label.text = "ITEM"
+	# Reset rarity state to defaults to prevent carry-over bugs
+	_rarity_name = "COMMON"
+	_rarity_color = GameColors.BORDER_OUTER_DEFAULT
+		
+	if _item_card.data and _item_card.data.rarity:
+		_rarity_name = _item_card.data.rarity.rarity_name.to_upper()
+		_rarity_color = _item_card.data.rarity.border_color
 	
-	# 2. Main Outer Border
-	if border_rect:
-		border_rect.border_color = GameColors.PANEL_BORDER_DEFAULT
-		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-		border_rect.interior_color = Color(0.9, 0.6, 0.1) # Golden orange background for items
-		border_rect.update_shader_parameters()
-		
-	_update_sub_panel_borders(Color(0.9, 0.6, 0.1).lightened(0.5))
-		
-	# 3. Sprite (Item fallback character icon)
-	sprite_rect.visible = false
-	fallback_label.visible = true
-	if _item_card.item_name == "Apple":
-		fallback_label.text = "🍎"
-	elif _item_card.item_name == "Sword":
-		fallback_label.text = "⚔️"
-	else:
-		fallback_label.text = "🎁"
-		
-	# 4. Badge
-	badge_panel.visible = true
-	if badge_container_panel:
-		badge_container_panel.visible = true
-	badge_label.text = "ITEM"
-	var flat_style: StyleBoxFlat = StyleBoxFlat.new()
-	flat_style.bg_color = Color(0.35, 0.65, 0.55) # Teal/greyish green matching reference item label bg
-	flat_style.content_margin_left = 8
-	flat_style.content_margin_right = 8
-	flat_style.content_margin_top = 3
-	flat_style.content_margin_bottom = 3
-	badge_panel.add_theme_stylebox_override("panel", flat_style)
-	
-	# 5. Stats (Items do not display a stat block)
+	# Items do not use the stats block or the type badge
 	stats_panel.visible = false
-	
-	# 6. Description
-	var desc: String = ""
-	if _item_card.stat_boost_attack > 0:
-		desc += "Give a unit +%d Attack." % _item_card.stat_boost_attack
-	if _item_card.stat_boost_hp > 0:
-		if not desc.is_empty():
-			desc += " "
-		desc += "Give a unit +%d Health." % _item_card.stat_boost_hp
-		
-	desc_panel.visible = true
-	desc_label.text = "[center]%s[/center]" % desc
+	badge_panel.visible = false
+	if badge_container_panel:
+		badge_container_panel.visible = false
+
+	update_header()
+	update_border()
+	update_sprite()
+	update_description()
 
 func _update_sub_panel_borders(border_col: Color) -> void:
 	var panels: Array[ShaderBorderDecorator] = [
@@ -194,10 +162,11 @@ func _update_sub_panel_borders(border_col: Color) -> void:
 func update_header() -> void:
 	if _unit_instance:
 		name_label.text = _unit_instance.get_unit_name().to_upper() + " [Lvl %d]" % _unit_instance.level
+	elif _item_card:
+		name_label.text = _item_card.item_name.to_upper()
 	rarity_label.text = _rarity_name
 
 func update_border() -> void:
-	# UPDATE BORDER
 	if border_rect:
 		border_rect.border_color = GameColors.PANEL_BORDER_DEFAULT
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
@@ -207,25 +176,30 @@ func update_border() -> void:
 	_update_sub_panel_borders(_rarity_color.lightened(0.5))
 
 func update_sprite() -> void:
-	if not _unit_instance:
-		return
-	if _unit_instance.data and _unit_instance.data.sprite:
-		sprite_rect.visible = true
-		fallback_label.visible = false
-		sprite_rect.texture = _unit_instance.data.sprite
-		if not sprite_rect.material:
-			var shader: Shader = load("res://src/shared/shaders/chroma_key.gdshader")
-			var mat: ShaderMaterial = ShaderMaterial.new()
-			mat.shader = shader
-			sprite_rect.material = mat
-	else:
+	if _unit_instance:
+		if _unit_instance.data and _unit_instance.data.sprite:
+			sprite_rect.visible = true
+			fallback_label.visible = false
+			sprite_rect.texture = _unit_instance.data.sprite
+			if not sprite_rect.material:
+				var shader: Shader = load("res://src/shared/shaders/chroma_key.gdshader") as Shader
+				var mat: ShaderMaterial = ShaderMaterial.new()
+				mat.shader = shader
+				sprite_rect.material = mat
+		else:
+			sprite_rect.visible = false
+			fallback_label.visible = true
+			fallback_label.text = _unit_instance.get_unit_name().left(1).to_upper()
+	elif _item_card:
 		sprite_rect.visible = false
 		fallback_label.visible = true
-		fallback_label.text = _unit_instance.get_unit_name().left(1).to_upper()
+		fallback_label.text = "🎁"
+
 
 func update_badge() -> void:
 	if not _unit_instance:
 		return
+
 	var types: Array[UnitType] = _unit_instance.get_types()
 	if not types.is_empty():
 		badge_panel.visible = true
@@ -273,8 +247,6 @@ func update_stats() -> void:
 	if _unit_instance.electrocute > 0:
 		active_stats.append("%s [color=%s]ELEC[/color]" % [NumberFormatter.format_large_number(_unit_instance.electrocute), GameColors.DESC_ELECTROCUTE])
 
-	
-		
 	var i: int = 0
 	while i < active_stats.size():
 		var left_text: String = active_stats[i]
@@ -299,15 +271,15 @@ func update_stats() -> void:
 		i += 2
 
 func update_description() -> void:
-	if not _unit_instance:
-		return
 	var full_desc: String = ""
-	if _unit_instance.data:
-		var modifier: UnitModifier = _unit_instance.data.modifier
-		if modifier:
-			if not full_desc.is_empty():
-				full_desc += "\n\n"
-			full_desc += modifier.get_description(_unit_instance.level)
+	if _unit_instance:
+		if _unit_instance.data:
+			var modifier: UnitModifier = _unit_instance.data.modifier
+			if modifier:
+				full_desc += modifier.get_description(_unit_instance.level)
+	elif _item_card:
+		if _item_card.data and _item_card.data.modifier:
+			full_desc += _item_card.data.modifier.get_description()
 			
 	if not full_desc.is_empty():
 		desc_panel.visible = true
@@ -381,7 +353,6 @@ func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
 	
 	_set_mouse_filter_ignore_recursive(panel)
 	return panel
-
 
 
 func _update_keywords_visibility(show_keywords: bool) -> void:
