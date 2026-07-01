@@ -23,42 +23,42 @@ static func setup_card_visuals(
 		candidates.append({
 			"name": "attack",
 			"value": unit_instance.get_attack(),
-			"color": GameColors.STAT_ATTACK_BG,
+			"color": Color(GameColors.DESC_ATTACK),
 			"priority": 0
 		})
 	if unit_instance.heal > 0:
 		candidates.append({
 			"name": "heal",
 			"value": unit_instance.heal,
-			"color": Color(0.15, 0.6, 0.3),
+			"color": Color(GameColors.DESC_HEAL),
 			"priority": 1
 		})
 	if unit_instance.shield > 0:
 		candidates.append({
 			"name": "shield",
 			"value": unit_instance.shield,
-			"color": Color(0.5, 0.5, 0.5),
+			"color": Color(GameColors.DESC_ATTACK),
 			"priority": 2
 		})
 	if unit_instance.poison > 0:
 		candidates.append({
 			"name": "poison",
 			"value": unit_instance.poison,
-			"color": GameColors.STAT_POISON_BG,
+			"color": Color(GameColors.DESC_POISON),
 			"priority": 3
 		})
 	if unit_instance.burn > 0:
 		candidates.append({
 			"name": "burn",
 			"value": unit_instance.burn,
-			"color": Color(0.9, 0.4, 0.1),
+			"color": Color(GameColors.DESC_BURN),
 			"priority": 4
 		})
 	if unit_instance.electrocute > 0:
 		candidates.append({
 			"name": "electrocute",
 			"value": unit_instance.electrocute,
-			"color": Color(0.85, 0.75, 0.1),
+			"color": Color(GameColors.DESC_ELECTROCUTE),
 			"priority": 5
 		})
 
@@ -223,7 +223,7 @@ static func setup_item_visuals(
 		if stat_boost_attack > 0:
 			attack_panel.visible = true
 			attack_label.text = "+" + str(stat_boost_attack)
-			setup_stat_panel_shader(attack_panel, GameColors.STAT_ATTACK_BG, stat_size)
+			setup_stat_panel_shader(attack_panel, Color(GameColors.DESC_ATTACK), stat_size)
 		else:
 			attack_panel.visible = false
 			

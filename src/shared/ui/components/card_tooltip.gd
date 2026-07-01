@@ -8,15 +8,17 @@ extends MarginContainer
 @onready var fallback_label: Label = %FallbackLabel
 @onready var badge_panel: PanelContainer = %BadgePanel
 @onready var badge_label: Label = %BadgeLabel
-@onready var stats_panel: PanelContainer = %StatsPanel
-@onready var stats_label: Label = %StatsLabel
+@onready var badge_container_panel: PanelContainer = %BadgeContainerPanel
+@onready var stats_panel: MarginContainer = %StatsPanel
+@onready var stats_grid: GridContainer = %StatsGrid
+@onready var stat_label_template: Label = %StatLabelTemplate
 @onready var desc_panel: PanelContainer = %DescPanel
 @onready var desc_label: RichTextLabel = %DescLabel
 
 # Cache border panels as @onready to avoid runtime lookup issues
 @onready var portrait_border_rect: ShaderBorderDecorator = %PortraitBorderRect
 @onready var sprite_border_rect: ShaderBorderDecorator = %SpriteBorderRect
-@onready var stats_border_rect: ShaderBorderDecorator = %StatsBorderRect
+@onready var badge_container_border_rect: ShaderBorderDecorator = %BadgeContainerBorderRect
 @onready var desc_border_rect: ShaderBorderDecorator = %DescBorderRect
 @onready var help_border_rect: ShaderBorderDecorator = %HelpBorderRect
 
@@ -148,6 +150,8 @@ func _setup_item_ui() -> void:
 		
 	# 4. Badge
 	badge_panel.visible = true
+	if badge_container_panel:
+		badge_container_panel.visible = true
 	badge_label.text = "ITEM"
 	var flat_style: StyleBoxFlat = StyleBoxFlat.new()
 	flat_style.bg_color = Color(0.35, 0.65, 0.55) # Teal/greyish green matching reference item label bg
@@ -176,7 +180,7 @@ func _update_sub_panel_borders(border_col: Color) -> void:
 	var panels: Array[ShaderBorderDecorator] = [
 		portrait_border_rect,
 		sprite_border_rect,
-		stats_border_rect,
+		badge_container_border_rect,
 		desc_border_rect,
 		help_border_rect
 	]
@@ -225,6 +229,8 @@ func update_badge() -> void:
 	var types: Array[UnitType] = _unit_instance.get_types()
 	if not types.is_empty():
 		badge_panel.visible = true
+		if badge_container_panel:
+			badge_container_panel.visible = true
 		var first_type: UnitType = types[0]
 		badge_label.text = first_type.type_name.to_upper()
 		
@@ -237,27 +243,58 @@ func update_badge() -> void:
 		badge_panel.add_theme_stylebox_override("panel", flat_style)
 	else:
 		badge_panel.visible = false
+		if badge_container_panel:
+			badge_container_panel.visible = false
 
 func update_stats() -> void:
 	if not _unit_instance:
 		return
 		
-	var stats_text: String = "%d HP" % _unit_instance.get_max_health()
-	if _unit_instance.get_attack() > 0:
-		stats_text += "   |   %d ATK" % _unit_instance.get_attack()
-	if _unit_instance.heal > 0:
-		stats_text += "   |   %d Heal" % _unit_instance.heal
-	if _unit_instance.shield > 0:
-		stats_text += "   |   %d Shield" % _unit_instance.shield
-	if _unit_instance.burn > 0:
-		stats_text += "   |   %d Burn" % _unit_instance.burn
-	if _unit_instance.electrocute > 0:
-		stats_text += "   |   %d Electro" % _unit_instance.electrocute
-	stats_text += "   |   %.1fs" % _unit_instance.get_cast_speed()
-	if _unit_instance.poison > 0:
-		stats_text += "   |   %d Poison" % _unit_instance.poison
+	# Clear old children in stats_grid
+	for child: Node in stats_grid.get_children():
+		child.queue_free()
 		
-	stats_label.text = stats_text
+	var active_stats: PackedStringArray = PackedStringArray()
+	active_stats.append("%d HP" % _unit_instance.get_max_health())
+	
+	if _unit_instance.get_attack() > 0:
+		active_stats.append("%d ATK" % _unit_instance.get_attack())
+	if _unit_instance.heal > 0:
+		active_stats.append("%d Heal" % _unit_instance.heal)
+	if _unit_instance.shield > 0:
+		active_stats.append("%d Shield" % _unit_instance.shield)
+	if _unit_instance.poison > 0:
+		active_stats.append("%d Poison" % _unit_instance.poison)
+	if _unit_instance.burn > 0:
+		active_stats.append("%d Burn" % _unit_instance.burn)
+	if _unit_instance.electrocute > 0:
+		active_stats.append("%d Electro" % _unit_instance.electrocute)
+
+	active_stats.append("%.1fs" % _unit_instance.get_cast_speed())
+	
+		
+	var i: int = 0
+	while i < active_stats.size():
+		var left_text: String = active_stats[i]
+		var right_text: String = ""
+		if i + 1 < active_stats.size():
+			right_text = active_stats[i + 1]
+			
+		var left_lbl: Label = stat_label_template.duplicate() as Label
+		left_lbl.text = left_text
+		left_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		left_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		left_lbl.visible = true
+		stats_grid.add_child(left_lbl)
+		
+		var right_lbl: Label = stat_label_template.duplicate() as Label
+		right_lbl.text = right_text
+		right_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		right_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		right_lbl.visible = true
+		stats_grid.add_child(right_lbl)
+		
+		i += 2
 
 func update_description() -> void:
 	if not _unit_instance:

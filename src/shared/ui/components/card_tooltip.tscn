@@ -110,30 +110,37 @@ text = "?"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="BadgeCenter" type="CenterContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
+[node name="StatsPanel" type="MarginContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
 
-[node name="BadgePanel" type="PanelContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/BadgeCenter"]
+[node name="StatsGrid" type="GridContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/StatsPanel"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+columns = 2
 
-[node name="BadgeLabel" type="Label" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/BadgeCenter/BadgePanel"]
+[node name="StatLabelTemplate" type="Label" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/StatsPanel"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 14
-text = "TYPE"
-horizontal_alignment = 1
-vertical_alignment = 1
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 15
 
-[node name="StatsPanel" type="PanelContainer" parent="Padding/VBox"]
+[node name="BadgeContainerPanel" type="PanelContainer" parent="Padding/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="StatsBorderRect" type="ColorRect" parent="Padding/VBox/StatsPanel"]
+[node name="BadgeContainerBorderRect" type="ColorRect" parent="Padding/VBox/BadgeContainerPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 script = ExtResource("2_decorator")
@@ -143,21 +150,30 @@ interior_color = Color(1, 1, 1, 1)
 outer_border_width = 2
 border_indentation = 1
 
-[node name="Margin" type="MarginContainer" parent="Padding/VBox/StatsPanel"]
+[node name="Margin" type="MarginContainer" parent="Padding/VBox/BadgeContainerPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 4
 
-[node name="StatsLabel" type="Label" parent="Padding/VBox/StatsPanel/Margin"]
+[node name="Center" type="CenterContainer" parent="Padding/VBox/BadgeContainerPanel/Margin"]
+layout_mode = 2
+
+[node name="BadgePanel" type="PanelContainer" parent="Padding/VBox/BadgeContainerPanel/Margin/Center"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BadgeLabel" type="Label" parent="Padding/VBox/BadgeContainerPanel/Margin/Center/BadgePanel"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_constants/outline_size = 5
+theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 14
+text = "TYPE"
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="DescPanel" type="PanelContainer" parent="Padding/VBox"]
 unique_name_in_owner = true
