@@ -4,7 +4,7 @@ extends UnitModifier
 func get_target(p_level: int = 1) -> TargetType:
 	if p_level >= 3:
 		return TargetType.ADJACENT
-	elif p_level >= 2:
+	if p_level >= 2:
 		return TargetType.HORIZONTAL
 	return TargetType.LEFT
 

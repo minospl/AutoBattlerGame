@@ -1,6 +1,7 @@
 # Przegląd Projektu i Wytyczne: AutoBattlerDungeonGame
 
-Ten dokument zawiera analizę projektu i służy jako baza wiedzy oraz zbiór reguł dla asystenta AI (Antigravity).
+Ten dokument zawiera analizę projektu i służy jako baza wiedzy oraz zbiór reguł dla asystenta AI (Antigravity). Szczegółowy plan rozwoju (roadmapa) projektu z podziałem na kamienie milowe znajduje się w pliku [project_road_map.md](file:///d:/Projekty/AutoBattlerDungeonGame/project_road_map.md) w głównym katalogu projektu.
+
 
 ## 1. Czym jest ten projekt?
 **AutoBattlerDungeonGame** to gra typu auto-battler z elementami dungeon crawler, rozwijana w silniku **Godot 4.7 (Forward Plus)** przy użyciu języka **GDScript**.
