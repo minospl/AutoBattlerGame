@@ -28,3 +28,5 @@ const DESC_SHIELD : String = "#b3b3b3"   # Standardized blue for Shield buffs
 const DESC_POISON : String = "#8e44ad"   # Standardized purple for poison
 const DESC_BURN : String = "#e67e22"     # Standardized Orange for burn
 const DESC_ELECTROCUTE : String = "#f1c40f" # Standardized Yellow for electrocute
+const DESC_GOLD : String = "#ffd700"         # Gold color
+const DESC_CAST_SPEED : String = "#54a0ff"   # Light blue for cast speed / cd reduction

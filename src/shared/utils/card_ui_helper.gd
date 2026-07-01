@@ -37,7 +37,7 @@ static func setup_card_visuals(
 		candidates.append({
 			"name": "shield",
 			"value": unit_instance.shield,
-			"color": Color(GameColors.DESC_ATTACK),
+			"color": Color(GameColors.DESC_SHIELD),
 			"priority": 2
 		})
 	if unit_instance.poison > 0:
@@ -231,7 +231,7 @@ static func setup_item_visuals(
 		if stat_boost_hp > 0:
 			hp_panel.visible = true
 			hp_label.text = "+" + str(stat_boost_hp)
-			setup_stat_panel_shader(hp_panel, Color(0.15, 0.6, 0.3), stat_size) # Green for HP
+			setup_stat_panel_shader(hp_panel, Color(GameColors.DESC_HEALTH), stat_size)
 		else:
 			hp_panel.visible = false
 
