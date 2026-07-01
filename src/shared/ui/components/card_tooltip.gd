@@ -11,7 +11,7 @@ extends MarginContainer
 @onready var badge_container_panel: PanelContainer = %BadgeContainerPanel
 @onready var stats_panel: MarginContainer = %StatsPanel
 @onready var stats_grid: GridContainer = %StatsGrid
-@onready var stat_label_template: Label = %StatLabelTemplate
+@onready var stat_label_template: RichTextLabel = %StatLabelTemplate
 @onready var desc_panel: PanelContainer = %DescPanel
 @onready var desc_label: RichTextLabel = %DescLabel
 
@@ -255,22 +255,24 @@ func update_stats() -> void:
 		child.queue_free()
 		
 	var active_stats: PackedStringArray = PackedStringArray()
-	active_stats.append("%d HP" % _unit_instance.get_max_health())
-	
-	if _unit_instance.get_attack() > 0:
-		active_stats.append("%d ATK" % _unit_instance.get_attack())
-	if _unit_instance.heal > 0:
-		active_stats.append("%d Heal" % _unit_instance.heal)
-	if _unit_instance.shield > 0:
-		active_stats.append("%d Shield" % _unit_instance.shield)
-	if _unit_instance.poison > 0:
-		active_stats.append("%d Poison" % _unit_instance.poison)
-	if _unit_instance.burn > 0:
-		active_stats.append("%d Burn" % _unit_instance.burn)
-	if _unit_instance.electrocute > 0:
-		active_stats.append("%d Electro" % _unit_instance.electrocute)
+	active_stats.append("%s [color=%s]HP[/color]" % [NumberFormatter.format_large_number(_unit_instance.get_max_health()), GameColors.DESC_HEALTH])
 
-	active_stats.append("%.1fs" % _unit_instance.get_cast_speed())
+	var cs_val: float = _unit_instance.get_cast_speed()
+	active_stats.append(str(cs_val).trim_suffix(".0") + " [color=%s]CD[/color]" % GameColors.DESC_CAST_SPEED)
+
+	if _unit_instance.get_attack() > 0:
+		active_stats.append("%s [color=%s]ATK[/color]" % [NumberFormatter.format_large_number(_unit_instance.get_attack()), GameColors.DESC_ATTACK])
+	if _unit_instance.heal > 0:
+		active_stats.append("%s [color=%s]HEAL[/color]" % [NumberFormatter.format_large_number(_unit_instance.heal), GameColors.DESC_HEAL])
+	if _unit_instance.shield > 0:
+		active_stats.append("%s [color=%s]SHIELD[/color]" % [NumberFormatter.format_large_number(_unit_instance.shield), GameColors.DESC_SHIELD])
+	if _unit_instance.poison > 0:
+		active_stats.append("%s [color=%s]POISON[/color]" % [NumberFormatter.format_large_number(_unit_instance.poison), GameColors.DESC_POISON])
+	if _unit_instance.burn > 0:
+		active_stats.append("%s [color=%s]BURN[/color]" % [NumberFormatter.format_large_number(_unit_instance.burn), GameColors.DESC_BURN])
+	if _unit_instance.electrocute > 0:
+		active_stats.append("%s [color=%s]ELEC[/color]" % [NumberFormatter.format_large_number(_unit_instance.electrocute), GameColors.DESC_ELECTROCUTE])
+
 	
 		
 	var i: int = 0
@@ -280,14 +282,14 @@ func update_stats() -> void:
 		if i + 1 < active_stats.size():
 			right_text = active_stats[i + 1]
 			
-		var left_lbl: Label = stat_label_template.duplicate() as Label
+		var left_lbl: RichTextLabel = stat_label_template.duplicate() as RichTextLabel
 		left_lbl.text = left_text
 		left_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		left_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		left_lbl.visible = true
 		stats_grid.add_child(left_lbl)
 		
-		var right_lbl: Label = stat_label_template.duplicate() as Label
+		var right_lbl: RichTextLabel = stat_label_template.duplicate() as RichTextLabel
 		right_lbl.text = right_text
 		right_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		right_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL

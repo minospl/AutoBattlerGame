@@ -411,7 +411,7 @@ func show_battle_outcome(p_outcome: String) -> void:
 func _on_gold_generated(amount: int, slot_idx: int) -> void:
 	if run_state:
 		run_state.gold += amount
-	_on_floating_text_requested(false, "+" + str(amount) + " Gold", Color(GameColors.DESC_GOLD), true, slot_idx)
+	_on_floating_text_requested(false, "+" + NumberFormatter.format_large_number(amount) + " Gold", Color(GameColors.DESC_GOLD), true, slot_idx)
 
 func set_playing(play: bool) -> void:
 	if play:

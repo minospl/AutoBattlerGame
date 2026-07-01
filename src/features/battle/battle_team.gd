@@ -124,7 +124,7 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 		health -= remaining_dmg
 		
 	health_changed.emit(health, max_health, shield)
-	floating_text_requested.emit("-" + str(actual_dmg), text_color, false, 0)
+	floating_text_requested.emit("-" + NumberFormatter.format_large_number(actual_dmg), text_color, false, 0)
 		
 	if max_health > 0 and health <= 0:
 		team_defeated.emit()
@@ -140,16 +140,16 @@ func heal(amount: int, source_slot_idx: int = -1) -> void:
 	
 	if actual_heal > 0:
 		if source_slot_idx != -1:
-			spawn_floating_text_on_slot(source_slot_idx, "+" + str(actual_heal), Color(GameColors.DESC_HEAL))
+			spawn_floating_text_on_slot(source_slot_idx, "+" + NumberFormatter.format_large_number(actual_heal), Color(GameColors.DESC_HEAL))
 		else:
-			floating_text_requested.emit("+" + str(actual_heal), Color(GameColors.DESC_HEAL), false, 0)
+			floating_text_requested.emit("+" + NumberFormatter.format_large_number(actual_heal), Color(GameColors.DESC_HEAL), false, 0)
 
 func add_shield(amount: int) -> void:
 	if amount <= 0:
 		return
 	shield += amount
 	health_changed.emit(health, max_health, shield)
-	floating_text_requested.emit("+" + str(amount), Color(GameColors.DESC_SHIELD), false, 0)
+	floating_text_requested.emit("+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_SHIELD), false, 0)
 
 func apply_status(status_type: String, amount: int) -> void:
 	if amount <= 0:
@@ -226,7 +226,7 @@ func buff_unit_attack(slot_idx: int, amount: int, permanent: bool = false) -> vo
 		b_unit.attack += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.attack += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " ATK", Color(GameColors.DESC_ATTACK))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " ATK", Color(GameColors.DESC_ATTACK))
 
 func buff_unit_max_health(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
@@ -239,7 +239,7 @@ func buff_unit_max_health(slot_idx: int, amount: int, permanent: bool = false) -
 	max_health += amount
 	health += amount
 	health_changed.emit(health, max_health, shield)
-	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " HP", Color(GameColors.DESC_HEALTH))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " HP", Color(GameColors.DESC_HEALTH))
 
 func add_unit_shield(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
@@ -251,7 +251,7 @@ func add_unit_shield(slot_idx: int, amount: int, permanent: bool = false) -> voi
 			b_unit.base_unit.shield += amount
 	shield += amount
 	health_changed.emit(health, max_health, shield)
-	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Shield", Color(GameColors.DESC_SHIELD))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Shield", Color(GameColors.DESC_SHIELD))
 
 func buff_unit_poison(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
@@ -261,7 +261,7 @@ func buff_unit_poison(slot_idx: int, amount: int, permanent: bool = false) -> vo
 		b_unit.poison += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.poison += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Poison", Color(GameColors.DESC_POISON))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Poison", Color(GameColors.DESC_POISON))
 
 func buff_unit_burn(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
@@ -271,7 +271,7 @@ func buff_unit_burn(slot_idx: int, amount: int, permanent: bool = false) -> void
 		b_unit.burn += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.burn += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Burn", Color(GameColors.DESC_BURN))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Burn", Color(GameColors.DESC_BURN))
 
 func buff_unit_electrocute(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
@@ -281,7 +281,7 @@ func buff_unit_electrocute(slot_idx: int, amount: int, permanent: bool = false) 
 		b_unit.electrocute += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.electrocute += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Electrocute", Color(GameColors.DESC_ELECTROCUTE))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Electrocute", Color(GameColors.DESC_ELECTROCUTE))
 
 func buff_unit_heal_power(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
@@ -291,7 +291,7 @@ func buff_unit_heal_power(slot_idx: int, amount: int, permanent: bool = false) -
 		b_unit.heal += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.heal += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + str(amount) + " Heal Power", Color(GameColors.DESC_HEAL))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Heal Power", Color(GameColors.DESC_HEAL))
 
 func buff_unit_cast_speed(slot_idx: int, amount: float, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:

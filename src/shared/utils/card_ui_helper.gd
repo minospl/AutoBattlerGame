@@ -95,7 +95,7 @@ static func setup_card_visuals(
 			var label: Label = panel.find_child("*Label", true, false) as Label
 			if label:
 				var stat_val: int = stat.value
-				label.text = format_large_number(stat_val)
+				label.text = NumberFormatter.format_large_number(stat_val)
 			var stat_color: Color = stat.color
 			setup_stat_panel_shader(panel, stat_color, stat_size)
 			panel.visible = true
@@ -249,21 +249,3 @@ static func show_item_tooltip(tooltip: CardTooltip, item_card: ShopItemInstance)
 static func hide_tooltip(tooltip: CardTooltip) -> void:
 	if tooltip:
 		tooltip.visible = false
-
-## Helper to format large numbers (e.g. 15029 -> 15k, 1000 -> 1k, 1500000 -> 1.5M)
-static func format_large_number(val: int) -> String:
-	if val < 1000:
-		return str(val)
-		
-	if val < 1000000:
-		var k_val: float = val / 1000.0
-		var formatted: String = "%.1fk" % k_val
-		if formatted.ends_with(".0k"):
-			formatted = str(roundi(k_val)) + "k"
-		return formatted
-	
-	var m_val: float = val / 1000000.0
-	var formatted_m: String = "%.1fM" % m_val
-	if formatted_m.ends_with(".0M"):
-		formatted_m = str(roundi(m_val)) + "M"
-	return formatted_m
