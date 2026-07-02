@@ -6,11 +6,11 @@ enum BorderType { SINGLE, DOUBLE }
 @export var border_type: BorderType = BorderType.DOUBLE
 @export var border_color: Color = GameColors.PANEL_BORDER_DEFAULT
 @export var inner_border_color: Color = GameColors.BORDER_INNER_DEFAULT
-@export var interior_color: Color = Color(0, 0, 0, 0)
+@export var interior_color: Color = GameColors.TRANSPARENT
 @export var outer_border_width: int = 3
 @export var inner_border_width: int = 3
 @export var border_indentation: int = 3
-@export var corner_color: Color = Color(0, 0, 0, 0) # GameColors.TRANSPARENT
+@export var corner_color: Color = GameColors.TRANSPARENT
 
 var shader_material: ShaderMaterial
 

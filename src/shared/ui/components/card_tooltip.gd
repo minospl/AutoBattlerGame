@@ -156,7 +156,6 @@ func _update_sub_panel_borders(border_col: Color) -> void:
 	for rect: ShaderBorderDecorator in panels:
 		if rect:
 			rect.border_color = border_col
-			rect.interior_color = Color(1, 1, 1, 1)
 			rect.update_shader_parameters()
 
 func update_header() -> void:

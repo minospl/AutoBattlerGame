@@ -81,22 +81,23 @@ layout_mode = 2
 
 [node name="SpriteBorderRect" type="ColorRect" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame"]
 unique_name_in_owner = true
+z_index = 1
 layout_mode = 2
 script = ExtResource("2_decorator")
 border_type = 1
 border_color = Color(0.57, 0.58, 0.65, 1)
 inner_border_color = Color(0.88, 0.89, 0.91, 1)
-interior_color = Color(1, 1, 1, 1)
-outer_border_width = 3
-inner_border_width = 3
-border_indentation = 3
+interior_color = Color(1, 1, 1, 0)
+outer_border_width = 2
+inner_border_width = 2
+border_indentation = 1
 
 [node name="Center" type="CenterContainer" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame"]
 layout_mode = 2
 
 [node name="SpriteRect" type="TextureRect" parent="Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(76, 76)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
