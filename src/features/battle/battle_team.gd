@@ -20,12 +20,48 @@ var max_health: int = 0
 var health: int = 0
 var shield: int = 0
 
-# Status Effects
-var poison: int = 0
-var poison_timer: float = 0.0
-var burn: int = 0
-var burn_timer: float = 0.0
-var electrocute: int = 0
+# Status Effects Dictionary (Typed to avoid unsafe cast warnings)
+var active_statuses: Dictionary[String, StatusEffect] = {}
+
+# Getter/Setter compatibility properties
+var poison: int:
+	get:
+		var effect: StatusEffect = active_statuses.get("poison")
+		return effect.stacks if effect else 0
+	set(val):
+		var effect: StatusEffect = active_statuses.get("poison")
+		if effect:
+			if val <= 0:
+				effect.reset()
+			else:
+				effect.stacks = val
+				effect.on_apply()
+
+var burn: int:
+	get:
+		var effect: StatusEffect = active_statuses.get("burn")
+		return effect.stacks if effect else 0
+	set(val):
+		var effect: StatusEffect = active_statuses.get("burn")
+		if effect:
+			if val <= 0:
+				effect.reset()
+			else:
+				effect.stacks = val
+				effect.on_apply()
+
+var electrocute: int:
+	get:
+		var effect: StatusEffect = active_statuses.get("electrocute")
+		return effect.stacks if effect else 0
+	set(val):
+		var effect: StatusEffect = active_statuses.get("electrocute")
+		if effect:
+			if val <= 0:
+				effect.reset()
+			else:
+				effect.stacks = val
+				effect.on_apply()
 
 var is_enemy: bool = false
 
@@ -35,14 +71,17 @@ func initialize(p_is_enemy: bool = false) -> void:
 	units.clear()
 	units.resize(MAX_TEAM_SIZE)
 	cast_timers = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+	
+	_initialize_status_effects()
 
 func load_team_units(new_units: Array[UnitInstance]) -> void:
 	shield = 0
-	poison = 0
-	poison_timer = 0.0
-	burn = 0
-	burn_timer = 0.0
-	electrocute = 0
+	
+	if active_statuses.is_empty():
+		_initialize_status_effects()
+	else:
+		for effect: StatusEffect in active_statuses.values():
+			effect.reset()
 	
 	health = 0
 	max_health = 0
@@ -76,8 +115,6 @@ func execute_cast(source_idx: int, opponent: BattleTeam) -> void:
 	# Attack opponent team!
 	var dmg: int = unit.get_attack()
 	if dmg > 0:
-		if opponent.electrocute > 0:
-			dmg += opponent.electrocute
 		opponent.take_damage(dmg)
 		
 	# Apply status effects to opponent
@@ -102,6 +139,13 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 		return
 		
 	var actual_dmg: int = amount
+	
+	# Let active status effects modify the incoming damage
+	for effect: StatusEffect in active_statuses.values():
+		actual_dmg = effect.modify_incoming_damage(actual_dmg, damage_type)
+			
+	if actual_dmg <= 0:
+		return
 	var text_color: Color = Color(GameColors.DESC_ATTACK) # default red
 	
 	if damage_type == "poison":
@@ -159,53 +203,52 @@ func add_shield(amount: int) -> void:
 func apply_status(status_type: String, amount: int) -> void:
 	if amount <= 0:
 		return
-	if status_type == "poison":
-		poison += amount
-	elif status_type == "burn":
-		burn += amount
-	elif status_type == "electrocute":
-		electrocute += amount
 		
-	status_changed.emit(status_type, get_status_value(status_type), get_status_cooldown_ratio(status_type))
+	var effect: StatusEffect = active_statuses.get(status_type)
+	if effect:
+		effect.add_stacks(amount)
+
+func remove_status(status_type: String) -> void:
+	var effect: StatusEffect = active_statuses.get(status_type)
+	if effect:
+		effect.reset()
+		status_changed.emit(status_type, 0, 0.0)
+
+func emit_status_changed(status_type: String, amount: int, cooldown_ratio: float) -> void:
+	status_changed.emit(status_type, amount, cooldown_ratio)
+
+func _initialize_status_effects() -> void:
+	active_statuses.clear()
+	
+	var poison_effect: StatusEffect = PoisonStatus.new()
+	poison_effect.initialize("poison", self, 0)
+	active_statuses["poison"] = poison_effect
+	
+	var burn_effect: StatusEffect = BurnStatus.new()
+	burn_effect.initialize("burn", self, 0)
+	active_statuses["burn"] = burn_effect
+	
+	var electrocute_effect: StatusEffect = ElectrocuteStatus.new()
+	electrocute_effect.initialize("electrocute", self, 0)
+	active_statuses["electrocute"] = electrocute_effect
 
 func get_status_value(status_type: String) -> int:
-	match status_type:
-		"poison": return poison
-		"burn": return burn
-		"electrocute": return electrocute
-	return 0
+	var effect: StatusEffect = active_statuses.get(status_type)
+	return effect.stacks if effect else 0
 
 func get_status_cooldown_ratio(status_type: String) -> float:
-	match status_type:
-		"poison": return clampf(poison_timer / 1.0, 0.0, 1.0)
-		"burn": return clampf(burn_timer / 0.5, 0.0, 1.0)
+	var effect: StatusEffect = active_statuses.get(status_type)
+	if effect:
+		if effect is PoisonStatus:
+			return clampf((effect as PoisonStatus).timer / 1.0, 0.0, 1.0)
+		if effect is BurnStatus:
+			return clampf((effect as BurnStatus).timer / 0.5, 0.0, 1.0)
 	return 0.0
 
 func tick_statuses(delta: float) -> void:
-	# Tick poison status every second!
-	if poison > 0:
-		poison_timer += delta
-		if poison_timer >= 1.0:
-			poison_timer -= 1.0
-			take_damage(poison, "poison")
-		status_changed.emit("poison", poison, clampf(poison_timer / 1.0, 0.0, 1.0))
-	else:
-		if poison_timer > 0.0:
-			poison_timer = 0.0
-			status_changed.emit("poison", 0, 0.0)
-
-	# Tick burn status every 0.5 seconds!
-	if burn > 0:
-		burn_timer += delta
-		if burn_timer >= 0.5:
-			burn_timer -= 0.5
-			take_damage(burn, "burn")
-			burn = max(0, burn - 1)
-		status_changed.emit("burn", burn, clampf(burn_timer / 0.5, 0.0, 1.0))
-	else:
-		if burn_timer > 0.0:
-			burn_timer = 0.0
-			status_changed.emit("burn", 0, 0.0)
+	for effect: StatusEffect in active_statuses.values():
+		if effect.stacks > 0:
+			effect.tick(delta)
 
 func tick_casts(delta: float, cast_callback: Callable) -> void:
 	for i: int in range(MAX_TEAM_SIZE):
