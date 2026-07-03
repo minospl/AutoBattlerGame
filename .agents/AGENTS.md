@@ -83,26 +83,31 @@ Każda jednostka z unikalną zdolnością posiada przypisany modyfikator dziedzi
 Podczas edycji lub rozbudowy tego projektu muszę przestrzegać następujących reguł:
 
 1.  **Ścisłe typowanie (Static Typing):** W pliku `project.godot` włączone są restrykcyjne ostrzeżenia kompilatora GDScript (`untyped_declaration=1`, `unsafe_property_access=1`, `inferred_declaration=1` itp.). Należy przestrzegać następujących zasad:
-    *   **Brak wnioskowania typów (Inferred Types):** Nie używaj operatora wnioskowania `:=` (np. `var x := 5` lub `var inst := run_state.active_team[i]`). Wszystkie zmienne muszą mieć w pełni i jawnie zadeklarowany typ (np. `var x: int = 5`, `var inst: UnitInstance = ...`).
-    *   **Typowanie iteratorów pętli:** Każdy iterator w pętli `for` musi mieć zadeklarowany typ (np. `for i: int in range(6):` lub `for slot: ShopCardSlot in slots:`).
-    *   **Typowanie lambd/funkcji anonimowych:** Wszystkie lambdy przypisywane do zmiennych lub przekazywane jako Callables muszą mieć otypowane parametry oraz określony typ zwracany (np. `var find_template: Callable = func(p_name: String) -> UnitData:`).
-    *   **Bezpieczny dostęp (Unsafe Access):** Unikaj ostrzeżeń `unsafe_property_access`. Przypisuj dynamicznie pobierane obiekty bezpośrednio do zmiennych z jawnym typem podklasy (np. `var card: ShopCard = slots[i].get_card()`), co jest dozwolone i bezpieczne dla obiektów z hierarchii klas bazowych. Używaj rzutowania `as` tylko przy odczycie pól typu `Variant` (np. `card.get("unit_instance") as UnitInstance`) lub przy rzutowaniu obiektów z typów dynamicznych.
-    *   **Jawne rzutowanie typów:** Podczas wczytywania scen, skryptów lub zasobów zawsze rzutuj załadowany zasób (np. `load(path) as PackedScene` or `load(path) as Script`).
-    *   **Bezpieczne rzutowanie ze słowników (Unsafe Casts):** Dla stałych słowników klasowych zawsze używaj silnego typowania generycznego (np. `var active_statuses: Dictionary[String, StatusEffect] = {}`). Zapobiega to zwracaniu typu `Variant` i ostrzeżeniom `UNSAFE_CAST` przy odczycie.
+    *   **Brak wnioskowania typów (Inferred Types):** Nie używaj operatora wnioskowania `:=` (np. `var x := 5` lub `var inst := get_item()`). Wszystkie zmienne muszą mieć w pełni i jawnie zadeklarowany typ (np. `var x: int = 5`, `var inst: MyClass = ...`).
+    *   **Typowanie iteratorów pętli:** Każdy iterator w pętli `for` musi mieć zadeklarowany typ (np. `for i: int in range(6):` lub `for node: Node in container.get_children():`).
+    *   **Typowanie lambd/funkcji anonimowych:** Wszystkie lambdy przypisywane do zmiennych lub przekazywane jako Callables muszą mieć otypowane parametry oraz określony typ zwracany (np. `var process_data: Callable = func(p_name: String) -> Variant:`).
+    *   **Bezpieczny dostęp (Unsafe Access):** Unikaj ostrzeżeń `unsafe_property_access`. Przypisuj dynamicznie pobierane obiekty bezpośrednio do zmiennych z jawnym typem podklasy (np. `var child: ChildClass = parent.get_child(i)`), co jest dozwolone i bezpieczne dla obiektów z hierarchii klas bazowych. Używaj rzutowania `as` tylko przy odczycie pól typu `Variant` (np. `node.get("property") as MyClass`) lub przy rzutowaniu obiektów z typów dynamicznych.
+    *   **Jawne rzutowanie typów:** Podczas wczytywania scen, skryptów lub zasobów zawsze rzutuj załadowany zasób (np. `load(path) as PackedScene` lub `load(path) as Script`).
+    *   **Bezpieczne rzutowanie ze słowników (Unsafe Casts):** Dla słowników klasowych reprezentujących stałą strukturę danych zawsze używaj silnego typowania generycznego (np. `var my_dict: Dictionary[String, ResourceClass] = {}`). Zapobiega to zwracaniu typu `Variant` i ostrzeżeniom `UNSAFE_CAST` przy odczycie.
+
 2.  **Dobre praktyki Godot 4.x & GDScript:**
     *   **Konwencje Nazewnictwa:** Klasy w PascalCase (`class_name MyClass`), zmienne i funkcje w snake_case (`func load_game()`), stałe w UPPER_SNAKE_CASE (`const MAX_SIZE = 6`).
-    *   **Referencje do węzłów:** Do pobierania węzłów z drzewa sceny używaj mechanizmu unikalnych nazw (`%UniqueNodeName`) oraz słowa kluczowego `@onready` (np. `@onready var play_button = %PlayButton`). Zapobiega to psuciu się referencji po zmianie struktury sceny.
+    *   **Referencje do węzłów:** Do pobierania węzłów z drzewa sceny używaj mechanizmu unikalnych nazw (`%UniqueNodeName`) oraz słowa kluczowego `@onready` (np. `@onready var confirm_button = %ConfirmButton`). Zapobiega to psuciu się referencji po zmianie struktury sceny.
     *   **Zarządzanie Pamięcią:** Zawsze używaj `queue_free()` zamiast `free()` do bezpiecznego usuwania węzłów pod koniec klatki.
     *   **Wydajność:** Unikaj wywołań wyszukiwania węzłów (`get_node()` lub `$`) w pętlach i funkcjach cyklicznych takich jak `_process()` lub `_physics_process()`. Cache'uj referencje w zmiennych `@onready`.
     *   **Obsługa Sygnałów:** Preferuj łączenie sygnałów w kodzie za pomocą bezpiecznej składni Godot 4 (np. `button.pressed.connect(_on_button_pressed)`).
-3.  **Architektura bez Autoloadów (Singletons):** Stan gry (`RunState`) nie jest singletonem. Jest przekazywany bezpośrednio między scenami w funkcjach `setup()`. Należy unikać wprowadzania globalnych autoloadów, chyba że jest to absolutnie konieczne.
-4.  **Podział Logiki i UI:** Komponenty interfejsu (np. `ShopCardSlot`, `BattleCardSlot`) wizualizują stan logiczny obiektów typu `UnitInstance` i `ShopItemInstance`. Zmiany w UI muszą być synchronizowane z danymi w logicznych strukturach (funkcja `sync_data_from_ui()`).
-5.  **Zachowanie Premium UI:** Zmiany wizualne powinny zachowywać estetyczny, spójny styl gry (ciemne tła, dopasowane kolory zdefiniowane w `GameColors`, płynne przejścia).
-6.  **Minimalizacja halucynacji i weryfikacja kodu:** Zanim założysz istnienie jakiejkolwiek metody, zmiennej lub wartości enuma w klasach pomocniczych (np. `UnitModifier.Trigger`), ZAWSZE otwórz i przeanalizuj powiązane pliki źródłowe (.gd lub .tres) w celu weryfikacji ich rzeczywistej implementacji. Jeśli nie jesteś czegoś pewien, zbadaj bazę kodu zamiast zgadywać.
-7.  **Zasada Szerokiej Analizy i Walka z Tunnel Vision:**
-    *   **Analiza Konsekwencji:** Zanim wprowadzisz jakąś zmianę (np. ukryjesz panel lub zmodyfikujesz flagę), pomyśl o jej szerokich konsekwencjach. Czy powiązane zmienne, sygnatury metod pomocniczych lub węzły w scenach `.tscn` stają się niepotrzebne? Jeśli tak, usuń je zamiast pisać puste obejścia.
-    *   **Brak Ślepego Kopiowania (No Boilerplate):** Kopiując wzorce (np. z jednostek do przedmiotów), zawsze upewnij się, że obiekt docelowy potrzebuje wszystkich tych mechanik (np. przedmioty nie potrzebują skalowania poziomów i `get_modifier_value`).
-    *   **Zgodność Stylistyczna:** Wszystkie nowo generowane opisy, wartości i teksty UI muszą zachować formatowanie spójne z istniejącymi elementami (np. używanie kolorów BBCode `GameColors.DESC_HEALTH` w opisach).
-    *   **Ujednolicone Szablony UI:** Wszelkie generyczne węzły matryc w `.tscn` (np. powielane w pętli) muszą mieć ogólne nazwy typu `StatPanel` czy `LabelTemplate`, a nie konkretne `AttackPanel`.
-8.  **Spłaszczanie struktury kodu (Guard Clauses):** Unikaj głębokich zagnieżdżeń bloków `if` w logice gry i interfejsu. Dąż do zmniejszenia wcięć tabulacji poprzez stosowanie klauzul strażniczych (wczesnych powrotów `return` na początku funkcji).
+
+3.  **Zarządzanie stanem i architekturą:**
+    *   **Architektura bez Autoloadów (Singletons):** Stan gry nie powinien być przechowywany w globalnych singletonach (Autoloadach). Powinien być przekazywany bezpośrednio między scenami za pomocą dedykowanych metod konfiguracyjnych (np. `setup(state)`).
+    *   **Podział Logiki i UI:** Komponenty interfejsu (UI) wizualizują stan logiczny obiektów/zasobów. Wszelkie zmiany w UI muszą być synchronizowane z danymi w logicznych strukturach danych.
+    *   **Zachowanie Spójności Stylu (Premium UI):** Zmiany wizualne powinny zachowywać estetyczny, spójny styl graficzny zdefiniowany w motywach i kolorach klas wspólnych gry.
+
+4.  **Weryfikacja kodu i zapobieganie błędom:**
+    *   **Minimalizacja halucynacji i weryfikacja kodu:** Zanim założysz istnienie jakiejkolwiek metody, zmiennej lub wartości enuma w klasach pomocniczych i zasobach, ZAWSZE otwórz i przeanalizuj powiązane pliki źródłowe (`.gd` lub `.tres`) w celu weryfikacji ich rzeczywistej implementacji.
+    *   **Zasada Szerokiej Analizy i Walka z Tunnel Vision:**
+        *   **Analiza Konsekwencji:** Zanim wprowadzisz jakąś zmianę, pomyśl o jej szerokich konsekwencjach. Czy powiązane zmienne, sygnatury metod pomocniczych lub węzły w scenach `.tscn` stają się niepotrzebne? Jeśli tak, usuń je zamiast pisać puste obejścia.
+        *   **Brak Ślepego Kopiowania (No Boilerplate):** Kopiując wzorce, zawsze upewnij się, że obiekt docelowy potrzebuje wszystkich tych mechanik (nie twórz nadmiarowych metod i pól).
+        *   **Zgodność Stylistyczna:** Wszystkie nowo generowane opisy, wartości i teksty UI muszą zachować formatowanie spójne z istniejącymi elementami (np. używanie jednolitych tagów formatowania tekstu i kolorów).
+        *   **Ujednolicone Szablony UI:** Wszelkie generyczne węzły i szablony w plikach `.tscn` (np. powielane w pętli) muszą mieć ogólne nazwy klasowe/funkcjonalne, a nie powiązane z konkretnymi wariantami danych.
+    *   **Spłaszczanie struktury kodu (Guard Clauses):** Unikaj głębokich zagnieżdżeń bloków `if` w logice gry i interfejsu. Dąż do zmniejszenia wcięć tabulacji poprzez stosowanie klauzul strażniczych (wczesnych powrotów `return` na początku funkcji).
 
