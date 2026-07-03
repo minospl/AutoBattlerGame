@@ -42,6 +42,8 @@ var bench_slots: Array[ShopCardSlot]:
 		return bench_panel.slots
 
 var preview_tooltip: CardTooltip
+var current_hovered_card: Control = null
+var current_drag_hovered_slot: ShopCardSlot = null
 
 func _ready() -> void:
 	active_team.resize(active_slot_count)
@@ -137,6 +139,12 @@ func create_slots() -> void:
 		slot.gold_provider = get_gold_fn
 		slot.gold_deductor = deduct_gold_fn
 		slot.shop_refiller = refill_slot_fn
+		
+		# Connect drag hover signals for target highlighting preview
+		if not slot.drag_hover_started.is_connected(_on_slot_drag_hover_started):
+			slot.drag_hover_started.connect(_on_slot_drag_hover_started)
+		if not slot.drag_hover_ended.is_connected(_on_slot_drag_hover_ended):
+			slot.drag_hover_ended.connect(_on_slot_drag_hover_ended)
 
 
 func _on_slot_changed(_slot: ShopCardSlot) -> void:
@@ -189,14 +197,14 @@ func populate_ui() -> void:
 	# Instantiate cards according to the data state
 	for i: int in range(active_slot_count):
 		if i < active_team.size() and active_team[i] != null:
-			var card: ShopCard = card_scene.instantiate() as ShopCard
+			var card: ShopCard = card_scene.instantiate()
 			card.unit_instance = active_team[i]
 			_connect_card_signals(card)
 			active_slots[i].add_card(card)
 			
 	for i: int in range(bench_slot_count):
 		if i < bench.size() and bench[i] != null:
-			var card: ShopCard = card_scene.instantiate() as ShopCard
+			var card: ShopCard = card_scene.instantiate()
 			card.unit_instance = bench[i]
 			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
@@ -206,7 +214,7 @@ func add_unit_to_bench(unit: UnitInstance) -> bool:
 	for i: int in range(bench_slot_count):
 		if bench[i] == null:
 			bench[i] = unit
-			var card: ShopCard = card_scene.instantiate() as ShopCard
+			var card: ShopCard = card_scene.instantiate()
 			card.unit_instance = unit
 			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
@@ -218,14 +226,14 @@ func add_unit_to_bench(unit: UnitInstance) -> bool:
 func clear_all() -> void:
 	for i: int in range(active_slot_count):
 		active_team[i] = null
-		var card: Control = active_slots[i].get_card()
+		var card: ShopCard = active_slots[i].get_card() 
 		if card:
 			active_slots[i].remove_card(card)
 			card.queue_free()
 			
 	for i: int in range(bench_slot_count):
 		bench[i] = null
-		var card: Control = bench_slots[i].get_card()
+		var card: ShopCard = bench_slots[i].get_card()
 		if card:
 			bench_slots[i].remove_card(card)
 			card.queue_free()
@@ -350,6 +358,8 @@ func set_preview_card(card: Control) -> void:
 	if not preview_tooltip:
 		return
 		
+	current_hovered_card = card
+	
 	if card is ShopCard:
 		var shop_card: ShopCard = card
 		if shop_card.unit_instance:
@@ -364,15 +374,23 @@ func clear_preview_card(card: Control = null) -> void:
 	if not preview_tooltip:
 		return
 		
+	# Only clear if the card exiting hover is actually the one currently tracked!
+	if card != null and current_hovered_card != card:
+		return
+		
+	current_hovered_card = null
 	CardUIHelper.hide_tooltip(preview_tooltip)
 	_on_card_hovered(card, false)
 
-func _on_card_hovered(card: Control, is_hovered: bool) -> void:
-	# Clear all target highlights first
+func _clear_all_target_highlights() -> void:
 	for slot: ShopCardSlot in active_slots:
 		slot.set_target_highlight(false)
 	for slot: ShopCardSlot in bench_slots:
 		slot.set_target_highlight(false)
+
+func _on_card_hovered(card: Control, is_hovered: bool) -> void:
+	# Clear all target highlights first
+	_clear_all_target_highlights()
 		
 	if not is_hovered or card == null or not (card is ShopCard) or (card as ShopCard).unit_instance == null:
 		return
@@ -421,6 +439,37 @@ func _on_card_hover_changed(card: Control, is_hovered: bool) -> void:
 		set_preview_card(card)
 	else:
 		clear_preview_card(card)
+
+func _on_slot_drag_hover_started(slot: ShopCardSlot, data: Dictionary) -> void:
+	current_drag_hovered_slot = slot
+	_clear_all_target_highlights()
+	
+	if not slot.is_active_team:
+		return
+		
+	var dragged_card: Variant = data.get("card")
+	if not (dragged_card is ShopCard):
+		return
+		
+	var unit_card: ShopCard = dragged_card
+	var unit: UnitInstance = unit_card.unit_instance
+	if not unit or not unit.data or not unit.data.modifier:
+		return
+		
+	var modifier: UnitModifier = unit.data.modifier
+	var current_target: UnitModifier.TargetType = modifier.get_target(unit.level)
+	if current_target == UnitModifier.TargetType.SELF:
+		return
+		
+	var target_indices: Array[int] = TargetResolver.get_target_indices(slot.slot_index, current_target)
+	for t_idx: int in target_indices:
+		if t_idx < active_slots.size():
+			active_slots[t_idx].set_target_highlight(true)
+
+func _on_slot_drag_hover_ended(slot: ShopCardSlot) -> void:
+	if current_drag_hovered_slot == slot:
+		current_drag_hovered_slot = null
+		_clear_all_target_highlights()
 
 func _on_card_clicked(card: ShopCard) -> void:
 	var original_slot: ShopCardSlot = card.slot

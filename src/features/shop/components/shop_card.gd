@@ -98,9 +98,13 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	
 	# Semitransparent preview
 	preview.modulate.a = 0.7
+	preview.z_index = 100
+	preview.z_as_relative = false
 	
 	# Create a wrapper control to center the preview under the mouse cursor
 	var preview_wrapper: Control = Control.new()
+	preview_wrapper.z_index = 100
+	preview_wrapper.z_as_relative = false
 	preview_wrapper.add_child(preview)
 	preview.position = -custom_minimum_size / 2.0
 	

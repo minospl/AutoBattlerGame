@@ -3,6 +3,10 @@ extends Control
 
 ## Signal emitted when the card inside this slot changes (added, removed, swapped)
 signal slot_changed(slot: ShopCardSlot)
+signal drag_hover_started(slot: ShopCardSlot, data: Dictionary)
+signal drag_hover_ended(slot: ShopCardSlot)
+
+var is_drag_hovering: bool = false
 
 ## If true, this slot is part of the active combat team. If false, it is on the bench.
 @export var is_active_team: bool = false
@@ -115,6 +119,9 @@ func _process(_delta: float) -> void:
 		var rect: Rect2 = Rect2(Vector2.ZERO, card_container.size)
 		if not rect.has_point(mouse_pos):
 			update_style(false)
+			if is_drag_hovering:
+				is_drag_hovering = false
+				drag_hover_ended.emit(self)
 
 # Determine if we can drop a dragged item onto this slot
 func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
@@ -143,11 +150,17 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 				var target_card: Control = get_card()
 				if target_card and "unit_instance" in target_card:
 					update_style(true)
+					if not is_drag_hovering:
+						is_drag_hovering = true
+						drag_hover_started.emit(self, dict)
 					return true
 				return false
 		
 			# Normal unit card
 			update_style(true)
+			if not is_drag_hovering:
+				is_drag_hovering = true
+				drag_hover_started.emit(self, dict)
 			return true
 			
 	return false
@@ -157,6 +170,9 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_END:
 		# Restore proper style based on slot occupancy
 		update_style(false)
+		if is_drag_hovering:
+			is_drag_hovering = false
+			drag_hover_ended.emit(self)
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	update_style(false)
