@@ -10,7 +10,7 @@ signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
 @onready var sell_overlay: MarginContainer = %SellOverlay
 @onready var sell_panel: PanelContainer = %SellPanel
 @onready var sell_label: Label = %SellLabel
-@onready var border_decorator: PanelBorderDecorator = $PanelBorderDecorator
+@onready var border_decorator: ShaderBorderDecorator = $PanelBorder/BorderOverlay as ShaderBorderDecorator
 
 @export var gold: int = 10:
 	set(val):
@@ -49,11 +49,9 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 			var dict: Dictionary = data
 			if dict.has("original_slot") and dict.has("card"):
 				var original_slot: ShopCardSlot = dict["original_slot"]
-				# Can only sell if it comes from team or bench (not a shop slot)
-				if original_slot and not original_slot.is_shop_slot:
+				if original_slot and not original_slot.is_shop_slot: # Can only sell if it comes from team or bench (not a shop slot)
 					var card: Control = dict["card"]
-					# Only sell Card (units)
-					if card is ShopCard:
+					if card is ShopCard: # Only sell Card (units)
 						return true
 	return false
 
@@ -66,8 +64,7 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 			sell_card_requested.emit(card, original_slot)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_DRAG_BEGIN:
-		# Check if the dragged item is sellable by querying DragManager's static variables
+	if what == NOTIFICATION_DRAG_BEGIN: # Check if the dragged item is sellable by querying DragManager's static variables
 		var card: Control = DragManager.dragged_card
 		var original_slot: ShopCardSlot = null
 		if DragManager.dragged_card_original_slot is ShopCardSlot:

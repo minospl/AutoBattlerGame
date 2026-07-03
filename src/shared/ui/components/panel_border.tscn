@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://cx8g0ytsq24b"]
+
+[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="1_script"]
+
+[node name="PanelBorder" type="PanelContainer"]
+theme_type_variation = &"TransparentPanel"
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BackgroundOverlay" type="ColorRect" parent="."]
+layout_mode = 2
+script = ExtResource("1_script")
+border_type = 0
+border_color = Color(1, 1, 1, 1)
+interior_color = Color(1, 1, 1, 1)
+border_indentation = 3
+
+[node name="Content" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BorderOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+z_index = 1
+script = ExtResource("1_script")
+border_type = 1
+border_color = Color(0.3, 0.25, 0.25, 1.0)
+interior_color = Color(0, 0, 0, 0)
+border_indentation = 3

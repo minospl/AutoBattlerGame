@@ -14,7 +14,7 @@ extends Node
 @export var color_hover: Color = Color(0.18, 0.60, 0.36, 1.0) # BTN_GREEN_HOVER
 @export var color_pressed: Color = Color(0.12, 0.40, 0.24, 1.0) # BTN_GREEN_PRESSED
 
-@export var color_outer_border: Color = Color(0.29, 0.251, 0.255, 1.0) # PANEL_BORDER_DEFAULT
+@export var color_outer_border: Color = Color(0.3, 0.25, 0.25, 1.0) # PANEL_BORDER_DEFAULT
 @export var color_inner_border: Color = Color(1.0, 1.0, 1.0, 1.0) # WHITE
 
 var parent_button: Button

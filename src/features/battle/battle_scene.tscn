@@ -1,9 +1,8 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/features/battle/battle_scene.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_card_slot.tscn" id="2_slot"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="3_button_decorator"]
-[ext_resource type="Script" path="res://src/shared/ui/decorators/panel_border_decorator.gd" id="4_border_decorator"]
 [ext_resource type="Script" path="res://src/features/battle/components/status_badge.gd" id="5_status_badge"]
 
 [node name="BattleScene" type="Control"]
@@ -140,7 +139,7 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
-color = Color(0.29, 0.251, 0.255, 1)
+color = Color(0.3, 0.25, 0.25, 1)
 
 [node name="BattleAreaVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
@@ -373,7 +372,6 @@ layout_mode = 2
 [node name="EnemySlot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
-
 
 [node name="PreviewContainer" type="MarginContainer" parent="."]
 unique_name_in_owner = true

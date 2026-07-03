@@ -4,7 +4,7 @@ extends Node
 # Card and Slot borders
 const BORDER_OUTER_DEFAULT : Color = Color(0.57, 0.58, 0.65, 1) # Grey-blue
 const BORDER_INNER_DEFAULT : Color= Color(0.88, 0.89, 0.91, 1) # Light grey
-const PANEL_BORDER_DEFAULT : Color= Color(0.29, 0.251, 0.255, 1.0)
+const PANEL_BORDER_DEFAULT : Color= Color(0.3, 0.25, 0.25, 1.0)
 const GOLDEN_BORDER : Color = Color(0.95, 0.72, 0.15, 1.0) # Golden yellow
 
 # Hover interaction borders

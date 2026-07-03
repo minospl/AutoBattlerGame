@@ -79,3 +79,7 @@ func update_shader_parameters() -> void:
 		shader_material.set_shader_parameter("inner_border_indentation", border_indentation)
 		shader_material.set_shader_parameter("interior_color", interior_color)
 		shader_material.set_shader_parameter("corner_color", corner_color)
+
+func set_border_color(new_color: Color) -> void:
+	border_color = new_color
+	update_shader_parameters()

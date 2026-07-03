@@ -288,7 +288,7 @@ func update_description() -> void:
 
 func _process(_delta: float) -> void:
 	if visible:
-		var shift_pressed: bool = not Input.is_key_pressed(KEY_SHIFT)
+		var shift_pressed: bool = Input.is_key_pressed(KEY_SHIFT)
 		_update_keywords_visibility(shift_pressed)
 
 func _build_keywords() -> void:

@@ -55,7 +55,7 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
-color = Color(0.29, 0.251, 0.255, 1)
+color = Color(0.3, 0.25, 0.25, 1)
 
 [node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer" unique_id=830363032]
 layout_mode = 2
