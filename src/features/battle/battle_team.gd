@@ -202,10 +202,10 @@ func tick_statuses(delta: float) -> void:
 			burn_timer = 0.0
 			status_changed.emit("burn", 0, 0.0)
 
-func tick_casts(delta: float, game_speed: float, cast_callback: Callable) -> void:
+func tick_casts(delta: float, cast_callback: Callable) -> void:
 	for i: int in range(MAX_TEAM_SIZE):
 		if units[i]:
-			cast_timers[i] += delta * game_speed
+			cast_timers[i] += delta
 			var speed: float = units[i].get_cast_speed()
 			if speed <= 0.0: speed = 1.0
 			

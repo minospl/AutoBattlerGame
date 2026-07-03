@@ -1,7 +1,5 @@
 extends Control
 
-var parent_scene: ShopScene
-
 var _was_dragging: bool = false
 
 func _ready() -> void:

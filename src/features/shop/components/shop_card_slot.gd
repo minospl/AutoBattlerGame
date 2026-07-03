@@ -231,7 +231,7 @@ func add_card(card: Control) -> void:
 			price = card.get("price")
 
 func remove_card(card: Control) -> void:
-	if has_node("CardContainer"):
+	if has_node("CardContainer") and card.get_parent() == card_container:
 		card_container.remove_child(card)
 		if "slot" in card:
 			card.set("slot", null)

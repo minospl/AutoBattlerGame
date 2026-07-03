@@ -296,6 +296,7 @@ func advance_simulation(delta: float) -> void:
 			var dmg: int = get_fibonacci(stage + 1)
 			
 			player_team.take_damage(dmg)
+			enemy_team.take_damage(dmg)
 			_update_all_card_uis()
 
 	# Tick statuses
@@ -303,8 +304,8 @@ func advance_simulation(delta: float) -> void:
 	enemy_team.tick_statuses(delta)
 
 	# Tick card casts
-	player_team.tick_casts(delta, 1.0, trigger_cast)
-	enemy_team.tick_casts(delta, 1.0, trigger_enemy_cast)
+	player_team.tick_casts(delta, trigger_cast)
+	enemy_team.tick_casts(delta, trigger_enemy_cast)
 
 func spawn_floating_text(value_text: String, text_color: Color, start_pos: Vector2) -> void:
 	var offset_x: float = randf_range(-30.0, 30.0)

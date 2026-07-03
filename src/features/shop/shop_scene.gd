@@ -284,6 +284,8 @@ func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void
 	if "price" in card:
 		refund_gold = card.get("price")
 		
+	if original_slot:
+		original_slot.remove_card(card)
 	card.queue_free()
 	if original_slot:
 		original_slot.slot_changed.emit(original_slot)
