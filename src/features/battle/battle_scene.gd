@@ -143,6 +143,14 @@ func _ready() -> void:
 func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 	run_state = p_state
 	enemy_units_to_load = p_enemy_units
+	
+	if run_state:
+		if run_state.battle_speed <= 0.0:
+			run_state.battle_speed = 1.0
+		game_speed = run_state.battle_speed
+		if speed_button:
+			speed_button.text = "⚡ Speed: %dx" % int(game_speed)
+			
 	# Load state and backup
 	load_battle_team()
 	
@@ -295,8 +303,8 @@ func advance_simulation(delta: float) -> void:
 			var stage: int = floori((fatigue_tick_count - 1) / 3.0) + 1
 			var dmg: int = get_fibonacci(stage + 1)
 			
-			player_team.take_damage(dmg)
-			enemy_team.take_damage(dmg)
+			player_team.take_damage(dmg, "fatigue")
+			enemy_team.take_damage(dmg, "fatigue")
 			_update_all_card_uis()
 
 	# Tick statuses
@@ -475,6 +483,9 @@ func _on_speed_pressed() -> void:
 		game_speed = 3.0
 	else:
 		game_speed = 1.0
+		
+	if run_state:
+		run_state.battle_speed = game_speed
 		
 	if speed_button:
 		speed_button.text = "⚡ Speed: %dx" % int(game_speed)

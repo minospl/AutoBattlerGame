@@ -10,6 +10,7 @@ extends Resource
 @export var day: int = 1
 @export var trophies: int = 0
 @export var max_trophies: int = 10
+@export var battle_speed: float = 1.0
 
 func check_and_merge_units() -> bool:
 	var groups: Dictionary = {}

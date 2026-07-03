@@ -125,6 +125,11 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 		
 	health_changed.emit(health, max_health, shield)
 	floating_text_requested.emit("-" + NumberFormatter.format_large_number(actual_dmg), text_color, false, 0)
+	
+	if damage_type == "physical":
+		for i: int in range(MAX_TEAM_SIZE):
+			if units[i]:
+				ModifierEngine.trigger_unit_modifier(i, self, UnitModifier.Trigger.ON_TAKE_DAMAGE)
 		
 	if max_health > 0 and health <= 0:
 		team_defeated.emit()
