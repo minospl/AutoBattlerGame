@@ -1,7 +1,7 @@
 class_name TeamPanel
 extends PanelContainer
 
-signal slot_changed(slot: ShopCardSlot)
+signal card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target_slot: ShopCardSlot)
 
 @onready var row0_hbox: HBoxContainer = %Row0HBox
 @onready var row1_hbox: HBoxContainer = %Row1HBox
@@ -19,7 +19,7 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 		var slot: ShopCardSlot = slot_scene.instantiate() as ShopCardSlot
 		slot.is_active_team = true
 		slot.slot_index = i
-		slot.slot_changed.connect(func(_slot: ShopCardSlot) -> void: slot_changed.emit(_slot))
+		slot.card_dropped.connect(func(c: Control, o: ShopCardSlot, t: ShopCardSlot) -> void: card_dropped.emit(c, o, t))
 		
 		if i < 3:
 			row0_hbox.add_child(slot) # Slots 0, 1, 2 go to Row 0 (top)

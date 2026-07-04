@@ -39,9 +39,8 @@ func apply_food_effect(card: Control) -> void:
 		var inst: UnitInstance = shop_card.unit_instance
 		if inst and item_instance.data.modifier:
 			item_instance.data.modifier.apply_unit_effect(inst)
-
 func _get_drag_data(_at_position: Vector2) -> Variant:
-	# Keep the card in place but dim it visually
+	# Keep the card in place but dim it visually so we can see the item while targeting
 	modulate.a = 0.5
 	
 	# Create an empty transparent preview so no card visual is dragged under the mouse
@@ -53,9 +52,12 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Notify about the drag starting using DragManager
 	DragManager.notify_drag_started(self, original_slot)
 		
-	# Restore normal modulate when drag ends
+	# Restore normal appearance when drag ends
 	preview_wrapper.tree_exiting.connect(func() -> void:
-		modulate.a = 1.0
+		if is_instance_valid(self):
+			modulate.a = 1.0
+			if original_slot:
+				original_slot.update_placeholder()
 		DragManager.notify_drag_ended()
 	)
 	

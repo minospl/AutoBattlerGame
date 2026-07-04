@@ -79,7 +79,7 @@ Każda jednostka z unikalną zdolnością posiada przypisany modyfikator dziedzi
 
 ---
 
-## 4. Wytyczne i Dobre Praktyki dla Asystenta AI (Antigravity)
+## 4. Wytyczne i Dobre Praktyki dla Asystenta AI
 Podczas edycji lub rozbudowy tego projektu muszę przestrzegać następujących reguł:
 
 1.  **Ścisłe typowanie (Static Typing):** W pliku `project.godot` włączone są restrykcyjne ostrzeżenia kompilatora GDScript (`untyped_declaration=1`, `unsafe_property_access=1`, `inferred_declaration=1` itp.). Należy przestrzegać następujących zasad:

@@ -1,10 +1,9 @@
 class_name ShopCardSlot
 extends Control
 
-## Signal emitted when the card inside this slot changes (added, removed, swapped)
-signal slot_changed(slot: ShopCardSlot)
 signal drag_hover_started(slot: ShopCardSlot, data: Dictionary)
 signal drag_hover_ended(slot: ShopCardSlot)
+signal card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target_slot: ShopCardSlot)
 
 var is_drag_hovering: bool = false
 
@@ -176,67 +175,16 @@ func _notification(what: int) -> void:
 
 func _drop_data(_at_position: Vector2, data: Variant) -> void:
 	update_style(false)
+	if is_drag_hovering:
+		is_drag_hovering = false
+		drag_hover_ended.emit(self)
 	
 	if typeof(data) == TYPE_DICTIONARY:
 		var dict: Dictionary = data
 		if dict.has("card") and dict.has("original_slot"):
 			var dragged_card: Control = dict["card"]
 			var original_slot: ShopCardSlot = dict["original_slot"]
-			
-			if original_slot == self:
-				add_card(dragged_card)
-				slot_changed.emit(self)
-				return
-				
-			var current_card: Control = get_card()
-			
-			# 1. If dragged card is food:
-			if dragged_card is ShopCardItem:
-				var food_card: ShopCardItem = dragged_card
-				if current_card is ShopCard:
-					var shop_card: ShopCard = current_card
-					# Apply food stats directly to unit in this slot
-					food_card.apply_food_effect(shop_card)
-					shop_card.update_ui()
-					
-					# Deduct gold if purchased
-					if original_slot and original_slot.is_shop_slot:
-						if gold_deductor.is_valid():
-							gold_deductor.call(original_slot.price)
-						if shop_refiller.is_valid():
-							shop_refiller.call(original_slot.slot_index)
-					
-					# Consume food item
-					if dragged_card.get_parent() != null:
-						dragged_card.get_parent().remove_child(dragged_card)
-					if not dragged_card.is_queued_for_deletion():
-						dragged_card.queue_free()
-					
-					slot_changed.emit(self)
-					if original_slot:
-						original_slot.slot_changed.emit(original_slot)
-					return
-					
-			# 2. Normal unit card move/swap:
-			if current_card:
-				# SWAP logic: Swap the parent slots of the two cards
-				remove_card(current_card)
-				add_card(dragged_card)
-				original_slot.add_card(current_card)
-			else:
-				# MOVE logic: Move card from original slot to this empty slot
-				add_card(dragged_card)
-				
-			# Deduct gold if purchased from the shop
-			if original_slot and original_slot.is_shop_slot:
-				if gold_deductor.is_valid():
-					gold_deductor.call(original_slot.price)
-				if shop_refiller.is_valid():
-					shop_refiller.call(original_slot.slot_index)
-					
-			# Emit signals
-			slot_changed.emit(self)
-			original_slot.slot_changed.emit(original_slot)
+			card_dropped.emit(dragged_card, original_slot, self)
 
 func add_card(card: Control) -> void:
 	if has_node("CardContainer"):
@@ -261,9 +209,10 @@ func get_card() -> Control:
 			return child as Control
 	return null
 
-## Check if slot is empty
+## Check if slot is empty (treats hidden cards, e.g. during dragging, as empty)
 func is_empty() -> bool:
-	return get_card() == null
+	var card: Control = get_card()
+	return card == null or not card.visible
 
 ## Returns the UnitInstance from the card in this slot, or null
 func get_unit_instance() -> UnitInstance:

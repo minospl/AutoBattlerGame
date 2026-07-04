@@ -1,7 +1,7 @@
 class_name BenchPanel
 extends PanelContainer
 
-signal slot_changed(slot: ShopCardSlot)
+signal card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target_slot: ShopCardSlot)
 
 @onready var bench_hbox: HBoxContainer = %BenchHBox
 
@@ -16,6 +16,6 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 		var slot: ShopCardSlot = slot_scene.instantiate() as ShopCardSlot
 		slot.is_active_team = false
 		slot.slot_index = i
-		slot.slot_changed.connect(func(_slot: ShopCardSlot) -> void: slot_changed.emit(_slot))
+		slot.card_dropped.connect(func(c: Control, o: ShopCardSlot, t: ShopCardSlot) -> void: card_dropped.emit(c, o, t))
 		bench_hbox.add_child(slot)
 		slots.append(slot)

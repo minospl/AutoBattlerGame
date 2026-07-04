@@ -113,21 +113,19 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Find original CardSlot ancestor using the slot reference
 	var original_slot: ShopCardSlot = slot as ShopCardSlot
 		
-	# Temporarily remove the card from the original slot
+	# Temporarily hide the card instead of removing it
+	self.visible = false
 	if original_slot:
-		original_slot.remove_card.call_deferred(self)
-		original_slot.slot_changed.emit.call_deferred(original_slot)
+		original_slot.update_placeholder()
 		
 	# Notify about the drag starting using DragManager
 	DragManager.notify_drag_started(self, original_slot)
 		
-	var viewport: Viewport = get_viewport()
 	preview_wrapper.tree_exiting.connect(func() -> void:
-		# If the drag was not successful, return the card to its original slot
-		if viewport and not viewport.gui_is_drag_successful():
+		if is_instance_valid(self):
+			self.visible = true
 			if original_slot:
-				original_slot.add_card(self)
-				original_slot.slot_changed.emit(original_slot)
+				original_slot.update_placeholder()
 		DragManager.notify_drag_ended()
 	)
 	
