@@ -3,6 +3,16 @@
 Ten dokument zawiera analizę projektu i służy jako baza wiedzy oraz zbiór reguł dla asystenta AI (Antigravity). Szczegółowy plan rozwoju (roadmapa) projektu z podziałem na kamienie milowe znajduje się w pliku [project_road_map.md](file:///d:/Projekty/AutoBattlerDungeonGame/project_road_map.md) w głównym katalogu projektu.
 
 
+# Weryfikacja kodu i zapobieganie błędom
+Podczas edycji i analizy kodu zawsze przestrzegaj tych zasad:
+* **Minimalizacja halucynacji i weryfikacja kodu** Zanim założysz istnienie jakiejkolwiek metody, zmiennej lub wartości enuma w klasach pomocniczych i zasobach, ZAWSZE otwórz i przeanalizuj powiązane pliki źródłowe (`.gd` lub `.tres`) w celu weryfikacji ich rzeczywistej implementacji.
+* **Spłaszczanie struktury kodu (Guard Clauses):** Unikaj głębokich zagnieżdżeń bloków `if` w logice gry i interfejsu. Dąż do zmniejszenia wcięć tabulacji poprzez stosowanie klauzul strażniczych (wczesnych powrotów `return` na początku funkcji).
+* **Zasada Szerokiej Analizy i Walka z Tunnel Vision:**
+    * **Analiza Konsekwencji:** Zanim wprowadzisz jakąś zmianę, pomyśl o jej szerokich konsekwencjach. Czy powiązane zmienne, sygnatury metod pomocniczych lub węzły w scenach `.tscn` stają się niepotrzebne? Jeśli tak, usuń je zamiast pisać puste obejścia.
+    * **Brak Ślepego Kopiowania (No Boilerplate):** Kopiując wzorce, zawsze upewnij się, że obiekt docelowy potrzebuje wszystkich tych mechanik (nie twórz nadmiarowych metod i pól).
+    * **Zgodność Stylistyczna:** Wszystkie nowo generowane opisy, wartości i teksty UI muszą zachować formatowanie spójne z istniejącymi elementami (np. używanie jednolitych tagów formatowania tekstu i kolorów).
+    * **Ujednolicone Szablony UI:** Wszelkie generyczne węzły i szablony w plikach `.tscn` (np. powielane w pętli) muszą mieć ogólne nazwy klasowe/funkcjonalne, a nie powiązane z konkretnymi wariantami danych.
+
 ## 1. Czym jest ten projekt?
 **AutoBattlerDungeonGame** to gra typu auto-battler z elementami dungeon crawler, rozwijana w silniku **Godot 4.7 (Forward Plus)** przy użyciu języka **GDScript**.
 
@@ -101,13 +111,3 @@ Podczas edycji lub rozbudowy tego projektu muszę przestrzegać następujących 
     *   **Architektura bez Autoloadów (Singletons):** Stan gry nie powinien być przechowywany w globalnych singletonach (Autoloadach). Powinien być przekazywany bezpośrednio między scenami za pomocą dedykowanych metod konfiguracyjnych (np. `setup(state)`).
     *   **Podział Logiki i UI:** Komponenty interfejsu (UI) wizualizują stan logiczny obiektów/zasobów. Wszelkie zmiany w UI muszą być synchronizowane z danymi w logicznych strukturach danych.
     *   **Zachowanie Spójności Stylu (Premium UI):** Zmiany wizualne powinny zachowywać estetyczny, spójny styl graficzny zdefiniowany w motywach i kolorach klas wspólnych gry.
-
-4.  **Weryfikacja kodu i zapobieganie błędom:**
-    *   **Minimalizacja halucynacji i weryfikacja kodu:** Zanim założysz istnienie jakiejkolwiek metody, zmiennej lub wartości enuma w klasach pomocniczych i zasobach, ZAWSZE otwórz i przeanalizuj powiązane pliki źródłowe (`.gd` lub `.tres`) w celu weryfikacji ich rzeczywistej implementacji.
-    *   **Zasada Szerokiej Analizy i Walka z Tunnel Vision:**
-        *   **Analiza Konsekwencji:** Zanim wprowadzisz jakąś zmianę, pomyśl o jej szerokich konsekwencjach. Czy powiązane zmienne, sygnatury metod pomocniczych lub węzły w scenach `.tscn` stają się niepotrzebne? Jeśli tak, usuń je zamiast pisać puste obejścia.
-        *   **Brak Ślepego Kopiowania (No Boilerplate):** Kopiując wzorce, zawsze upewnij się, że obiekt docelowy potrzebuje wszystkich tych mechanik (nie twórz nadmiarowych metod i pól).
-        *   **Zgodność Stylistyczna:** Wszystkie nowo generowane opisy, wartości i teksty UI muszą zachować formatowanie spójne z istniejącymi elementami (np. używanie jednolitych tagów formatowania tekstu i kolorów).
-        *   **Ujednolicone Szablony UI:** Wszelkie generyczne węzły i szablony w plikach `.tscn` (np. powielane w pętli) muszą mieć ogólne nazwy klasowe/funkcjonalne, a nie powiązane z konkretnymi wariantami danych.
-    *   **Spłaszczanie struktury kodu (Guard Clauses):** Unikaj głębokich zagnieżdżeń bloków `if` w logice gry i interfejsu. Dąż do zmniejszenia wcięć tabulacji poprzez stosowanie klauzul strażniczych (wczesnych powrotów `return` na początku funkcji).
-

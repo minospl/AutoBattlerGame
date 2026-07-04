@@ -9,9 +9,7 @@ signal battle_requested
 @export var active_slot_count: int = 6
 @export var bench_slot_count: int = 8
 
-# Logic data structures representing team state
-var active_team: Array[UnitInstance] = []
-var bench: Array[UnitInstance] = []
+# Logic data structures representing templates
 var unit_templates: Array[UnitData] = []
 var item_templates: Array[ItemData] = []
 var run_state: RunState
@@ -46,8 +44,6 @@ var current_hovered_card: Control = null
 var current_drag_hovered_slot: ShopCardSlot = null
 
 func _ready() -> void:
-	active_team.resize(active_slot_count)
-	bench.resize(bench_slot_count)
 	
 	# Connect sub-panel signals
 	bench_panel.card_dropped.connect(_on_card_dropped)
@@ -151,21 +147,19 @@ func check_for_unit_merges() -> void:
 	if not run_state:
 		return
 	
-	run_state.active_team = active_team.duplicate()
-	run_state.bench = bench.duplicate()
-	
-	var merged: bool = false
-	while run_state.check_and_merge_units():
-		merged = true
-		
-	if merged:
-		active_team = run_state.active_team.duplicate()
-		bench = run_state.bench.duplicate()
-		populate_ui()
+	var merge: Dictionary = run_state.check_and_merge_units()
+	if not merge.is_empty():
+		# Animate this merge and then check again for cascade fusions recursively
+		ShopMergeAnimator.animate_merge(self, merge, func() -> void:
+			check_for_unit_merges()
+		)
+
 
 ## Populate the UI based on external changes to logic data structures
 func populate_ui() -> void:
-	
+	if run_state == null:
+		return
+		
 	# Clear existing cards immediately
 	for slot: ShopCardSlot in active_slots:
 		var card: Control = slot.get_card()
@@ -181,24 +175,26 @@ func populate_ui() -> void:
 			
 	# Instantiate cards according to the data state
 	for i: int in range(active_slot_count):
-		if i < active_team.size() and active_team[i] != null:
+		if i < run_state.active_team.size() and run_state.active_team[i] != null:
 			var card: ShopCard = card_scene.instantiate()
-			card.unit_instance = active_team[i]
+			card.unit_instance = run_state.active_team[i]
 			_connect_card_signals(card)
 			active_slots[i].add_card(card)
 			
 	for i: int in range(bench_slot_count):
-		if i < bench.size() and bench[i] != null:
+		if i < run_state.bench.size() and run_state.bench[i] != null:
 			var card: ShopCard = card_scene.instantiate()
-			card.unit_instance = bench[i]
+			card.unit_instance = run_state.bench[i]
 			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
 
 ## Add a unit to the first empty slot on the bench
 func add_unit_to_bench(unit: UnitInstance) -> bool:
+	if run_state == null:
+		return false
 	for i: int in range(bench_slot_count):
-		if bench[i] == null:
-			bench[i] = unit
+		if run_state.bench[i] == null:
+			run_state.bench[i] = unit
 			populate_ui()
 			team_state_changed.emit()
 			return true
@@ -206,10 +202,12 @@ func add_unit_to_bench(unit: UnitInstance) -> bool:
 
 ## Empty all team and bench slots
 func clear_all() -> void:
+	if run_state == null:
+		return
 	for i: int in range(active_slot_count):
-		active_team[i] = null
+		run_state.active_team[i] = null
 	for i: int in range(bench_slot_count):
-		bench[i] = null
+		run_state.bench[i] = null
 	populate_ui()
 	team_state_changed.emit()
 
@@ -269,12 +267,17 @@ func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void
 		refund_gold = card.get("price")
 		
 	if original_slot.is_active_team:
-		active_team[original_slot.slot_index] = null
+		run_state.active_team[original_slot.slot_index] = null
 	else:
-		bench[original_slot.slot_index] = null
+		run_state.bench[original_slot.slot_index] = null
 		
 	gold += refund_gold
-	populate_ui()
+	
+	# Incremental UI update: remove and queue free the sold card
+	original_slot.remove_card(card)
+	card.queue_free()
+	original_slot.update_placeholder()
+	
 	team_state_changed.emit()
 
 func _on_card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target_slot: ShopCardSlot) -> void:
@@ -294,7 +297,12 @@ func _on_card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target
 					food_card.item_instance.data.modifier.apply_unit_effect(target_unit)
 				deduct_gold(original_slot.price)
 				refill_shop_slot(original_slot.slot_index)
-				populate_ui()
+				
+				# Incremental UI update: refresh the visual stats of the fed unit
+				var target_card: Control = target_slot.get_card()
+				if target_card and target_card.has_method("update_ui"):
+					target_card.call("update_ui")
+					
 				team_state_changed.emit()
 		return
 			
@@ -305,21 +313,37 @@ func _on_card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target
 	var source_is_active: bool = original_slot.is_active_team
 	var dest_is_active: bool = target_slot.is_active_team
 	
-	var source_unit: UnitInstance = active_team[source_idx] if source_is_active else bench[source_idx]
-	var dest_unit: UnitInstance = active_team[dest_idx] if dest_is_active else bench[dest_idx]
+	var source_unit: UnitInstance = run_state.active_team[source_idx] if source_is_active else run_state.bench[source_idx]
+	var dest_unit: UnitInstance = run_state.active_team[dest_idx] if dest_is_active else run_state.bench[dest_idx]
 	
 	if source_is_active:
-		active_team[source_idx] = dest_unit
+		run_state.active_team[source_idx] = dest_unit
 	else:
-		bench[source_idx] = dest_unit
+		run_state.bench[source_idx] = dest_unit
 		
 	if dest_is_active:
-		active_team[dest_idx] = source_unit
+		run_state.active_team[dest_idx] = source_unit
 	else:
-		bench[dest_idx] = source_unit
+		run_state.bench[dest_idx] = source_unit
+		
+	# Incremental UI update: physically swap card nodes in slots
+	var source_card: Control = original_slot.get_card()
+	var dest_card: Control = target_slot.get_card()
+	
+	if source_card:
+		original_slot.remove_card(source_card)
+	if dest_card:
+		target_slot.remove_card(dest_card)
+		
+	if source_card:
+		target_slot.add_card(source_card)
+	if dest_card:
+		original_slot.add_card(dest_card)
+		
+	original_slot.update_placeholder()
+	target_slot.update_placeholder()
 		
 	check_for_unit_merges()
-	populate_ui()
 	team_state_changed.emit()
 
 func roll_shop(_free: bool = false) -> void:
@@ -563,14 +587,14 @@ func _on_card_clicked(card: ShopCard) -> void:
 	var target_idx: int = -1
 	
 	for i: int in range(active_slot_count):
-		if active_team[i] == null:
+		if run_state.active_team[i] == null:
 			target_idx = i
 			target_is_active = true
 			break
 			
 	if target_idx == -1:
 		for i: int in range(bench_slot_count):
-			if bench[i] == null:
+			if run_state.bench[i] == null:
 				target_idx = i
 				target_is_active = false
 				break
@@ -581,14 +605,21 @@ func _on_card_clicked(card: ShopCard) -> void:
 	# Update data
 	var unit_inst: UnitInstance = card.unit_instance
 	if target_is_active:
-		active_team[target_idx] = unit_inst
+		run_state.active_team[target_idx] = unit_inst
 	else:
-		bench[target_idx] = unit_inst
+		run_state.bench[target_idx] = unit_inst
+		
+	# Incremental UI update: instantiate and add the card to the target slot
+	var target_slot: ShopCardSlot = active_slots[target_idx] if target_is_active else bench_slots[target_idx]
+	var new_card: ShopCard = card_scene.instantiate() as ShopCard
+	new_card.unit_instance = unit_inst
+	_connect_card_signals(new_card)
+	target_slot.add_card(new_card)
+	target_slot.update_placeholder()
 		
 	deduct_gold(original_slot.price)
 	refill_shop_slot(original_slot.slot_index)
 	check_for_unit_merges()
-	populate_ui()
 	team_state_changed.emit()
 
 func load_state_from_run() -> void:
@@ -604,9 +635,11 @@ func load_state_from_run() -> void:
 	shop_panel.shop_level = run_state.shop_level
 	shop_panel.chance_text = run_state.get_chance_text()
 	
-	# Load active team and bench
-	active_team = run_state.active_team.duplicate()
-	bench = run_state.bench.duplicate()
+	# Ensure active team and bench size matches expectations
+	if run_state.active_team.size() != active_slot_count:
+		run_state.active_team.resize(active_slot_count)
+	if run_state.bench.size() != bench_slot_count:
+		run_state.bench.resize(bench_slot_count)
 	
 	populate_ui()
 	
@@ -650,9 +683,6 @@ func sync_data_to_run_state() -> void:
 	run_state.lives = shop_header_bar.lives
 	run_state.day = shop_header_bar.day
 	run_state.trophies = shop_header_bar.trophies
-	
-	run_state.active_team = active_team.duplicate()
-	run_state.bench = bench.duplicate()
 	
 	for i: int in range(shop_panel.slots.size()):
 		var slot: ShopCardSlot = shop_panel.slots[i] as ShopCardSlot

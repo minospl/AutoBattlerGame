@@ -106,7 +106,7 @@ func get_chance_text() -> String:
 		parts.append("[color=#d69e2e]L:%d%%[/color]" % int(weights[3] * 100))
 	return " | ".join(parts)
 
-func check_and_merge_units() -> bool:
+func check_and_merge_units() -> Dictionary:
 	var groups: Dictionary = {}
 	
 	for i: int in range(active_team.size()):
@@ -134,6 +134,7 @@ func check_and_merge_units() -> bool:
 			var main_unit: UnitInstance = main_info["unit"]
 			main_unit.level_up()
 			
+			var removed_list: Array = []
 			for j: int in range(1, 3):
 				var info: Dictionary = list[j]
 				var is_bench: bool = info["is_bench"]
@@ -142,6 +143,11 @@ func check_and_merge_units() -> bool:
 					bench[idx] = null
 				else:
 					active_team[idx] = null
-			return true
+				removed_list.append({"is_bench": is_bench, "idx": idx})
+				
+			return {
+				"main": main_info,
+				"removed": removed_list
+			}
 			
-	return false
+	return {}
