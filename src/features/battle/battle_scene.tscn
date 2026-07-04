@@ -198,24 +198,6 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="TeamPoisonBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("5_status_badge")
-type = 0
-
-[node name="TeamBurnBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("5_status_badge")
-type = 1
-
-[node name="TeamElectrocuteBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/TeamHealthBarMargin/LeftHeaderColumn/TeamStatusHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("5_status_badge")
-type = 2
-
 [node name="EnemyHealthBarMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox"]
 custom_minimum_size = Vector2(400, 0)
 layout_mode = 2
@@ -259,25 +241,6 @@ vertical_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
-
-
-[node name="PoisonBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("5_status_badge")
-type = 0
-
-[node name="BurnBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("5_status_badge")
-type = 1
-
-[node name="ElectrocuteBadge" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/HealthBarsHBox/EnemyHealthBarMargin/RightHeaderColumn/EnemyStatusHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("5_status_badge")
-type = 2
 
 [node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox"]
 layout_mode = 2

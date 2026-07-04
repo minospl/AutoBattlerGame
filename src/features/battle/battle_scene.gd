@@ -53,13 +53,8 @@ var enemy_slots: Array[BattleCardSlot] = []
 @onready var team_status_hbox: Control = %TeamStatusHBox
 @onready var enemy_status_hbox: Control = %EnemyStatusHBox
 
-@onready var team_poison_badge: StatusBadge = %TeamPoisonBadge
-@onready var team_burn_badge: StatusBadge = %TeamBurnBadge
-@onready var team_electrocute_badge: StatusBadge = %TeamElectrocuteBadge
-
-@onready var enemy_poison_badge: StatusBadge = %PoisonBadge
-@onready var enemy_burn_badge: StatusBadge = %BurnBadge
-@onready var enemy_electrocute_badge: StatusBadge = %ElectrocuteBadge
+var player_status_badges: Dictionary[String, StatusBadge] = {}
+var enemy_status_badges: Dictionary[String, StatusBadge] = {}
 
 func _ready() -> void:
 	# Add the tooltip instance to PreviewContainer
@@ -102,14 +97,9 @@ func _ready() -> void:
 	# Connect signals from player_team
 	player_team.team_units_loaded.connect(_on_units_loaded.bind(player_slots))
 	player_team.health_changed.connect(_on_health_changed.bind(team_hp_material, team_health_label))
-	player_team.status_changed.connect(_on_status_changed.bind(
-		{
-			"poison": team_poison_badge,
-			"burn": team_burn_badge,
-			"electrocute": team_electrocute_badge
-		},
-		team_status_hbox
-	))
+	player_team.status_changed.connect(func(status_type: String, amount: int, ratio: float) -> void:
+		_on_status_changed_dynamic(status_type, amount, ratio, player_status_badges, team_status_hbox)
+	)
 	player_team.cast_progress_changed.connect(_on_cast_progress_changed.bind(player_slots))
 	player_team.floating_text_requested.connect(func(text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
 		_on_floating_text_requested(false, text, color, is_on_slot, slot_idx)
@@ -120,14 +110,9 @@ func _ready() -> void:
 	# Connect signals from enemy_team
 	enemy_team.team_units_loaded.connect(_on_units_loaded.bind(enemy_slots))
 	enemy_team.health_changed.connect(_on_health_changed.bind(enemy_hp_material, enemy_health_label))
-	enemy_team.status_changed.connect(_on_status_changed.bind(
-		{
-			"poison": enemy_poison_badge,
-			"burn": enemy_burn_badge,
-			"electrocute": enemy_electrocute_badge
-		},
-		enemy_status_hbox
-	))
+	enemy_team.status_changed.connect(func(status_type: String, amount: int, ratio: float) -> void:
+		_on_status_changed_dynamic(status_type, amount, ratio, enemy_status_badges, enemy_status_hbox)
+	)
 	enemy_team.cast_progress_changed.connect(_on_cast_progress_changed.bind(enemy_slots))
 	enemy_team.floating_text_requested.connect(func(text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
 		_on_floating_text_requested(true, text, color, is_on_slot, slot_idx)
@@ -197,6 +182,16 @@ func _apply_visual_styling() -> void:
 func load_battle_team() -> void:
 	if run_state == null:
 		return
+
+	# Clear status UI badges
+	if team_status_hbox:
+		for child: Node in team_status_hbox.get_children():
+			child.queue_free()
+	if enemy_status_hbox:
+		for child: Node in enemy_status_hbox.get_children():
+			child.queue_free()
+	player_status_badges.clear()
+	enemy_status_badges.clear()
 
 	# Copy team and make clones for the battle scene simulation
 	var player_units: Array[UnitInstance] = []
@@ -542,19 +537,24 @@ func _on_health_changed(current_health: int, max_health: int, shield: int, mat: 
 		else:
 			label.text = "%d / %d" % [max(0, current_health), max_health]
 
-func _on_status_changed(status_type: String, amount: int, cooldown_ratio: float, badges: Dictionary, status_hbox: Control) -> void:
-	if status_type in badges and badges[status_type]:
-		badges[status_type].value = amount
-		badges[status_type].cooldown_ratio = cooldown_ratio
-		
-	var has_statuses: bool = false
-	for badge: StatusBadge in badges.values():
-		if badge and badge.value > 0:
-			has_statuses = true
-			break
+func _on_status_changed_dynamic(status_type: String, amount: int, ratio: float, badges_dict: Dictionary[String, StatusBadge], container: Control) -> void:
+	if amount > 0:
+		var badge: StatusBadge = badges_dict.get(status_type)
+		if badge == null:
+			badge = StatusBadge.new()
+			badge.status_type = status_type
+			container.add_child(badge)
+			badges_dict[status_type] = badge
+		badge.value = amount
+		badge.cooldown_ratio = ratio
+	else:
+		var badge: StatusBadge = badges_dict.get(status_type)
+		if badge != null:
+			badge.queue_free()
+			badges_dict.erase(status_type)
 			
-	if status_hbox:
-		status_hbox.visible = has_statuses
+	if container:
+		container.visible = not badges_dict.is_empty()
 
 func _on_cast_progress_changed(slot_idx: int, ratio: float, slots: Array[BattleCardSlot]) -> void:
 	if slot_idx >= 0 and slot_idx < slots.size():

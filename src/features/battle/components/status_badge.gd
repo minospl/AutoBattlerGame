@@ -17,6 +17,17 @@ enum Type {
 			queue_redraw()
 			_update_styling()
 
+@export var status_type: String = "poison":
+	set(val):
+		status_type = val
+		match val:
+			"poison": type = Type.POISON
+			"burn": type = Type.BURN
+			"electrocute": type = Type.ELECTROCUTE
+		if is_node_ready():
+			queue_redraw()
+			_update_styling()
+
 @export var value: int = 0:
 	set(val):
 		value = val

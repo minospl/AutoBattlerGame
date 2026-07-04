@@ -214,23 +214,23 @@ func remove_status(status_type: String) -> void:
 		effect.reset()
 		status_changed.emit(status_type, 0, 0.0)
 
+func modify_status_interval(status_type: String, delta_interval: float) -> void:
+	var effect: StatusEffect = active_statuses.get(status_type)
+	if effect:
+		effect.tick_interval = maxf(0.1, effect.tick_interval + delta_interval)
+
 func emit_status_changed(status_type: String, amount: int, cooldown_ratio: float) -> void:
 	status_changed.emit(status_type, amount, cooldown_ratio)
 
 func _initialize_status_effects() -> void:
 	active_statuses.clear()
-	
-	var poison_effect: StatusEffect = PoisonStatus.new()
-	poison_effect.initialize("poison", self, 0)
-	active_statuses["poison"] = poison_effect
-	
-	var burn_effect: StatusEffect = BurnStatus.new()
-	burn_effect.initialize("burn", self, 0)
-	active_statuses["burn"] = burn_effect
-	
-	var electrocute_effect: StatusEffect = ElectrocuteStatus.new()
-	electrocute_effect.initialize("electrocute", self, 0)
-	active_statuses["electrocute"] = electrocute_effect
+	_register_status("poison", PoisonStatus.new())
+	_register_status("burn", BurnStatus.new())
+	_register_status("electrocute", ElectrocuteStatus.new())
+
+func _register_status(p_type: String, p_effect: StatusEffect) -> void:
+	p_effect.initialize(p_type, self, 0)
+	active_statuses[p_type] = p_effect
 
 func get_status_value(status_type: String) -> int:
 	var effect: StatusEffect = active_statuses.get(status_type)
@@ -239,10 +239,7 @@ func get_status_value(status_type: String) -> int:
 func get_status_cooldown_ratio(status_type: String) -> float:
 	var effect: StatusEffect = active_statuses.get(status_type)
 	if effect:
-		if effect is PoisonStatus:
-			return clampf((effect as PoisonStatus).timer / 1.0, 0.0, 1.0)
-		if effect is BurnStatus:
-			return clampf((effect as BurnStatus).timer / 0.5, 0.0, 1.0)
+		return effect.get_cooldown_ratio()
 	return 0.0
 
 func tick_statuses(delta: float) -> void:

@@ -4,6 +4,8 @@ extends RefCounted
 var status_type: String = ""
 var team: BattleTeam = null
 var stacks: int = 0
+var timer: float = 0.0
+var tick_interval: float = 1.0
 
 func initialize(p_type: String, p_team: BattleTeam, p_stacks: int) -> void:
 	status_type = p_type
@@ -24,6 +26,12 @@ func tick(_delta: float) -> void:
 func modify_incoming_damage(amount: int, _damage_type: String) -> int:
 	return amount
 
+func get_cooldown_ratio() -> float:
+	if tick_interval > 0.0:
+		return clampf(timer / tick_interval, 0.0, 1.0)
+	return 0.0
+
 func reset() -> void:
 	stacks = 0
+	timer = 0.0
 
