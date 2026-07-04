@@ -55,6 +55,7 @@ func _initialize_new_run() -> void:
 	run_state.day = STARTING_DAY
 	run_state.trophies = STARTING_TROPHIES
 	run_state.max_trophies = MAX_TROPHIES
+	run_state.shop_level = 1
 	
 	# Find templates by unit name
 	var find_template: Callable = func(p_name: String) -> UnitData:
@@ -159,6 +160,10 @@ func _on_battle_finished(p_outcome: String) -> void:
 	else:
 		run_state.day += 1
 		run_state.gold += 10
+		run_state.shop_level += 1
+		for i: int in range(run_state.shop_cards.size()):
+			if not run_state.shop_frozen_statuses[i]:
+				run_state.shop_cards[i] = null
 		_go_to_shop()
 
 func _show_game_over(p_victory: bool) -> void:

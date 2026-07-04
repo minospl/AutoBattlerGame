@@ -309,6 +309,50 @@ func roll_shop(_free: bool = false) -> void:
 			
 		refill_shop_slot(i)
 
+func get_random_unit_template_by_rarity(rarity_name: String) -> UnitData:
+	var matching: Array[UnitData] = []
+	for template: UnitData in unit_templates:
+		if template == null:
+			continue
+		var r_name: String = "Common"
+		if template.rarity:
+			r_name = template.rarity.rarity_name
+		if r_name == rarity_name:
+			matching.append(template)
+			
+	# Fallback if no matching templates
+	if matching.is_empty():
+		for template: UnitData in unit_templates:
+			if template != null:
+				matching.append(template)
+				
+	if matching.is_empty():
+		return null
+		
+	return matching[randi() % matching.size()]
+
+func get_random_item_template_by_rarity(rarity_name: String) -> ItemData:
+	var matching: Array[ItemData] = []
+	for template: ItemData in item_templates:
+		if template == null:
+			continue
+		var r_name: String = "Common"
+		if template.rarity:
+			r_name = template.rarity.rarity_name
+		if r_name == rarity_name:
+			matching.append(template)
+			
+	# Fallback if no matching templates
+	if matching.is_empty():
+		for template: ItemData in item_templates:
+			if template != null:
+				matching.append(template)
+				
+	if matching.is_empty():
+		return null
+		
+	return matching[randi() % matching.size()]
+
 func refill_shop_slot(slot_index: int) -> void:
 	if slot_index < 0 or slot_index >= shop_panel.slots.size():
 		return
@@ -331,26 +375,32 @@ func refill_shop_slot(slot_index: int) -> void:
 	if not item_templates.is_empty() and randf() < 0.3:
 		spawn_item = true
 		
-	if spawn_item:
-		var template: ItemData = item_templates[randi() % item_templates.size()]
-		var instance: ItemInstance = ItemInstance.new()
-		instance.initialize(template)
+	var rolled_rarity: String = "Common"
+	if run_state:
+		rolled_rarity = run_state.roll_rarity_name()
 		
-		var card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
-		card.item_instance = instance
-		_connect_card_signals(card)
-		slot.add_card(card)
+	if spawn_item:
+		var template: ItemData = get_random_item_template_by_rarity(rolled_rarity)
+		if template:
+			var instance: ItemInstance = ItemInstance.new()
+			instance.initialize(template)
+			
+			var card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
+			card.item_instance = instance
+			_connect_card_signals(card)
+			slot.add_card(card)
 	else:
 		if unit_templates.is_empty():
 			return
-		var template: UnitData = unit_templates[randi() % unit_templates.size()]
-		var instance: UnitInstance = UnitInstance.new()
-		instance.initialize(template)
-		
-		var card: ShopCard = card_scene.instantiate() as ShopCard
-		card.unit_instance = instance
-		_connect_card_signals(card)
-		slot.add_card(card)
+		var template: UnitData = get_random_unit_template_by_rarity(rolled_rarity)
+		if template:
+			var instance: UnitInstance = UnitInstance.new()
+			instance.initialize(template)
+			
+			var card: ShopCard = card_scene.instantiate() as ShopCard
+			card.unit_instance = instance
+			_connect_card_signals(card)
+			slot.add_card(card)
 		
 	slot.update_placeholder()
 
@@ -513,6 +563,10 @@ func load_state_from_run() -> void:
 	shop_header_bar.lives = run_state.lives
 	shop_header_bar.day = run_state.day
 	shop_header_bar.trophies = run_state.trophies
+	
+	# Update shop level and chance text in the shop panel
+	shop_panel.shop_level = run_state.shop_level
+	shop_panel.chance_text = run_state.get_chance_text()
 	
 	# Load active team and bench
 	active_team = run_state.active_team.duplicate()

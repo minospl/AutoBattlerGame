@@ -56,6 +56,22 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "SHOP"
 
+[node name="ChanceLabel" type="RichTextLabel" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/normal_font_size = 11
+clip_contents = false
+bbcode_enabled = true
+fit_content = true
+autowrap_mode = 0
+text = "C:100%"
+
 [node name="GoldLabel" type="RichTextLabel" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2

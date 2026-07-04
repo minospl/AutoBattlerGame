@@ -17,6 +17,19 @@ signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
 		gold = val
 		_update_labels()
 
+@onready var shop_label: Label = %ShopLabel
+@onready var chance_label: RichTextLabel = %ChanceLabel
+
+@export var shop_level: int = 1:
+	set(val):
+		shop_level = val
+		_update_labels()
+
+@export var chance_text: String = "":
+	set(val):
+		chance_text = val
+		_update_labels()
+
 var slots: Array[ShopCardSlot] = []
 
 func _ready() -> void:
@@ -98,3 +111,7 @@ func _process(_delta: float) -> void:
 func _update_labels() -> void:
 	if is_inside_tree() and gold_label:
 		gold_label.text = str(gold) + "[color=#f2b726]G[/color]"
+	if is_inside_tree() and shop_label:
+		shop_label.text = "SHOP LVL " + str(shop_level)
+	if is_inside_tree() and chance_label:
+		chance_label.text = chance_text
