@@ -90,24 +90,25 @@ Każda jednostka z unikalną zdolnością posiada przypisany modyfikator dziedzi
 ---
 
 ## 4. Wytyczne i Dobre Praktyki dla Asystenta AI
-Podczas edycji lub rozbudowy tego projektu muszę przestrzegać następujących reguł:
+Podczas edycji lub rozbudowy tego projektu muszę bezwzględnie przestrzegać następujących reguł:
 
-1.  **Ścisłe typowanie (Static Typing):** W pliku `project.godot` włączone są restrykcyjne ostrzeżenia kompilatora GDScript (`untyped_declaration=1`, `unsafe_property_access=1`, `inferred_declaration=1` itp.). Należy przestrzegać następujących zasad:
-    *   **Brak wnioskowania typów (Inferred Types):** Nie używaj operatora wnioskowania `:=` (np. `var x := 5` lub `var inst := get_item()`). Wszystkie zmienne muszą mieć w pełni i jawnie zadeklarowany typ (np. `var x: int = 5`, `var inst: MyClass = ...`).
-    *   **Typowanie iteratorów pętli:** Każdy iterator w pętli `for` musi mieć zadeklarowany typ (np. `for i: int in range(6):` lub `for node: Node in container.get_children():`).
-    *   **Typowanie lambd/funkcji anonimowych:** Wszystkie lambdy przypisywane do zmiennych lub przekazywane jako Callables muszą mieć otypowane parametry oraz określony typ zwracany (np. `var process_data: Callable = func(p_name: String) -> Variant:`).
-    *   **Bezpieczny dostęp (Unsafe Access):** Unikaj ostrzeżeń `unsafe_property_access`. Przypisuj dynamicznie pobierane obiekty bezpośrednio do zmiennych z jawnym typem podklasy (np. `var child: ChildClass = parent.get_child(i)`), co jest dozwolone i bezpieczne dla obiektów z hierarchii klas bazowych. Używaj rzutowania `as` tylko przy odczycie pól typu `Variant` (np. `node.get("property") as MyClass`) lub przy rzutowaniu obiektów z typów dynamicznych.
-    *   **Jawne rzutowanie typów:** Podczas wczytywania scen, skryptów lub zasobów zawsze rzutuj załadowany zasób (np. `load(path) as PackedScene` lub `load(path) as Script`).
-    *   **Bezpieczne rzutowanie ze słowników (Unsafe Casts):** Dla słowników klasowych reprezentujących stałą strukturę danych zawsze używaj silnego typowania generycznego (np. `var my_dict: Dictionary[String, ResourceClass] = {}`). Zapobiega to zwracaniu typu `Variant` i ostrzeżeniom `UNSAFE_CAST` przy odczycie.
+1. **Ścisłe typowanie (Static Typing):** W pliku `project.godot` włączone są restrykcyjne ostrzeżenia kompilatora GDScript (`untyped_declaration=1`, `unsafe_property_access=1`, `inferred_declaration=1` itp.). Należy przestrzegać następujących zasad:
+    * **Brak nieweryfikowalnych typów:** Każda zmienna, w tym zmienne `@onready`, musi mieć jawnie zadeklarowany typ po dwukropku (np. `@onready var confirm_button: Button = %ConfirmButton` – *nigdy* bez określenia typu).
+    * **Typowanie iteratorów pętli:** Każdy iterator w pętli `for` musi mieć zadeklarowany typ (np. `for i: int in range(6):` lub `for node: Node in container.get_children():`).
+    * **Typowanie lambd/funkcji anonimowych:** Wszystkie lambdy przypisywane do zmiennych lub przekazywane jako Callables muszą mieć otypowane parametry oraz określony typ zwracany (np. `var process_data: Callable = func(p_name: String) -> Variant:`).
+    * **Bezpieczny dostęp (Unsafe Access):** Unikaj ostrzeżeń `unsafe_property_access`. Przypisuj dynamicznie pobierane obiekty bezpośrednio do zmiennych z jawnym typem podklasy (np. `var child: ChildClass = parent.get_child(i)`), co jest dozwolone i bezpieczne dla obiektów z hierarchii klas bazowych. Używaj rzutowania `as` tylko przy odczycie pól typu `Variant` (np. `node.get("property") as MyClass`) lub przy rzutowaniu obiektów z typów dynamicznych.
+    * **Jawne rzutowanie typów:** Podczas wczytywania scen, skryptów lub zasobów zawsze rzutuj załadowany zasób (np. `load(path) as PackedScene` lub `load(path) as Script`).
+    * **Bezpieczne rzutowanie ze słowników (Unsafe Casts):** Dla słowników klasowych reprezentujących stałą strukturę danych zawsze używaj silnego typowania generycznego (np. `var my_dict: Dictionary[String, ResourceClass] = {}`). Zapobiega to zwracaniu typu `Variant` i ostrzeżeniom `UNSAFE_CAST` przy odczycie.
 
-2.  **Dobre praktyki Godot 4.x & GDScript:**
-    *   **Konwencje Nazewnictwa:** Klasy w PascalCase (`class_name MyClass`), zmienne i funkcje w snake_case (`func load_game()`), stałe w UPPER_SNAKE_CASE (`const MAX_SIZE = 6`).
-    *   **Referencje do węzłów:** Do pobierania węzłów z drzewa sceny używaj mechanizmu unikalnych nazw (`%UniqueNodeName`) oraz słowa kluczowego `@onready` (np. `@onready var confirm_button = %ConfirmButton`). Zapobiega to psuciu się referencji po zmianie struktury sceny.
-    *   **Zarządzanie Pamięcią:** Zawsze używaj `queue_free()` zamiast `free()` do bezpiecznego usuwania węzłów pod koniec klatki.
-    *   **Wydajność:** Unikaj wywołań wyszukiwania węzłów (`get_node()` lub `$`) w pętlach i funkcjach cyklicznych takich jak `_process()` lub `_physics_process()`. Cache'uj referencje w zmiennych `@onready`.
-    *   **Obsługa Sygnałów:** Preferuj łączenie sygnałów w kodzie za pomocą bezpiecznej składni Godot 4 (np. `button.pressed.connect(_on_button_pressed)`).
+2. **Dobre praktyki Godot 4.x & GDScript:**
+    * **Konwencje Nazewnictwa:** Klasy w PascalCase (`class_name MyClass`), zmienne i funkcje w snake_case (`func load_game()`), stałe w UPPER_SNAKE_CASE (`const MAX_SIZE = 6`).
+    * **Referencje do węzłów:** Do pobierania węzłów z drzewa sceny używaj mechanizmu unikalnych nazw (`%UniqueNodeName`) oraz słowa kluczowego `@onready` z jawnym typem. Zapobiega to psuciu się referencji po zmianie struktury sceny.
+    * **Zarządzanie Pamięcią:** Zawsze używaj `queue_free()` zamiast `free()` do bezpiecznego usuwania węzłów pod koniec klatki.
+    * **Wydajność i Object Pooling:** Unikaj wywołań wyszukiwania węzłów (`get_node()` lub `$`) w pętlach i funkcjach cyklicznych takich jak `_process()`. Cache'uj referencje w zmiennych `@onready`. Dla obiektów często tworzonych i niszczonych w fazie walki (np. wyskakujące teksty obrażeń/damage popups, pociski, ikony statusów) **wymagane jest** stosowanie wzorca Object Pool zamiast ciągłego `instantiate()` i `queue_free()`.
+    * **Obsługa Sygnałów:** Preferuj łączenie sygnałów w kodzie za pomocą bezpiecznej składni Godot 4 (np. `button.pressed.connect(_on_button_pressed)`).
 
-3.  **Zarządzanie stanem i architekturą:**
-    *   **Architektura bez Autoloadów (Singletons):** Stan gry nie powinien być przechowywany w globalnych singletonach (Autoloadach). Powinien być przekazywany bezpośrednio między scenami za pomocą dedykowanych metod konfiguracyjnych (np. `setup(state)`).
-    *   **Podział Logiki i UI:** Komponenty interfejsu (UI) wizualizują stan logiczny obiektów/zasobów. Wszelkie zmiany w UI muszą być synchronizowane z danymi w logicznych strukturach danych.
-    *   **Zachowanie Spójności Stylu (Premium UI):** Zmiany wizualne powinny zachowywać estetyczny, spójny styl graficzny zdefiniowany w motywach i kolorach klas wspólnych gry.
+3. **Zarządzanie stanem i architekturą:**
+    * **Architektura bez Autoloadów (Singletons):** Stan gry nie jest przechowywany w globalnych singletonach. Musi być przekazywany bezpośrednio między scenami za pomocą metod konfiguracyjnych (np. `setup(state)`).
+    * **Komunikacja "Sygnały w górę, funkcje w dół":** Aby uniknąć sztywnego sprzężenia (tight coupling) pod nieobecność Autoloadów, węzły-dzieci (szczególnie komponenty UI) nigdy nie wywołują bezpośrednio metod rodziców ani nie szukają ich w drzewie. Dzieci komunikują się w górę wyłącznie za pomocą sygnałów. Rodzice zarządzają dziećmi, wywołując ich funkcje bezpośrednio w dół hierarchii.
+    * **Podział Logiki i UI:** Komponenty interfejsu (UI) wizualizują stan logiczny obiektów/zasobów. Wszelkie zmiany w UI muszą być synchronizowane z danymi w logicznych strukturach danych.
+    * **Zachowanie Spójności Stylu (Premium UI):** Zmiany wizualne powinny zachowywać estetyczny, spójny styl graficzny zdefiniowany w motywach i kolorach klas wspólnych gry.

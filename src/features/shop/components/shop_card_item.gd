@@ -31,14 +31,7 @@ func update_ui() -> void:
 		get_node_or_null("BorderRect") as ShaderBorderDecorator
 	)
 
-func apply_food_effect(card: Control) -> void:
-	if not item_instance or not item_instance.data:
-		return
-	if card is ShopCard:
-		var shop_card: ShopCard = card
-		var inst: UnitInstance = shop_card.unit_instance
-		if inst and item_instance.data.modifier:
-			item_instance.data.modifier.apply_unit_effect(inst)
+
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	# Keep the card in place but dim it visually so we can see the item while targeting
 	modulate.a = 0.5

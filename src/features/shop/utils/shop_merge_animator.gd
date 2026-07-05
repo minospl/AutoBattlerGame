@@ -233,6 +233,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 		if parent:
 			parent.remove_child(main_card)
 		main_slot.add_card(main_card)
+		main_card.z_index = 0
 		main_slot.update_placeholder()
 		
 		dim_rect.queue_free()

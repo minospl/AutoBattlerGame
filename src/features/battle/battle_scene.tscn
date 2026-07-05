@@ -1,9 +1,16 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://src/features/battle/battle_scene.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_card_slot.tscn" id="2_slot"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="3_button_decorator"]
 [ext_resource type="Script" path="res://src/features/battle/components/status_badge.gd" id="5_status_badge"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/shop_background.jpg" id="6_bg"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bg"]
+texture = ExtResource("6_bg")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+modulate_color = Color(0.3, 0.3, 0.3, 1)
 
 [node name="BattleScene" type="Control"]
 layout_mode = 3
@@ -21,6 +28,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_bg")
 
 [node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel"]
 layout_mode = 1

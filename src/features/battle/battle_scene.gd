@@ -11,7 +11,7 @@ const SHOP_BACKGROUND_TEXTURE: Texture2D = preload("res://src/assets/ui/shop_bac
 const RIVER_CRAB_RES: UnitData = preload("res://src/features/units/templates/river_crab.tres")
 const BATTLE_CARD_SCENE: PackedScene = preload("res://src/features/battle/components/battle_card.tscn")
 
-const MAX_TEAM_SIZE: int = 6
+const MAX_TEAM_SIZE: int = RunState.MAX_ACTIVE_TEAM_SIZE
 
 enum State { PLAYING, PAUSED }
 var simulation_state: State = State.PAUSED
@@ -144,6 +144,9 @@ func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 
 	# Start battle start modifiers immediately
 	trigger_battle_start()
+	
+	# Start simulation immediately without requiring a Play click
+	set_playing(true)
 
 func _configure_hp_bar_shader(hp_bar: Control) -> ShaderMaterial:
 	if not hp_bar:
@@ -165,16 +168,6 @@ func _configure_hp_bar_shader(hp_bar: Control) -> ShaderMaterial:
 	return hp_material
 
 func _apply_visual_styling() -> void:
-	# Background style
-	var bg_panel: Panel = get_node_or_null("BackgroundPanel") as Panel
-	if bg_panel:
-		var bg_style: StyleBoxTexture = StyleBoxTexture.new()
-		bg_style.texture = SHOP_BACKGROUND_TEXTURE
-		bg_style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
-		bg_style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
-		bg_style.modulate_color = Color(0.3, 0.3, 0.3, 1.0) # Modulate darker for battle focus
-		bg_panel.add_theme_stylebox_override("panel", bg_style)
-		
 	# Outer border coloring
 	if outer_border:
 		outer_border.color = GameColors.PANEL_BORDER_DEFAULT

@@ -6,8 +6,22 @@ signal team_state_changed
 ## Signal emitted when the player wants to transition to battle
 signal battle_requested
 
-@export var active_slot_count: int = 6
-@export var bench_slot_count: int = 8
+var active_slot_count: int:
+	get:
+		return RunState.MAX_ACTIVE_TEAM_SIZE
+
+var bench_slot_count: int:
+	get:
+		return RunState.MAX_BENCH_SIZE
+
+var gold: int:
+	get:
+		return run_state.gold if run_state else 10
+	set(value):
+		if run_state:
+			run_state.gold = value
+		if is_inside_tree() and shop_panel:
+			shop_panel.gold = value
 
 # Logic data structures representing templates
 var unit_templates: Array[UnitData] = []
@@ -19,11 +33,6 @@ var run_state: RunState
 @onready var team_panel: TeamPanel = %TeamPanel
 @onready var shop_panel: ShopPanel = %ShopPanel
 
-var gold: int = 10:
-	set(value):
-		gold = value
-		if is_inside_tree() and shop_panel:
-			shop_panel.gold = gold
 
 var slot_scene: PackedScene = preload("res://src/features/shop/components/shop_card_slot.tscn")
 var card_scene: PackedScene = preload("res://src/features/shop/components/shop_card.tscn")
@@ -44,7 +53,6 @@ var current_hovered_card: Control = null
 var current_drag_hovered_slot: ShopCardSlot = null
 
 func _ready() -> void:
-	
 	# Connect sub-panel signals
 	bench_panel.card_dropped.connect(_on_card_dropped)
 	team_panel.card_dropped.connect(_on_card_dropped)
@@ -97,19 +105,10 @@ func setup(p_state: RunState, p_templates: Array[UnitData], p_item_templates: Ar
 	overlay.name = "TargetingLineOverlay"
 	overlay.set_script(overlay_script)
 	overlay.set("parent_scene", self)
+	overlay.z_index = 10
 	add_child(overlay)
 
 func _apply_visual_styling() -> void:
-	# 1. Main Background Panel
-	var bg_panel: Panel = get_node("BackgroundPanel") as Panel
-	if bg_panel:
-		var bg_style: StyleBoxTexture = StyleBoxTexture.new()
-		bg_style.texture = load("res://src/assets/ui/shop_background.jpg") as Texture2D
-		bg_style.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
-		bg_style.axis_stretch_vertical = StyleBoxTexture.AXIS_STRETCH_MODE_TILE
-		bg_style.modulate_color = Color(1.0, 1.0, 1.0, 1.0)
-		bg_panel.add_theme_stylebox_override("panel", bg_style)
-	
 	# 2. Outer Border Color
 	var outer_border: ColorRect = %OuterBorder as ColorRect
 	if outer_border:
@@ -122,9 +121,9 @@ func create_slots() -> void:
 	shop_panel.create_slots(slot_scene, 4)
 	
 	# Bind dependency injection Callables for slots
-	var get_gold_fn: Callable = func() -> int: return get_gold()
-	var deduct_gold_fn: Callable = func(amount: int) -> void: deduct_gold(amount)
-	var refill_slot_fn: Callable = func(idx: int) -> void: refill_shop_slot(idx)
+	var get_gold_fn: Callable = get_gold
+	var deduct_gold_fn: Callable = deduct_gold
+	var refill_slot_fn: Callable = refill_shop_slot
 	
 	var all_slots: Array[ShopCardSlot] = []
 	all_slots.append_array(active_slots)
@@ -137,10 +136,8 @@ func create_slots() -> void:
 		slot.shop_refiller = refill_slot_fn
 		
 		# Connect drag hover signals for target highlighting preview
-		if not slot.drag_hover_started.is_connected(_on_slot_drag_hover_started):
-			slot.drag_hover_started.connect(_on_slot_drag_hover_started)
-		if not slot.drag_hover_ended.is_connected(_on_slot_drag_hover_ended):
-			slot.drag_hover_ended.connect(_on_slot_drag_hover_ended)
+		slot.drag_hover_started.connect(_on_slot_drag_hover_started)
+		slot.drag_hover_ended.connect(_on_slot_drag_hover_ended)
 
 
 func check_for_unit_merges() -> void:
@@ -282,6 +279,9 @@ func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void
 
 func _on_card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target_slot: ShopCardSlot) -> void:
 	if not original_slot or not target_slot:
+		return
+		
+	if original_slot == target_slot:
 		return
 		
 	# 1. Purchase from the Shop slot
@@ -527,14 +527,22 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 func _connect_card_signals(card: Control) -> void:
 	if card is ShopCard:
 		var shop_card: ShopCard = card
-		if not shop_card.hovered.is_connected(_on_card_hover_changed):
-			shop_card.hovered.connect(_on_card_hover_changed)
-		if not shop_card.clicked.is_connected(_on_card_clicked):
-			shop_card.clicked.connect(_on_card_clicked)
+		shop_card.hovered.connect(_on_card_hover_changed)
+		shop_card.clicked.connect(_on_card_clicked)
+		shop_card.right_clicked.connect(_on_card_right_clicked)
 	elif card is ShopCardItem:
 		var item_card: ShopCardItem = card
-		if not item_card.hovered.is_connected(_on_card_hover_changed):
-			item_card.hovered.connect(_on_card_hover_changed)
+		item_card.hovered.connect(_on_card_hover_changed)
+
+func _on_card_right_clicked(card: ShopCard) -> void:
+	if card.slot and card.slot.is_active_team:
+		if card.unit_instance:
+			card.unit_instance.level_up()
+			card.update_ui()
+			if preview_tooltip and preview_tooltip.visible and current_hovered_card == card:
+				CardUIHelper.show_tooltip(preview_tooltip, card.unit_instance)
+			check_for_unit_merges()
+			team_state_changed.emit()
 
 func _on_card_hover_changed(card: Control, is_hovered: bool) -> void:
 	if is_hovered:
@@ -549,11 +557,11 @@ func _on_slot_drag_hover_started(slot: ShopCardSlot, data: Dictionary) -> void:
 	if not slot.is_active_team:
 		return
 		
-	var dragged_card: Variant = data.get("card")
+	var dragged_card: Control = data.get("card")
 	if not (dragged_card is ShopCard):
 		return
 		
-	var unit_card: ShopCard = dragged_card
+	var unit_card: ShopCard = dragged_card as ShopCard
 	var unit: UnitInstance = unit_card.unit_instance
 	if not unit or not unit.data or not unit.data.modifier:
 		return
@@ -626,7 +634,7 @@ func load_state_from_run() -> void:
 	if run_state == null:
 		return
 		
-	gold = run_state.gold
+	self.gold = run_state.gold
 	shop_header_bar.lives = run_state.lives
 	shop_header_bar.day = run_state.day
 	shop_header_bar.trophies = run_state.trophies
@@ -663,13 +671,13 @@ func load_state_from_run() -> void:
 		if item_or_unit != null:
 			if item_or_unit is UnitInstance:
 				var card: ShopCard = card_scene.instantiate() as ShopCard
-				var unit_inst: UnitInstance = item_or_unit
+				var unit_inst: UnitInstance = item_or_unit as UnitInstance
 				card.unit_instance = unit_inst
 				_connect_card_signals(card)
 				slot.add_card(card)
 			elif item_or_unit is ItemInstance:
 				var item_card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
-				item_card.item_instance = item_or_unit
+				item_card.item_instance = item_or_unit as ItemInstance
 				_connect_card_signals(item_card)
 				slot.add_card(item_card)
 				
@@ -679,7 +687,6 @@ func sync_data_to_run_state() -> void:
 	if run_state == null:
 		return
 		
-	run_state.gold = gold
 	run_state.lives = shop_header_bar.lives
 	run_state.day = shop_header_bar.day
 	run_state.trophies = shop_header_bar.trophies

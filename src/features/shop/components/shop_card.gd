@@ -3,6 +3,7 @@ extends PanelContainer
 
 signal hovered(card: ShopCard, is_hovered: bool)
 signal clicked(card: ShopCard)
+signal right_clicked(card: ShopCard)
 
 @export var price: int
 
@@ -141,3 +142,6 @@ func _gui_input(event: InputEvent) -> void:
 			if slot and slot.is_shop_slot:
 				clicked.emit(self)
 				accept_event()
+		elif mouse_event.button_index == MOUSE_BUTTON_RIGHT and mouse_event.pressed:
+			right_clicked.emit(self)
+			accept_event()

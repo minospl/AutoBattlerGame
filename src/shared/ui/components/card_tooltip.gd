@@ -1,7 +1,7 @@
 class_name CardTooltip
 extends MarginContainer
 
-@onready var border_rect: ShaderBorderDecorator = $BorderRect
+@onready var border_rect: ShaderBorderDecorator = %BorderRect
 @onready var name_label: Label = %NameLabel
 @onready var rarity_label: Label = %RarityLabel
 @onready var sprite_rect: TextureRect = %SpriteRect
@@ -27,42 +27,10 @@ var _item_card: ItemInstance
 var _rarity_name: String = "COMMON"
 var _rarity_color: Color = GameColors.BORDER_OUTER_DEFAULT
 
-var _keywords_vbox: VBoxContainer
-var _main_hbox: HBoxContainer
-var _main_tooltip_wrapper: PanelContainer
+@onready var keywords_vbox: VBoxContainer = %KeywordsVBox
+@onready var main_tooltip_wrapper: PanelContainer = %MainTooltipWrapper
 
 func _ready() -> void:
-	# Restructure scene to allow keywords on the left and main card tooltip on the right
-	_main_hbox = HBoxContainer.new()
-	_main_hbox.alignment = BoxContainer.ALIGNMENT_END
-	_main_hbox.add_theme_constant_override("separation", 10)
-	_main_hbox.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	
-	_keywords_vbox = VBoxContainer.new()
-	_keywords_vbox.alignment = BoxContainer.ALIGNMENT_BEGIN
-	_keywords_vbox.add_theme_constant_override("separation", 8)
-	_keywords_vbox.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	_keywords_vbox.visible = false
-	_main_hbox.add_child(_keywords_vbox)
-	
-	_main_tooltip_wrapper = PanelContainer.new()
-	_main_tooltip_wrapper.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-	_main_tooltip_wrapper.custom_minimum_size = custom_minimum_size
-	_main_tooltip_wrapper.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	_main_hbox.add_child(_main_tooltip_wrapper)
-	
-	# Add _main_hbox to tree first
-	add_child(_main_hbox)
-	
-	var children_to_move: Array[Node] = []
-	for child: Node in get_children():
-		if child != _main_hbox:
-			children_to_move.append(child)
-			
-	for child: Node in children_to_move:
-		remove_child(child)
-		_main_tooltip_wrapper.add_child(child)
-	
 	if _unit_instance:
 		_setup_unit_ui()
 		_build_keywords()
@@ -95,8 +63,8 @@ func setup_for_item(item_card: ItemInstance) -> void:
 	_unit_instance = null
 	if is_node_ready():
 		_setup_item_ui()
-		if _keywords_vbox:
-			for child: Node in _keywords_vbox.get_children():
+		if keywords_vbox:
+			for child: Node in keywords_vbox.get_children():
 				child.queue_free()
 
 func _setup_unit_ui() -> void:
@@ -162,7 +130,7 @@ func update_header() -> void:
 	if _unit_instance:
 		name_label.text = _unit_instance.get_unit_name().to_upper() + " [Lvl %d]" % _unit_instance.level
 	elif _item_card:
-		name_label.text = _item_card.item_name.to_upper()
+		name_label.text = _item_card.data.item_name.to_upper() if _item_card.data else ""
 	rarity_label.text = _rarity_name
 
 func update_border() -> void:
@@ -292,17 +260,17 @@ func _process(_delta: float) -> void:
 		_update_keywords_visibility(shift_pressed)
 
 func _build_keywords() -> void:
-	if not _keywords_vbox:
+	if not keywords_vbox:
 		return
 		
 	# Clear old nodes
-	for child: Node in _keywords_vbox.get_children():
+	for child: Node in keywords_vbox.get_children():
 		child.queue_free()
 		
 	var keywords: Array[Dictionary] = KeywordDatabase.get_keywords_for_unit(_unit_instance, _unit_instance.level)
 	for kw: Dictionary in keywords:
 		var panel: PanelContainer = _create_keyword_panel(str(kw["title"]), str(kw["desc"]))
-		_keywords_vbox.add_child(panel)
+		keywords_vbox.add_child(panel)
 
 func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
 	var panel: PanelContainer = PanelContainer.new()
@@ -355,7 +323,7 @@ func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
 
 
 func _update_keywords_visibility(show_keywords: bool) -> void:
-	if not _keywords_vbox:
+	if not keywords_vbox:
 		return
-	var has_keywords: bool = _keywords_vbox.get_child_count() > 0
-	_keywords_vbox.visible = show_keywords and has_keywords
+	var has_keywords: bool = keywords_vbox.get_child_count() > 0
+	keywords_vbox.visible = show_keywords and has_keywords

@@ -172,8 +172,3 @@ func _get_bezier_point(p0: Vector2, p1: Vector2, p2: Vector2, t: float) -> Vecto
 	var q1: Vector2 = p1.lerp(p2, t)
 	return q0.lerp(q1, t)
 
-func _get_bezier_tangent(p0: Vector2, p1: Vector2, p2: Vector2, t: float) -> Vector2:
-	var d: Vector2 = 2.0 * (1.0 - t) * (p1 - p0) + 2.0 * t * (p2 - p1)
-	if d.is_zero_approx():
-		return Vector2.RIGHT
-	return d.normalized()

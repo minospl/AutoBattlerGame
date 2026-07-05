@@ -1,6 +1,16 @@
 class_name RunState
 extends Resource
 
+const MAX_ACTIVE_TEAM_SIZE: int = 6
+const MAX_BENCH_SIZE: int = 8
+
+func _init() -> void:
+	if active_team.is_empty():
+		active_team.resize(MAX_ACTIVE_TEAM_SIZE)
+	if bench.is_empty():
+		bench.resize(MAX_BENCH_SIZE)
+
+
 @export var active_team: Array[UnitInstance] = []
 @export var bench: Array[UnitInstance] = []
 @export var shop_cards: Array[Resource] = [] # Can hold UnitInstance, ItemInstance, or null
@@ -107,7 +117,7 @@ func get_chance_text() -> String:
 	return " | ".join(parts)
 
 func check_and_merge_units() -> Dictionary:
-	var groups: Dictionary = {}
+	var groups: Dictionary[String, Array] = {}
 	
 	for i: int in range(active_team.size()):
 		var unit: UnitInstance = active_team[i]

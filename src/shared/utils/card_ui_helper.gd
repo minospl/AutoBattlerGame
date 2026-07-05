@@ -77,28 +77,30 @@ static func setup_card_visuals(
 		
 	var template_panel: PanelContainer = stats_hbox.get_child(0) as PanelContainer if stats_hbox and stats_hbox.get_child_count() > 0 else null
 
-	if stats_hbox:
+	if stats_hbox and template_panel:
 		stats_hbox.visible = true
-		# Hide default template panels initially, clean up old dynamic ones
-		for child: Node in stats_hbox.get_children():
-			if not child.has_meta("is_dynamic"):
-				(child as Control).visible = false
+		template_panel.visible = false
+		
+		# 1. Ensure we have enough child panels (up to active_stats.size() + 1)
+		while stats_hbox.get_child_count() <= active_stats.size():
+			var new_panel: PanelContainer = template_panel.duplicate() as PanelContainer
+			stats_hbox.add_child(new_panel)
+			
+		# 2. Update and show the required panels, hide the rest
+		for i: int in range(1, stats_hbox.get_child_count()):
+			var panel: PanelContainer = stats_hbox.get_child(i) as PanelContainer
+			var stat_idx: int = i - 1
+			if stat_idx < active_stats.size():
+				var stat: Dictionary = active_stats[stat_idx]
+				panel.visible = true
+				var label: Label = panel.find_child("*Label", true, false) as Label
+				if label:
+					var stat_val: int = stat.value
+					label.text = NumberFormatter.format_large_number(stat_val)
+				var stat_color: Color = stat.color
+				setup_stat_panel_shader(panel, stat_color, stat_size)
 			else:
-				child.queue_free()
-
-	# Dynamically populate bottom panels for the top 3 active stats
-	for stat: Dictionary in active_stats:
-		if stats_hbox and template_panel:
-			var panel: PanelContainer = template_panel.duplicate() as PanelContainer
-			panel.set_meta("is_dynamic", true)
-			stats_hbox.add_child(panel)
-			var label: Label = panel.find_child("*Label", true, false) as Label
-			if label:
-				var stat_val: int = stat.value
-				label.text = NumberFormatter.format_large_number(stat_val)
-			var stat_color: Color = stat.color
-			setup_stat_panel_shader(panel, stat_color, stat_size)
-			panel.visible = true
+				panel.visible = false
 			
 	# 2. Setup sprite / fallback portrait
 	if sprite_rect and fallback_label:
@@ -196,8 +198,8 @@ static func setup_item_visuals(
 	# 1. Outer Border style based on rarity
 	if border_rect:
 		var border_color: Color = Color(0.9, 0.6, 0.1) # Fallback to golden orange
-		if item_instance.rarity:
-			border_color = item_instance.rarity.border_color
+		if item_instance.data and item_instance.data.rarity:
+			border_color = item_instance.data.rarity.border_color
 		border_rect.border_color = border_color
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 		border_rect.interior_color = GameColors.WHITE_COLOR
