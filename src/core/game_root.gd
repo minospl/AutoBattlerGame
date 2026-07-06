@@ -104,7 +104,7 @@ func _go_to_shop() -> void:
 	)
 
 func _go_to_battle() -> void:
-	var enemy_team_units: Array[UnitInstance] = generate_enemy_team(run_state.day)
+	var enemy_team_units: Array[UnitInstance] = run_state.generate_enemy_team()
 	_change_scene(battle_scene_path, func(battle_node: Node) -> void:
 		var battle: BattleScene = battle_node as BattleScene
 		if battle:
@@ -112,59 +112,17 @@ func _go_to_battle() -> void:
 			battle.battle_finished.connect(_on_battle_finished)
 	)
 
-func generate_enemy_team(p_day: int) -> Array[UnitInstance]:
-	var enemies: Array[UnitInstance] = []
-	enemies.resize(6)
-	
-	var team_size: int = clampi(1 + floori((p_day - 1) / 2.0), 1, 6)
-	
-	var max_price_unlocked: int = 2
-	if p_day >= 3 and p_day <= 4:
-		max_price_unlocked = 3
-	elif p_day >= 5:
-		max_price_unlocked = 4
-		
-	var pool: Array[UnitData] = []
-	for t: UnitData in unit_templates:
-		if t.price <= max_price_unlocked:
-			pool.append(t)
-			
-	if pool.is_empty():
-		return enemies
-		
-	for i: int in range(team_size):
-		var template: UnitData = pool[randi() % pool.size()]
-		var inst: UnitInstance = UnitInstance.new()
-		inst.initialize(template)
-		
-		var target_level: int = clampi(1 + floori((p_day - 1) / 3.0), 1, 3)
-		while inst.level < target_level:
-			inst.level_up()
-			
-		enemies[i] = inst
-		
-	return enemies
-
 func _on_battle_requested() -> void:
 	_go_to_battle()
 
 func _on_battle_finished(p_outcome: String) -> void:
-	if p_outcome == "victory":
-		run_state.trophies += 1
-	elif p_outcome == "defeat":
-		run_state.lives -= 1
+	run_state.complete_battle(p_outcome)
 	
-	if run_state.lives <= 0:
+	if run_state.is_defeat():
 		_show_game_over(false)
-	elif run_state.trophies >= run_state.max_trophies:
+	elif run_state.is_victory():
 		_show_game_over(true)
 	else:
-		run_state.day += 1
-		run_state.gold += 10
-		run_state.shop_level += 1
-		for i: int in range(run_state.shop_cards.size()):
-			if not run_state.shop_frozen_statuses[i]:
-				run_state.shop_cards[i] = null
 		_go_to_shop()
 
 func _show_game_over(p_victory: bool) -> void:

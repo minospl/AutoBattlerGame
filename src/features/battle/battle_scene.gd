@@ -428,21 +428,7 @@ func _on_pause_pressed() -> void:
 
 func sync_stats_to_run_state() -> void:
 	if run_state != null:
-		for i: int in range(MAX_TEAM_SIZE):
-			var persistent_unit: UnitInstance = run_state.active_team[i]
-			var battle_unit_wrapper: BattleUnitInstance = player_team.units[i] as BattleUnitInstance
-			var battle_unit: UnitInstance = battle_unit_wrapper.base_unit if battle_unit_wrapper else null
-			if persistent_unit and battle_unit:
-				persistent_unit.health = battle_unit.health
-				persistent_unit.attack = battle_unit.attack
-				persistent_unit.poison = battle_unit.poison
-				persistent_unit.burn = battle_unit.burn
-				persistent_unit.electrocute = battle_unit.electrocute
-				persistent_unit.heal = battle_unit.heal
-				persistent_unit.shield = battle_unit.shield
-				persistent_unit.cast_speed = battle_unit.cast_speed
-			else:
-				run_state.active_team[i] = null
+		run_state.sync_battle_team_stats(player_team.units)
 
 func _on_exit_pressed() -> void:
 	sync_stats_to_run_state()

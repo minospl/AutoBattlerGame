@@ -145,18 +145,78 @@ func roll_rarity_name() -> String:
 		return "Epic"
 	return "Legendary"
 
-func get_chance_text() -> String:
-	var weights: Array[float] = shop_weights
-	var parts: Array[String] = []
-	if weights[0] > 0.0:
-		parts.append("[color=#708094]C:%d%%[/color]" % int(weights[0] * 100))
-	if weights[1] > 0.0:
-		parts.append("[color=#3082cf]R:%d%%[/color]" % int(weights[1] * 100))
-	if weights[2] > 0.0:
-		parts.append("[color=#8059d6]E:%d%%[/color]" % int(weights[2] * 100))
-	if weights[3] > 0.0:
-		parts.append("[color=#d69e2e]L:%d%%[/color]" % int(weights[3] * 100))
-	return " | ".join(parts)
+func complete_battle(outcome: String) -> void:
+	if outcome == "victory":
+		trophies += 1
+	elif outcome == "defeat":
+		lives -= 1
+		
+	if lives > 0 and trophies < max_trophies:
+		day += 1
+		gold += 10
+		shop_level += 1
+		for i: int in range(shop_cards.size()):
+			if not shop_frozen_statuses[i]:
+				shop_cards[i] = null
+
+func is_victory() -> bool:
+	return trophies >= max_trophies
+
+func is_defeat() -> bool:
+	return lives <= 0
+
+func is_game_over() -> bool:
+	return is_victory() or is_defeat()
+
+func generate_enemy_team() -> Array[UnitInstance]:
+	var enemies: Array[UnitInstance] = []
+	enemies.resize(6)
+	
+	var team_size: int = clampi(1 + floori((day - 1) / 2.0), 1, 6)
+	
+	var max_price_unlocked: int = 2
+	if day >= 3 and day <= 4:
+		max_price_unlocked = 3
+	elif day >= 5:
+		max_price_unlocked = 4
+		
+	var pool: Array[UnitData] = []
+	for t: UnitData in unit_templates:
+		if t.price <= max_price_unlocked:
+			pool.append(t)
+			
+	if pool.is_empty():
+		return enemies
+		
+	for i: int in range(team_size):
+		var template: UnitData = pool[randi() % pool.size()]
+		var inst: UnitInstance = UnitInstance.new()
+		inst.initialize(template)
+		
+		var target_level: int = clampi(1 + floori((day - 1) / 3.0), 1, 3)
+		while inst.level < target_level:
+			inst.level_up()
+			
+		enemies[i] = inst
+		
+	return enemies
+
+func sync_battle_team_stats(player_battle_units: Array[UnitInstance]) -> void:
+	for i: int in range(active_team.size()):
+		var persistent_unit: UnitInstance = active_team[i]
+		var battle_unit_wrapper: BattleUnitInstance = player_battle_units[i] as BattleUnitInstance
+		var battle_unit: UnitInstance = battle_unit_wrapper.base_unit if battle_unit_wrapper else null
+		if persistent_unit and battle_unit:
+			persistent_unit.health = battle_unit.health
+			persistent_unit.attack = battle_unit.attack
+			persistent_unit.poison = battle_unit.poison
+			persistent_unit.burn = battle_unit.burn
+			persistent_unit.electrocute = battle_unit.electrocute
+			persistent_unit.heal = battle_unit.heal
+			persistent_unit.shield = battle_unit.shield
+			persistent_unit.cast_speed = battle_unit.cast_speed
+		else:
+			active_team[i] = null
 
 func check_and_merge_units() -> Dictionary:
 	var groups: Dictionary[String, Array] = {}

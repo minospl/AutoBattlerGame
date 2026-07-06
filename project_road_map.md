@@ -39,7 +39,7 @@ Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności za
 | **Mechanika** | **[x] Zunifikowany System Przedmiotów (Spawnowanie, Rzadkość i Modułowość):** Przebudowa przedmiotów na wzór potworów. Wdrożenie klas `ItemData`, `ItemInstance` oraz bazowej klasy `ItemModifier` (oddzielne skrypty dla efektów). Dodanie właściwości `is_draggable` (dla jedzenia/zwojów nakładanych na sojuszników) i `is_clickable` (dla natychmiastowych zakupów globalnych). Aktywacja generowania przedmiotów w sklepie (szansa 30% na slot przedmiotu) z przypisaną rzadkością (Rarity). | **Krytyczny** |
 | **Mechanika** | **[x] Poziom Sklepu (Shop Level):** Zaimplementowanie mechaniki poziomów sklepu. Ulepszanie sklepu (automatycznie z każdym dniem) zmienia wagi prawdopodobieństwa (szanse procentowe) losowania rzadszych kart przy odświeżaniu sklepu. | **Krytyczny** |
 | **UI / UX** | **[x] Tooltip Rzadkości Przedmiotów:** Dostosowanie tooltipu przedmiotu ([CardTooltip](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_tooltip.gd)), tak aby wyświetlał tekstową etykietę rzadkości (Common, Rare, Legendary) oraz zmieniał barwy obramowania i tekstów odpowiednio do rzadkości (na wzór kart jednostek). | **Krytyczny** |
-| **Refaktor** | **[/] Model-View separation:** Zmiana architektury aktualizacji sklepu tak, aby to logiczny `RunState` decydował o zmianach, a UI tylko je odzwierciedlało (RunState jako źródło prawdy, eliminacja błędów wyścigu). Zrobione logicznie (state-first), ale UI wciąż stosuje ręczne, inkrementalne modyfikacje węzłów. | **Krytyczny** |
+| **Refaktor** | **[x] Model-View separation:** Zmiana architektury aktualizacji sklepu tak, aby to logiczny `RunState` decydował o zmianach, a UI tylko je odzwierciedlało (RunState jako źródło prawdy, eliminacja błędów wyścigu). Zaimplementowano reaktywne sygnały aktualizacji, a widoki sklepu i walki są całkowicie sterowane przez model. | **Krytyczny** |
 | **Refaktor** | **[x] Poprawki Modyfikatorów (Typowanie i Null-Safety):** Dostosowanie istniejących skryptów modyfikatorów do ścisłego typowania w Godot 4.7 (bezpieczne rzutowanie `as UnitInstance` oraz guard clauses dla wartości `null` na wejściu). | **Krytyczny** |
 | **Mechanika** | **Relikty / Przedmioty Pasywne:** Rozbudowa systemu o relikty (pasywne modyfikatory wpływające globalnie na rozgrywkę/walkę), a nie tradycyjne przedmioty typu zbroje/hełmy. | Opcjonalny |
 
@@ -93,22 +93,11 @@ Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności za
 
 Podczas skalowania gry należy zwrócić szczególną uwagę na trzy kluczowe aspekty architektury, które przy restrykcyjnym typowaniu w Godot 4.7 mogą prowadzić do błędów kompilacji lub trudnych do debugowania zachowań w czasie rzeczywistym.
 
-### Zagrożenie 1: Synchronizacja danych poprzez UI (`sync_data_from_ui()`)
-Obecnie interfejs sklepu stosuje podejście, w którym fizyczne ułożenie kart w drzewie sceny (reprezentowane przez dzieci węzła `CardContainer`) jest źródłem prawdy dla logiki:
-```gdscript
-func sync_data_from_ui() -> void:
-    for i: int in range(active_slot_count):
-        active_team[i] = active_slots[i].get_unit_instance()
-```
-#### Ryzyko:
-1.  **Asynchroniczność węzłów:** Metoda `queue_free()` usuwa węzły pod koniec klatki. Jeśli wywołamy `sync_data_from_ui()` natychmiast po usunięciu karty, `get_unit_instance()` może nadal zwrócić referencję do usuwanego obiektu lub wywołać błąd `Attempt to call function on a cleared instance`.
-2.  **Operacje Drag & Drop:** Podczas przeciągania, karta tymczasowo zmienia rodzica (zostaje odpięta ze slotu). Jeśli w tym samym momencie wyzwolona zostanie synchronizacja, gra uzna, że slot jest pusty, co prowadzi do utraty jednostki.
-
-#### Rekomendacja (Rozwiązanie):
-Należy przejść na architekturę **Data-Driven (MVC)**.
-*   Logiczny stan drużyny (`active_team` w `RunState`) musi być **jedynym źródłem prawdy**.
-*   Wszelkie operacje (zakup, przesunięcie, sprzedaż) modyfikują najpierw tablicę w `RunState`.
-*   UI powinno jedynie reagować na te zmiany (nasłuchiwać sygnałów z `RunState` i odświeżać widok kart). Dzięki temu UI staje się "głupią" warstwą prezentacji, a logika gry nie zależy od struktury drzewa sceny.
+### Zagrożenie 1: Synchronizacja danych poprzez UI (`sync_data_from_ui()`) [ROZWIĄZANE]
+Zagrożenie to zostało całkowicie wyeliminowane w Kamieniu Milowym 1 poprzez pełne wdrożenie architektury **Data-Driven (MVC)**:
+*   Logiczny stan gry (`active_team`, `bench`, `shop_cards` w `RunState`) jest **jedynym źródłem prawdy**.
+*   Wszelkie operacje modyfikują wyłącznie tablice w `RunState` (poprzez transakcje `buy_unit()`, `swap_units()`, `sell_unit()`, `roll_shop()`).
+*   Widoki (`ShopScene`, `ShopPanel`, `ShopCardSlot`) reagują wyłącznie na sygnały wysyłane przez `RunState` (np. `gold_changed`, `shop_slot_updated`, `shop_slot_freeze_changed`), aktualizując interfejs bez ryzyka asynchroniczności czy błędów drag & drop.
 
 ---
 

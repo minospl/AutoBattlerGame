@@ -25,9 +25,9 @@ signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
 		shop_level = val
 		_update_labels()
 
-@export var chance_text: String = "":
+@export var shop_weights: Array[float] = []:
 	set(val):
-		chance_text = val
+		shop_weights = val
 		_update_labels()
 
 var slots: Array[ShopCardSlot] = []
@@ -108,10 +108,22 @@ func _process(_delta: float) -> void:
 			if border_decorator:
 				border_decorator.set_border_color(GameColors.PANEL_BORDER_DEFAULT)
 
+func _format_chance_text(weights: Array[float]) -> String:
+	var parts: Array[String] = []
+	if weights.size() > 0 and weights[0] > 0.0:
+		parts.append("[color=#708094]C:%d%%[/color]" % int(weights[0] * 100))
+	if weights.size() > 1 and weights[1] > 0.0:
+		parts.append("[color=#3082cf]R:%d%%[/color]" % int(weights[1] * 100))
+	if weights.size() > 2 and weights[2] > 0.0:
+		parts.append("[color=#8059d6]E:%d%%[/color]" % int(weights[2] * 100))
+	if weights.size() > 3 and weights[3] > 0.0:
+		parts.append("[color=#d69e2e]L:%d%%[/color]" % int(weights[3] * 100))
+	return " | ".join(parts)
+
 func _update_labels() -> void:
 	if is_inside_tree() and gold_label:
 		gold_label.text = str(gold) + "[color=#f2b726]G[/color]"
 	if is_inside_tree() and shop_label:
 		shop_label.text = "SHOP LVL " + str(shop_level)
 	if is_inside_tree() and chance_label:
-		chance_label.text = chance_text
+		chance_label.text = _format_chance_text(shop_weights)

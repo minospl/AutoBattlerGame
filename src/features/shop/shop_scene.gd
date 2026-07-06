@@ -562,9 +562,9 @@ func load_state_from_run() -> void:
 	shop_header_bar.day = run_state.day
 	shop_header_bar.trophies = run_state.trophies
 	
-	# Update shop level and chance text in the shop panel
+	# Update shop level and chance weights in the shop panel
 	shop_panel.shop_level = run_state.shop_level
-	shop_panel.chance_text = run_state.get_chance_text()
+	shop_panel.shop_weights = run_state.shop_weights
 	
 	# Ensure active team and bench size matches expectations
 	if run_state.active_team.size() != active_slot_count:
