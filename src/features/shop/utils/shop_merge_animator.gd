@@ -28,6 +28,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	dim_rect.color = Color(0.0, 0.0, 0.0, 0.0)
 	dim_rect.mouse_filter = Control.MOUSE_FILTER_STOP
 	dim_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	dim_rect.z_index = 998
 	shop.add_child(dim_rect)
 	
 	var dim_tween: Tween = shop.create_tween()
@@ -48,14 +49,13 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 			# Use the slot's CardContainer global position if layout hasn't run yet
 			var start_pos: Vector2 = rem_card.global_position
 			var rem_container: Node = rem_slot.get_node_or_null("CardContainer")
-			if rem_container and rem_container is Control:
-				start_pos = (rem_container as Control).global_position
+			start_pos = (rem_container as Control).global_position
 				
 			var card_size: Vector2 = rem_card.size
 			if card_size == Vector2.ZERO:
 				card_size = rem_card.custom_minimum_size
 			if card_size == Vector2.ZERO:
-				card_size = Vector2(100, 125)
+				card_size = Vector2(100, 135)
 				
 			rem_slot.remove_card(rem_card)
 			animating_removed.append({
@@ -64,32 +64,28 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 				"size": card_size
 			})
 			
-	# Cache main card details and detach it from its slot so it can fly
-	# Use main slot CardContainer position to prevent default coordinates during cascade merges
+	# Cache main card details and resting/target positions before detaching
 	var main_start_pos: Vector2 = main_card.global_position
 	var main_container: Node = main_slot.get_node_or_null("CardContainer")
 	if main_container and main_container is Control:
 		main_start_pos = (main_container as Control).global_position
-		
 	var main_size: Vector2 = main_card.size
-	if main_size == Vector2.ZERO:
-		main_size = main_card.custom_minimum_size
-	if main_size == Vector2.ZERO:
-		main_size = Vector2(100, 125)
 		
-	main_slot.remove_card(main_card)
+	# Lock custom_minimum_size to preserve the exact starting dimensions
+	main_card.custom_minimum_size = main_size
+	main_card.size = main_size
+		
+	# Since the card starts in main_slot and returns to main_slot,
+	# target position is identical to the exact starting global position.
+	var main_slot_target_pos: Vector2 = main_start_pos
 	
-	# Determine target slot position (where the slot container is located globally)
-	var main_slot_target_pos: Vector2 = main_slot.global_position
-	var card_container: Node = main_slot.get_node_or_null("CardContainer")
-	if card_container and card_container is Control:
-		main_slot_target_pos = (card_container as Control).global_position
+	main_slot.remove_card(main_card)
 		
 	# Add all 3 cards as overlay child nodes
 	shop.add_child(main_card)
 	main_card.global_position = main_start_pos
 	main_card.z_index = 999
-	main_card.pivot_offset = main_size / 2.0
+	main_card.pivot_offset = Vector2.ZERO
 	main_card.rotation = 0.0
 	main_card.scale = Vector2(1.0, 1.0)
 	
@@ -117,32 +113,20 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 		
 	# 3. Calculate Center Position and Triangle Points
 	var screen_center: Vector2 = shop.size / 2.0
-	var triangle_radius: float = 80.0
-	
-	# Points (offset relative to center of screen)
-	var p1_offset: Vector2 = Vector2(0.0, -triangle_radius)
-	var p2_offset: Vector2 = Vector2(-triangle_radius * 0.866, triangle_radius * 0.5)
-	var p3_offset: Vector2 = Vector2(triangle_radius * 0.866, triangle_radius * 0.5)
-	
-	var target_points: Array[Vector2] = [
-		screen_center + p1_offset - main_size / 2.0,
-		screen_center + p2_offset - main_size / 2.0,
-		screen_center + p3_offset - main_size / 2.0
-	]
+	var center_main_pos: Vector2 = screen_center - main_size / 2.0
 	
 	# Assign points to our 3 cards
 	var all_animating: Array[Dictionary] = []
 	all_animating.append({
 		"card": main_card,
 		"start_pos": main_start_pos,
-		"target_pos": target_points[0],
 		"target_rotation": 0.0,
 		"size": main_size
 	})
 	
 	for i: int in range(overlay_removed.size()):
 		var info: Dictionary = overlay_removed[i]
-		var rot: float = -0.2 if i == 0 else 0.2
+		var rot: float = 0.0 if i == 0 else 0.2
 		var info_card: ShopCard = info.get("card")
 		var info_start_pos: Vector2 = info.get("start_pos", Vector2.ZERO)
 		var info_card_size: Vector2 = info.get("size", Vector2.ZERO)
@@ -150,7 +134,6 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 		all_animating.append({
 			"card": info_card,
 			"start_pos": info_start_pos,
-			"target_pos": target_points[i + 1],
 			"target_rotation": rot,
 			"size": info_card_size
 		})
@@ -162,10 +145,9 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 			continue
 		var item: Dictionary = item_val
 		var card: ShopCard = item.get("card")
-		var target_pos: Vector2 = item.get("target_pos", Vector2.ZERO)
 		var target_rot: float = item.get("target_rotation", 0.0)
 		
-		p1_tween.tween_property(card, "global_position", target_pos, 0.45)\
+		p1_tween.tween_property(card, "global_position", center_main_pos, 0.45)\
 			.set_trans(Tween.TRANS_QUAD)\
 			.set_ease(Tween.EASE_OUT)
 		p1_tween.tween_property(card, "rotation", target_rot, 0.45)\
@@ -174,15 +156,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 			
 	# --- PHASE 2: Spin and Merge to Center ---
 	var merge_tween: Tween = p1_tween.chain().set_parallel(true)
-	
-	# Tween the main card to the center and slightly larger
-	var scale_merge: float = 1.35
-	var center_main_pos: Vector2 = screen_center - (main_size * scale_merge) / 2.0
-	
-	merge_tween.tween_property(main_card, "global_position", center_main_pos, 0.35)\
-		.set_trans(Tween.TRANS_QUAD)\
-		.set_ease(Tween.EASE_IN_OUT)
-	merge_tween.tween_property(main_card, "scale", Vector2(scale_merge, scale_merge), 0.35)\
+	merge_tween.tween_property(main_card, "scale", Vector2(1.35, 1.35), 0.35)\
 		.set_trans(Tween.TRANS_QUAD)\
 		.set_ease(Tween.EASE_IN_OUT)
 	merge_tween.tween_property(main_card, "rotation", 0.0, 0.35)
@@ -204,40 +178,57 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 			.set_ease(Tween.EASE_IN)
 		merge_tween.tween_property(card, "modulate:a", 0.0, 0.35)
 		
-	# Clean up removed cards and update main card visual
-	var update_and_clean: Tween = merge_tween.chain()
-	update_and_clean.tween_callback(func() -> void:
+	# Callback to clean up removed cards (runs immediately after Phase 2 finishes)
+	var clean_chain: Tween = merge_tween.chain()
+	clean_chain.tween_callback(func() -> void:
 		for info_clean: Dictionary in overlay_removed:
 			var card_clean: ShopCard = info_clean.get("card")
 			if card_clean:
 				card_clean.queue_free()
-		main_card.update_ui()
 	)
-	
-	# --- PHASE 3: Fly Back to Slot ---
-	var fly_back_tween: Tween = update_and_clean.chain().set_parallel(true)
-	fly_back_tween.tween_property(main_card, "global_position", main_slot_target_pos, 0.45)\
-		.set_trans(Tween.TRANS_QUAD)\
-		.set_ease(Tween.EASE_IN_OUT)
-	fly_back_tween.tween_property(main_card, "scale", Vector2(1.0, 1.0), 0.45)\
-		.set_trans(Tween.TRANS_QUAD)\
-		.set_ease(Tween.EASE_IN_OUT)
+
+	# 0.5s Timer
+	clean_chain.finished.connect(func() -> void:
+		var timer: SceneTreeTimer = shop.get_tree().create_timer(0.5)
+		timer.timeout.connect(func() -> void:
+			if not is_instance_valid(main_card) or not is_instance_valid(main_slot):
+				dim_rect.queue_free()
+				callback.call()
+				return
+				
+			# --- PHASE 3: Fly Back to Slot ---
+			var fly_back_tween: Tween = shop.create_tween().set_parallel(true)
+			fly_back_tween.tween_property(main_card, "global_position", main_slot_target_pos, 0.5)\
+				.set_trans(Tween.TRANS_QUAD)\
+				.set_ease(Tween.EASE_IN_OUT)
+			fly_back_tween.tween_property(main_card, "scale", Vector2(1.0, 1.0), 0.5)\
+				.set_trans(Tween.TRANS_QUAD)\
+				.set_ease(Tween.EASE_IN_OUT)
+				
+			# Fade out dim overlay
+			fly_back_tween.tween_property(dim_rect, "color", Color(0.0, 0.0, 0.0, 0.0), 0.5)
+			
+			fly_back_tween.finished.connect(func() -> void:
+				if not is_instance_valid(main_card) or not is_instance_valid(main_slot):
+					dim_rect.queue_free()
+					callback.call()
+					return
+					
+				var parent: Node = main_card.get_parent()
+				if parent:
+					parent.remove_child(main_card)
+				
+				# Perform the Level 2 UI/visual update here upon landing
+				main_card.update_ui()
+				main_card.z_index = 0
 		
-	# Fade out dim overlay
-	fly_back_tween.tween_property(dim_rect, "color", Color(0.0, 0.0, 0.0, 0.0), 0.45)
-	
-	# Final step: parent main card back to slot and remove dimming overlay
-	var final_tween: Tween = fly_back_tween.chain()
-	final_tween.tween_callback(func() -> void:
-		var parent: Node = main_card.get_parent()
-		if parent:
-			parent.remove_child(main_card)
-		main_slot.add_card(main_card)
-		main_card.z_index = 0
-		main_slot.update_placeholder()
-		
-		dim_rect.queue_free()
-		
-		# Invoke the callback to trigger next pending fusion recursively
-		callback.call()
+				main_slot.add_card(main_card)	
+				main_slot.update_placeholder()
+				
+				dim_rect.queue_free()
+				
+				# Invoke the callback to trigger next pending fusions
+				callback.call()
+			)
+		)
 	)
