@@ -23,9 +23,6 @@ var gold: int:
 		if is_inside_tree() and shop_panel:
 			shop_panel.gold = value
 
-# Logic data structures representing templates
-var unit_templates: Array[UnitData] = []
-var item_templates: Array[ItemData] = []
 var run_state: RunState
 
 @onready var shop_header_bar: ShopHeaderBar = %ShopHeaderBar
@@ -84,10 +81,24 @@ func _ready() -> void:
 	if run_state:
 		load_state_from_run()
 
-func setup(p_state: RunState, p_templates: Array[UnitData], p_item_templates: Array[ItemData] = []) -> void:
+func setup(p_state: RunState) -> void:
 	run_state = p_state
-	unit_templates = p_templates
-	item_templates = p_item_templates
+	
+	# Pass run_state to slots
+	var all_slots: Array[ShopCardSlot] = []
+	all_slots.append_array(active_slots)
+	all_slots.append_array(bench_slots)
+	all_slots.append_array(shop_panel.slots)
+	for slot: ShopCardSlot in all_slots:
+		slot.run_state = run_state
+		
+	# Connect signals from Model (RunState)
+	run_state.gold_changed.connect(_on_gold_changed)
+	run_state.lives_changed.connect(_on_lives_changed)
+	run_state.day_changed.connect(_on_day_changed)
+	run_state.trophies_changed.connect(_on_trophies_changed)
+	run_state.shop_slot_updated.connect(_on_shop_slot_updated)
+	run_state.shop_slot_freeze_changed.connect(_on_shop_slot_freeze_changed)
 	
 	load_state_from_run()
 	
@@ -98,7 +109,7 @@ func setup(p_state: RunState, p_templates: Array[UnitData], p_item_templates: Ar
 			has_shop_cards = true
 			break
 	if not has_shop_cards:
-		roll_shop(true)
+		run_state.roll_shop(true)
 	
 	# Instantiate and add the targeting line overlay to draw on top of everything
 	var overlay: Control = Control.new()
@@ -120,21 +131,12 @@ func create_slots() -> void:
 	team_panel.create_slots(slot_scene, active_slot_count)
 	shop_panel.create_slots(slot_scene, 4)
 	
-	# Bind dependency injection Callables for slots
-	var get_gold_fn: Callable = get_gold
-	var deduct_gold_fn: Callable = deduct_gold
-	var refill_slot_fn: Callable = refill_shop_slot
-	
 	var all_slots: Array[ShopCardSlot] = []
 	all_slots.append_array(active_slots)
 	all_slots.append_array(bench_slots)
 	all_slots.append_array(shop_panel.slots)
 	
 	for slot: ShopCardSlot in all_slots:
-		slot.gold_provider = get_gold_fn
-		slot.gold_deductor = deduct_gold_fn
-		slot.shop_refiller = refill_slot_fn
-		
 		# Connect drag hover signals for target highlighting preview
 		slot.drag_hover_started.connect(_on_slot_drag_hover_started)
 		slot.drag_hover_ended.connect(_on_slot_drag_hover_ended)
@@ -209,11 +211,11 @@ func clear_all() -> void:
 	team_state_changed.emit()
 
 func _on_add_monster_requested() -> void:
-	if unit_templates.is_empty():
+	if not run_state or run_state.unit_templates.is_empty():
 		return
 		
 	# Pick random template
-	var template: UnitData = unit_templates[randi() % unit_templates.size()]
+	var template: UnitData = run_state.unit_templates[randi() % run_state.unit_templates.size()]
 	
 	# Create runtime instance
 	var instance: UnitInstance = UnitInstance.new()
@@ -226,49 +228,44 @@ func _on_restart_requested() -> void:
 	# 1. Clear team and bench slots
 	clear_all()
 	
-	# 2. Reset header bar values to starting position
-	shop_header_bar.lives = 10
-	shop_header_bar.day = 4
-	shop_header_bar.trophies = 3
+	# 2. Reset header bar values to starting position (via Model)
+	if run_state:
+		run_state.lives = 10
+		run_state.day = 4
+		run_state.trophies = 3
 	
 	# 3. Spawn initial units: 1 of each type
-	for template: UnitData in unit_templates:
-		var instance: UnitInstance = UnitInstance.new()
-		instance.initialize(template)
-		add_unit_to_bench(instance)
+	if run_state:
+		for template: UnitData in run_state.unit_templates:
+			var instance: UnitInstance = UnitInstance.new()
+			instance.initialize(template)
+			add_unit_to_bench(instance)
 		
-	# 4. Reset gold to 10 and roll the shop for free
-	gold = 10
-	roll_shop(true)
+	# 4. Reset gold to 10 and roll the shop for free (via Model)
+	if run_state:
+		run_state.gold = 10
+		run_state.roll_shop(true)
 
 func _on_team_state_changed() -> void:
 	pass
 
-func get_gold() -> int:
-	return gold
-
-func deduct_gold(amount: int) -> void:
-	gold -= amount
-
 func _on_roll_requested() -> void:
-	if gold >= 1:
-		gold -= 1
-		roll_shop(false)
+	if run_state:
+		run_state.roll_shop(false)
 
 func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void:
-	if not original_slot:
+	if original_slot == null or original_slot.is_shop_slot or not run_state:
 		return
 		
-	var refund_gold: int = 1
-	if "price" in card:
-		refund_gold = card.get("price")
+	var unit_inst: UnitInstance = null
+	if card is ShopCard:
+		unit_inst = (card as ShopCard).unit_instance
+			
+	if unit_inst == null:
+		return
 		
-	if original_slot.is_active_team:
-		run_state.active_team[original_slot.slot_index] = null
-	else:
-		run_state.bench[original_slot.slot_index] = null
-		
-	gold += refund_gold
+	# Execute in Model first
+	run_state.sell_unit(original_slot.slot_index, original_slot.is_active_team)
 	
 	# Incremental UI update: remove and queue free the sold card
 	original_slot.remove_card(card)
@@ -278,7 +275,7 @@ func _on_sell_card_requested(card: Control, original_slot: ShopCardSlot) -> void
 	team_state_changed.emit()
 
 func _on_card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target_slot: ShopCardSlot) -> void:
-	if not original_slot or not target_slot:
+	if not original_slot or not target_slot or not run_state:
 		return
 		
 	if original_slot == target_slot:
@@ -286,18 +283,12 @@ func _on_card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target
 		
 	# 1. Purchase from the Shop slot
 	if original_slot.is_shop_slot:
-		if gold < original_slot.price:
-			return
-			
 		if dragged_card is ShopCardItem:
-			var food_card: ShopCardItem = dragged_card as ShopCardItem
-			var target_unit: UnitInstance = target_slot.get_unit_instance()
-			if target_unit:
-				if food_card.item_instance and food_card.item_instance.data and food_card.item_instance.data.modifier:
-					food_card.item_instance.data.modifier.apply_unit_effect(target_unit)
-				deduct_gold(original_slot.price)
-				refill_shop_slot(original_slot.slot_index)
-				
+			var target_idx: int = target_slot.slot_index
+			var target_is_active: bool = target_slot.is_active_team
+			
+			var applied: bool = run_state.apply_item(original_slot.slot_index, target_idx, target_is_active)
+			if applied:
 				# Incremental UI update: refresh the visual stats of the fed unit
 				var target_card: Control = target_slot.get_card()
 				if target_card and target_card.has_method("update_ui"):
@@ -309,22 +300,10 @@ func _on_card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target
 	# 2. Relocate / Swap inside team & bench (non-shop slots)
 	var source_idx: int = original_slot.slot_index
 	var dest_idx: int = target_slot.slot_index
-	
 	var source_is_active: bool = original_slot.is_active_team
 	var dest_is_active: bool = target_slot.is_active_team
 	
-	var source_unit: UnitInstance = run_state.active_team[source_idx] if source_is_active else run_state.bench[source_idx]
-	var dest_unit: UnitInstance = run_state.active_team[dest_idx] if dest_is_active else run_state.bench[dest_idx]
-	
-	if source_is_active:
-		run_state.active_team[source_idx] = dest_unit
-	else:
-		run_state.bench[source_idx] = dest_unit
-		
-	if dest_is_active:
-		run_state.active_team[dest_idx] = source_unit
-	else:
-		run_state.bench[dest_idx] = source_unit
+	run_state.swap_units(source_idx, source_is_active, dest_idx, dest_is_active)
 		
 	# Incremental UI update: physically swap card nodes in slots
 	var source_card: Control = original_slot.get_card()
@@ -346,64 +325,25 @@ func _on_card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target
 	check_for_unit_merges()
 	team_state_changed.emit()
 
-func roll_shop(_free: bool = false) -> void:
-	for i: int in range(shop_panel.slots.size()):
-		var slot: ShopCardSlot = shop_panel.slots[i] as ShopCardSlot
-		
-		# If the slot is frozen and is NOT empty, keep it
-		if slot.is_frozen and not slot.is_empty():
-			continue
-			
-		refill_shop_slot(i)
+func _on_gold_changed(new_gold: int) -> void:
+	if shop_panel:
+		shop_panel.gold = new_gold
 
-func get_random_unit_template_by_rarity(rarity_name: String) -> UnitData:
-	var matching: Array[UnitData] = []
-	for template: UnitData in unit_templates:
-		if template == null:
-			continue
-		var r_name: String = "Common"
-		if template.rarity:
-			r_name = template.rarity.rarity_name
-		if r_name == rarity_name:
-			matching.append(template)
-			
-	# Fallback if no matching templates
-	if matching.is_empty():
-		for template: UnitData in unit_templates:
-			if template != null:
-				matching.append(template)
-				
-	if matching.is_empty():
-		return null
-		
-	return matching[randi() % matching.size()]
+func _on_lives_changed(new_lives: int) -> void:
+	if shop_header_bar:
+		shop_header_bar.lives = new_lives
 
-func get_random_item_template_by_rarity(rarity_name: String) -> ItemData:
-	var matching: Array[ItemData] = []
-	for template: ItemData in item_templates:
-		if template == null:
-			continue
-		var r_name: String = "Common"
-		if template.rarity:
-			r_name = template.rarity.rarity_name
-		if r_name == rarity_name:
-			matching.append(template)
-			
-	# Fallback if no matching templates
-	if matching.is_empty():
-		for template: ItemData in item_templates:
-			if template != null:
-				matching.append(template)
-				
-	if matching.is_empty():
-		return null
-		
-	return matching[randi() % matching.size()]
+func _on_day_changed(new_day: int) -> void:
+	if shop_header_bar:
+		shop_header_bar.day = new_day
 
-func refill_shop_slot(slot_index: int) -> void:
+func _on_trophies_changed(new_trophies: int) -> void:
+	if shop_header_bar:
+		shop_header_bar.trophies = new_trophies
+
+func _on_shop_slot_updated(slot_index: int, card_instance: Resource) -> void:
 	if slot_index < 0 or slot_index >= shop_panel.slots.size():
 		return
-		
 	var slot: ShopCardSlot = shop_panel.slots[slot_index] as ShopCardSlot
 	
 	# Clear current card
@@ -412,44 +352,34 @@ func refill_shop_slot(slot_index: int) -> void:
 		slot.remove_card(old_card)
 		old_card.queue_free()
 		
-	# Unfreeze the slot upon refill
+	# Unfreeze slot
 	slot.is_frozen = false
 	if slot.has_node("%FreezeButton"):
 		(slot.get_node("%FreezeButton") as Button).button_pressed = false
 		
-	# Roll 30% chance for an item card if templates are available, else 70% unit card
-	var spawn_item: bool = false
-	if not item_templates.is_empty() and randf() < 0.3:
-		spawn_item = true
-		
-	var rolled_rarity: String = "Common"
-	if run_state:
-		rolled_rarity = run_state.roll_rarity_name()
-		
-	if spawn_item:
-		var template: ItemData = get_random_item_template_by_rarity(rolled_rarity)
-		if template:
-			var instance: ItemInstance = ItemInstance.new()
-			instance.initialize(template)
-			
-			var card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
-			card.item_instance = instance
-			_connect_card_signals(card)
-			slot.add_card(card)
-	else:
-		if unit_templates.is_empty():
-			return
-		var template: UnitData = get_random_unit_template_by_rarity(rolled_rarity)
-		if template:
-			var instance: UnitInstance = UnitInstance.new()
-			instance.initialize(template)
-			
+	if card_instance != null:
+		if card_instance is UnitInstance:
 			var card: ShopCard = card_scene.instantiate() as ShopCard
-			card.unit_instance = instance
+			card.unit_instance = card_instance as UnitInstance
 			_connect_card_signals(card)
 			slot.add_card(card)
-		
+		elif card_instance is ItemInstance:
+			var card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
+			card.item_instance = card_instance as ItemInstance
+			_connect_card_signals(card)
+			slot.add_card(card)
 	slot.update_placeholder()
+
+func _on_shop_slot_freeze_changed(slot_index: int, is_frozen: bool) -> void:
+	if slot_index < 0 or slot_index >= shop_panel.slots.size():
+		return
+	var slot: ShopCardSlot = shop_panel.slots[slot_index] as ShopCardSlot
+	slot.is_frozen = is_frozen
+	if slot.has_node("%FreezeButton"):
+		var btn: Button = slot.get_node("%FreezeButton") as Button
+		if btn.button_pressed != is_frozen:
+			btn.set_pressed_no_signal(is_frozen)
+		slot._update_freeze_button_style()
 
 func set_preview_card(card: Control) -> void:
 	if not preview_tooltip:
@@ -583,11 +513,7 @@ func _on_slot_drag_hover_ended(slot: ShopCardSlot) -> void:
 
 func _on_card_clicked(card: ShopCard) -> void:
 	var original_slot: ShopCardSlot = card.slot
-	if not original_slot or not original_slot.is_shop_slot:
-		return
-		
-	# Check gold
-	if gold < original_slot.price:
+	if not original_slot or not original_slot.is_shop_slot or not run_state:
 		return
 		
 	# Find target slot index (team first, then bench)
@@ -610,31 +536,28 @@ func _on_card_clicked(card: ShopCard) -> void:
 	if target_idx == -1:
 		return # No room
 		
-	# Update data
 	var unit_inst: UnitInstance = card.unit_instance
-	if target_is_active:
-		run_state.active_team[target_idx] = unit_inst
-	else:
-		run_state.bench[target_idx] = unit_inst
+	
+	# Execute buy in Model
+	var bought: bool = run_state.buy_unit(original_slot.slot_index, target_idx, target_is_active)
+	if bought:
+		# Incremental UI update: instantiate and add the card to the target slot
+		var target_slot: ShopCardSlot = active_slots[target_idx] if target_is_active else bench_slots[target_idx]
+		var new_card: ShopCard = card_scene.instantiate() as ShopCard
+		new_card.unit_instance = unit_inst
+		_connect_card_signals(new_card)
+		target_slot.add_card(new_card)
+		target_slot.update_placeholder()
 		
-	# Incremental UI update: instantiate and add the card to the target slot
-	var target_slot: ShopCardSlot = active_slots[target_idx] if target_is_active else bench_slots[target_idx]
-	var new_card: ShopCard = card_scene.instantiate() as ShopCard
-	new_card.unit_instance = unit_inst
-	_connect_card_signals(new_card)
-	target_slot.add_card(new_card)
-	target_slot.update_placeholder()
-		
-	deduct_gold(original_slot.price)
-	refill_shop_slot(original_slot.slot_index)
-	check_for_unit_merges()
-	team_state_changed.emit()
+		check_for_unit_merges()
+		team_state_changed.emit()
 
 func load_state_from_run() -> void:
 	if run_state == null:
 		return
 		
-	self.gold = run_state.gold
+	if shop_panel:
+		shop_panel.gold = run_state.gold
 	shop_header_bar.lives = run_state.lives
 	shop_header_bar.day = run_state.day
 	shop_header_bar.trophies = run_state.trophies
@@ -682,28 +605,6 @@ func load_state_from_run() -> void:
 				slot.add_card(item_card)
 				
 		slot.update_placeholder()
- 
-func sync_data_to_run_state() -> void:
-	if run_state == null:
-		return
-		
-	run_state.lives = shop_header_bar.lives
-	run_state.day = shop_header_bar.day
-	run_state.trophies = shop_header_bar.trophies
-	
-	for i: int in range(shop_panel.slots.size()):
-		var slot: ShopCardSlot = shop_panel.slots[i] as ShopCardSlot
-		var card: Control = slot.get_card()
-		if card:
-			if card is ShopCard:
-				run_state.shop_cards[i] = (card as ShopCard).unit_instance
-			elif card is ShopCardItem:
-				run_state.shop_cards[i] = (card as ShopCardItem).item_instance
-		else:
-			run_state.shop_cards[i] = null
-			
-		run_state.shop_frozen_statuses[i] = slot.is_frozen
- 
+
 func _on_battle_requested() -> void:
-	sync_data_to_run_state()
 	battle_requested.emit()

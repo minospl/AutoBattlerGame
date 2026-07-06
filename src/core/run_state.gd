@@ -11,17 +11,59 @@ func _init() -> void:
 		bench.resize(MAX_BENCH_SIZE)
 
 
+signal gold_changed(p_gold: int)
+signal lives_changed(p_lives: int)
+signal day_changed(p_day: int)
+signal trophies_changed(p_trophies: int)
+signal shop_level_changed(p_level: int)
+signal shop_slot_updated(p_slot_index: int, p_card_instance: Resource)
+signal shop_slot_freeze_changed(p_slot_index: int, p_is_frozen: bool)
+
+var unit_templates: Array[UnitData] = []
+var item_templates: Array[ItemData] = []
+
+func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData]) -> void:
+	unit_templates = p_units
+	item_templates = p_items
+
 @export var active_team: Array[UnitInstance] = []
 @export var bench: Array[UnitInstance] = []
 @export var shop_cards: Array[Resource] = [] # Can hold UnitInstance, ItemInstance, or null
 @export var shop_frozen_statuses: Array[bool] = []
-@export var gold: int = 10
-@export var lives: int = 10
-@export var day: int = 1
-@export var trophies: int = 0
+
+@export var gold: int = 10:
+	set(val):
+		if gold != val:
+			gold = val
+			gold_changed.emit(gold)
+
+@export var lives: int = 10:
+	set(val):
+		if lives != val:
+			lives = val
+			lives_changed.emit(lives)
+
+@export var day: int = 1:
+	set(val):
+		if day != val:
+			day = val
+			day_changed.emit(day)
+
+@export var trophies: int = 0:
+	set(val):
+		if trophies != val:
+			trophies = val
+			trophies_changed.emit(trophies)
+
 @export var max_trophies: int = 10
+
 @export var battle_speed: float = 1.0
-@export var shop_level: int = 1
+
+@export var shop_level: int = 1:
+	set(val):
+		if shop_level != val:
+			shop_level = val
+			shop_level_changed.emit(shop_level)
 
 const DAILY_SHOP_WEIGHTS: Dictionary = {
 	1: [1.00, 0.00, 0.00, 0.00],
@@ -161,3 +203,187 @@ func check_and_merge_units() -> Dictionary:
 			}
 			
 	return {}
+
+# --- SHOP BUSINESS LOGIC & ROLLING ---
+
+func get_random_unit_template_by_rarity(rarity_name: String) -> UnitData:
+	var matching: Array[UnitData] = []
+	for template: UnitData in unit_templates:
+		if template == null:
+			continue
+		var r_name: String = "Common"
+		if template.rarity:
+			r_name = template.rarity.rarity_name
+		if r_name == rarity_name:
+			matching.append(template)
+			
+	if matching.is_empty():
+		for template: UnitData in unit_templates:
+			if template != null:
+				matching.append(template)
+				
+	if matching.is_empty():
+		return null
+		
+	return matching[randi() % matching.size()]
+
+func get_random_item_template_by_rarity(rarity_name: String) -> ItemData:
+	var matching: Array[ItemData] = []
+	for template: ItemData in item_templates:
+		if template == null:
+			continue
+		var r_name: String = "Common"
+		if template.rarity:
+			r_name = template.rarity.rarity_name
+		if r_name == rarity_name:
+			matching.append(template)
+			
+	if matching.is_empty():
+		for template: ItemData in item_templates:
+			if template != null:
+				matching.append(template)
+				
+	if matching.is_empty():
+		return null
+		
+	return matching[randi() % matching.size()]
+
+func roll_single_shop_card() -> Resource:
+	var spawn_item: bool = false
+	if not item_templates.is_empty() and randf() < 0.3:
+		spawn_item = true
+		
+	var rolled_rarity: String = roll_rarity_name()
+	if spawn_item:
+		var template: ItemData = get_random_item_template_by_rarity(rolled_rarity)
+		if template:
+			var instance: ItemInstance = ItemInstance.new()
+			instance.initialize(template)
+			return instance
+	else:
+		if unit_templates.is_empty():
+			return null
+		var template: UnitData = get_random_unit_template_by_rarity(rolled_rarity)
+		if template:
+			var instance: UnitInstance = UnitInstance.new()
+			instance.initialize(template)
+			return instance
+	return null
+
+func buy_unit(shop_slot_idx: int, target_idx: int, target_is_active: bool) -> bool:
+	if shop_slot_idx < 0 or shop_slot_idx >= shop_cards.size():
+		return false
+		
+	var item_or_unit: Resource = shop_cards[shop_slot_idx]
+	if not (item_or_unit is UnitInstance):
+		return false
+		
+	var unit: UnitInstance = item_or_unit as UnitInstance
+	var cost: int = unit.data.price if unit.data else 3
+	if gold < cost:
+		return false
+		
+	var target_array: Array[UnitInstance] = active_team if target_is_active else bench
+	if target_idx < 0 or target_idx >= target_array.size():
+		return false
+		
+	if target_array[target_idx] != null:
+		return false # Slot is occupied
+		
+	# Execute purchase
+	gold -= cost
+	target_array[target_idx] = unit
+	
+	# Refill shop slot immediately
+	shop_cards[shop_slot_idx] = roll_single_shop_card()
+	shop_frozen_statuses[shop_slot_idx] = false
+	
+	# Emit updates
+	shop_slot_updated.emit(shop_slot_idx, shop_cards[shop_slot_idx])
+	shop_slot_freeze_changed.emit(shop_slot_idx, false)
+	
+	return true
+
+func apply_item(shop_slot_idx: int, target_idx: int, target_is_active: bool) -> bool:
+	if shop_slot_idx < 0 or shop_slot_idx >= shop_cards.size():
+		return false
+		
+	var item_or_unit: Resource = shop_cards[shop_slot_idx]
+	if not (item_or_unit is ItemInstance):
+		return false
+		
+	var item: ItemInstance = item_or_unit as ItemInstance
+	var cost: int = item.data.price if item.data else 2
+	if gold < cost:
+		return false
+		
+	var target_array: Array[UnitInstance] = active_team if target_is_active else bench
+	if target_idx < 0 or target_idx >= target_array.size():
+		return false
+		
+	var target_unit: UnitInstance = target_array[target_idx]
+	if target_unit == null:
+		return false # No unit to feed
+		
+	# Apply effect
+	if item.data and item.data.modifier:
+		item.data.modifier.apply_unit_effect(target_unit)
+		
+	# Execute purchase
+	gold -= cost
+	
+	# Refill shop slot immediately
+	shop_cards[shop_slot_idx] = roll_single_shop_card()
+	shop_frozen_statuses[shop_slot_idx] = false
+	
+	# Emit updates
+	shop_slot_updated.emit(shop_slot_idx, shop_cards[shop_slot_idx])
+	shop_slot_freeze_changed.emit(shop_slot_idx, false)
+	
+	return true
+
+func swap_units(from_idx: int, from_active: bool, to_idx: int, to_active: bool) -> void:
+	var source_array: Array[UnitInstance] = active_team if from_active else bench
+	var target_array: Array[UnitInstance] = active_team if to_active else bench
+	
+	if from_idx < 0 or from_idx >= source_array.size() or to_idx < 0 or to_idx >= target_array.size():
+		return
+		
+	var temp: UnitInstance = source_array[from_idx]
+	source_array[from_idx] = target_array[to_idx]
+	target_array[to_idx] = temp
+
+func sell_unit(slot_idx: int, is_active: bool) -> void:
+	var target_array: Array[UnitInstance] = active_team if is_active else bench
+	if slot_idx < 0 or slot_idx >= target_array.size():
+		return
+		
+	var unit: UnitInstance = target_array[slot_idx]
+	if unit == null:
+		return
+		
+	var sell_price: int = 1
+	if unit.data:
+		sell_price = max(1, unit.data.price - 1)
+		
+	# Execute sell
+	target_array[slot_idx] = null
+	gold += sell_price
+
+func toggle_freeze_shop_slot(slot_idx: int) -> void:
+	if slot_idx < 0 or slot_idx >= shop_frozen_statuses.size():
+		return
+	var next_status: bool = not shop_frozen_statuses[slot_idx]
+	shop_frozen_statuses[slot_idx] = next_status
+	shop_slot_freeze_changed.emit(slot_idx, next_status)
+
+func roll_shop(free: bool = false) -> void:
+	if not free:
+		if gold < 1:
+			return
+		gold -= 1
+		
+	for i: int in range(shop_cards.size()):
+		if not shop_frozen_statuses[i]:
+			shop_cards[i] = roll_single_shop_card()
+			shop_slot_updated.emit(i, shop_cards[i])

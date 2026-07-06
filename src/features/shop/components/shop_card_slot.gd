@@ -27,10 +27,7 @@ var is_targeted: bool = false
 
 @export var drag_drop_enabled: bool = true
 
-# Dependency Injection callbacks to avoid tight coupling to ShopScene
-var gold_provider: Callable
-var gold_deductor: Callable
-var shop_refiller: Callable
+var run_state: RunState = null
 
 @onready var card_container: Control = $CardContainer
 
@@ -138,9 +135,8 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 			
 			# Check if the player has enough gold for a purchase
 			if original_slot and original_slot.is_shop_slot:
-				if gold_provider.is_valid():
-					var current_gold: int = gold_provider.call()
-					if current_gold < original_slot.price:
+				if run_state:
+					if run_state.gold < original_slot.price:
 						return false # Cannot afford this card
 			
 			# If the dragged card is food:

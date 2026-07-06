@@ -45,6 +45,7 @@ func _load_item_templates() -> void:
 
 func _initialize_new_run() -> void:
 	run_state = RunState.new()
+	run_state.setup_templates(unit_templates, item_templates)
 	run_state.active_team.resize(MAX_ACTIVE_TEAM_SIZE)
 	run_state.bench.resize(MAX_BENCH_SIZE)
 	run_state.shop_cards.resize(MAX_SHOP_CARDS_SIZE)
@@ -98,7 +99,7 @@ func _go_to_shop() -> void:
 	_change_scene(shop_scene_path, func(shop_node: Node) -> void:
 		var shop: ShopScene = shop_node as ShopScene
 		if shop:
-			shop.setup(run_state, unit_templates, item_templates)
+			shop.setup(run_state)
 			shop.battle_requested.connect(_on_battle_requested)
 	)
 
