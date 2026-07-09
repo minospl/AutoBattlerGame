@@ -18,18 +18,28 @@ signal trophies_changed(p_trophies: int)
 signal shop_level_changed(p_level: int)
 signal shop_slot_updated(p_slot_index: int, p_card_instance: Resource)
 signal shop_slot_freeze_changed(p_slot_index: int, p_is_frozen: bool)
+signal relics_changed(p_relics: Array[RelicInstance])
+signal relic_added(relic: RelicInstance)
+signal shop_card_generated(card: Resource)
+signal shop_rolled()
+
+var price_modifiers: Array[Callable] = []
+var shop_weights_modifiers: Array[Callable] = []
 
 var unit_templates: Array[UnitData] = []
 var item_templates: Array[ItemData] = []
+var relic_templates: Array[RelicData] = []
 
-func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData]) -> void:
+func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relics: Array[RelicData] = []) -> void:
 	unit_templates = p_units
 	item_templates = p_items
+	relic_templates = p_relics
 
 @export var active_team: Array[UnitInstance] = []
 @export var bench: Array[UnitInstance] = []
 @export var shop_cards: Array[Resource] = [] # Can hold UnitInstance, ItemInstance, or null
 @export var shop_frozen_statuses: Array[bool] = []
+@export var relics: Array[RelicInstance] = []
 
 @export var gold: int = 10:
 	set(val):
@@ -109,13 +119,8 @@ func get_base_shop_weights() -> Array[float]:
 var shop_weights: Array[float]:
 	get:
 		var weights: Array[float] = get_base_shop_weights()
-		
-		# --- PLACEHOLDER FOR FUTURE MODIFIERS / RELICS ---
-		# E.g., if player has a relic that bans legendary cards:
-		# weights[3] = 0.0
-		# weights = normalize_weights(weights)
-		# -------------------------------------------------
-		
+		for modifier: Callable in shop_weights_modifiers:
+			weights = modifier.call(weights)
 		return weights
 
 func normalize_weights(p_weights: Array[float]) -> Array[float]:
@@ -314,12 +319,13 @@ func roll_single_shop_card() -> Resource:
 		spawn_item = true
 		
 	var rolled_rarity: String = roll_rarity_name()
+	var rolled_card: Resource = null
 	if spawn_item:
 		var template: ItemData = get_random_item_template_by_rarity(rolled_rarity)
 		if template:
 			var instance: ItemInstance = ItemInstance.new()
 			instance.initialize(template)
-			return instance
+			rolled_card = instance
 	else:
 		if unit_templates.is_empty():
 			return null
@@ -327,8 +333,12 @@ func roll_single_shop_card() -> Resource:
 		if template:
 			var instance: UnitInstance = UnitInstance.new()
 			instance.initialize(template)
-			return instance
-	return null
+			rolled_card = instance
+			
+	if rolled_card:
+		shop_card_generated.emit(rolled_card)
+		
+	return rolled_card
 
 func buy_unit(shop_slot_idx: int, target_idx: int, target_is_active: bool) -> bool:
 	if shop_slot_idx < 0 or shop_slot_idx >= shop_cards.size():
@@ -443,7 +453,57 @@ func roll_shop(free: bool = false) -> void:
 			return
 		gold -= 1
 		
+	shop_rolled.emit()
+		
 	for i: int in range(shop_cards.size()):
 		if not shop_frozen_statuses[i]:
 			shop_cards[i] = roll_single_shop_card()
 			shop_slot_updated.emit(i, shop_cards[i])
+
+func add_relic(relic: RelicInstance) -> void:
+	if not relic:
+		return
+		
+	# Check if we already have this relic and increase stack count
+	for existing: RelicInstance in relics:
+		if existing.data == relic.data:
+			existing.stacks += relic.stacks
+			relics_changed.emit(relics)
+			relic_added.emit(existing)
+			return
+			
+	relics.append(relic)
+	relics_changed.emit(relics)
+	if relic.data and relic.data.modifier:
+		relic.data.modifier.on_acquire(relic, self)
+	relic_added.emit(relic)
+
+func buy_clickable_item(shop_slot_idx: int) -> bool:
+	if shop_slot_idx < 0 or shop_slot_idx >= shop_cards.size():
+		return false
+		
+	var item_or_unit: Resource = shop_cards[shop_slot_idx]
+	if not (item_or_unit is ItemInstance):
+		return false
+		
+	var item: ItemInstance = item_or_unit as ItemInstance
+	var cost: int = item.data.price if item.data else 2
+	if gold < cost:
+		return false
+		
+	# Apply effect
+	if item.data and item.data.modifier:
+		item.data.modifier.apply_shop_effect(self)
+		
+	# Execute purchase
+	gold -= cost
+	
+	# Refill shop slot immediately
+	shop_cards[shop_slot_idx] = roll_single_shop_card()
+	shop_frozen_statuses[shop_slot_idx] = false
+	
+	# Emit updates
+	shop_slot_updated.emit(shop_slot_idx, shop_cards[shop_slot_idx])
+	shop_slot_freeze_changed.emit(shop_slot_idx, false)
+	
+	return true

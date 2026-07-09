@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="RelicData" format=3]
+
+[ext_resource type="Script" path="res://src/features/relics/templates/modifiers/thiefs_glove_relic.gd" id="1_modifier"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/legendary.tres" id="2_rarity"]
+[ext_resource type="Script" path="res://src/features/relics/relic_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_thiefs_glove_modifier"]
+script = ExtResource("1_modifier")
+gold_amount = 1
+max_gold_per_battle = 5
+
+[resource]
+script = ExtResource("3_data")
+relic_name = "Thief's Glove"
+rarity = ExtResource("2_rarity")
+modifier = SubResource("Resource_thiefs_glove_modifier")

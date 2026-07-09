@@ -9,6 +9,8 @@ signal cast_progress_changed(slot_idx: int, ratio: float)
 signal floating_text_requested(text: String, color: Color, is_on_slot: bool, slot_idx: int)
 signal team_defeated()
 signal gold_generated(amount: int, slot_idx: int)
+signal unit_casted(source_idx: int)
+signal damage_taken(amount: int, damage_type: String)
 
 const MAX_TEAM_SIZE: int = 6
 
@@ -133,6 +135,8 @@ func execute_cast(source_idx: int, opponent: BattleTeam) -> void:
 		
 	# Trigger ON_CAST modifier
 	ModifierEngine.trigger_unit_modifier(source_idx, self, UnitModifier.Trigger.ON_CAST)
+	
+	unit_casted.emit(source_idx)
 
 func take_damage(amount: int, damage_type: String = "physical") -> void:
 	if amount <= 0:
@@ -174,6 +178,8 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 		for i: int in range(MAX_TEAM_SIZE):
 			if units[i]:
 				ModifierEngine.trigger_unit_modifier(i, self, UnitModifier.Trigger.ON_TAKE_DAMAGE)
+				
+	damage_taken.emit(actual_dmg, damage_type)
 		
 	if max_health > 0 and health <= 0:
 		team_defeated.emit()

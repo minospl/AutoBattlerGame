@@ -58,6 +58,24 @@ func _initialize_new_run() -> void:
 	run_state.max_trophies = MAX_TROPHIES
 	run_state.shop_level = 1
 	
+	# Temporary injection of all relics with different stack counts
+	var relics_to_inject: Dictionary[String, int] = {
+		"res://src/features/relics/templates/cursed_doll.tres": 2,
+		"res://src/features/relics/templates/iron_shield.tres": 3,
+		"res://src/features/relics/templates/healing_herb.tres": 1,
+		"res://src/features/relics/templates/poisonous_fangs.tres": 2,
+		"res://src/features/relics/templates/thiefs_glove.tres": 1,
+		"res://src/features/relics/templates/golden_touch.tres": 4
+	}
+	
+	for path: String in relics_to_inject:
+		var relic_res: RelicData = load(path) as RelicData
+		if relic_res:
+			var relic_inst: RelicInstance = RelicInstance.new()
+			relic_inst.initialize(relic_res)
+			relic_inst.stacks = relics_to_inject[path]
+			run_state.add_relic(relic_inst)
+	
 	# Find templates by unit name
 	var find_template: Callable = func(p_name: String) -> UnitData:
 		for t: UnitData in unit_templates:

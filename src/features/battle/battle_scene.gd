@@ -25,6 +25,8 @@ var team_hp_material: ShaderMaterial
 var enemy_hp_material: ShaderMaterial
 var enemy_units_to_load: Array[UnitInstance] = []
 var is_outcome_showing: bool = false
+var active_relics: Array[RelicInstance] = []
+var _battle_start_triggered: bool = false
 
 # Countdown Timer & Fatigue
 var match_timer: float = 30.0
@@ -138,12 +140,13 @@ func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 			
 	# Load state and backup
 	load_battle_team()
+	match_timer = 30.0
+	fatigue_tick_timer = 0.0
+	fatigue_tick_count = 0
+	_battle_start_triggered = false
 	
 	# Apply visual styling
 	_apply_visual_styling()
-
-	# Start battle start modifiers immediately
-	trigger_battle_start()
 	
 	# Start simulation immediately without requiring a Play click
 	set_playing(true)
@@ -196,6 +199,13 @@ func load_battle_team() -> void:
 			player_units.append(null)
 
 	player_team.load_team_units(player_units)
+	
+	# Copy and clone relics for the battle simulation
+	active_relics.clear()
+	if run_state:
+		for relic: RelicInstance in run_state.relics:
+			if relic:
+				active_relics.append(relic.clone())
 
 	match_timer = 30.0
 	fatigue_tick_timer = 0.0
@@ -228,12 +238,14 @@ func load_enemy_team() -> void:
 	enemy_team.load_team_units(enemy_units)
 
 func trigger_battle_start() -> void:
-	# Wait one frame to let Godot layout engine calculate slot positions
-	await get_tree().process_frame
-	
 	for i: int in range(MAX_TEAM_SIZE):
 		if player_team.units[i]:
 			ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
+			
+	# Trigger player relics on_battle_start
+	for relic: RelicInstance in active_relics:
+		if relic and relic.data and relic.data.modifier:
+			relic.data.modifier.on_battle_start(relic, player_team, enemy_team)
 					
 	# Update all health and stat overlays
 	_update_all_card_uis()
@@ -266,6 +278,10 @@ func _update_all_card_uis() -> void:
 			slot.update_placeholder()
 
 func _process(delta: float) -> void:
+	if not _battle_start_triggered:
+		_battle_start_triggered = true
+		trigger_battle_start()
+
 	if simulation_state == State.PLAYING:
 		advance_simulation(delta * game_speed)
 		
@@ -548,5 +564,9 @@ func _on_floating_text_requested(is_enemy_team: bool, text: String, color: Color
 		var hp_bar: Control = enemy_health_bar_rect if is_enemy_team else team_health_bar_rect
 		if hp_bar:
 			spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
+		
+	# Fallback if UI hasn't resolved positions yet (to prevent spawning in top-left 0,0)
+	if spawn_pos == Vector2.ZERO or spawn_pos.is_equal_approx(Vector2.ZERO):
+		spawn_pos = size / 2.0
 		
 	spawn_floating_text(text, color, spawn_pos)

@@ -41,7 +41,7 @@ Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności za
 | **UI / UX** | **[x] Tooltip Rzadkości Przedmiotów:** Dostosowanie tooltipu przedmiotu ([CardTooltip](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_tooltip.gd)), tak aby wyświetlał tekstową etykietę rzadkości (Common, Rare, Legendary) oraz zmieniał barwy obramowania i tekstów odpowiednio do rzadkości (na wzór kart jednostek). | **Krytyczny** |
 | **Refaktor** | **[x] Model-View separation:** Zmiana architektury aktualizacji sklepu tak, aby to logiczny `RunState` decydował o zmianach, a UI tylko je odzwierciedlało (RunState jako źródło prawdy, eliminacja błędów wyścigu). Zaimplementowano reaktywne sygnały aktualizacji, a widoki sklepu i walki są całkowicie sterowane przez model. | **Krytyczny** |
 | **Refaktor** | **[x] Poprawki Modyfikatorów (Typowanie i Null-Safety):** Dostosowanie istniejących skryptów modyfikatorów do ścisłego typowania w Godot 4.7 (bezpieczne rzutowanie `as UnitInstance` oraz guard clauses dla wartości `null` na wejściu). | **Krytyczny** |
-| **Mechanika** | **Relikty / Przedmioty Pasywne:** Rozbudowa systemu o relikty (pasywne modyfikatory wpływające globalnie na rozgrywkę/walkę), a nie tradycyjne przedmioty typu zbroje/hełmy. | Opcjonalny |
+| **Mechanika** | **Relikty / Przedmioty Pasywne:** Rozbudowa systemu o relikty (pasywne modyfikatory wpływające globalnie na rozgrywkę/walkę). | Opcjonalny |
 
 ---
 
