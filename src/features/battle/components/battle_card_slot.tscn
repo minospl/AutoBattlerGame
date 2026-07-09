@@ -4,11 +4,11 @@
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
 
 [node name="BattleCardSlot" type="Control"]
-custom_minimum_size = Vector2(112, 125)
+custom_minimum_size = Vector2(112, 100)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 112.0
-offset_bottom = 125.0
+offset_bottom = 100.0
 script = ExtResource("1_script")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
@@ -27,7 +27,7 @@ theme_override_constants/separation = 4
 
 [node name="CardContainer" type="PanelContainer" parent="VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 125)
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 mouse_filter = 1
 
@@ -46,7 +46,7 @@ vertical_alignment = 1
 
 [node name="CooldownContainer" type="Control" parent="VBoxContainer/HBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(8, 125)
+custom_minimum_size = Vector2(8, 100)
 layout_mode = 2
 
 [node name="CooldownBg" type="ColorRect" parent="VBoxContainer/HBoxContainer/CooldownContainer"]

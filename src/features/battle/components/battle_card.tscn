@@ -44,9 +44,9 @@ corner_radius_bottom_right = 4
 anti_aliasing = false
 
 [node name="BattleCard" type="PanelContainer"]
-custom_minimum_size = Vector2(100, 125)
+custom_minimum_size = Vector2(100, 100)
 offset_right = 100.0
-offset_bottom = 125.0
+offset_bottom = 100.0
 mouse_filter = 1
 script = ExtResource("1_script")
 

@@ -11,6 +11,19 @@ extends Control
 var is_targeted: bool = false
 
 func _ready() -> void:
+	# Configure sizes dynamically based on CardUIHelper
+	custom_minimum_size = Vector2(CardUIHelper.CARD_SIZE.x + 8 + 4, CardUIHelper.CARD_SIZE.y)
+	
+	if has_node("%CardContainer"):
+		var container: PanelContainer = get_node("%CardContainer") as PanelContainer
+		if container:
+			container.custom_minimum_size = CardUIHelper.CARD_SIZE
+		
+	if has_node("%CooldownContainer"):
+		var cooldown: Control = get_node("%CooldownContainer") as Control
+		if cooldown:
+			cooldown.custom_minimum_size = Vector2(8, CardUIHelper.CARD_SIZE.y)
+			
 	# Initialize slot placeholder state
 	update_placeholder()
 

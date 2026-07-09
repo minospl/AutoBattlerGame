@@ -25,6 +25,7 @@ var is_targeted: bool = false
 var slot: ShopCardSlot = null
 
 func _ready() -> void:
+	custom_minimum_size = CardUIHelper.CARD_SIZE
 	update_ui()
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)

@@ -37,6 +37,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_bottom = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer"]
 layout_mode = 2
@@ -73,28 +74,27 @@ alignment = 1
 [node name="ContentMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 32
-theme_override_constants/margin_bottom = 32
+theme_override_constants/margin_bottom = -10
 
 [node name="ContentVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 3
-theme_override_constants/separation = 16
+theme_override_constants/separation = 8
 
 [node name="BenchPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox" instance=ExtResource("2_bench")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="BottomRowHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox"]
-layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
-
-[node name="TeamPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox/BottomRowHBox" instance=ExtResource("3_team")]
+[node name="TeamPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox" instance=ExtResource("3_team")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ShopPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox/BottomRowHBox" instance=ExtResource("5_shop")]
+[node name="Spacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ShopPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox" instance=ExtResource("5_shop")]
 unique_name_in_owner = true
 layout_mode = 2
 

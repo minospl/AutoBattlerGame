@@ -2,7 +2,7 @@ class_name RunState
 extends Resource
 
 const MAX_ACTIVE_TEAM_SIZE: int = 6
-const MAX_BENCH_SIZE: int = 8
+const MAX_BENCH_SIZE: int = 6
 
 func _init() -> void:
 	if active_team.is_empty():

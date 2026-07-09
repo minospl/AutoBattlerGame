@@ -1,6 +1,10 @@
 class_name CardUIHelper
 extends Object
 
+const CARD_SIZE : Vector2 = Vector2(100, 100)
+const CARD_SLOT_SIZE_DEFAULT : Vector2 = Vector2(100, 100)
+const CARD_SLOT_SIZE_SHOP : Vector2 = Vector2(100, 125)
+
 const CHROMA_KEY_SHADER: Shader = preload("res://src/shared/shaders/chroma_key.gdshader")
 
 ## Shared helper to configure card unit visuals (Attack, Poison, sprite, indicators)

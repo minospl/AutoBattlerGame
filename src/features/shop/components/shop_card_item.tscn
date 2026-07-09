@@ -4,9 +4,9 @@
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
 
 [node name="ShopCardItem" type="PanelContainer"]
-custom_minimum_size = Vector2(100, 125)
+custom_minimum_size = Vector2(100, 100)
 offset_right = 100.0
-offset_bottom = 125.0
+offset_bottom = 100.0
 mouse_filter = 1
 script = ExtResource("1_script")
 

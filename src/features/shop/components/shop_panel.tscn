@@ -126,7 +126,7 @@ text = "1[color=#f2b726]G[/color]"
 [node name="ShopMargin" type="MarginContainer" parent="PanelBorder/Content/ShopOuterMargin/VBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 4
+theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 

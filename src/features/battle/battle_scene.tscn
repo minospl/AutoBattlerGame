@@ -260,42 +260,34 @@ layout_mode = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_bottom = 32
 
-[node name="GridVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin"]
+[node name="GridContainer" type="GridContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3
 
-[node name="Row0HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="Slot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+[node name="Slot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridContainer" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Slot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+[node name="Slot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridContainer" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Slot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row0HBox" instance=ExtResource("2_slot")]
+[node name="Slot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridContainer" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Row1HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="Slot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+[node name="Slot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridContainer" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Slot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+[node name="Slot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridContainer" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Slot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridVBox/Row1HBox" instance=ExtResource("2_slot")]
+[node name="Slot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/GridMargin/GridContainer" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -305,42 +297,33 @@ layout_mode = 2
 theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 32
 
-[node name="RightColumn" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin"]
+[node name="RightColumn" type="GridContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin"]
 layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3
 
-[node name="EnemyRow0HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="EnemySlot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+[node name="EnemySlot0" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="EnemySlot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+[node name="EnemySlot1" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="EnemySlot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow0HBox" instance=ExtResource("2_slot")]
+[node name="EnemySlot2" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="EnemyRow1HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn"]
-layout_mode = 2
-theme_override_constants/separation = 16
-alignment = 1
-
-[node name="EnemySlot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+[node name="EnemySlot3" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="EnemySlot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+[node name="EnemySlot4" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="EnemySlot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn/EnemyRow1HBox" instance=ExtResource("2_slot")]
+[node name="EnemySlot5" parent="BackgroundPanel/MarginContainer/VBoxContainer/BattleAreaVBox/MainHBox/EnemyMargin/RightColumn" instance=ExtResource("2_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 

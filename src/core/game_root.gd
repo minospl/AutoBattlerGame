@@ -5,7 +5,7 @@ extends Node
 @export var battle_scene_path: String = "res://src/features/battle/battle_scene.tscn"
 
 const MAX_ACTIVE_TEAM_SIZE: int = 6
-const MAX_BENCH_SIZE: int = 8
+const MAX_BENCH_SIZE: int = 6
 const MAX_SHOP_CARDS_SIZE: int = 4
 const STARTING_GOLD: int = 10
 const STARTING_LIVES: int = 10

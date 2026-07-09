@@ -4,20 +4,19 @@
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
 
 [node name="ShopCardSlot" type="Control"]
-custom_minimum_size = Vector2(100, 135)
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 100.0
-offset_bottom = 135.0
+offset_bottom = 100.0
 script = ExtResource("1_script")
 
 [node name="CardContainer" type="PanelContainer" parent="."]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 125)
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 0
-offset_top = 10.0
 offset_right = 100.0
-offset_bottom = 135.0
+offset_bottom = 100.0
 mouse_filter = 1
 
 [node name="BorderRect" type="ColorRect" parent="CardContainer"]
@@ -37,11 +36,11 @@ vertical_alignment = 1
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
-offset_top = 138.0
+offset_top = 103.0
 offset_right = 100.0
-offset_bottom = 158.0
+offset_bottom = 123.0
 alignment = 1
-theme_override_constants/separation = 4
+theme_override_constants/separation = 8
 
 [node name="PriceLabel" type="Label" parent="ShopControls"]
 unique_name_in_owner = true

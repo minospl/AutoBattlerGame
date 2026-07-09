@@ -48,26 +48,16 @@ text = "TEAM"
 [node name="TeamMargin" type="MarginContainer" parent="PanelBorder/Content/TeamOuterMargin/VBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 4
+theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="TeamRows" type="VBoxContainer" parent="PanelBorder/Content/TeamOuterMargin/VBox/TeamMargin"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Row0Align" type="CenterContainer" parent="PanelBorder/Content/TeamOuterMargin/VBox/TeamMargin/TeamRows"]
+[node name="GridAlign" type="CenterContainer" parent="PanelBorder/Content/TeamOuterMargin/VBox/TeamMargin"]
 layout_mode = 2
 
-[node name="Row0HBox" type="HBoxContainer" parent="PanelBorder/Content/TeamOuterMargin/VBox/TeamMargin/TeamRows/Row0Align"]
+[node name="GridContainer" type="GridContainer" parent="PanelBorder/Content/TeamOuterMargin/VBox/TeamMargin/GridAlign"]
 unique_name_in_owner = true
 layout_mode = 2
-alignment = 1
-
-[node name="Row1Align" type="CenterContainer" parent="PanelBorder/Content/TeamOuterMargin/VBox/TeamMargin/TeamRows"]
-layout_mode = 2
-
-[node name="Row1HBox" type="HBoxContainer" parent="PanelBorder/Content/TeamOuterMargin/VBox/TeamMargin/TeamRows/Row1Align"]
-unique_name_in_owner = true
-layout_mode = 2
-alignment = 1
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3

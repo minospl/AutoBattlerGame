@@ -14,6 +14,7 @@ signal hovered(card: BattleCard, is_hovered: bool)
 @onready var portrait_char_label: Label = %PortraitCharLabel
 
 func _ready() -> void:
+	custom_minimum_size = CardUIHelper.CARD_SIZE
 	update_ui()
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)

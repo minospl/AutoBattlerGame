@@ -55,7 +55,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 			if card_size == Vector2.ZERO:
 				card_size = rem_card.custom_minimum_size
 			if card_size == Vector2.ZERO:
-				card_size = Vector2(100, 135)
+				card_size = CardUIHelper.CARD_SIZE
 				
 			rem_slot.remove_card(rem_card)
 			animating_removed.append({

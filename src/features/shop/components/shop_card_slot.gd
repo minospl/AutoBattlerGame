@@ -40,23 +40,43 @@ func _ready() -> void:
 	
 	# Setup Shop Controls
 	if is_shop_slot:
-		custom_minimum_size.y = 160
+		custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_SHOP
+		var container: PanelContainer = get_node("%CardContainer") as PanelContainer
+		if container:
+			container.custom_minimum_size = CardUIHelper.CARD_SIZE
+			container.offset_top = 0
+			container.offset_bottom = CardUIHelper.CARD_SIZE.y
+			container.offset_right = CardUIHelper.CARD_SIZE.x
+			
 		if has_node("%ShopControls"):
-			var controls: Control = get_node("%ShopControls")
+			var controls: Control = get_node("%ShopControls") as Control
 			controls.visible = true
-			var price_lbl: Label = get_node("%PriceLabel")
-			price_lbl.text = str(price) + "g"
-			var freeze_btn: Button = get_node("%FreezeButton")
-			freeze_btn.toggled.connect(func(pressed: bool) -> void:
-				is_frozen = pressed
+			controls.offset_top = CardUIHelper.CARD_SIZE.y + 3
+			controls.offset_bottom = CardUIHelper.CARD_SIZE.y + 23
+			controls.offset_right = CardUIHelper.CARD_SIZE.x
+			
+			var price_lbl: Label = get_node("%PriceLabel") as Label
+			if price_lbl:
+				price_lbl.text = str(price) + "g"
+			var freeze_btn: Button = get_node("%FreezeButton") as Button
+			if freeze_btn:
+				freeze_btn.toggled.connect(func(pressed: bool) -> void:
+					is_frozen = pressed
+					_update_freeze_button_style()
+				)
 				_update_freeze_button_style()
-			)
-			_update_freeze_button_style()
 	else:
+		custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_DEFAULT
+		var container: PanelContainer = get_node("%CardContainer") as PanelContainer
+		if container:
+			container.custom_minimum_size = CardUIHelper.CARD_SIZE
+			container.offset_top = 0
+			container.offset_bottom = CardUIHelper.CARD_SIZE.y
+			container.offset_right = CardUIHelper.CARD_SIZE.x
+			
 		if has_node("%ShopControls"):
-			var controls: Control = get_node("%ShopControls")
+			var controls: Control = get_node("%ShopControls") as Control
 			controls.visible = false
-		custom_minimum_size.y = 135
 
 func _update_freeze_button_style() -> void:
 	if not has_node("%FreezeButton"):
