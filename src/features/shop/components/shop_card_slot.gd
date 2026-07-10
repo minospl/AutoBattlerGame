@@ -62,9 +62,9 @@ func _ready() -> void:
 			if freeze_btn:
 				freeze_btn.toggled.connect(func(pressed: bool) -> void:
 					is_frozen = pressed
-					_update_freeze_button_style()
+					update_freeze_button_style()
 				)
-				_update_freeze_button_style()
+				update_freeze_button_style()
 	else:
 		custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_DEFAULT
 		var container: PanelContainer = get_node("%CardContainer") as PanelContainer
@@ -78,7 +78,7 @@ func _ready() -> void:
 			var controls: Control = get_node("%ShopControls") as Control
 			controls.visible = false
 
-func _update_freeze_button_style() -> void:
+func update_freeze_button_style() -> void:
 	if not has_node("%FreezeButton"):
 		return
 	var btn: Button = get_node("%FreezeButton")

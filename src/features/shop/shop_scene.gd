@@ -379,7 +379,7 @@ func _on_shop_slot_freeze_changed(slot_index: int, is_frozen: bool) -> void:
 		var btn: Button = slot.get_node("%FreezeButton") as Button
 		if btn.button_pressed != is_frozen:
 			btn.set_pressed_no_signal(is_frozen)
-		slot._update_freeze_button_style()
+		slot.update_freeze_button_style()
 
 func set_preview_card(card: Control) -> void:
 	if not preview_tooltip:
@@ -463,6 +463,7 @@ func _connect_card_signals(card: Control) -> void:
 	elif card is ShopCardItem:
 		var item_card: ShopCardItem = card
 		item_card.hovered.connect(_on_card_hover_changed)
+		item_card.clicked.connect(_on_item_card_clicked)
 
 func _on_card_right_clicked(card: ShopCard) -> void:
 	if card.slot and card.slot.is_active_team:
@@ -551,6 +552,14 @@ func _on_card_clicked(card: ShopCard) -> void:
 		
 		check_for_unit_merges()
 		team_state_changed.emit()
+
+func _on_item_card_clicked(card: ShopCardItem) -> void:
+	var original_slot: ShopCardSlot = card.slot
+	if not original_slot or not original_slot.is_shop_slot or not run_state:
+		return
+		
+	run_state.buy_clickable_item(original_slot.slot_index)
+	team_state_changed.emit()
 
 func load_state_from_run() -> void:
 	if run_state == null:

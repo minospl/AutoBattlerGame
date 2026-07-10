@@ -2,6 +2,7 @@ class_name ShopCardItem
 extends PanelContainer
 
 signal hovered(card: ShopCardItem, is_hovered: bool)
+signal clicked(card: ShopCardItem)
 
 @export var item_instance: ItemInstance:
 	set(val):
@@ -34,6 +35,9 @@ func update_ui() -> void:
 
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
+	if item_instance and item_instance.data and item_instance.data.is_clickable:
+		return null
+		
 	# Keep the card in place but dim it visually so we can see the item while targeting
 	modulate.a = 0.5
 	
@@ -67,3 +71,11 @@ func _on_mouse_entered() -> void:
 
 func _on_mouse_exited() -> void:
 	hovered.emit(self, false)
+
+func _gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mouse_event: InputEventMouseButton = event
+		if mouse_event.pressed and mouse_event.button_index == MOUSE_BUTTON_LEFT:
+			if item_instance and item_instance.data and item_instance.data.is_clickable:
+				clicked.emit(self)
+				accept_event()

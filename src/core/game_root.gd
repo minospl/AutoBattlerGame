@@ -16,11 +16,13 @@ const MAX_TROPHIES: int = 10
 var run_state: RunState
 var unit_templates: Array[UnitData] = []
 var item_templates: Array[ItemData] = []
+var relic_templates: Array[RelicData] = []
 var current_scene: Node = null
 
 func _ready() -> void:
 	_load_unit_templates()
 	_load_item_templates()
+	_load_relic_templates()
 	_initialize_new_run()
 	_go_to_shop()
 
@@ -40,12 +42,25 @@ func _load_unit_templates() -> void:
 func _load_item_templates() -> void:
 	item_templates = [
 		preload("res://src/features/items/templates/apple.tres") as ItemData,
-		preload("res://src/features/items/templates/sword.tres") as ItemData
+		preload("res://src/features/items/templates/sword.tres") as ItemData,
+		preload("res://src/features/items/templates/common_relic_chest.tres") as ItemData,
+		preload("res://src/features/items/templates/rare_relic_chest.tres") as ItemData,
+		preload("res://src/features/items/templates/legendary_relic_chest.tres") as ItemData
+	]
+
+func _load_relic_templates() -> void:
+	relic_templates = [
+		preload("res://src/features/relics/templates/cursed_doll.tres") as RelicData,
+		preload("res://src/features/relics/templates/iron_shield.tres") as RelicData,
+		preload("res://src/features/relics/templates/healing_herb.tres") as RelicData,
+		preload("res://src/features/relics/templates/poisonous_fangs.tres") as RelicData,
+		preload("res://src/features/relics/templates/thiefs_glove.tres") as RelicData,
+		preload("res://src/features/relics/templates/golden_touch.tres") as RelicData
 	]
 
 func _initialize_new_run() -> void:
 	run_state = RunState.new()
-	run_state.setup_templates(unit_templates, item_templates)
+	run_state.setup_templates(unit_templates, item_templates, relic_templates)
 	run_state.active_team.resize(MAX_ACTIVE_TEAM_SIZE)
 	run_state.bench.resize(MAX_BENCH_SIZE)
 	run_state.shop_cards.resize(MAX_SHOP_CARDS_SIZE)
@@ -57,24 +72,6 @@ func _initialize_new_run() -> void:
 	run_state.trophies = STARTING_TROPHIES
 	run_state.max_trophies = MAX_TROPHIES
 	run_state.shop_level = 1
-	
-	# Temporary injection of all relics with different stack counts
-	var relics_to_inject: Dictionary[String, int] = {
-		"res://src/features/relics/templates/cursed_doll.tres": 2,
-		"res://src/features/relics/templates/iron_shield.tres": 3,
-		"res://src/features/relics/templates/healing_herb.tres": 1,
-		"res://src/features/relics/templates/poisonous_fangs.tres": 2,
-		"res://src/features/relics/templates/thiefs_glove.tres": 1,
-		"res://src/features/relics/templates/golden_touch.tres": 4
-	}
-	
-	for path: String in relics_to_inject:
-		var relic_res: RelicData = load(path) as RelicData
-		if relic_res:
-			var relic_inst: RelicInstance = RelicInstance.new()
-			relic_inst.initialize(relic_res)
-			relic_inst.stacks = relics_to_inject[path]
-			run_state.add_relic(relic_inst)
 	
 	# Find templates by unit name
 	var find_template: Callable = func(p_name: String) -> UnitData:
