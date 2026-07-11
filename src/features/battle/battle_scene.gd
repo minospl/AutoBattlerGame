@@ -38,14 +38,9 @@ var player_slots: Array[BattleCardSlot] = []
 var enemy_slots: Array[BattleCardSlot] = []
 
 # Cached Node References
-@onready var exit_button: Button = %ExitButton
-@onready var play_button: Button = %PlayButton
-@onready var pause_button: Button = %PauseButton
-@onready var speed_button: Button = %SpeedButton
+@onready var header_bar: BattleHeaderBar = %BattleHeaderBar
 @onready var preview_container: Control = %PreviewContainer
 @onready var relic_bar_wrapper: Control = %RelicBarWrapper
-@onready var timer_container: Control = %TimerContainer
-@onready var timer_label: Label = %TimerLabel
 
 @onready var team_health_bar_rect: Control = %TeamHealthBarRect
 @onready var enemy_health_bar_rect: Control = %EnemyHealthBarRect
@@ -67,10 +62,11 @@ func _ready() -> void:
 		preview_container.add_child(preview_tooltip)
 		preview_tooltip.visible = false
 
-	if exit_button: exit_button.pressed.connect(_on_exit_pressed)
-	if play_button: play_button.pressed.connect(_on_play_pressed)
-	if pause_button: pause_button.pressed.connect(_on_pause_pressed)
-	if speed_button: speed_button.pressed.connect(_on_speed_pressed)
+	if header_bar:
+		header_bar.exit_pressed.connect(_on_exit_pressed)
+		header_bar.play_pressed.connect(_on_play_pressed)
+		header_bar.pause_pressed.connect(_on_pause_pressed)
+		header_bar.speed_pressed.connect(_on_speed_pressed)
 
 	# Fetch slots
 	player_slots = [
@@ -145,8 +141,8 @@ func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 		if run_state.battle_speed <= 0.0:
 			run_state.battle_speed = 1.0
 		game_speed = run_state.battle_speed
-		if speed_button:
-			speed_button.text = "Speed: %dx" % int(game_speed)
+		if header_bar:
+			header_bar.set_speed_text("Speed: %dx" % int(game_speed))
 			
 	# Load state and backup
 	load_battle_team()
@@ -216,10 +212,9 @@ func load_battle_team() -> void:
 	match_timer = 30.0
 	fatigue_tick_timer = 0.0
 	fatigue_tick_count = 0
-	if timer_container:
-		timer_container.visible = true
-	if timer_label:
-		timer_label.text = "⏳ 30.0s"
+	if header_bar:
+		header_bar.set_timer_visible(true)
+		header_bar.set_timer_text("⏳ 30.0s")
 		
 	load_enemy_team()
 
@@ -300,10 +295,10 @@ func advance_simulation(delta: float) -> void:
 		match_timer -= delta
 		if match_timer <= 0.0:
 			match_timer = 0.0
-			if timer_container:
-				timer_container.visible = false
-		if timer_label:
-			timer_label.text = "⏳ %.1fs" % match_timer
+			if header_bar:
+				header_bar.set_timer_visible(false)
+		if header_bar:
+			header_bar.set_timer_text("⏳ %.1fs" % match_timer)
 	else:
 		# Fatigue damage active
 		fatigue_tick_timer += delta
@@ -435,12 +430,11 @@ func _on_gold_generated(amount: int, slot_idx: int) -> void:
 func set_playing(play: bool) -> void:
 	if play:
 		simulation_state = State.PLAYING
-		if play_button: play_button.visible = false
-		if pause_button: pause_button.visible = true
 	else:
 		simulation_state = State.PAUSED
-		if play_button: play_button.visible = true
-		if pause_button: pause_button.visible = false
+		
+	if header_bar:
+		header_bar.set_playing(play)
 
 func _on_play_pressed() -> void:
 	set_playing(true)
@@ -483,8 +477,8 @@ func _on_speed_pressed() -> void:
 	if run_state:
 		run_state.battle_speed = game_speed
 		
-	if speed_button:
-		speed_button.text = "Speed: %dx" % int(game_speed)
+	if header_bar:
+		header_bar.set_speed_text("Speed: %dx" % int(game_speed))
 
 func get_fibonacci(n: int) -> int:
 	if n <= 0:

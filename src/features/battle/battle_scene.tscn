@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://src/features/battle/battle_scene.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_card_slot.tscn" id="2_slot"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="3_button_decorator"]
+[ext_resource type="PackedScene" path="res://src/features/battle/components/battle_header_bar.tscn" id="4_header"]
 [ext_resource type="Script" path="res://src/features/battle/components/status_badge.gd" id="5_status_badge"]
 [ext_resource type="Texture2D" path="res://src/assets/ui/shop_background.jpg" id="6_bg"]
 
@@ -46,95 +47,9 @@ theme_override_constants/separation = 24
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="TopBarContainer" type="PanelContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
-custom_minimum_size = Vector2(0, 45)
-layout_mode = 2
-
-[node name="Margin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 8
-
-[node name="HBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin"]
-layout_mode = 2
-
-[node name="ExitButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
+[node name="BattleHeaderBar" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" instance=ExtResource("4_header")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "🚪 Exit to Shop"
-
-[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ExitButton"]
-script = ExtResource("3_button_decorator")
-color_normal = Color(0.12, 0.45, 0.22, 1)
-color_hover = Color(0.15, 0.55, 0.27, 1)
-color_pressed = Color(0.18, 0.65, 0.32, 1)
-
-[node name="LeftSpacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="TimerContainer" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="TimerLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/TimerContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.75, 0.2, 1)
-theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 18
-text = "⏳ 30.0s"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="RightSpacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="ControlsHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="PlayButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Play"
-
-[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/PlayButton"]
-script = ExtResource("3_button_decorator")
-color_normal = Color(0.1, 0.35, 0.6, 1)
-color_hover = Color(0.15, 0.45, 0.75, 1)
-color_pressed = Color(0.2, 0.55, 0.9, 1)
-
-[node name="PauseButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
-unique_name_in_owner = true
-visible = false
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Pause"
-
-[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/PauseButton"]
-script = ExtResource("3_button_decorator")
-color_normal = Color(0.7, 0.4, 0.1, 1)
-color_hover = Color(0.8, 0.5, 0.15, 1)
-color_pressed = Color(0.9, 0.6, 0.2, 1)
-
-[node name="SpeedButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Speed: 1x"
-
-[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/SpeedButton"]
-script = ExtResource("3_button_decorator")
-color_normal = Color(0.4, 0.2, 0.6, 1)
-color_hover = Color(0.5, 0.25, 0.7, 1)
-color_pressed = Color(0.6, 0.3, 0.8, 1)
 
 [node name="RelicBarWrapper" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
 unique_name_in_owner = true
