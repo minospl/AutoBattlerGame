@@ -25,8 +25,8 @@ var team_hp_material: ShaderMaterial
 var enemy_hp_material: ShaderMaterial
 var enemy_units_to_load: Array[UnitInstance] = []
 var is_outcome_showing: bool = false
-var active_relics: Array[RelicInstance] = []
 var _battle_start_triggered: bool = false
+var relic_bar: RelicBar = null
 
 # Countdown Timer & Fatigue
 var match_timer: float = 30.0
@@ -43,7 +43,7 @@ var enemy_slots: Array[BattleCardSlot] = []
 @onready var pause_button: Button = %PauseButton
 @onready var speed_button: Button = %SpeedButton
 @onready var preview_container: Control = %PreviewContainer
-@onready var outer_border: ColorRect = %OuterBorder
+@onready var relic_bar_wrapper: Control = %RelicBarWrapper
 @onready var timer_container: Control = %TimerContainer
 @onready var timer_label: Label = %TimerLabel
 
@@ -124,6 +124,16 @@ func _ready() -> void:
 	player_team.initialize(false)
 	enemy_team.initialize(true)
 
+	# Initialize RelicBar below TopBar (inside the scene-defined RelicBarWrapper placeholder)
+	if relic_bar_wrapper:
+		relic_bar = RelicBar.new()
+		relic_bar.setup(preview_tooltip)
+		relic_bar.anchor_left = 0.0
+		relic_bar.anchor_right = 1.0
+		relic_bar.offset_left = 0.0
+		relic_bar.offset_right = 0.0
+		relic_bar_wrapper.add_child(relic_bar)
+
 	if run_state:
 		setup(run_state)
 
@@ -136,7 +146,7 @@ func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 			run_state.battle_speed = 1.0
 		game_speed = run_state.battle_speed
 		if speed_button:
-			speed_button.text = "⚡ Speed: %dx" % int(game_speed)
+			speed_button.text = "Speed: %dx" % int(game_speed)
 			
 	# Load state and backup
 	load_battle_team()
@@ -144,9 +154,6 @@ func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 	fatigue_tick_timer = 0.0
 	fatigue_tick_count = 0
 	_battle_start_triggered = false
-	
-	# Apply visual styling
-	_apply_visual_styling()
 	
 	# Start simulation immediately without requiring a Play click
 	set_playing(true)
@@ -169,11 +176,6 @@ func _configure_hp_bar_shader(hp_bar: Control) -> ShaderMaterial:
 		initial_hp_size = Vector2(340.0, 32.0)
 	hp_material.set_shader_parameter("size", initial_hp_size)
 	return hp_material
-
-func _apply_visual_styling() -> void:
-	# Outer border coloring
-	if outer_border:
-		outer_border.color = GameColors.PANEL_BORDER_DEFAULT
 
 func load_battle_team() -> void:
 	if run_state == null:
@@ -200,12 +202,16 @@ func load_battle_team() -> void:
 
 	player_team.load_team_units(player_units)
 	
-	# Copy and clone relics for the battle simulation
-	active_relics.clear()
+	# Direct reference to player relics from run_state
 	if run_state:
-		for relic: RelicInstance in run_state.relics:
-			if relic:
-				active_relics.append(relic.clone())
+		player_team.active_relics = run_state.relics
+		player_team.has_magnetic_core = run_state.has_magnetic_core
+	else:
+		player_team.active_relics = []
+		player_team.has_magnetic_core = false
+				
+	if relic_bar:
+		relic_bar.update_relics(player_team.active_relics)
 
 	match_timer = 30.0
 	fatigue_tick_timer = 0.0
@@ -243,7 +249,7 @@ func trigger_battle_start() -> void:
 			ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
 			
 	# Trigger player relics on_battle_start
-	for relic: RelicInstance in active_relics:
+	for relic: RelicInstance in player_team.active_relics:
 		if relic and relic.data and relic.data.modifier:
 			relic.data.modifier.on_battle_start(relic, player_team, enemy_team)
 					
@@ -478,7 +484,7 @@ func _on_speed_pressed() -> void:
 		run_state.battle_speed = game_speed
 		
 	if speed_button:
-		speed_button.text = "⚡ Speed: %dx" % int(game_speed)
+		speed_button.text = "Speed: %dx" % int(game_speed)
 
 func get_fibonacci(n: int) -> int:
 	if n <= 0:

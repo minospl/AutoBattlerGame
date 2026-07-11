@@ -3,7 +3,10 @@ extends Object
 
 ## Given the source index in the active team (0-5) and a TargetType,
 ## returns an array of target slot indices in the active team.
-static func get_target_indices(source_idx: int, target_type: UnitModifier.TargetType) -> Array[int]:
+static func get_target_indices(source_idx: int, target_type: UnitModifier.TargetType, has_magnetic_core: bool = false) -> Array[int]:
+	if has_magnetic_core and target_type == UnitModifier.TargetType.ADJACENT:
+		target_type = UnitModifier.TargetType.ALL
+		
 	var targets: Array[int] = []
 	
 	# Active team is a 2x3 grid:

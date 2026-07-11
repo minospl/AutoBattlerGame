@@ -1,8 +1,8 @@
-[gd_resource type="Resource" script_class="ItemData" format=3]
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dnxm6aryluees"]
 
-[ext_resource type="Script" path="res://src/features/items/templates/modifiers/relic_chest_modifier.gd" id="1_modifier"]
+[ext_resource type="Script" uid="uid://cv421fpu6y6y6" path="res://src/features/items/templates/modifiers/relic_chest_modifier.gd" id="1_modifier"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="2_rarity"]
-[ext_resource type="Script" path="res://src/features/items/item_data.gd" id="3_data"]
+[ext_resource type="Script" uid="uid://babbbffhegvof" path="res://src/features/items/item_data.gd" id="3_data"]
 
 [sub_resource type="Resource" id="Resource_common_chest_modifier"]
 script = ExtResource("1_modifier")
@@ -13,6 +13,5 @@ script = ExtResource("3_data")
 item_name = "Common Chest"
 price = 3
 rarity = ExtResource("2_rarity")
-is_draggable = false
 is_clickable = true
 modifier = SubResource("Resource_common_chest_modifier")

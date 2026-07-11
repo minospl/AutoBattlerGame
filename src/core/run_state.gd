@@ -40,6 +40,7 @@ func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relic
 @export var shop_cards: Array[Resource] = [] # Can hold UnitInstance, ItemInstance, or null
 @export var shop_frozen_statuses: Array[bool] = []
 @export var relics: Array[RelicInstance] = []
+@export var has_magnetic_core: bool = false
 
 @export var gold: int = 10:
 	set(val):
@@ -464,6 +465,9 @@ func add_relic(relic: RelicInstance) -> void:
 	if not relic:
 		return
 		
+	if relic.data and relic.data.relic_name == "Magnetic Core":
+		has_magnetic_core = true
+		
 	# Check if we already have this relic and increase stack count
 	for existing: RelicInstance in relics:
 		if existing.data == relic.data:
@@ -507,3 +511,23 @@ func buy_clickable_item(shop_slot_idx: int) -> bool:
 	shop_slot_freeze_changed.emit(shop_slot_idx, false)
 	
 	return true
+
+func has_relic(p_name: String) -> bool:
+	return RelicInstance.has_relic(relics, p_name)
+
+## Returns an array of relic templates that are available to be rolled/acquired
+## (filters out unique relics that the player already owns).
+## If a rarity is specified, it also filters by that rarity.
+func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
+	var available: Array[RelicData] = []
+	for relic: RelicData in relic_templates:
+		if not relic:
+			continue
+		# Filter by rarity if requested
+		if p_rarity and (not relic.rarity or relic.rarity.rarity_name != p_rarity.rarity_name):
+			continue
+		# Filter out unique relics that are already owned
+		if relic.is_unique and has_relic(relic.relic_name):
+			continue
+		available.append(relic)
+	return available

@@ -50,8 +50,8 @@ Kod projektu jest podzielony modularnie w katalogu `src`:
 
 ### Pozycjonowanie (Siatka 2x3)
 Aktywna drużyna jest ułożona w siatkę o wymiarach 2 wiersze na 3 kolumny:
-*   **Rząd górny (Row 0):** Sloty `0` (lewy), `1` (środkowy), `2` (prawy)
-*   **Rząd dolny (Row 1):** Sloty `3` (lewy), `4` (środkowy), `5` (prawy)
+*   Sloty `0` (lewy), `1` (środkowy), `2` (prawy)
+*   Sloty `3` (lewy), `4` (środkowy), `5` (prawy)
 
 Pozycjonowanie wpływa bezpośrednio na to, jak działają modyfikatory jednostek (np. nakładanie tarcz na sąsiadów, wzmacnianie jednostki powyżej/poniżej). Celowanie jest rozwiązywane przez `target_resolver.gd`.
 

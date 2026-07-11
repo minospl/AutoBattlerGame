@@ -1,0 +1,17 @@
+class_name ShieldBatteryRelic
+extends RelicModifier
+
+@export var shield_per_cast: int = 5
+
+func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeam, _enemy_team: BattleTeam) -> void:
+	if player_team and relic_inst:
+		player_team.unit_casted.connect(func(source_idx: int) -> void:
+			if player_team.units[source_idx]:
+				var total_shield: int = shield_per_cast * relic_inst.stacks
+				player_team.add_unit_shield(source_idx, total_shield)
+		)
+
+func get_description(relic_inst: RelicInstance = null) -> String:
+	var current_stacks: int = relic_inst.stacks if relic_inst else 1
+	var total_shield: int = shield_per_cast * current_stacks
+	return "Whenever an ally casts, give them [color=%s]+%d Shield[/color]." % [GameColors.DESC_SHIELD, total_shield]

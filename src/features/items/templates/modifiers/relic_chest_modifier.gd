@@ -7,20 +7,16 @@ func apply_shop_effect(run_state: RunState) -> void:
 	if not run_state or not target_rarity:
 		return
 		
-	# Filter relic templates by target_rarity
-	var matching_relics: Array[RelicData] = []
-	for relic: RelicData in run_state.relic_templates:
-		if relic and relic.rarity and relic.rarity.rarity_name == target_rarity.rarity_name:
-			matching_relics.append(relic)
+	# 1. Zbieramy tylko te relikty, które pasują i nie są posiadanymi unikalnymi
+	var available_relics: Array[RelicData] = run_state.get_available_relic_templates(target_rarity)
 			
-	if matching_relics.is_empty():
+	# 2. Bezpieczeństwo na wypadek braku jakichkolwiek zdefiniowanych reliktów tej rzadkości w bazie danych
+	if available_relics.is_empty():
 		printerr("No relics found matching rarity: ", target_rarity.rarity_name)
 		return
 		
-	# Select a random one
-	var rolled_relic: RelicData = matching_relics[randi() % matching_relics.size()]
-	
-	# Instantiate and add to player's relics
+	# 3. Losujemy i dodajemy
+	var rolled_relic: RelicData = available_relics[randi() % available_relics.size()]
 	var relic_inst: RelicInstance = RelicInstance.new()
 	relic_inst.initialize(rolled_relic)
 	run_state.add_relic(relic_inst)

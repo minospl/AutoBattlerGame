@@ -45,6 +45,7 @@ func _load_item_templates() -> void:
 		preload("res://src/features/items/templates/sword.tres") as ItemData,
 		preload("res://src/features/items/templates/common_relic_chest.tres") as ItemData,
 		preload("res://src/features/items/templates/rare_relic_chest.tres") as ItemData,
+		preload("res://src/features/items/templates/epic_relic_chest.tres") as ItemData,
 		preload("res://src/features/items/templates/legendary_relic_chest.tres") as ItemData
 	]
 
@@ -55,7 +56,10 @@ func _load_relic_templates() -> void:
 		preload("res://src/features/relics/templates/healing_herb.tres") as RelicData,
 		preload("res://src/features/relics/templates/poisonous_fangs.tres") as RelicData,
 		preload("res://src/features/relics/templates/thiefs_glove.tres") as RelicData,
-		preload("res://src/features/relics/templates/golden_touch.tres") as RelicData
+		preload("res://src/features/relics/templates/golden_touch.tres") as RelicData,
+		preload("res://src/features/relics/templates/fire_opal.tres") as RelicData,
+		preload("res://src/features/relics/templates/shield_battery.tres") as RelicData,
+		preload("res://src/features/relics/templates/magnetic_core.tres") as RelicData
 	]
 
 func _initialize_new_run() -> void:

@@ -10,6 +10,7 @@ signal floating_text_requested(text: String, color: Color, is_on_slot: bool, slo
 signal team_defeated()
 signal gold_generated(amount: int, slot_idx: int)
 signal unit_casted(source_idx: int)
+signal unit_attacked(source_idx: int)
 signal damage_taken(amount: int, damage_type: String)
 
 const MAX_TEAM_SIZE: int = 6
@@ -17,6 +18,9 @@ const MAX_TEAM_SIZE: int = 6
 # Combat State
 var units: Array[UnitInstance] = []
 var cast_timers: Array[float] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+var active_relics: Array[RelicInstance] = []
+var has_magnetic_core: bool = false
 
 var max_health: int = 0
 var health: int = 0
@@ -118,6 +122,7 @@ func execute_cast(source_idx: int, opponent: BattleTeam) -> void:
 	var dmg: int = unit.get_attack()
 	if dmg > 0:
 		opponent.take_damage(dmg)
+		unit_attacked.emit(source_idx)
 		
 	# Apply status effects to opponent
 	if unit.poison > 0:
@@ -368,3 +373,6 @@ func add_unit_gold(slot_idx: int, amount: int) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
 		return
 	gold_generated.emit(amount, slot_idx)
+
+func has_relic(p_name: String) -> bool:
+	return RelicInstance.has_relic(active_relics, p_name)

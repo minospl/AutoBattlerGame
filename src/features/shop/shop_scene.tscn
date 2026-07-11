@@ -51,19 +51,9 @@ theme_override_constants/separation = 0
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HeaderBarBorder" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="InnerBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder"]
-custom_minimum_size = Vector2(0, 2)
-layout_mode = 2
-
-[node name="OuterBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder"]
+[node name="RelicBarWrapper" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
-color = Color(0.3, 0.25, 0.25, 1)
 
 [node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2

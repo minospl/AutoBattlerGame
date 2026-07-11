@@ -233,6 +233,7 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 13
 bbcode_enabled = true
 fit_content = true
+clip_contents = false
 autowrap_mode = 2
 
 [node name="HelpPanel" type="PanelContainer" parent="HBox/MainTooltipWrapper/Padding/VBox"]

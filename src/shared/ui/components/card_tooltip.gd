@@ -1,6 +1,8 @@
 class_name CardTooltip
 extends MarginContainer
 
+const CHROMA_KEY_SHADER: Shader = preload("res://src/shared/shaders/chroma_key.gdshader")
+
 @onready var border_rect: ShaderBorderDecorator = %BorderRect
 @onready var name_label: Label = %NameLabel
 @onready var rarity_label: Label = %RarityLabel
@@ -24,6 +26,7 @@ extends MarginContainer
 
 var _unit_instance: UnitInstance
 var _item_card: ItemInstance
+var _relic_instance: RelicInstance
 var _rarity_name: String = "COMMON"
 var _rarity_color: Color = GameColors.BORDER_OUTER_DEFAULT
 
@@ -36,6 +39,8 @@ func _ready() -> void:
 		_build_keywords()
 	elif _item_card:
 		_setup_item_ui()
+	elif _relic_instance:
+		_setup_relic_ui()
 
 	_set_mouse_filter_ignore_recursive(self)
 	
@@ -54,6 +59,7 @@ func _set_mouse_filter_ignore_recursive(node: Node) -> void:
 func setup_for_unit(unit_instance: UnitInstance) -> void:
 	_unit_instance = unit_instance
 	_item_card = null
+	_relic_instance = null
 	if is_node_ready():
 		_setup_unit_ui()
 		_build_keywords()
@@ -61,8 +67,19 @@ func setup_for_unit(unit_instance: UnitInstance) -> void:
 func setup_for_item(item_card: ItemInstance) -> void:
 	_item_card = item_card
 	_unit_instance = null
+	_relic_instance = null
 	if is_node_ready():
 		_setup_item_ui()
+		if keywords_vbox:
+			for child: Node in keywords_vbox.get_children():
+				child.queue_free()
+
+func setup_for_relic(relic_instance: RelicInstance) -> void:
+	_relic_instance = relic_instance
+	_unit_instance = null
+	_item_card = null
+	if is_node_ready():
+		_setup_relic_ui()
 		if keywords_vbox:
 			for child: Node in keywords_vbox.get_children():
 				child.queue_free()
@@ -112,6 +129,32 @@ func _setup_item_ui() -> void:
 	update_sprite()
 	update_description()
 
+func _setup_relic_ui() -> void:
+	if not _relic_instance:
+		return
+		
+	# Reset rarity state to defaults
+	_rarity_name = "COMMON"
+	_rarity_color = GameColors.BORDER_OUTER_DEFAULT
+	
+	var relic_data: RelicData = _relic_instance.data
+	if relic_data and relic_data.rarity:
+		var rarity_res: Rarity = relic_data.rarity
+		if rarity_res:
+			_rarity_name = rarity_res.rarity_name.to_upper()
+			_rarity_color = rarity_res.border_color
+	
+	# Relics do not use stats block or type badge
+	stats_panel.visible = false
+	badge_panel.visible = false
+	if badge_container_panel:
+		badge_container_panel.visible = false
+
+	update_header()
+	update_border()
+	update_sprite()
+	update_description()
+
 func _update_sub_panel_borders(border_col: Color) -> void:
 	var panels: Array[ShaderBorderDecorator] = [
 		portrait_border_rect,
@@ -131,6 +174,12 @@ func update_header() -> void:
 		name_label.text = _unit_instance.get_unit_name().to_upper() + " [Lvl %d]" % _unit_instance.level
 	elif _item_card:
 		name_label.text = _item_card.data.item_name.to_upper() if _item_card.data else ""
+	elif _relic_instance:
+		var relic_data: RelicData = _relic_instance.data
+		name_label.text = relic_data.relic_name.to_upper() if relic_data else ""
+		var stacks: int = _relic_instance.stacks
+		if stacks > 1:
+			name_label.text += " [x%d]" % stacks
 	rarity_label.text = _rarity_name
 
 func update_border() -> void:
@@ -149,9 +198,8 @@ func update_sprite() -> void:
 			fallback_label.visible = false
 			sprite_rect.texture = _unit_instance.data.sprite
 			if not sprite_rect.material:
-				var shader: Shader = load("res://src/shared/shaders/chroma_key.gdshader") as Shader
 				var mat: ShaderMaterial = ShaderMaterial.new()
-				mat.shader = shader
+				mat.shader = CHROMA_KEY_SHADER
 				sprite_rect.material = mat
 		else:
 			sprite_rect.visible = false
@@ -160,7 +208,25 @@ func update_sprite() -> void:
 	elif _item_card:
 		sprite_rect.visible = false
 		fallback_label.visible = true
-		fallback_label.text = "🎁"
+		if _item_card.data and _item_card.data.is_clickable:
+			fallback_label.text = "📦"
+		else:
+			fallback_label.text = "🎁"
+	elif _relic_instance:
+		var relic_data: RelicData = _relic_instance.data
+		var sprite_tex: Texture2D = relic_data.sprite if relic_data else null
+		if sprite_tex:
+			sprite_rect.visible = true
+			fallback_label.visible = false
+			sprite_rect.texture = sprite_tex
+			if not sprite_rect.material:
+				var mat: ShaderMaterial = ShaderMaterial.new()
+				mat.shader = CHROMA_KEY_SHADER
+				sprite_rect.material = mat
+		else:
+			sprite_rect.visible = false
+			fallback_label.visible = true
+			fallback_label.text = "📦"
 
 
 func update_badge() -> void:
@@ -247,6 +313,12 @@ func update_description() -> void:
 	elif _item_card:
 		if _item_card.data and _item_card.data.modifier:
 			full_desc += _item_card.data.modifier.get_description()
+	elif _relic_instance:
+		var relic_data: RelicData = _relic_instance.data
+		if relic_data and relic_data.modifier:
+			var modifier: RelicModifier = relic_data.modifier
+			if modifier:
+				full_desc += modifier.get_description(_relic_instance)
 			
 	if not full_desc.is_empty():
 		desc_panel.visible = true

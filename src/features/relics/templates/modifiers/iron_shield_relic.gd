@@ -13,4 +13,4 @@ func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeam, _enemy_
 func get_description(relic_inst: RelicInstance = null) -> String:
 	var current_stacks: int = relic_inst.stacks if relic_inst else 1
 	var total_shield: int = shield_amount * current_stacks
-	return "At the start of battle, give your units in the top row (rząd górny) [color=%s]+%d Shield[/color]." % [GameColors.DESC_SHIELD, total_shield]
+	return "At the start of battle, give your units in the top row [color=%s]+%d Shield[/color]." % [GameColors.DESC_SHIELD, total_shield]

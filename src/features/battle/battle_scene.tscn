@@ -47,6 +47,7 @@ layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="TopBarContainer" type="PanelContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
+custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
 
 [node name="Margin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer"]
@@ -102,7 +103,7 @@ theme_override_constants/separation = 8
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "▶ Play"
+text = "Play"
 
 [node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/PlayButton"]
 script = ExtResource("3_button_decorator")
@@ -115,7 +116,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "⏸ Pause"
+text = "Pause"
 
 [node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/PauseButton"]
 script = ExtResource("3_button_decorator")
@@ -127,7 +128,7 @@ color_pressed = Color(0.9, 0.6, 0.2, 1)
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "⚡ Speed: 1x"
+text = "Speed: 1x"
 
 [node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/TopBarContainer/Margin/HBox/ControlsHBox/SpeedButton"]
 script = ExtResource("3_button_decorator")
@@ -135,19 +136,9 @@ color_normal = Color(0.4, 0.2, 0.6, 1)
 color_hover = Color(0.5, 0.25, 0.7, 1)
 color_pressed = Color(0.6, 0.3, 0.8, 1)
 
-[node name="HeaderBarBorder" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="InnerBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder"]
-custom_minimum_size = Vector2(0, 2)
-layout_mode = 2
-
-[node name="OuterBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox/HeaderBarBorder"]
+[node name="RelicBarWrapper" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
-color = Color(0.3, 0.25, 0.25, 1)
 
 [node name="BattleAreaVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true

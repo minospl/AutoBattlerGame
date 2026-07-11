@@ -12,7 +12,7 @@ func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
 	var unit: UnitInstance = team_obj.units[source_idx]
 	var current_level: int = unit.level if unit else 1
 	var current_target: TargetType = get_target(current_level)
-	for idx: int in TargetResolver.get_target_indices(source_idx, current_target):
+	for idx: int in TargetResolver.get_target_indices(source_idx, current_target, team_obj.has_magnetic_core):
 		if idx >= 0 and idx < team_obj.units.size() and team_obj.units[idx] != null:
 			ModifierEngine.trigger_unit_modifier(idx, team_obj, Trigger.ON_BATTLE_START)
 

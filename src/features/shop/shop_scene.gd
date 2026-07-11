@@ -24,12 +24,13 @@ var gold: int:
 			shop_panel.gold = value
 
 var run_state: RunState
+var relic_bar: RelicBar = null
 
 @onready var shop_header_bar: ShopHeaderBar = %ShopHeaderBar
 @onready var bench_panel: BenchPanel = %BenchPanel
 @onready var team_panel: TeamPanel = %TeamPanel
 @onready var shop_panel: ShopPanel = %ShopPanel
-
+@onready var relic_bar_wrapper: Control = %RelicBarWrapper
 
 var slot_scene: PackedScene = preload("res://src/features/shop/components/shop_card_slot.tscn")
 var card_scene: PackedScene = preload("res://src/features/shop/components/shop_card.tscn")
@@ -56,6 +57,7 @@ func _ready() -> void:
 	
 	# Connect control panel signals
 	shop_header_bar.add_monster_requested.connect(_on_add_monster_requested)
+	shop_header_bar.add_relic_requested.connect(_on_add_relic_requested)
 	shop_header_bar.restart_requested.connect(_on_restart_requested)
 	shop_header_bar.battle_requested.connect(_on_battle_requested)
 	
@@ -74,8 +76,15 @@ func _ready() -> void:
 	
 	create_slots()
 	
-	# Apply visual styling programmatically to keep the presentation premium and clean
-	_apply_visual_styling()
+	# Initialize RelicBar below ShopHeaderBar (inside the scene-defined RelicBarWrapper placeholder)
+	if relic_bar_wrapper:
+		relic_bar = RelicBar.new()
+		relic_bar.setup(preview_tooltip)
+		relic_bar.anchor_left = 0.0
+		relic_bar.anchor_right = 1.0
+		relic_bar.offset_left = 0.0
+		relic_bar.offset_right = 0.0
+		relic_bar_wrapper.add_child(relic_bar)
 	
 	# Initialize run state if already set, otherwise wait for setup()
 	if run_state:
@@ -99,6 +108,10 @@ func setup(p_state: RunState) -> void:
 	run_state.trophies_changed.connect(_on_trophies_changed)
 	run_state.shop_slot_updated.connect(_on_shop_slot_updated)
 	run_state.shop_slot_freeze_changed.connect(_on_shop_slot_freeze_changed)
+	run_state.relics_changed.connect(func(relics: Array[RelicInstance]) -> void:
+		if relic_bar:
+			relic_bar.update_relics(relics)
+	)
 	
 	load_state_from_run()
 	
@@ -119,11 +132,7 @@ func setup(p_state: RunState) -> void:
 	overlay.z_index = 10
 	add_child(overlay)
 
-func _apply_visual_styling() -> void:
-	# 2. Outer Border Color
-	var outer_border: ColorRect = %OuterBorder as ColorRect
-	if outer_border:
-		outer_border.color = GameColors.PANEL_BORDER_DEFAULT
+
 
 ## Instantiate slot scenes and arrange them inside containers
 func create_slots() -> void:
@@ -224,23 +233,38 @@ func _on_add_monster_requested() -> void:
 	# Try to add to bench
 	add_unit_to_bench(instance)
 
+func _on_add_relic_requested() -> void:
+	if not run_state:
+		return
+		
+	var available: Array[RelicData] = run_state.get_available_relic_templates()
+	
+	if available.is_empty():
+		print("No relics found")
+		return
+		
+	var template: RelicData = available[randi() % available.size()]
+	if template:
+		var relic_inst: RelicInstance = RelicInstance.new()
+		relic_inst.initialize(template)
+		run_state.add_relic(relic_inst)
+
 func _on_restart_requested() -> void:
 	# 1. Clear team and bench slots
 	clear_all()
 	
-	# 2. Reset header bar values to starting position (via Model)
+	# 2. Reset header bar values, relics and modifiers to starting position (via Model)
 	if run_state:
 		run_state.lives = 10
 		run_state.day = 4
 		run_state.trophies = 3
+		run_state.relics.clear()
+		run_state.has_magnetic_core = false
+		run_state.price_modifiers.clear()
+		run_state.shop_weights_modifiers.clear()
+		run_state.relics_changed.emit(run_state.relics)
 	
-	# 3. Spawn initial units: 1 of each type
-	if run_state:
-		for template: UnitData in run_state.unit_templates:
-			var instance: UnitInstance = UnitInstance.new()
-			instance.initialize(template)
-			add_unit_to_bench(instance)
-		
+
 	# 4. Reset gold to 10 and roll the shop for free (via Model)
 	if run_state:
 		run_state.gold = 10
@@ -449,7 +473,8 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 		# Skip SELF target highlighting as we only want to highlight other targets
 		var current_target: UnitModifier.TargetType = modifier.get_target(unit_card.unit_instance.level)
 		if current_target != UnitModifier.TargetType.SELF:
-			var target_indices: Array[int] = TargetResolver.get_target_indices(idx, current_target)
+			var has_core: bool = run_state.has_magnetic_core if run_state else false
+			var target_indices: Array[int] = TargetResolver.get_target_indices(idx, current_target, has_core)
 			for t_idx: int in target_indices:
 				if t_idx < active_slots.size():
 					active_slots[t_idx].set_target_highlight(true)
@@ -502,7 +527,8 @@ func _on_slot_drag_hover_started(slot: ShopCardSlot, data: Dictionary) -> void:
 	if current_target == UnitModifier.TargetType.SELF:
 		return
 		
-	var target_indices: Array[int] = TargetResolver.get_target_indices(slot.slot_index, current_target)
+	var has_core: bool = run_state.has_magnetic_core if run_state else false
+	var target_indices: Array[int] = TargetResolver.get_target_indices(slot.slot_index, current_target, has_core)
 	for t_idx: int in target_indices:
 		if t_idx < active_slots.size():
 			active_slots[t_idx].set_target_highlight(true)
@@ -570,6 +596,9 @@ func load_state_from_run() -> void:
 	shop_header_bar.lives = run_state.lives
 	shop_header_bar.day = run_state.day
 	shop_header_bar.trophies = run_state.trophies
+	
+	if relic_bar:
+		relic_bar.update_relics(run_state.relics)
 	
 	# Update shop level and chance weights in the shop panel
 	shop_panel.shop_level = run_state.shop_level

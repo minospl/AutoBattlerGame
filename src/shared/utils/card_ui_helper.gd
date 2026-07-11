@@ -210,12 +210,22 @@ static func setup_item_visuals(
 		border_rect.update_shader_parameters()
 		
 	# 2. Portrait setup
-	if sprite_rect:
-		sprite_rect.visible = false
-	if portrait_label:
-		portrait_label.visible = true
-		portrait_label.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
-		portrait_label.text = "🎁"
+	if item_instance.data and item_instance.data.sprite:
+		if sprite_rect:
+			sprite_rect.visible = true
+			sprite_rect.texture = item_instance.data.sprite
+		if portrait_label:
+			portrait_label.visible = false
+	else:
+		if sprite_rect:
+			sprite_rect.visible = false
+		if portrait_label:
+			portrait_label.visible = true
+			portrait_label.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
+			if item_instance.data and item_instance.data.is_clickable:
+				portrait_label.text = "📦" # Chest emoji for relic chests
+			else:
+				portrait_label.text = "🎁" # Gift emoji for regular food items
 
 ## Tooltip Display Manager helpers
 static func show_tooltip(tooltip: CardTooltip, unit_instance: UnitInstance) -> void:
@@ -226,6 +236,11 @@ static func show_tooltip(tooltip: CardTooltip, unit_instance: UnitInstance) -> v
 static func show_item_tooltip(tooltip: CardTooltip, item_card: ItemInstance) -> void:
 	if tooltip and item_card:
 		tooltip.setup_for_item(item_card)
+		tooltip.visible = true
+
+static func show_relic_tooltip(tooltip: CardTooltip, relic: RelicInstance) -> void:
+	if tooltip and relic:
+		tooltip.setup_for_relic(relic)
 		tooltip.visible = true
 
 static func hide_tooltip(tooltip: CardTooltip) -> void:

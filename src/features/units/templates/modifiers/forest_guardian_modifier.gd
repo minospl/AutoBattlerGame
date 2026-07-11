@@ -26,7 +26,7 @@ func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
 	var current_target: TargetType = get_target(current_level)
 	var buff: int = int(get_modifier_value(current_level))
 	var permanent: bool = is_permanent(current_level)
-	for idx: int in TargetResolver.get_target_indices(source_idx, current_target):
+	for idx: int in TargetResolver.get_target_indices(source_idx, current_target, team_obj.has_magnetic_core):
 		team_obj.add_unit_shield(idx, buff, permanent)
 
 func get_description(p_level: int = 1) -> String:

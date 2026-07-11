@@ -2,7 +2,6 @@ class_name ShopMergeAnimator
 extends Object
 
 ## Animates three matching cards merging into a higher tier card in the center.
-## Offloads visual code from ShopScene for cleaner separation of concerns.
 static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable) -> void:
 	var main_info: Dictionary = merge.get("main", {})
 	var removed_list: Array = merge.get("removed", [])

@@ -12,3 +12,6 @@ extends Resource
 
 ## Optional texture/sprite for relic artwork
 @export var sprite: Texture2D
+
+## True if this relic is unique and should not be rolled if already owned
+@export var is_unique: bool = false

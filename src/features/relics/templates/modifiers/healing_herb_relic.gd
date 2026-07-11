@@ -13,4 +13,4 @@ func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeam, _enemy_
 func get_description(relic_inst: RelicInstance = null) -> String:
 	var current_stacks: int = relic_inst.stacks if relic_inst else 1
 	var total_heal: int = heal_power * current_stacks
-	return "Whenever a friendly unit casts their skill, heal the team's shared health pool for [color=%s]%d HP[/color]." % [GameColors.DESC_HEAL, total_heal]
+	return "Whenever a friendly unit casts, heal the team's shared health pool for [color=%s]%d HP[/color]." % [GameColors.DESC_HEAL, total_heal]
