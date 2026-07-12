@@ -25,7 +25,7 @@ enum TargetType {
 @export var trigger: Trigger
 @export var target: TargetType = TargetType.SELF
 
-func apply_modifier(_source_idx: int, _team_obj: BattleTeam) -> void:
+func apply_modifier(_source_idx: int, _team_obj: BattleTeamModel) -> void:
 	push_error("Abstract method apply_modifier() must be overridden in subclass of UnitModifier!")
 	assert(false, "Subclass must override apply_modifier()")
 

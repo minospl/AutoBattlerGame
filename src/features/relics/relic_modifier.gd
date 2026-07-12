@@ -6,7 +6,7 @@ func on_acquire(_relic_inst: RelicInstance, _run_state: RunState) -> void:
 	pass
 
 ## Called at the start of battle
-func on_battle_start(_relic_inst: RelicInstance, _player_team: BattleTeam, _enemy_team: BattleTeam) -> void:
+func on_battle_start(_relic_inst: RelicInstance, _player_team: BattleTeamModel, _enemy_team: BattleTeamModel) -> void:
 	pass
 
 ## Returns dynamic description for the tooltip

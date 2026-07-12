@@ -3,7 +3,7 @@ extends RelicModifier
 
 @export var electrocute_stacks: int = 5
 
-func on_battle_start(relic_inst: RelicInstance, _player_team: BattleTeam, enemy_team: BattleTeam) -> void:
+func on_battle_start(relic_inst: RelicInstance, _player_team: BattleTeamModel, enemy_team: BattleTeamModel) -> void:
 	if enemy_team and relic_inst:
 		var total_stacks: int = electrocute_stacks * relic_inst.stacks
 		enemy_team.apply_status("electrocute", total_stacks)

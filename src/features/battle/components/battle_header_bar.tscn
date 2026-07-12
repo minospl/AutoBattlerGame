@@ -25,7 +25,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "🚪 Exit to Shop"
+text = "Exit to Shop"
 
 [node name="GameButtonDecorator" type="Node" parent="Margin/HBox/ExitButton"]
 script = ExtResource("2_button_decorator")

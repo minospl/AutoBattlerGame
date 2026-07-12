@@ -4,7 +4,7 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 1. Wycieki pamięci przez cykle referencji (Reference Cycles) w modyfikatorach reliktów
+### 1. [ROZWIĄZANE] Wycieki pamięci przez cykle referencji (Reference Cycles) w modyfikatorach reliktów
 - **Lokalizacja:** 
   - [healing_herb_relic.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/templates/modifiers/healing_herb_relic.gd), linia 9, funkcja `on_battle_start`
   - [poisonous_fangs_relic.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/templates/modifiers/poisonous_fangs_relic.gd), linia 9, funkcja `on_battle_start`
@@ -12,15 +12,8 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
   - [shield_battery_relic.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/templates/modifiers/shield_battery_relic.gd), linia 8, funkcja `on_battle_start`
 - **Krytyczne pytania & Problem:** Czy te lambda-funkcje nie powodują wycieku pamięci? Klasa `BattleTeam` dziedziczy po `RefCounted` (kontrolowanej przez licznik referencji). Kiedy modyfikator łączy sygnał `player_team.unit_casted.connect(func(...) -> void)` i w ciele tej anonimowej funkcji odwołuje się bezpośrednio do zmiennej `player_team` (lub `enemy_team`), kompilator GDScript automatycznie przechwytuje silną referencję (strong reference) do tego obiektu w domknięciu (closure) lambdy. Powstaje cykl referencji: `player_team` -> połączenie sygnału -> lambda -> `player_team`.
 - **Logiczne uzasadnienie:** Ponieważ `BattleTeam` nie jest węzłem sceny (`Node`) usuwanym za pomocą `queue_free()`, lecz obiektem typu `RefCounted`, jego pamięć zostanie zwolniona tylko wtedy, gdy licznik referencji spadnie do zera. Cykl referencyjny blokuje to na zawsze, powodując wyciek pamięci instancji `BattleTeam` oraz powiązanych zasobów przy każdej pojedynczej walce.
-- **Sugerowana zmiana:** Użyj słabej referencji (`WeakRef`), aby przełamać cykl referencji:
-  ```gdscript
-  var team_ref := weakref(player_team)
-  player_team.unit_casted.connect(func(source_idx: int) -> void:
-      var team: BattleTeam = team_ref.get_ref() as BattleTeam
-      if team:
-          # Logika modyfikatora
-  )
-  ```
+- **Sugerowana zmiana:** Użyj słabej referencji (`WeakRef`), aby przełamać cykl referencji.
+- **Status:** **[ROZWIĄZANE]** Zdecydowano o zastosowaniu bardziej eleganckiego, centralnego podejścia. W klasie `BattleTeamModel` dodano metodę `cleanup()`, która przy niszczeniu sceny walki (`_exit_tree()` w `battle_scene.gd`) wymazuje statusy oraz automatycznie odłącza wszystkie sygnały przy użyciu `get_signal_connection_list()`. Powoduje to zniszczenie anonimowych lambd i uwalnia silne referencje, pozwalając na całkowite i czyste zwolnienie pamięci obu modeli drużyn przy zachowaniu czystego kodu reliktów bez ostrzeżeń kompilatora.
 
 ---
 
@@ -118,3 +111,18 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 - **Krytyczne pytania & Problem:** Dlaczego w przypadku braku dostępnych reliktów o danej rzadkości system pozwala na ponowne wylosowanie i zduplikowanie reliktów oznaczonych jako `is_unique = true`?
 - **Logiczne uzasadnienie:** Fallback ten całkowicie niweczy znaczenie flagi `is_unique` zadeklarowanej w `RelicData`. Jeśli gracz posiada już wszystkie relikty z danej puli rzadkości, a gra wylosuje duplikat reliktu unikalnego (np. Magnetic Core), to metoda `add_relic` w `run_state.gd` po prostu zwiększy jego liczbę stosów (`stacks += 1`). Jednak unikalne relikty nie posiadają skalowania na poziomie kodu modyfikatorów, co spowoduje marnowanie zasobów gracza na bezużyteczne stosy.
 - **Sugerowana zmiana:** W sytuacji krytycznej (brak wolnych reliktów danej rzadkości) system powinien wylosować relikt o innej rzadkości lub zwrócić złoto graczowi, zamiast generować niefunkcjonalne duplikaty reliktów unikalnych.
+
+---
+
+### 13. Modyfikatory "On Battle Start" nie odpalają się dla przeciwnej drużyny (Enemy Team)
+- **Lokalizacja:** [battle_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_scene.gd), funkcja `trigger_battle_start()` (linia 194)
+- **Krytyczne pytania & Problem:** Dlaczego w momencie rozpoczęcia walki modyfikatory typu `ON_BATTLE_START` są wyzwalane wyłącznie dla drużyny gracza (`player_team`), a drużyna przeciwna (`enemy_team`) jest całkowicie pomijana?
+- **Logiczne uzasadnienie:** Jeśli przeciwnik posiada w swojej drużynie potwory ze zdolnościami aktywowanymi na początku walki (np. Wild Wolf, który daje sąsiednim jednostkom buffa do ataku), zdolności te nigdy się nie uruchamiają dla przeciwnika. Sprawia to, że walka z wrogiem posiadającym takie jednostki nie odzwierciedla poprawnie jego faktycznej siły bojowej.
+- **Sugerowana zmiana:** Wewnątrz funkcji `trigger_battle_start()` dodaj wywołanie wyzwalacza również dla `enemy_team`:
+  ```gdscript
+  for i: int in range(MAX_TEAM_SIZE):
+      if player_team.units[i]:
+          ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
+      if enemy_team.units[i]:
+          ModifierEngine.trigger_unit_modifier(i, enemy_team, UnitModifier.Trigger.ON_BATTLE_START)
+  ```

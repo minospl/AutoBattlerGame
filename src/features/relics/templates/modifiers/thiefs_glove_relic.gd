@@ -4,7 +4,7 @@ extends RelicModifier
 @export var gold_amount: int = 1
 @export var max_gold_per_battle: int = 5
 
-func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeam, _enemy_team: BattleTeam) -> void:
+func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, _enemy_team: BattleTeamModel) -> void:
 	if player_team and relic_inst:
 		var limit: int = max_gold_per_battle * relic_inst.stacks
 		var gold_generated: Array[int] = [0]

@@ -3,7 +3,7 @@ extends RelicModifier
 
 @export var poison_stacks: int = 1
 
-func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeam, enemy_team: BattleTeam) -> void:
+func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, enemy_team: BattleTeamModel) -> void:
 	if player_team and enemy_team and relic_inst:
 		var total_poison: int = poison_stacks * relic_inst.stacks
 		player_team.unit_attacked.connect(func(_source_idx: int) -> void:

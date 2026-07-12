@@ -3,7 +3,7 @@ extends RelicModifier
 
 @export var shield_amount: int = 10
 
-func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeam, _enemy_team: BattleTeam) -> void:
+func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, _enemy_team: BattleTeamModel) -> void:
 	if player_team and relic_inst:
 		var total_shield: int = shield_amount * relic_inst.stacks
 		for idx: int in [0, 1, 2]:

@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://cx5y7hsqt4k2b"]
+
+[ext_resource type="Script" path="res://src/features/battle/components/battle_team_panel.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://src/features/battle/components/health_bar.tscn" id="2_health_bar"]
+[ext_resource type="PackedScene" path="res://src/features/battle/components/battle_card_slot.tscn" id="3_slot"]
+
+[node name="BattleTeamPanel" type="VBoxContainer"]
+offset_right = 332.0
+offset_bottom = 236.0
+theme_override_constants/separation = 8
+script = ExtResource("1_script")
+
+[node name="HealthBarMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_right = 10
+
+[node name="HealthBar" parent="HealthBarMargin" instance=ExtResource("2_health_bar")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="StatusBoxMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_right = 10
+
+[node name="StatusHBox" type="HBoxContainer" parent="StatusBoxMargin"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="GridContainer" type="GridContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3
+
+[node name="Slot0" parent="GridContainer" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot1" parent="GridContainer" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot2" parent="GridContainer" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot3" parent="GridContainer" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot4" parent="GridContainer" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot5" parent="GridContainer" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2

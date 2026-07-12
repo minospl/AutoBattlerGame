@@ -3,7 +3,7 @@ extends RelicModifier
 
 @export var burn_stacks: int = 8
 
-func on_battle_start(relic_inst: RelicInstance, _player_team: BattleTeam, enemy_team: BattleTeam) -> void:
+func on_battle_start(relic_inst: RelicInstance, _player_team: BattleTeamModel, enemy_team: BattleTeamModel) -> void:
 	if enemy_team and relic_inst:
 		var total_stacks: int = burn_stacks * relic_inst.stacks
 		enemy_team.apply_status("burn", total_stacks)

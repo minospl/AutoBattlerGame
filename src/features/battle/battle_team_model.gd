@@ -1,12 +1,18 @@
-class_name BattleTeam
+class_name BattleTeamModel
 extends RefCounted
 
 # Signals for communicating with BattleScene controller
+enum SpawnTarget {
+	TEAM_HEALTH_BAR,
+	SLOT,
+	SHIELD
+}
+
 signal team_units_loaded(loaded_units: Array[UnitInstance])
 signal health_changed(current_health: int, max_health: int, shield: int)
 signal status_changed(status_type: String, amount: int, cooldown_ratio: float)
 signal cast_progress_changed(slot_idx: int, ratio: float)
-signal floating_text_requested(text: String, color: Color, is_on_slot: bool, slot_idx: int)
+signal floating_text_requested(text: String, color: Color, target: SpawnTarget, key: Variant)
 signal team_defeated()
 signal gold_generated(amount: int, slot_idx: int)
 signal unit_casted(source_idx: int)
@@ -113,7 +119,7 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 	status_changed.emit("burn", burn, 0.0)
 	status_changed.emit("electrocute", electrocute, 0.0)
 
-func execute_cast(source_idx: int, opponent: BattleTeam) -> void:
+func execute_cast(source_idx: int, opponent: BattleTeamModel) -> void:
 	var unit: UnitInstance = units[source_idx]
 	if not unit:
 		return
@@ -177,7 +183,7 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 		health -= remaining_dmg
 		
 	health_changed.emit(health, max_health, shield)
-	floating_text_requested.emit("-" + NumberFormatter.format_large_number(actual_dmg), text_color, false, 0)
+	floating_text_requested.emit("-" + NumberFormatter.format_large_number(actual_dmg), text_color, SpawnTarget.TEAM_HEALTH_BAR, 0)
 	
 	if damage_type == "physical":
 		for i: int in range(MAX_TEAM_SIZE):
@@ -202,14 +208,14 @@ func heal(amount: int, source_slot_idx: int = -1) -> void:
 		if source_slot_idx != -1:
 			spawn_floating_text_on_slot(source_slot_idx, "+" + NumberFormatter.format_large_number(actual_heal), Color(GameColors.DESC_HEAL))
 		else:
-			floating_text_requested.emit("+" + NumberFormatter.format_large_number(actual_heal), Color(GameColors.DESC_HEAL), false, 0)
+			floating_text_requested.emit("+" + NumberFormatter.format_large_number(actual_heal), Color(GameColors.DESC_HEAL), SpawnTarget.TEAM_HEALTH_BAR, 0)
 
 func add_shield(amount: int) -> void:
 	if amount <= 0:
 		return
 	shield += amount
 	health_changed.emit(health, max_health, shield)
-	floating_text_requested.emit("+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_SHIELD), false, 0)
+	floating_text_requested.emit("+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_SHIELD), SpawnTarget.SHIELD, 0)
 
 func apply_status(status_type: String, amount: int) -> void:
 	if amount <= 0:
@@ -272,7 +278,7 @@ func tick_casts(delta: float, cast_callback: Callable) -> void:
 				cast_callback.call(i)
 
 func spawn_floating_text_on_slot(t_idx: int, text: String, color: Color) -> void:
-	floating_text_requested.emit(text, color, true, t_idx)
+	floating_text_requested.emit(text, color, SpawnTarget.SLOT, t_idx)
 
 func buff_unit_attack(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
@@ -372,7 +378,26 @@ func buff_unit_cast_speed(slot_idx: int, amount: float, permanent: bool = false)
 func add_unit_gold(slot_idx: int, amount: int) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
 		return
-	gold_generated.emit(amount, slot_idx)
+
+	gold_generated.emit(amount)
+
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Gold", Color(GameColors.DESC_GOLD))
 
 func has_relic(p_name: String) -> bool:
 	return RelicInstance.has_relic(active_relics, p_name)
+
+## Cleans up model references, status effects, and disconnects all signals to free captured lambdas
+func cleanup() -> void:
+	# 1. Clear status effects (breaks their cycle)
+	active_statuses.clear()
+	
+	# 2. Clear units
+	units.clear()
+	
+	# 3. Disconnect all signal connections to free captured lambdas
+	for sig_info: Dictionary in get_signal_list():
+		var sig_name: StringName = sig_info["name"]
+		for conn: Dictionary in get_signal_connection_list(sig_name):
+			var callable: Callable = conn["callable"]
+			if is_connected(sig_name, callable):
+				disconnect(sig_name, callable)

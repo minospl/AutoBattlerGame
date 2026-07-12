@@ -2,12 +2,12 @@ class_name StatusEffect
 extends RefCounted
 
 var status_type: String = ""
-var team: BattleTeam = null
+var team: BattleTeamModel = null
 var stacks: int = 0
 var timer: float = 0.0
 var tick_interval: float = 1.0
 
-func initialize(p_type: String, p_team: BattleTeam, p_stacks: int) -> void:
+func initialize(p_type: String, p_team: BattleTeamModel, p_stacks: int) -> void:
 	status_type = p_type
 	team = p_team
 	stacks = p_stacks
@@ -34,4 +34,3 @@ func get_cooldown_ratio() -> float:
 func reset() -> void:
 	stacks = 0
 	timer = 0.0
-

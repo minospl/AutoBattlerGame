@@ -8,7 +8,7 @@ func get_target(p_level: int = 1) -> TargetType:
 		return TargetType.HORIZONTAL
 	return TargetType.LEFT
 
-func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
+func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	var unit: UnitInstance = team_obj.units[source_idx]
 	var current_level: int = unit.level if unit else 1
 	var current_target: TargetType = get_target(current_level)

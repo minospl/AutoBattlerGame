@@ -3,7 +3,7 @@ extends RelicModifier
 
 @export var heal_power: int = 5
 
-func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeam, _enemy_team: BattleTeam) -> void:
+func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, _enemy_team: BattleTeamModel) -> void:
 	if player_team and relic_inst:
 		var total_heal: int = heal_power * relic_inst.stacks
 		player_team.unit_casted.connect(func(_source_idx: int) -> void:

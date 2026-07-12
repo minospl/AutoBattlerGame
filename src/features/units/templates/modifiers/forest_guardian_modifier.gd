@@ -20,7 +20,7 @@ func get_modifier_value(p_level: int = 1) -> float:
 func is_permanent(p_level: int) -> bool:
 	return p_level >= 3
 
-func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
+func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	var unit: UnitInstance = team_obj.units[source_idx]
 	var current_level: int = unit.level if unit else 1
 	var current_target: TargetType = get_target(current_level)

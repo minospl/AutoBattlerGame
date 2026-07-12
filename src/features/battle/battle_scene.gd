@@ -16,13 +16,11 @@ const MAX_TEAM_SIZE: int = RunState.MAX_ACTIVE_TEAM_SIZE
 enum State { PLAYING, PAUSED }
 var simulation_state: State = State.PAUSED
 
-var player_team: BattleTeam
-var enemy_team: BattleTeam
+var player_team: BattleTeamModel
+var enemy_team: BattleTeamModel
 
 var game_speed: float = 1.0
 var preview_tooltip: CardTooltip
-var team_hp_material: ShaderMaterial
-var enemy_hp_material: ShaderMaterial
 var enemy_units_to_load: Array[UnitInstance] = []
 var is_outcome_showing: bool = false
 var _battle_start_triggered: bool = false
@@ -41,17 +39,9 @@ var enemy_slots: Array[BattleCardSlot] = []
 @onready var header_bar: BattleHeaderBar = %BattleHeaderBar
 @onready var preview_container: Control = %PreviewContainer
 @onready var relic_bar_wrapper: Control = %RelicBarWrapper
-
-@onready var team_health_bar_rect: Control = %TeamHealthBarRect
-@onready var enemy_health_bar_rect: Control = %EnemyHealthBarRect
-@onready var team_health_label: Label = %TeamHealthLabel
-@onready var enemy_health_label: Label = %EnemyHealthLabel
-
-@onready var team_status_hbox: Control = %TeamStatusHBox
-@onready var enemy_status_hbox: Control = %EnemyStatusHBox
-
-var player_status_badges: Dictionary[String, StatusBadge] = {}
-var enemy_status_badges: Dictionary[String, StatusBadge] = {}
+@onready var player_panel: BattleTeamPanel = %PlayerTeamPanel
+@onready var enemy_panel: BattleTeamPanel = %EnemyTeamPanel
+@onready var floating_text_manager: FloatingTextManager = %FloatingTextManager
 
 func _ready() -> void:
 	# Add the tooltip instance to PreviewContainer
@@ -68,54 +58,42 @@ func _ready() -> void:
 		header_bar.pause_pressed.connect(_on_pause_pressed)
 		header_bar.speed_pressed.connect(_on_speed_pressed)
 
-	# Fetch slots
-	player_slots = [
-		%Slot0, %Slot1, %Slot2,
-		%Slot3, %Slot4, %Slot5
-	]
-	for i: int in range(MAX_TEAM_SIZE):
-		player_slots[i].slot_index = i
+	# Populate slots from components
+	if player_panel:
+		player_slots = player_panel.slots
+		for i: int in range(player_slots.size()):
+			player_slots[i].slot_index = i
+			
+	if enemy_panel:
+		enemy_slots = enemy_panel.slots
+		for i: int in range(enemy_slots.size()):
+			enemy_slots[i].slot_index = i
 
-	# Fetch enemy slots
-	enemy_slots = [
-		%EnemySlot0, %EnemySlot1, %EnemySlot2,
-		%EnemySlot3, %EnemySlot4, %EnemySlot5
-	]
-	for i: int in range(MAX_TEAM_SIZE):
-		enemy_slots[i].slot_index = i
-
-	# Configure HP border shaders
-	team_hp_material = _configure_hp_bar_shader(team_health_bar_rect)
-	enemy_hp_material = _configure_hp_bar_shader(enemy_health_bar_rect)
-
-	# Create BattleTeam instances
-	player_team = BattleTeam.new()
-	enemy_team = BattleTeam.new()
+	# Create BattleTeamModel instances
+	player_team = BattleTeamModel.new()
+	enemy_team = BattleTeamModel.new()
 	
 	# Connect signals from player_team
 	player_team.team_units_loaded.connect(_on_units_loaded.bind(player_slots))
-	player_team.health_changed.connect(_on_health_changed.bind(team_hp_material, team_health_label))
-	player_team.status_changed.connect(func(status_type: String, amount: int, ratio: float) -> void:
-		_on_status_changed_dynamic(status_type, amount, ratio, player_status_badges, team_status_hbox)
-	)
-	player_team.cast_progress_changed.connect(_on_cast_progress_changed.bind(player_slots))
-	player_team.floating_text_requested.connect(func(text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
-		_on_floating_text_requested(false, text, color, is_on_slot, slot_idx)
-	)
 	player_team.team_defeated.connect(_on_team_defeat)
 	player_team.gold_generated.connect(_on_gold_generated)
 
 	# Connect signals from enemy_team
 	enemy_team.team_units_loaded.connect(_on_units_loaded.bind(enemy_slots))
-	enemy_team.health_changed.connect(_on_health_changed.bind(enemy_hp_material, enemy_health_label))
-	enemy_team.status_changed.connect(func(status_type: String, amount: int, ratio: float) -> void:
-		_on_status_changed_dynamic(status_type, amount, ratio, enemy_status_badges, enemy_status_hbox)
-	)
-	enemy_team.cast_progress_changed.connect(_on_cast_progress_changed.bind(enemy_slots))
-	enemy_team.floating_text_requested.connect(func(text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
-		_on_floating_text_requested(true, text, color, is_on_slot, slot_idx)
-	)
 	enemy_team.team_defeated.connect(_on_enemy_defeat)
+
+	# Connect UI Panels (setup model data and signals)
+	if player_panel:
+		player_panel.setup_model(player_team)
+		player_panel.floating_text_spawn_requested.connect(func(txt: String, col: Color, pos: Vector2) -> void:
+			if floating_text_manager: floating_text_manager.show_popup(txt, col, pos)
+		)
+		
+	if enemy_panel:
+		enemy_panel.setup_model(enemy_team)
+		enemy_panel.floating_text_spawn_requested.connect(func(txt: String, col: Color, pos: Vector2) -> void:
+			if floating_text_manager: floating_text_manager.show_popup(txt, col, pos)
+		)
 
 	player_team.initialize(false)
 	enemy_team.initialize(true)
@@ -151,41 +129,12 @@ func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 	fatigue_tick_count = 0
 	_battle_start_triggered = false
 	
-	# Start simulation immediately without requiring a Play click
+	# Start simulation
 	set_playing(true)
-
-func _configure_hp_bar_shader(hp_bar: Control) -> ShaderMaterial:
-	if not hp_bar:
-		return null
-	var hp_material: ShaderMaterial = ShaderMaterial.new()
-	hp_material.shader = HP_BORDER_SHADER
-	hp_material.set_shader_parameter("fill_percentage", 1.0)
-	hp_bar.material = hp_material
-	
-	hp_bar.resized.connect(func() -> void:
-		if hp_material:
-			hp_material.set_shader_parameter("size", hp_bar.size)
-	)
-	
-	var initial_hp_size: Vector2 = hp_bar.size
-	if initial_hp_size.x == 0.0:
-		initial_hp_size = Vector2(340.0, 32.0)
-	hp_material.set_shader_parameter("size", initial_hp_size)
-	return hp_material
 
 func load_battle_team() -> void:
 	if run_state == null:
 		return
-
-	# Clear status UI badges
-	if team_status_hbox:
-		for child: Node in team_status_hbox.get_children():
-			child.queue_free()
-	if enemy_status_hbox:
-		for child: Node in enemy_status_hbox.get_children():
-			child.queue_free()
-	player_status_badges.clear()
-	enemy_status_badges.clear()
 
 	# Copy team and make clones for the battle scene simulation
 	var player_units: Array[UnitInstance] = []
@@ -320,15 +269,6 @@ func advance_simulation(delta: float) -> void:
 	player_team.tick_casts(delta, trigger_cast)
 	enemy_team.tick_casts(delta, trigger_enemy_cast)
 
-func spawn_floating_text(value_text: String, text_color: Color, start_pos: Vector2) -> void:
-	var offset_x: float = randf_range(-30.0, 30.0)
-	var offset_y: float = randf_range(-20.0, 20.0)
-	var final_pos: Vector2 = start_pos + Vector2(offset_x, offset_y) - Vector2(50.0, 15.0)
-	
-	var f_text: FloatingText = FloatingText.new()
-	add_child(f_text)
-	f_text.setup(value_text, text_color, final_pos)
-
 func _on_enemy_defeat() -> void:
 	show_battle_outcome("victory")
 
@@ -422,10 +362,9 @@ func show_battle_outcome(p_outcome: String) -> void:
 	overlay.add_child(popup)
 	popup.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 
-func _on_gold_generated(amount: int, slot_idx: int) -> void:
+func _on_gold_generated(amount: int) -> void:
 	if run_state:
 		run_state.gold += amount
-	_on_floating_text_requested(false, "+" + NumberFormatter.format_large_number(amount) + " Gold", Color(GameColors.DESC_GOLD), true, slot_idx)
 
 func set_playing(play: bool) -> void:
 	if play:
@@ -493,9 +432,7 @@ func get_fibonacci(n: int) -> int:
 		b = temp
 	return b
 
-
 # UI Team Handler Methods
-
 func _update_team_slots_ui(slots_arr: Array[BattleCardSlot], loaded_units: Array[UnitInstance]) -> void:
 	for slot: BattleCardSlot in slots_arr:
 		var old_card: Control = slot.get_card()
@@ -517,56 +454,8 @@ func _update_team_slots_ui(slots_arr: Array[BattleCardSlot], loaded_units: Array
 func _on_units_loaded(loaded_units: Array[UnitInstance], slots: Array[BattleCardSlot]) -> void:
 	_update_team_slots_ui(slots, loaded_units)
 
-func _on_health_changed(current_health: int, max_health: int, shield: int, mat: ShaderMaterial, label: Label) -> void:
-	var fill_pct: float = 0.0
-	if max_health > 0:
-		var health_clamped: int = max(0, current_health)
-		fill_pct = float(health_clamped) / float(max_health)
-		
-	if mat:
-		mat.set_shader_parameter("fill_percentage", fill_pct)
-		
-	if label:
-		if shield > 0:
-			label.text = "%d / %d (🛡️ %d)" % [max(0, current_health), max_health, shield]
-		else:
-			label.text = "%d / %d" % [max(0, current_health), max_health]
-
-func _on_status_changed_dynamic(status_type: String, amount: int, ratio: float, badges_dict: Dictionary[String, StatusBadge], container: Control) -> void:
-	if amount > 0:
-		var badge: StatusBadge = badges_dict.get(status_type)
-		if badge == null:
-			badge = StatusBadge.new()
-			badge.status_type = status_type
-			container.add_child(badge)
-			badges_dict[status_type] = badge
-		badge.value = amount
-		badge.cooldown_ratio = ratio
-	else:
-		var badge: StatusBadge = badges_dict.get(status_type)
-		if badge != null:
-			badge.queue_free()
-			badges_dict.erase(status_type)
-			
-	if container:
-		container.visible = not badges_dict.is_empty()
-
-func _on_cast_progress_changed(slot_idx: int, ratio: float, slots: Array[BattleCardSlot]) -> void:
-	if slot_idx >= 0 and slot_idx < slots.size():
-		slots[slot_idx].set_cast_progress(ratio)
-
-func _on_floating_text_requested(is_enemy_team: bool, text: String, color: Color, is_on_slot: bool, slot_idx: int) -> void:
-	var spawn_pos: Vector2 = Vector2.ZERO
-	if is_on_slot:
-		var slot: BattleCardSlot = (enemy_slots[slot_idx] if is_enemy_team else player_slots[slot_idx]) as BattleCardSlot
-		spawn_pos = slot.global_position + slot.size / 2.0
-	else:
-		var hp_bar: Control = enemy_health_bar_rect if is_enemy_team else team_health_bar_rect
-		if hp_bar:
-			spawn_pos = hp_bar.global_position + hp_bar.size / 2.0
-		
-	# Fallback if UI hasn't resolved positions yet (to prevent spawning in top-left 0,0)
-	if spawn_pos == Vector2.ZERO or spawn_pos.is_equal_approx(Vector2.ZERO):
-		spawn_pos = size / 2.0
-		
-	spawn_floating_text(text, color, spawn_pos)
+func _exit_tree() -> void:
+	if player_team:
+		player_team.cleanup()
+	if enemy_team:
+		enemy_team.cleanup()

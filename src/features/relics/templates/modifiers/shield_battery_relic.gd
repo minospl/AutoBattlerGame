@@ -3,7 +3,7 @@ extends RelicModifier
 
 @export var shield_per_cast: int = 5
 
-func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeam, _enemy_team: BattleTeam) -> void:
+func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, _enemy_team: BattleTeamModel) -> void:
 	if player_team and relic_inst:
 		player_team.unit_casted.connect(func(source_idx: int) -> void:
 			if player_team.units[source_idx]:

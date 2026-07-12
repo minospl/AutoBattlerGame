@@ -12,7 +12,7 @@ func get_modifier_value(p_level: int = 1) -> float:
 		3: return float(value_3)
 	return float(value_1)
 
-func apply_modifier(source_idx: int, team_obj: BattleTeam) -> void:
+func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	var unit: UnitInstance = team_obj.units[source_idx]
 	var current_level: int = unit.level if unit else 1
 	team_obj.buff_unit_attack(source_idx, int(get_modifier_value(current_level)), true)
