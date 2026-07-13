@@ -30,3 +30,4 @@ const DESC_BURN: String = "#e67e22" # Standardized Orange for burn
 const DESC_ELECTROCUTE: String = "#f1c40f" # Standardized Yellow for electrocute
 const DESC_GOLD: String = "#ffd700" # Gold color
 const DESC_CAST_SPEED: String = "#54a0ff" # Light blue for cast speed / cd reduction
+const DESC_UNIQUE: String = "#e61a33" # Ruby-red for unique rarity / roll references

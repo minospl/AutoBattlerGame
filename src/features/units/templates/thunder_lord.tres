@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Script" path="res://src/features/units/unit_type.gd" id="1_type_script"]
+[ext_resource type="Script" path="res://src/features/units/templates/modifiers/thunder_lord_modifier.gd" id="2_modifier_script"]
+[ext_resource type="Resource" path="res://src/features/units/types/dragon.tres" id="3_type"]
+[ext_resource type="Script" path="res://src/features/units/unit_data.gd" id="4_unit_data_script"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/unique.tres" id="5_rarity"]
+
+[sub_resource type="Resource" id="Resource_thunder_lord_modifier"]
+script = ExtResource("2_modifier_script")
+trigger = 1
+target = 1
+
+[resource]
+script = ExtResource("4_unit_data_script")
+unit_name = "Thunder Lord"
+price = 5
+max_health = 45
+attack = 12
+types = Array[ExtResource("1_type_script")]([ExtResource("3_type")])
+rarity = ExtResource("5_rarity")
+cast_speed = 4.0
+modifier = SubResource("Resource_thunder_lord_modifier")

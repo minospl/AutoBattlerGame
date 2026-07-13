@@ -16,3 +16,8 @@ func initialize_battle_unit(p_unit: UnitInstance) -> void:
 	cast_speed = p_unit.cast_speed
 	level = p_unit.level
 	data = p_unit.data
+
+var ongoing_attack_bonus: int = 0
+
+func get_attack() -> int:
+	return attack + ongoing_attack_bonus

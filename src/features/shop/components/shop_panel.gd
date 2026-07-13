@@ -30,6 +30,11 @@ signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
 		shop_weights = val
 		_update_labels()
 
+@export var has_unique_potential: bool = false:
+	set(val):
+		has_unique_potential = val
+		_update_labels()
+
 var slots: Array[ShopCardSlot] = []
 
 func _ready() -> void:
@@ -110,14 +115,19 @@ func _process(_delta: float) -> void:
 
 func _format_chance_text(weights: Array[float]) -> String:
 	var parts: Array[String] = []
+	var w_scale: float = 0.9 if has_unique_potential else 1.0
+	
 	if weights.size() > 0 and weights[0] > 0.0:
-		parts.append("[color=#708094]C:%d%%[/color]" % int(weights[0] * 100))
+		parts.append("[color=#708094]C:%d%%[/color]" % int(weights[0] * w_scale * 100))
 	if weights.size() > 1 and weights[1] > 0.0:
-		parts.append("[color=#3082cf]R:%d%%[/color]" % int(weights[1] * 100))
+		parts.append("[color=#3082cf]R:%d%%[/color]" % int(weights[1] * w_scale * 100))
 	if weights.size() > 2 and weights[2] > 0.0:
-		parts.append("[color=#8059d6]E:%d%%[/color]" % int(weights[2] * 100))
+		parts.append("[color=#8059d6]E:%d%%[/color]" % int(weights[2] * w_scale * 100))
 	if weights.size() > 3 and weights[3] > 0.0:
-		parts.append("[color=#d69e2e]L:%d%%[/color]" % int(weights[3] * 100))
+		parts.append("[color=#d69e2e]L:%d%%[/color]" % int(weights[3] * w_scale * 100))
+	if has_unique_potential:
+		parts.append("[color=#e61a33]U:10%%[/color]")
+
 	return " | ".join(parts)
 
 func _update_labels() -> void:

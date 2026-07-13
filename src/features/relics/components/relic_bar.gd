@@ -23,18 +23,31 @@ func setup(p_tooltip: CardTooltip) -> void:
 	visible = false
 
 func update_relics(relic_list: Array[RelicInstance]) -> void:
-	# Clear old icons
+	# Czyszczenie starych ikon
 	for child: Node in icons_container.get_children():
 		child.queue_free()
 		
-	var active_count: int = 0
+	# Tworzymy posortowaną listę tymczasową
+	var sorted_list: Array[RelicInstance] = []
+	
+	# 1. Najpierw dodajemy wszystkie relikty, które NIE są unikalne
 	for relic: RelicInstance in relic_list:
-		if relic:
-			active_count += 1
-			var icon: Control = _create_relic_icon(relic)
-			icons_container.add_child(icon)
+		if relic.data.rarity.rarity_name != "Unique":
+			sorted_list.append(relic)
 			
-	# Only show the bar if we have active relics
+	# 2. Następnie na koniec dodajemy wszystkie relikty typu Unique
+	for relic: RelicInstance in relic_list:
+		if relic.data.rarity.rarity_name == "Unique":
+			sorted_list.append(relic)
+			
+	# Renderujemy ikony na podstawie posortowanej listy
+	var active_count: int = 0
+	for relic: RelicInstance in sorted_list:
+		active_count += 1
+		var icon: Control = _create_relic_icon(relic)
+		icons_container.add_child(icon)
+		
+	# Pokazujemy pasek tylko jeśli mamy aktywne relikty
 	visible = active_count > 0
 
 func _create_relic_icon(relic: RelicInstance) -> Control:
@@ -44,26 +57,14 @@ func _create_relic_icon(relic: RelicInstance) -> Control:
 	
 	var relic_data: RelicData = relic.data
 	
-	# Icon inside
-	if relic_data and relic_data.sprite:
-		var tex: TextureRect = TextureRect.new()
-		tex.texture = relic_data.sprite
-		tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		tex.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		tex.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-		tex.custom_minimum_size = Vector2(24, 24)
-		tex.set_anchors_preset(Control.PRESET_CENTER)
-		container.add_child(tex)
-	else:
-		var label: Label = Label.new()
-		# Use chest icon as a default fallback
-		label.text = "📦"
-		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		label.add_theme_font_size_override("font_size", 20)
-		label.set_anchors_preset(Control.PRESET_FULL_RECT)
-		container.add_child(label)
+	# Solid color square representing rarity for testing purposes
+	var rect: ColorRect = ColorRect.new()
+	rect.color = relic_data.rarity.border_color
+	rect.custom_minimum_size = Vector2(24, 24)
+	rect.size = Vector2(24, 24)
+	rect.position = Vector2(2, 2)
+	rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	container.add_child(rect)
 		
 	# Stacks badge
 	if relic.stacks > 1:

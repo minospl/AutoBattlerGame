@@ -38,6 +38,14 @@ func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relic
 @export var relics: Array[RelicInstance] = []
 @export var has_magnetic_core: bool = false
 
+var has_focusing_lens: bool:
+	get:
+		return has_relic("Focusing Lens")
+
+var has_unique_potential: bool:
+	get:
+		return has_relic("Unique Potential")
+
 @export var gold: int = 10:
 	set(val):
 		if gold != val:
@@ -268,17 +276,20 @@ func check_and_merge_units() -> Dictionary:
 func get_random_unit_template_by_rarity(rarity_name: String) -> UnitData:
 	var matching: Array[UnitData] = []
 	for template: UnitData in unit_templates:
-		if template == null:
+		var r_name: String = template.rarity.rarity_name
+
+		if r_name == "Unique":
+			if rarity_name == "Unique":
+				matching.append(template)
 			continue
-		var r_name: String = "Common"
-		if template.rarity:
-			r_name = template.rarity.rarity_name
+
 		if r_name == rarity_name:
 			matching.append(template)
-			
+
 	if matching.is_empty():
 		for template: UnitData in unit_templates:
-			if template != null:
+			var r_name: String = template.rarity.rarity_name
+			if r_name != "Unique":
 				matching.append(template)
 				
 	if matching.is_empty():
@@ -289,17 +300,18 @@ func get_random_unit_template_by_rarity(rarity_name: String) -> UnitData:
 func get_random_item_template_by_rarity(rarity_name: String) -> ItemData:
 	var matching: Array[ItemData] = []
 	for template: ItemData in item_templates:
-		if template == null:
+		var r_name: String = template.rarity.rarity_name
+			
+		if r_name == "Unique":
 			continue
-		var r_name: String = "Common"
-		if template.rarity:
-			r_name = template.rarity.rarity_name
+			
 		if r_name == rarity_name:
 			matching.append(template)
 			
 	if matching.is_empty():
 		for template: ItemData in item_templates:
-			if template != null:
+			var r_name: String = template.rarity.rarity_name
+			if r_name != "Unique":
 				matching.append(template)
 				
 	if matching.is_empty():
@@ -323,6 +335,10 @@ func roll_single_shop_card() -> Resource:
 	else:
 		if unit_templates.is_empty():
 			return null
+			
+		if has_unique_potential and randf() < 0.1:
+			rolled_rarity = "Unique"
+			
 		var template: UnitData = get_random_unit_template_by_rarity(rolled_rarity)
 		if template:
 			var instance: UnitInstance = UnitInstance.new()
@@ -525,7 +541,7 @@ func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 		available.append(relic)
 	return available
 
-func reset_for_new_run(p_lives: int = 10, p_day: int = 4, p_trophies: int = 3, p_gold: int = 10) -> void:
+func reset_for_new_run(p_lives: int = 10, p_day: int = 1, p_trophies: int = 0, p_gold: int = 10) -> void:
 	lives = p_lives
 	day = p_day
 	trophies = p_trophies

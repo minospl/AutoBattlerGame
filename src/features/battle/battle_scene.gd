@@ -156,9 +156,11 @@ func load_battle_team() -> void:
 			cloned_relics.append(relic.clone())
 		player_team.active_relics = cloned_relics
 		player_team.has_magnetic_core = run_state.has_magnetic_core
+		player_team.has_focusing_lens = run_state.has_focusing_lens
 	else:
 		player_team.active_relics = []
 		player_team.has_magnetic_core = false
+		player_team.has_focusing_lens = false
 				
 	if relic_bar:
 		relic_bar.update_relics(player_team.active_relics)
@@ -191,17 +193,23 @@ func load_enemy_team() -> void:
 			enemy_units[0] = crab_instance
 		
 	enemy_team.load_team_units(enemy_units)
+	ModifierEngine.update_ongoing_modifiers(player_team, enemy_team)
+	ModifierEngine.update_ongoing_modifiers(enemy_team, player_team)
 
 func trigger_battle_start() -> void:
+	var has_resonance_stone: bool = player_team.has_relic("Resonance Stone")
+	var player_triggers: int = 2 if has_resonance_stone else 1
+
 	for i: int in range(MAX_TEAM_SIZE):
 		if player_team.units[i]:
-			ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
+			for t: int in range(player_triggers):
+				ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
 		if enemy_team.units[i]:
 			ModifierEngine.trigger_unit_modifier(i, enemy_team, UnitModifier.Trigger.ON_BATTLE_START)
 			
 	# Trigger player relics on_battle_start
 	for relic: RelicInstance in player_team.active_relics:
-		if relic and relic.data and relic.data.modifier:
+		if relic.data.modifier:
 			relic.data.modifier.on_battle_start(relic, player_team, enemy_team)
 					
 	# Update all health and stat overlays
@@ -282,6 +290,10 @@ func advance_simulation(delta: float) -> void:
 	# Tick statuses
 	player_team.tick_statuses(delta)
 	enemy_team.tick_statuses(delta)
+
+	# Update ongoing modifiers
+	ModifierEngine.update_ongoing_modifiers(player_team, enemy_team)
+	ModifierEngine.update_ongoing_modifiers(enemy_team, player_team)
 
 	# Tick card casts
 	player_team.tick_casts(delta, trigger_cast)

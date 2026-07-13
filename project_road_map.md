@@ -103,3 +103,8 @@ Na podstawie wymagań projektowych zdefiniowano następujące źródła pozyskiw
 3. **Modyfikatory kart jednostek (Kamień Milowy 2 / Nowe modyfikatory):**
    - Zdolności potworów wyzwalane na koniec walki (np. *"On victory/defeat get a [Rarity] relic of [Level] level"*).
 
+### **Zaawansowany System Statystyk (Stat Modifier Pattern)**
+Jako przyszły refaktor w ramach rozwoju gry (np. przy wdrażaniu dziesiątek nakładających się efektów, aury i czasowych debufów w Kamieniu Milowym 3):
+- **Wdrożenie modułowego systemu statystyk**: Przejście z uproszczonego podejścia "zmienna + dynamiczny getter" (np. `attack + ongoing_attack_bonus`) na pełny wzorzec **Stat Modifier**. Każda statystyka jednostki (zdrowie, atak, cast speed) stanie się osobnym obiektem (klasa `Stat`), który zarządza listą aktywnych modyfikatorów (`StatModifier` o typach FLAT i PERCENT) i automatycznie wylicza końcową wartość, co wyeliminuje ryzyko konfliktów przy nakładaniu się wielu różnych efektów.
+
+

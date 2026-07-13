@@ -111,6 +111,10 @@ func setup(p_state: RunState) -> void:
 	run_state.relics_changed.connect(func(relics: Array[RelicInstance]) -> void:
 		if relic_bar:
 			relic_bar.update_relics(relics)
+		if shop_panel:
+			shop_panel.has_unique_potential = run_state.has_unique_potential
+			# Force update of weights formatting
+			shop_panel.shop_weights = run_state.shop_weights
 	)
 	
 	load_state_from_run()
@@ -444,8 +448,7 @@ func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 		# Skip SELF target highlighting as we only want to highlight other targets
 		var current_target: UnitModifier.TargetType = modifier.get_target(unit_card.unit_instance.level)
 		if current_target != UnitModifier.TargetType.SELF:
-			var has_core: bool = run_state.has_magnetic_core if run_state else false
-			var target_indices: Array[int] = TargetResolver.get_target_indices(idx, current_target, has_core)
+			var target_indices: Array[int] = TargetResolver.get_target_indices(idx, current_target, run_state.has_magnetic_core, run_state.has_focusing_lens)
 			for t_idx: int in target_indices:
 				if t_idx < active_slots.size():
 					active_slots[t_idx].set_target_highlight(true)
@@ -497,9 +500,8 @@ func _on_slot_drag_hover_started(slot: ShopCardSlot, data: Dictionary) -> void:
 	var current_target: UnitModifier.TargetType = modifier.get_target(unit.level)
 	if current_target == UnitModifier.TargetType.SELF:
 		return
-		
-	var has_core: bool = run_state.has_magnetic_core if run_state else false
-	var target_indices: Array[int] = TargetResolver.get_target_indices(slot.slot_index, current_target, has_core)
+
+	var target_indices: Array[int] = TargetResolver.get_target_indices(slot.slot_index, current_target, run_state.has_magnetic_core, run_state.has_focusing_lens)
 	for t_idx: int in target_indices:
 		if t_idx < active_slots.size():
 			active_slots[t_idx].set_target_highlight(true)
@@ -573,6 +575,7 @@ func load_state_from_run() -> void:
 	
 	# Update shop level and chance weights in the shop panel
 	shop_panel.shop_level = run_state.shop_level
+	shop_panel.has_unique_potential = run_state.has_unique_potential
 	shop_panel.shop_weights = run_state.shop_weights
 	
 	# Ensure active team and bench size matches expectations

@@ -4,7 +4,8 @@ extends Resource
 enum Trigger {
 	ON_CAST,
 	ON_BATTLE_START,
-	ON_TAKE_DAMAGE
+	ON_TAKE_DAMAGE,
+	ONGOING
 }
 
 enum TargetType {
@@ -38,16 +39,13 @@ func get_trigger_name(p_trigger: Trigger = trigger) -> String:
 			name = "On Battle Start"
 		Trigger.ON_TAKE_DAMAGE:
 			name = "On Take Damage"
+		Trigger.ONGOING:
+			name = "Ongoing"
 
 	return "[color=%s]%s[/color]" % [GameColors.DESC_TRIGGER, name]
 
 func get_target(_p_level: int = 1) -> TargetType:
 	return target
-
-func get_modifier_value(_p_level: int = 1) -> float:
-	push_error("Abstract method get_modifier_value() must be overridden in subclass of UnitModifier!")
-	assert(false, "Subclass must override get_modifier_value()")
-	return 0.0
 
 func get_description(_p_level: int = 1) -> String:
 	push_error("Abstract method get_description() must be overridden in subclass of UnitModifier!")
@@ -56,3 +54,6 @@ func get_description(_p_level: int = 1) -> String:
 
 func get_implied_keywords() -> Array[String]:
 	return []
+
+func apply_ongoing(_source_idx: int, _team_obj: BattleTeamModel, _opponent: BattleTeamModel) -> void:
+	pass

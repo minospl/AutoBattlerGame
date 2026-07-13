@@ -18,7 +18,7 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	var buff: int = int(get_modifier_value(current_level))
 	
 	var current_target: TargetType = get_target(current_level)
-	for idx: int in TargetResolver.get_target_indices(source_idx, current_target, team_obj.has_magnetic_core):
+	for idx: int in TargetResolver.get_target_indices(source_idx, current_target, team_obj.has_magnetic_core, team_obj.has_focusing_lens):
 		team_obj.buff_unit_attack(idx, buff, false)
 
 func get_description(p_level: int = 1) -> String:

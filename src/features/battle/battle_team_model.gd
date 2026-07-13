@@ -28,6 +28,7 @@ var cast_timers: Array[float] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 var active_relics: Array[RelicInstance] = []
 var has_magnetic_core: bool = false
+var has_focusing_lens: bool = false
 
 var max_health: int = 0
 var health: int = 0

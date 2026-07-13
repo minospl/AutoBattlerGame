@@ -3,10 +3,18 @@ extends Object
 
 ## Given the source index in the active team (0-5) and a TargetType,
 ## returns an array of target slot indices in the active team.
-static func get_target_indices(source_idx: int, target_type: UnitModifier.TargetType, has_magnetic_core: bool = false) -> Array[int]:
+static func get_target_indices(source_idx: int, target_type: UnitModifier.TargetType, has_magnetic_core: bool = false, has_focusing_lens: bool = false) -> Array[int]:
 	if has_magnetic_core and target_type == UnitModifier.TargetType.ADJACENT:
 		target_type = UnitModifier.TargetType.ALL
 		
+	if has_focusing_lens:
+		if target_type == UnitModifier.TargetType.LEFT:
+			target_type = UnitModifier.TargetType.LEFT_PLUS
+		elif target_type == UnitModifier.TargetType.RIGHT:
+			target_type = UnitModifier.TargetType.RIGHT_PLUS
+		elif target_type == UnitModifier.TargetType.HORIZONTAL:
+			target_type = UnitModifier.TargetType.HORIZONTAL_PLUS
+			
 	var targets: Array[int] = []
 	
 	var row: int = floori(source_idx / 3.0)
