@@ -196,6 +196,8 @@ func trigger_battle_start() -> void:
 	for i: int in range(MAX_TEAM_SIZE):
 		if player_team.units[i]:
 			ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
+		if enemy_team.units[i]:
+			ModifierEngine.trigger_unit_modifier(i, enemy_team, UnitModifier.Trigger.ON_BATTLE_START)
 			
 	# Trigger player relics on_battle_start
 	for relic: RelicInstance in player_team.active_relics:

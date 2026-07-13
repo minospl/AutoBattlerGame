@@ -98,19 +98,21 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 10. Powielona inicjalizacja shadera efektu wizualnego (DRY Violation)
+### 10. [POMINIĘTE] Powielona inicjalizacja shadera efektu wizualnego (DRY Violation)
 - **Lokalizacja:** [card_tooltip.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_tooltip.gd), linie 200–203 oraz 222–225, funkcja `update_sprite`
 - **Krytyczne pytania & Problem:** Dlaczego ten sam kod tworzenia `ShaderMaterial` i przypisywania shadera `CHROMA_KEY_SHADER` występuje dwukrotnie wewnątrz tej samej metody?
 - **Logiczne uzasadnienie:** Powoduje to niepotrzebne powielenie kodu (DRY Violation). Dodatkowo, shader ten mógłby zostać przypisany raz na stałe w edytorze bezpośrednio do właściwości `material` węzła `sprite_rect` w pliku `.tscn`.
 - **Sugerowana zmiana:** Usuń dynamiczną kreację shadera z funkcji `update_sprite()` i przypisz `chroma_key.gdshader` jako domyślny materiał węzła w scenie `card_tooltip.tscn`.
+- **Status:** **[POMINIĘTE]** Krok pominięty na życzenie użytkownika. Klasa `CardTooltip` zostanie w przyszłości w pełni zrestrukturyzowana i rozbita na trzy oddzielne klasy tooltips (`UnitTooltip`, `ItemTooltip`, `RelicTooltip`), co naturalnie rozwiąże problem spójności i powielania.
 
 ---
 
-### 11. Ograniczenie bazy słów kluczowych (Keyword Database) wyłącznie do jednostek
+### 11. [POMINIĘTE] Ograniczenie bazy słów kluczowych (Keyword Database) wyłącznie do jednostek
 - **Lokalizacja:** [card_tooltip.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_tooltip.gd), linie 73–75 oraz 83–85, funkcje `setup_for_item` i `setup_for_relic`
 - **Krytyczne pytania & Problem:** Dlaczego przy wyświetlaniu tooltipu dla reliktu lub przedmiotu całkowicie pomijane jest generowanie słów kluczowych?
 - **Logiczne uzasadnienie:** Niektóre relikty i przedmioty nakładają na drużynę statusy takie jak trucizna (`Poison`) czy oparzenie (`Burn`). Ponieważ jednak baza słów kluczowych `KeywordDatabase` obsługuje wyłącznie jednostki (`get_keywords_for_unit`), to gracz po najechaniu na relikt nakładający oparzenie (np. Fire Opal) nie otrzyma podglądu z wyjaśnieniem, czym jest i jak działa status "Burn".
 - **Sugerowana zmiana:** Zrefaktoryzuj `KeywordDatabase`, aby mogła przyjmować instancję dowolnego modyfikatora i ekstrahować z niego powiązane słowa kluczowe (np. poprzez sprawdzenie metody `get_implied_keywords()` na modyfikatorze reliktu).
+- **Status:** **[POMINIĘTE / PRZENIESIONE]** Krok pominięty ze względu na planowany w przyszłości podział `CardTooltip` na dedykowane klasy. Podczas rozbicia na `UnitTooltip`, `ItemTooltip` i `RelicTooltip`, należy wdrożyć skanowanie opisu tekstowego przedmiotu/reliktu (poszukiwanie słów takich jak *Poison*, *Burn*, *Shield* itp. w opisie) w celu dynamicznego dołączania odpowiednich paneli słów kluczowych.
 
 ---
 
@@ -123,7 +125,7 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 13. Modyfikatory "On Battle Start" nie odpalają się dla przeciwnej drużyny (Enemy Team)
+### 13. [ROZWIĄZANE] Modyfikatory "On Battle Start" nie odpalają się dla przeciwnej drużyny (Enemy Team)
 - **Lokalizacja:** [battle_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_scene.gd), funkcja `trigger_battle_start()` (linia 194)
 - **Krytyczne pytania & Problem:** Dlaczego w momencie rozpoczęcia walki modyfikatory typu `ON_BATTLE_START` są wyzwalane wyłącznie dla drużyny gracza (`player_team`), a drużyna przeciwna (`enemy_team`) jest całkowicie pomijana?
 - **Logiczne uzasadnienie:** Jeśli przeciwnik posiada w swojej drużynie potwory ze zdolnościami aktywowanymi na początku walki (np. Wild Wolf, który daje sąsiednim jednostkom buffa do ataku), zdolności te nigdy się nie uruchamiają dla przeciwnika. Sprawia to, że walka z wrogiem posiadającym takie jednostki nie odzwierciedla poprawnie jego faktycznej siły bojowej.
@@ -135,3 +137,4 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
       if enemy_team.units[i]:
           ModifierEngine.trigger_unit_modifier(i, enemy_team, UnitModifier.Trigger.ON_BATTLE_START)
   ```
+- **Status:** **[ROZWIĄZANE]** Zmodyfikowano funkcję `trigger_battle_start()` w `battle_scene.gd`, dołączając wywoływanie modyfikatorów `ON_BATTLE_START` dla jednostek wrogiej drużyny (`enemy_team`), co gwarantuje pełną zgodność symulacji po obu stronach pola bitwy.
