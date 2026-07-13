@@ -65,7 +65,7 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 7. Niepotrzebna dynamiczna alokacja Callable w krytycznej ścieżce wyszukiwania celów
+### 7. [ROZWIĄZANE] Niepotrzebna dynamiczna alokacja Callable w krytycznej ścieżce wyszukiwania celów
 - **Lokalizacja:** [target_resolver.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/target_resolver.gd), linie 24–27, zmienna lokalna `get_idx`
 - **Krytyczne pytania & Problem:** Dlaczego wewnątrz metody statycznej `get_target_indices` deklarowana jest lokalna lambda `get_idx: Callable` przy każdym wywołaniu funkcji?
 - **Logiczne uzasadnienie:** Metoda `get_target_indices` jest wywoływana bardzo często (np. przy rysowaniu linii celowania, hoverowaniu kart, symulacji walki). Alokowanie nowej lambdy w pamięci przy każdym jej wywołaniu narzuca niepotrzebny koszt wydajnościowy.
@@ -76,6 +76,7 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
           return r * 3 + c
       return -1
   ```
+- **Status:** **[ROZWIĄZANE]** Usunięto lokalną lambdę `get_idx` z wnętrza metody `get_target_indices` i zaimplementowano ją jako prywatną, statyczną funkcję `_get_idx`. Wszystkie wywołania `get_idx.call(...)` zostały zastąpione bezpośrednimi wywołaniami `_get_idx(...)`, co całkowicie usuwa dynamiczną alokację w krytycznej ścieżce wydajnościowej.
 
 ---
 

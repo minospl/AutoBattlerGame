@@ -9,73 +9,66 @@ static func get_target_indices(source_idx: int, target_type: UnitModifier.Target
 		
 	var targets: Array[int] = []
 	
-	# Active team is a 2x3 grid:
-	# Row 0: Slots 0, 1, 2 (top)
-	# Row 1: Slots 3, 4, 5 (bottom)
 	var row: int = floori(source_idx / 3.0)
 	var col: int = source_idx % 3
 	
-	var row_up: int = row - 1
-	var row_down: int = row + 1
-	var col_left: int = col - 1
-	var col_right: int = col + 1
-	
-	# Helper to get slot index at (r, c)
-	var get_idx: Callable = func(r: int, c: int) -> int:
-		if r >= 0 and r < 2 and c >= 0 and c < 3:
-			return r * 3 + c
-		return -1
-		
-	var left: int = -1
-	var right: int = -1
-	var up: int = -1
-	var down: int = -1
 	match target_type:
 		UnitModifier.TargetType.SELF:
 			targets.append(source_idx)
+			
 		UnitModifier.TargetType.UP:
-			up = get_idx.call(row_up, col)
+			_append_if_valid(targets, _get_idx(row - 1, col))
+			
 		UnitModifier.TargetType.DOWN:
-			down = get_idx.call(row_down, col)
+			_append_if_valid(targets, _get_idx(row + 1, col))
+			
 		UnitModifier.TargetType.VERTICAL:
-			up = get_idx.call(row_up, col)
-			down = get_idx.call(row_down, col)
+			_append_if_valid(targets, _get_idx(row - 1, col))
+			_append_if_valid(targets, _get_idx(row + 1, col))
+			
 		UnitModifier.TargetType.LEFT:
-			left = get_idx.call(row, col_left)
+			_append_if_valid(targets, _get_idx(row, col - 1))
+			
 		UnitModifier.TargetType.LEFT_PLUS:
 			for c: int in range(col):
-				var target_idx: int = get_idx.call(row, c)
-				if target_idx != -1:
-					targets.append(target_idx)
+				_append_if_valid(targets, _get_idx(row, c))
+				
 		UnitModifier.TargetType.RIGHT:
-			right = get_idx.call(row, col_right)
+			_append_if_valid(targets, _get_idx(row, col + 1))
+			
 		UnitModifier.TargetType.RIGHT_PLUS:
 			for c: int in range(col + 1, 3):
-				var target_idx: int = get_idx.call(row, c)
-				if target_idx != -1:
-					targets.append(target_idx)
+				_append_if_valid(targets, _get_idx(row, c))
+				
 		UnitModifier.TargetType.HORIZONTAL:
-			left = get_idx.call(row, col_left)
-			right = get_idx.call(row, col_right)
+			_append_if_valid(targets, _get_idx(row, col - 1))
+			_append_if_valid(targets, _get_idx(row, col + 1))
+			
 		UnitModifier.TargetType.HORIZONTAL_PLUS:
 			for c: int in range(3):
 				if c != col:
-					var target_idx: int = get_idx.call(row, c)
-					if target_idx != -1:
-						targets.append(target_idx)
+					_append_if_valid(targets, _get_idx(row, c))
+					
 		UnitModifier.TargetType.ADJACENT:
-			left = get_idx.call(row, col_left)
-			right = get_idx.call(row, col_right)
-			up = get_idx.call(row_up, col)
-			down = get_idx.call(row_down, col)
+			_append_if_valid(targets, _get_idx(row, col - 1))
+			_append_if_valid(targets, _get_idx(row, col + 1))
+			_append_if_valid(targets, _get_idx(row - 1, col))
+			_append_if_valid(targets, _get_idx(row + 1, col))
+			
 		UnitModifier.TargetType.ALL:
 			for i: int in range(6):
 				if i != source_idx:
 					targets.append(i)
-	
-	if left != -1: targets.append(left)
-	if right != -1: targets.append(right)
-	if up != -1: targets.append(up)
-	if down != -1: targets.append(down)
 					
 	return targets
+
+static func _append_if_valid(targets: Array[int], slot_idx: int) -> void:
+	if slot_idx != -1:
+		targets.append(slot_idx)
+
+## Helper to get slot index at grid coordinate (r, c) on a 2x3 active team grid.
+## Returns -1 if coordinates are out of bounds.
+static func _get_idx(r: int, c: int) -> int:
+	if r >= 0 and r < 2 and c >= 0 and c < 3:
+		return r * 3 + c
+	return -1
