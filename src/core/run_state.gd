@@ -519,8 +519,8 @@ func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 		# Filter by rarity if requested
 		if p_rarity and (not relic.rarity or relic.rarity.rarity_name != p_rarity.rarity_name):
 			continue
-		# Filter out unique relics that are already owned
-		if relic.is_unique and has_relic(relic.relic_name):
+		# Filter out unique relics (those with UNIQUE rarity) that are already owned
+		if relic.rarity.rarity_name == "Unique" and has_relic(relic.relic_name):
 			continue
 		available.append(relic)
 	return available
