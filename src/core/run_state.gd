@@ -531,3 +531,28 @@ func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 			continue
 		available.append(relic)
 	return available
+
+func reset_for_new_run(p_lives: int = 10, p_day: int = 4, p_trophies: int = 3, p_gold: int = 10) -> void:
+	lives = p_lives
+	day = p_day
+	trophies = p_trophies
+	gold = p_gold
+	relics.clear()
+	has_magnetic_core = false
+	price_modifiers.clear()
+	shop_weights_modifiers.clear()
+	relics_changed.emit(relics)
+	
+	# Clear active team and bench
+	for i: int in range(active_team.size()):
+		active_team[i] = null
+	for i: int in range(bench.size()):
+		bench[i] = null
+		
+	# Reset shop cards and frozen statuses
+	for i: int in range(shop_cards.size()):
+		shop_cards[i] = null
+	shop_frozen_statuses.fill(false)
+	
+	# Roll the shop for free
+	roll_shop(true)

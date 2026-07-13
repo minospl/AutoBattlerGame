@@ -250,25 +250,9 @@ func _on_add_relic_requested() -> void:
 		run_state.add_relic(relic_inst)
 
 func _on_restart_requested() -> void:
-	# 1. Clear team and bench slots
-	clear_all()
-	
-	# 2. Reset header bar values, relics and modifiers to starting position (via Model)
-	if run_state:
-		run_state.lives = 10
-		run_state.day = 4
-		run_state.trophies = 3
-		run_state.relics.clear()
-		run_state.has_magnetic_core = false
-		run_state.price_modifiers.clear()
-		run_state.shop_weights_modifiers.clear()
-		run_state.relics_changed.emit(run_state.relics)
-	
-
-	# 4. Reset gold to 10 and roll the shop for free (via Model)
-	if run_state:
-		run_state.gold = 10
-		run_state.roll_shop(true)
+	run_state.reset_for_new_run()
+	populate_ui()
+	team_state_changed.emit()
 
 func _on_team_state_changed() -> void:
 	pass

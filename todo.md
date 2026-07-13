@@ -26,11 +26,12 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 3. Złamanie zasady separacji Model-View-Controller w logice resetowania gry
+### 3. [ROZWIĄZANE] Złamanie zasady separacji Model-View-Controller w logice resetowania gry
 - **Lokalizacja:** [shop_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd), linie 263–274, funkcja `_on_restart_requested`
 - **Krytyczne pytania & Problem:** Dlaczego kontroler interfejsu sklepu bezpośrednio modyfikuje wewnętrzne tablice i stany modelu rozgrywki (`RunState`), czyszcząc modyfikatory ceny oraz wag i ręcznie emitując sygnały stanu?
 - **Logiczne uzasadnienie:** Klasa `ShopScene` powinna być wyłącznie widokiem/kontrolerem prezentacji. Bezpośrednie czyszczenie pól `run_state.relics.clear()`, `run_state.price_modifiers.clear()`, `run_state.shop_weights_modifiers.clear()` i samodzielne wywoływanie `run_state.relics_changed.emit()` łamie zasadę hermetyzacji. Jeśli w przyszłości struktura danych `RunState` ulegnie zmianie, poprawki będą musiały być nanoszone bezpośrednio w skryptach UI sklepu.
 - **Sugerowana zmiana:** Przenieś całą logikę czyszczenia i resetu stanu do dedykowanej metody wewnątrz `RunState` (np. `run_state.reset_for_new_run()`), która zajmie się modyfikacją stanu i wyemituje powiązane sygnały. W `shop_scene.gd` wywołuj wyłącznie tę jedną metodę.
+- **Status:** **[ROZWIĄZANE]** Przeniesiono całą logikę resetowania stanu gry (czyszczenie atrybutów, reliktów, modyfikatorów, wyczyszczenie tablic drużyny/ławki oraz darmowy roll sklepu) do nowej metody `RunState.reset_for_new_run()`. Kontroler `ShopScene` wywołuje teraz wyłącznie tę metodę, a następnie odświeża interfejs.
 
 ---
 
