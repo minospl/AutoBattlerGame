@@ -53,7 +53,7 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 6. Programowe tworzenie przycisku reliktu oraz obejście systemu typów dekoratora
+### 6. [ROZWIĄZANE] Programowe tworzenie przycisku reliktu oraz obejście systemu typów dekoratora
 - **Lokalizacja:** [shop_header_bar.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_header_bar.gd), linie 44–61, funkcja `_ready`
 - **Krytyczne pytania & Problem:** Dlaczego przycisk "Add Random Relic" oraz jego dekorator (`GameButtonDecorator`) są tworzone i konfigurowane programowo w kodzie (w dodatku z użyciem `load()` i `set_script()`), zamiast zostać dodane bezpośrednio w scenie `shop_header_bar.tscn`?
 - **Logiczne uzasadnienie:** 
@@ -61,6 +61,7 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
   2. Ręczne ładowanie skryptu z dysku i wywoływanie `set_script()` na surowym obiekcie `Node.new()` omija silny system typowania Godota (`class_name GameButtonDecorator`).
   Przeniesienie przycisku do sceny eliminuje oba te problemy jednocześnie – przycisk i jego dekorator będą zdefiniowane w scenie, a cały powiązany kod dynamiczny zostanie usunięty.
 - **Sugerowana zmiana:** Przenieś przycisk `AddRelicButton` bezpośrednio do sceny [shop_header_bar.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_header_bar.tscn) (między `AddUnitButton` a `RestartButton`), dodając do niego dziecko `GameButtonDecorator` w edytorze. W skrypcie [shop_header_bar.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_header_bar.gd) zadeklaruj go jako `@onready var add_relic_btn: Button = %AddRelicButton` i połącz jego sygnał w `_ready()`, usuwając cały blok dynamicznego tworzenia (linie 44-61).
+- **Status:** **[ROZWIĄZANE]** Przeniesiono przycisk `AddRelicButton` wraz z węzłem-dzieckiem `GameButtonDecorator` bezpośrednio do pliku sceny `shop_header_bar.tscn` w odpowiednim miejscu kontenera przycisków. W skrypcie `shop_header_bar.gd` zadeklarowano jawnie referencję `@onready var add_relic_btn: Button = %AddRelicButton` i podłączono sygnał bezpośrednio w `_ready()`, usuwając niepotrzebne, programowe instancjonowanie i błędy typowania.
 
 ---
 

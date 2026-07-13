@@ -27,6 +27,7 @@ signal battle_requested
 		_update_labels()
 
 @onready var add_btn: Button = %AddUnitButton
+@onready var add_relic_btn: Button = %AddRelicButton
 @onready var restart_btn: Button = %RestartButton
 @onready var battle_btn: Button = %StartBattleButton
 @onready var lives_label: Label = %LivesLabel
@@ -36,26 +37,9 @@ signal battle_requested
 func _ready() -> void:	
 	# Connect local button signals
 	add_btn.pressed.connect(func() -> void: add_monster_requested.emit())
+	add_relic_btn.pressed.connect(func() -> void: add_relic_requested.emit())
 	restart_btn.pressed.connect(func() -> void: restart_requested.emit())
 	battle_btn.pressed.connect(func() -> void: battle_requested.emit())
-	
-	# Instantiate and insert Add Random Relic button programmatically next to Add Random Unit button
-	var btn_container: HBoxContainer = get_node_or_null("VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer") as HBoxContainer
-	if btn_container:
-		var add_relic_btn: Button = Button.new()
-		add_relic_btn.name = "AddRelicButton"
-		add_relic_btn.text = "Add Random Relic"
-		add_relic_btn.add_theme_font_size_override("font_size", 14)
-		
-		var decorator_script: Script = load("res://src/shared/ui/decorators/game_button_decorator.gd") as Script
-		var decorator: Node = Node.new()
-		decorator.set_script(decorator_script)
-		add_relic_btn.add_child(decorator)
-		
-		btn_container.add_child(add_relic_btn)
-		btn_container.move_child(add_relic_btn, 1)
-		
-		add_relic_btn.pressed.connect(func() -> void: add_relic_requested.emit())
 	
 	# Apply visual styling programmatically to keep the presentation premium and clean
 	_apply_visual_styling()
