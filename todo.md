@@ -80,11 +80,12 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 8. Martwy kod (Zombie Properties) w RunState
+### 8. [ROZWIĄZANE] Martwy kod (Zombie Properties) w RunState
 - **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd), linie 26–27, zmienne `price_modifiers` i `shop_weights_modifiers`
 - **Krytyczne pytania & Problem:** Jaki jest sens istnienia zmiennych `price_modifiers` oraz `shop_weights_modifiers`, skoro w całym projekcie nie ma kodu dodającego do nich jakiekolwiek wartości?
 - **Logiczne uzasadnienie:** Zmienne te zajmują pamięć, są niepotrzebnie serializowane przy zapisie stanu gry, a ich czyszczenie w `shop_scene.gd` wprowadza zbędne instrukcje. W szczególności `price_modifiers` nie jest w ogóle odczytywane w logice obliczania ceny zakupu przedmiotów w sklepie.
 - **Sugerowana zmiana:** Usuń te właściwości lub przenieś je do roadmapy, aby nie zaśmiecały głównej klasy stanu gry.
+- **Status:** **[ROZWIĄZANE]** Usunięto nieużywane właściwości `price_modifiers` oraz `shop_weights_modifiers` z klasy `RunState`. Uproszczono getter `shop_weights`, który odtąd zwraca bazowe wagi bezpośrednio, oraz usunięto czyszczenie tych tablic w metodzie `reset_for_new_run()`.
 
 ---
 

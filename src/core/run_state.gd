@@ -22,9 +22,6 @@ signal relic_added(relic: RelicInstance)
 signal shop_card_generated(card: Resource)
 signal shop_rolled()
 
-var price_modifiers: Array[Callable] = []
-var shop_weights_modifiers: Array[Callable] = []
-
 var unit_templates: Array[UnitData] = []
 var item_templates: Array[ItemData] = []
 var relic_templates: Array[RelicData] = []
@@ -118,10 +115,7 @@ func get_base_shop_weights() -> Array[float]:
 
 var shop_weights: Array[float]:
 	get:
-		var weights: Array[float] = get_base_shop_weights()
-		for modifier: Callable in shop_weights_modifiers:
-			weights = modifier.call(weights)
-		return weights
+		return get_base_shop_weights()
 
 func normalize_weights(p_weights: Array[float]) -> Array[float]:
 	var total: float = 0.0
@@ -538,8 +532,6 @@ func reset_for_new_run(p_lives: int = 10, p_day: int = 4, p_trophies: int = 3, p
 	gold = p_gold
 	relics.clear()
 	has_magnetic_core = false
-	price_modifiers.clear()
-	shop_weights_modifiers.clear()
 	relics_changed.emit(relics)
 	
 	# Clear active team and bench
