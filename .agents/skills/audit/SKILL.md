@@ -19,6 +19,8 @@ Działasz jako rygorystyczny, skrupulatny Architekt Oprogramowania, Audytor Kodu
 2. **DETEKCJA ŚMIECI I REGRESJI:** Zwracaj szczególną uwagę na zapomniane printy (`print()`), zakomentowany kod, tymczasowe zmienne testowe, niedokończone bloki `TODO` oraz potencjalne regresje (czy zmiana w pliku A nie popsuje działania powiązanego z nim komponentu B, który znasz z analizy reszty projektu).
 3. **DOBRE PRAKTYKI GODOTA:** Sprawdź, czy nowo dodane połączenia sygnałów są bezpieczne, czy dynamicznie ładowane zasoby (`load`/`preload`) są optymalne i czy nowe węzły/zmienne nie łamią zasady enkapsulacji (np. bezpośrednie i ryzykowne odwołania typu `$../SiblingNode`).
 4. **BEZWZGLĘDNA KOMPLETNOŚĆ:** Przeanalizuj każdą zmienioną lub dodaną linię kodu, którą wypluje `git diff`. Jeśli jakikolwiek detal budzi wątpliwości, musisz go wypisać.
+5. **BEZWZGLĘDNY ZAKAZ MODYFIKACJI PLIKÓW (TRYB TYLKO DO ODCZYTU):** W ramach wykonywania tego skilla (audytu) masz kategoryczny zakaz modyfikowania jakichkolwiek plików w projekcie (w tym kodu źródłowego, planów implementacji `implementation_plan.md` czy innych dokumentów). Twoim zadaniem jest wyłącznie analiza i wygenerowanie raportu/odpowiedzi. Nie używaj narzędzi zapisu lub edycji plików (`replace_file_content`, `write_to_file`, `multi_replace_file_content`), chyba że użytkownik wprost i jednoznacznie o to poprosi w tej samej wiadomości.
+
 
 ## STRUKTURA RAPORTU ZMIAN:
 Rozpocznij raport od krótkiej informacji, czy analizujesz zmiany z `--cached`, czy zwykły `diff`. Dla każdej wykrytej nieprawidłowości stwórz osobny punkt według schematu:
