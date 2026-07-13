@@ -620,3 +620,22 @@ func load_state_from_run() -> void:
 
 func _on_battle_requested() -> void:
 	battle_requested.emit()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not run_state:
+		return
+		
+	var key_event: InputEventKey = event as InputEventKey
+	if key_event and key_event.pressed and not key_event.echo:
+		if key_event.keycode == KEY_R:
+			_on_roll_requested()
+			return
+			
+		if key_event.keycode == KEY_S:
+			if current_hovered_card and current_hovered_card is ShopCard:
+				var slot: ShopCardSlot = current_hovered_card.get_parent() as ShopCardSlot
+				if slot and not slot.is_shop_slot:
+					if preview_tooltip:
+						CardUIHelper.hide_tooltip(preview_tooltip)
+					_on_sell_card_requested(current_hovered_card, slot)
+					current_hovered_card = null
