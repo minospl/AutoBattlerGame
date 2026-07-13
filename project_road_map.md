@@ -42,6 +42,7 @@ Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności za
 | **Refaktor** | **[x] Model-View separation:** Zmiana architektury aktualizacji sklepu tak, aby to logiczny `RunState` decydował o zmianach, a UI tylko je odzwierciedlało (RunState jako źródło prawdy, eliminacja błędów wyścigu). Zaimplementowano reaktywne sygnały aktualizacji, a widoki sklepu i walki są całkowicie sterowane przez model. | **Krytyczny** |
 | **Refaktor** | **[x] Poprawki Modyfikatorów (Typowanie i Null-Safety):** Dostosowanie istniejących skryptów modyfikatorów do ścisłego typowania w Godot 4.7 (bezpieczne rzutowanie `as UnitInstance` oraz guard clauses dla wartości `null` na wejściu). | **Krytyczny** |
 | **Mechanika** | **[x] Relikty / Przedmioty Pasywne:** Rozbudowa systemu o relikty (pasywne modyfikatory wpływające globalnie na rozgrywkę/walkę). | Opcjonalny |
+| **UI / UX** | **Galeria / Kompendium (Lista jednostek/przedmiotów/reliktów):** Nowa scena prezentująca listę wszystkich istniejących w grze jednostek, przedmiotów oraz reliktów wraz z ich statystykami i opisami (np. tymczasowo dostepna z widoku sklepu). | Opcjonalny |
 
 ---
 
