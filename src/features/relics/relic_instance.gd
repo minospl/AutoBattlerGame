@@ -17,3 +17,9 @@ static func has_relic(relic_list: Array[RelicInstance], p_name: String) -> bool:
 		if r and r.data and r.data.relic_name == p_name:
 			return true
 	return false
+
+func clone() -> RelicInstance:
+	var new_inst: RelicInstance = RelicInstance.new()
+	new_inst.data = data
+	new_inst.stacks = stacks
+	return new_inst

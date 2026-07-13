@@ -12,6 +12,7 @@ Podczas edycji i analizy kodu zawsze przestrzegaj tych zasad:
     * **Brak Ślepego Kopiowania (No Boilerplate):** Kopiując wzorce, zawsze upewnij się, że obiekt docelowy potrzebuje wszystkich tych mechanik (nie twórz nadmiarowych metod i pól).
     * **Zgodność Stylistyczna:** Wszystkie nowo generowane opisy, wartości i teksty UI muszą zachować formatowanie spójne z istniejącymi elementami (np. używanie jednolitych tagów formatowania tekstu i kolorów).
     * **Ujednolicone Szablony UI:** Wszelkie generyczne węzły i szablony w plikach `.tscn` (np. powielane w pętli) muszą mieć ogólne nazwy klasowe/funkcjonalne, a nie powiązane z konkretnymi wariantami danych.
+* **Eliminacja nadmiarowych warunków (Redundant defensive checks):** Unikaj pisania redundantnych/nadgorliwych sprawdzeń `if` i `null` w miejscach, w których logika systemu, pre-filtrowanie lub statyczny stan gry gwarantują obecność obiektu (np. pętle po tablicach bez pustych wartości, wywołania wewnętrzne metod z przekazanym `self`, czy sprawdzone wcześniej sloty). Każdy warunek obronny musi mieć realne, logiczne uzasadnienie (np. dynamicznie wczytywane zasoby z zewnątrz, konfiguracja `@export` w inspektorze) – w przeciwnym wypadku pomijaj je, aby nie zaciemniać kodu.
 
 ## 1. Czym jest ten projekt?
 **AutoBattlerDungeonGame** to gra typu auto-battler z elementami dungeon crawler, rozwijana w silniku **Godot 4.7 (Forward Plus)** przy użyciu języka **GDScript**.

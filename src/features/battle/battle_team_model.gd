@@ -103,12 +103,11 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 	for i: int in range(MAX_TEAM_SIZE):
 		if i < num_units and new_units[i]:
 			var inst: UnitInstance = new_units[i]
-			var battle_inst: BattleUnitInstance = BattleUnitInstance.new()
-			battle_inst.initialize_battle_unit(inst)
-			units[i] = battle_inst
-			health += battle_inst.get_max_health()
-			max_health += battle_inst.get_max_health()
-			shield += battle_inst.shield
+			var battle_unit_instace: BattleUnitInstance = BattleUnitInstance.new()
+			battle_unit_instace.initialize_battle_unit(inst)
+			units[i] = battle_unit_instace
+			health += battle_unit_instace.get_max_health()
+			max_health += battle_unit_instace.get_max_health()
 		else:
 			units[i] = null
 			
@@ -162,29 +161,36 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 			
 	if actual_dmg <= 0:
 		return
+		
+	# Determine health damage popup color (red for health damage, status colors if applicable)
 	var text_color: Color = Color(GameColors.DESC_ATTACK) # default red
-	
 	if damage_type == "poison":
 		text_color = Color(GameColors.DESC_POISON)
 	elif damage_type == "burn":
 		text_color = Color(GameColors.DESC_BURN)
 	else:
-		# physical
-		if is_enemy:
-			text_color = GameColors.WHITE_COLOR
-		else:
-			text_color = Color(GameColors.DESC_ATTACK)
+		text_color = Color(GameColors.DESC_ATTACK)
 			
-	# Apply shield absorption
+	# Apply shield absorption and compute split damage for visual presentation
+	var damage_to_shield: int = 0
+	var damage_to_health: int = 0
+	
 	if shield >= actual_dmg:
+		damage_to_shield = actual_dmg
 		shield -= actual_dmg
 	else:
-		var remaining_dmg: int = actual_dmg - shield
+		damage_to_shield = shield
+		damage_to_health = actual_dmg - shield
 		shield = 0
-		health -= remaining_dmg
+		health -= damage_to_health
 		
 	health_changed.emit(health, max_health, shield)
-	floating_text_requested.emit("-" + NumberFormatter.format_large_number(actual_dmg), text_color, SpawnTarget.TEAM_HEALTH_BAR, 0)
+	
+	# Emit floating text popups: gray for shield hit, red/status-color for health hit
+	if damage_to_shield > 0:
+		floating_text_requested.emit("-" + NumberFormatter.format_large_number(damage_to_shield), Color(GameColors.DESC_SHIELD), SpawnTarget.TEAM_HEALTH_BAR, 0)
+	if damage_to_health > 0:
+		floating_text_requested.emit("-" + NumberFormatter.format_large_number(damage_to_health), text_color, SpawnTarget.TEAM_HEALTH_BAR, 0)
 	
 	if damage_type == "physical":
 		for i: int in range(MAX_TEAM_SIZE):
@@ -314,8 +320,6 @@ func add_unit_shield(slot_idx: int, amount: int, permanent: bool = false) -> voi
 		b_unit.shield += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.shield += amount
-	shield += amount
-	health_changed.emit(health, max_health, shield)
 	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Shield", Color(GameColors.DESC_SHIELD))
 	unit_stats_changed.emit(slot_idx)
 

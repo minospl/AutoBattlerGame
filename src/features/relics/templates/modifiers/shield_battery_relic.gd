@@ -14,4 +14,4 @@ func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, _e
 func get_description(relic_inst: RelicInstance = null) -> String:
 	var current_stacks: int = relic_inst.stacks if relic_inst else 1
 	var total_shield: int = shield_per_cast * current_stacks
-	return "Whenever an ally casts, give them [color=%s]+%d Shield[/color]." % [GameColors.DESC_SHIELD, total_shield]
+	return "Whenever an ally casts, give them [color=%s]+%d Shield[/color] for this battle." % [GameColors.DESC_SHIELD, total_shield]

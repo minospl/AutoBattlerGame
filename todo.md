@@ -89,11 +89,12 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 9. Bezpośrednie przekazywanie mutowalnych referencji stanu do symulacji walki
+### 9. [ROZWIĄZANE] Bezpośrednie przekazywanie mutowalnych referencji stanu do symulacji walki
 - **Lokalizacja:** [battle_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_scene.gd), linie 206–207, funkcja `load_battle_team`
 - **Krytyczne pytania & Problem:** Dlaczego usunięto klonowanie reliktów i przypisano tablicę reliktów z `RunState` bezpośrednio jako referencję do `player_team.active_relics = run_state.relics`?
 - **Logiczne uzasadnienie:** Jeśli dowolny relikt lub jego stan (np. liczba ładunków, wewnętrzne zmienne dynamiczne modyfikatora) ulegnie zmianie w trakcie symulacji walki, zmiana ta bezpośrednio zmodyfikuje stan całej rozgrywki (`RunState`). Ponadto, jeśli w walce podłączane są jakiekolwiek sygnały do instancji reliktów (lub ich modyfikatorów), to powrót do sklepu pozostawi te połączenia aktywne.
 - **Sugerowana zmiana:** Przywróć klonowanie instancji reliktów przed rozpoczęciem symulacji walki, aby zagwarantować pełną izolację środowiska bitwy od stanu rozgrywki.
+- **Status:** **[ROZWIĄZANE]** Dodano metodę `clone()` w `RelicInstance` i refaktoryzowano funkcję `load_battle_team()` w `BattleScene`, aby klonowała każdą instancję reliktu przed przekazaniem jej do symulacji walki. Zapewnia to pełną izolację stanu walki od stałego stanu gry.
 
 ---
 

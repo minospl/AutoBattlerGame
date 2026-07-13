@@ -149,9 +149,12 @@ func load_battle_team() -> void:
 
 	player_team.load_team_units(player_units)
 	
-	# Direct reference to player relics from run_state
+	# Clone player relics from run_state to isolate battle simulation state
 	if run_state:
-		player_team.active_relics = run_state.relics
+		var cloned_relics: Array[RelicInstance] = []
+		for relic: RelicInstance in run_state.relics:
+			cloned_relics.append(relic.clone())
+		player_team.active_relics = cloned_relics
 		player_team.has_magnetic_core = run_state.has_magnetic_core
 	else:
 		player_team.active_relics = []
