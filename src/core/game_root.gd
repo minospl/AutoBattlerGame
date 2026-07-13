@@ -27,40 +27,48 @@ func _ready() -> void:
 	_go_to_shop()
 
 func _load_unit_templates() -> void:
-	unit_templates = [
-		preload("res://src/features/units/templates/red_dragon.tres"),
-		preload("res://src/features/units/templates/forest_guardian.tres"),
-		preload("res://src/features/units/templates/wild_wolf.tres"),
-		preload("res://src/features/units/templates/river_crab.tres"),
-		preload("res://src/features/units/templates/spellweaver.tres"),
-		preload("res://src/features/units/templates/vitality_druid.tres"),
-		preload("res://src/features/units/templates/ancient_titan.tres"),
-		preload("res://src/features/units/templates/chronomancer.tres"),
-		preload("res://src/features/units/templates/golden_beetle.tres")
-	]
+	unit_templates.clear()
+	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/units/templates/")
+	for res: Resource in resources:
+		if res is UnitData:
+			unit_templates.append(res as UnitData)
 
 func _load_item_templates() -> void:
-	item_templates = [
-		preload("res://src/features/items/templates/apple.tres") as ItemData,
-		preload("res://src/features/items/templates/sword.tres") as ItemData,
-		preload("res://src/features/items/templates/common_relic_chest.tres") as ItemData,
-		preload("res://src/features/items/templates/rare_relic_chest.tres") as ItemData,
-		preload("res://src/features/items/templates/epic_relic_chest.tres") as ItemData,
-		preload("res://src/features/items/templates/legendary_relic_chest.tres") as ItemData
-	]
+	item_templates.clear()
+	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/items/templates/")
+	for res: Resource in resources:
+		if res is ItemData:
+			item_templates.append(res as ItemData)
 
 func _load_relic_templates() -> void:
-	relic_templates = [
-		preload("res://src/features/relics/templates/cursed_doll.tres") as RelicData,
-		preload("res://src/features/relics/templates/iron_shield.tres") as RelicData,
-		preload("res://src/features/relics/templates/healing_herb.tres") as RelicData,
-		preload("res://src/features/relics/templates/poisonous_fangs.tres") as RelicData,
-		preload("res://src/features/relics/templates/thiefs_glove.tres") as RelicData,
-		preload("res://src/features/relics/templates/golden_touch.tres") as RelicData,
-		preload("res://src/features/relics/templates/fire_opal.tres") as RelicData,
-		preload("res://src/features/relics/templates/shield_battery.tres") as RelicData,
-		preload("res://src/features/relics/templates/magnetic_core.tres") as RelicData
-	]
+	relic_templates.clear()
+	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/relics/templates/")
+	for res: Resource in resources:
+		if res is RelicData:
+			relic_templates.append(res as RelicData)
+
+func _load_resources_from_dir(path: String) -> Array[Resource]:
+	var list: Array[Resource] = []
+	var dir: DirAccess = DirAccess.open(path)
+	if not dir:
+		printerr("Failed to open directory: ", path)
+		return list
+		
+	dir.list_dir_begin()
+	var file_name: String = dir.get_next()
+	while file_name != "":
+		if not dir.current_is_dir():
+			if file_name.ends_with(".tres") or file_name.ends_with(".res") or file_name.ends_with(".tres.remap") or file_name.ends_with(".res.remap"):
+				var clean_name: String = file_name
+				if file_name.ends_with(".remap"):
+					clean_name = file_name.left(file_name.length() - 6)
+				
+				var res: Resource = load(path + clean_name)
+				if res:
+					list.append(res)
+		file_name = dir.get_next()
+	dir.list_dir_end()
+	return list
 
 func _initialize_new_run() -> void:
 	run_state = RunState.new()

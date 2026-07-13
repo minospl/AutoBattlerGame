@@ -44,11 +44,12 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 5. Brak skalowalności i sztywno zakodowane ładowanie zasobów (Resource Eager Loading)
+### 5. [ROZWIĄZANE] Brak skalowalności i sztywno zakodowane ładowanie zasobów (Resource Eager Loading)
 - **Lokalizacja:** [game_root.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/game_root.gd), linie 40–60, funkcje `_load_item_templates` i `_load_relic_templates`
 - **Krytyczne pytania & Problem:** Czy ładowanie każdego szablonu przedmiotu i reliktu na stałe w kodzie za pomocą `preload()` jest skalowalne?
 - **Logiczne uzasadnienie:** Jeśli projekt rozrośnie się do dużej liczby przedmiotów i reliktów, lista `preload` w `game_root.gd` stanie się olbrzymia, a silnik będzie musiał załadować wszystkie te zasoby do pamięci RAM już podczas uruchamiania gry.
 - **Sugerowana zmiana:** Zaimplementuj dynamiczne skanowanie katalogu z zasobami (przy użyciu klasy `DirAccess`) lub stwórz jeden główny plik bazy danych zasobów (`ItemDatabase.tres`, `RelicDatabase.tres`), który będzie ładowany leniwie (Lazy Loading) lub w tle.
+- **Status:** **[ROZWIĄZANE]** Zastąpiono sztywne listy preloadów dynamicznym skanowaniem folderów z szablonami za pomocą `DirAccess`. Dodano pomocnika w `GameRoot`, który ładuje wszystkie zasoby (obsługując poprawnie formaty `.remap` w wyeksportowanych buildach) i bezpiecznie filtruje je według typów (`UnitData`, `ItemData`, `RelicData`), co gwarantuje pełną skalowalność.
 
 ---
 

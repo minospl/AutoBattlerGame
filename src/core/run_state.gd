@@ -10,7 +10,6 @@ func _init() -> void:
 	if bench.is_empty():
 		bench.resize(MAX_BENCH_SIZE)
 
-
 signal gold_changed(p_gold: int)
 signal lives_changed(p_lives: int)
 signal day_changed(p_day: int)
