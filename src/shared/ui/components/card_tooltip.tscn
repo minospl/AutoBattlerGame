@@ -155,6 +155,7 @@ columns = 2
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/default_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
 theme_override_constants/outline_size = 5

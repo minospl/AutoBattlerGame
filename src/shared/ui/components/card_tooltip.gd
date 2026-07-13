@@ -257,15 +257,10 @@ func update_stats() -> void:
 	if not _unit_instance:
 		return
 		
-	# Clear old children in stats_grid
-	for child: Node in stats_grid.get_children():
-		child.queue_free()
-		
 	var active_stats: PackedStringArray = PackedStringArray()
 	active_stats.append("%s [color=%s]HP[/color]" % [NumberFormatter.format_large_number(_unit_instance.get_max_health()), GameColors.DESC_HEALTH])
 
-	var cs_val: float = _unit_instance.get_cast_speed()
-	active_stats.append(str(cs_val).trim_suffix(".0") + " [color=%s]CD[/color]" % GameColors.DESC_CAST_SPEED)
+	active_stats.append(str(_unit_instance.get_cast_speed()).trim_suffix(".0") + " [color=%s]CD[/color]" % GameColors.DESC_CAST_SPEED)
 
 	if _unit_instance.get_attack() > 0:
 		active_stats.append("%s [color=%s]ATK[/color]" % [NumberFormatter.format_large_number(_unit_instance.get_attack()), GameColors.DESC_ATTACK])
@@ -280,28 +275,27 @@ func update_stats() -> void:
 	if _unit_instance.electrocute > 0:
 		active_stats.append("%s [color=%s]ELEC[/color]" % [NumberFormatter.format_large_number(_unit_instance.electrocute), GameColors.DESC_ELECTROCUTE])
 
-	var i: int = 0
-	while i < active_stats.size():
-		var left_text: String = active_stats[i]
-		var right_text: String = ""
-		if i + 1 < active_stats.size():
-			right_text = active_stats[i + 1]
-			
-		var left_lbl: RichTextLabel = stat_label_template.duplicate() as RichTextLabel
-		left_lbl.text = left_text
-		left_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		left_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		left_lbl.visible = true
-		stats_grid.add_child(left_lbl)
+	# Node reuse (Object pooling) logic
+	var needed_labels: int = active_stats.size()
+	var existing_children: Array[Node] = stats_grid.get_children()
+	
+	# Add labels if we don't have enough
+	while existing_children.size() < needed_labels:
+		var new_lbl: RichTextLabel = stat_label_template.duplicate() as RichTextLabel
+		stats_grid.add_child(new_lbl)
+		existing_children.append(new_lbl)
 		
-		var right_lbl: RichTextLabel = stat_label_template.duplicate() as RichTextLabel
-		right_lbl.text = right_text
-		right_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
-		right_lbl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		right_lbl.visible = true
-		stats_grid.add_child(right_lbl)
-		
-		i += 2
+	# Update all labels text and visibility
+	for idx: int in range(existing_children.size()):
+		var lbl: RichTextLabel = existing_children[idx] as RichTextLabel
+		if idx < needed_labels:
+			if idx < active_stats.size():
+				lbl.text = active_stats[idx]
+			else:
+				lbl.text = ""
+			lbl.visible = true
+		else:
+			lbl.visible = false
 
 func update_description() -> void:
 	var full_desc: String = ""

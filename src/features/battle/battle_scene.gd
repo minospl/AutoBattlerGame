@@ -227,6 +227,9 @@ func _update_all_card_uis() -> void:
 		else:
 			slot.update_placeholder()
 
+	if preview_tooltip and preview_tooltip.visible:
+		preview_tooltip.update_stats()
+
 func _process(delta: float) -> void:
 	if not _battle_start_triggered:
 		_battle_start_triggered = true
@@ -234,9 +237,6 @@ func _process(delta: float) -> void:
 
 	if simulation_state == State.PLAYING:
 		advance_simulation(delta * game_speed)
-		
-	if preview_tooltip and preview_tooltip.visible:
-		preview_tooltip.update_stats()
 
 func advance_simulation(delta: float) -> void:
 	# Update match timer
@@ -259,7 +259,6 @@ func advance_simulation(delta: float) -> void:
 			
 			player_team.take_damage(dmg, "fatigue")
 			enemy_team.take_damage(dmg, "fatigue")
-			_update_all_card_uis()
 
 	# Tick statuses
 	player_team.tick_statuses(delta)

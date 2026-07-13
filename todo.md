@@ -17,11 +17,12 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 2. Niewydajność i alokacja pamięci w pętli procesowej Tooltipu
+### 2. [ROZWIĄZANE] Niewydajność i alokacja pamięci w pętli procesowej Tooltipu
 - **Lokalizacja:** [card_tooltip.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_tooltip.gd), linia 256, funkcja `update_stats()` (oraz jej wywołanie w [battle_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_scene.gd), linia 295, funkcja `_process`)
 - **Krytyczne pytania & Problem:** Dlaczego w każdym kroku pętli procesowej (co klatkę!) usuwane są i od nowa powielane węzły interfejsu użytkownika? W metodzie `update_stats()` wywoływana jest pętla czyszcząca stare dzieci z `stats_grid` (`child.queue_free()`), a następnie dla każdej statystyki tworzony jest nowy węzeł poprzez `stat_label_template.duplicate() as RichTextLabel` i dodawany za pomocą `add_child()`.
 - **Logiczne uzasadnienie:** Ponieważ `battle_scene.gd` w pętli `_process` co klatkę wywołuje `preview_tooltip.update_stats()`, gra wykonuje kilkanaście operacji alokacji i zwalniania węzłów interfejsu na sekundę. Generuje to narzut na Garbage Collector, powodując mikro-przycięcia (garbage collector spikes) oraz drastycznie obniżając wydajność gry.
 - **Sugerowana zmiana:** Zaimplementuj wielokrotne używanie istniejących węzłów (Object Pooling / Node Reuse). Aktualizuj właściwość `text` istniejących etykiet w `stats_grid`, ukrywaj nadmiarowe i twórz nowe za pomocą `duplicate()` tylko wtedy, gdy w gridzie jest ich za mało.
+- **Status:** **[ROZWIĄZANE]** Wyeliminowano odpytywanie tooltipu w pętli procesowej `_process`. Tooltip aktualizuje się teraz reaktywnie (zdarzeniowo) na koniec metody `_update_all_card_uis()` w scenie walki, co całkowicie eliminuje narzut w klatce procesowej. W `update_stats()` zaimplementowano wielokrotne używanie istniejących węzłów (Node Reuse/Object Pooling), a właściwości layoutu szablonu przeniesiono do pliku sceny `.tscn` w celu uproszczenia kodu. Dodatkowo usunięto zbędne wywołanie odświeżania kart przy tikach Fatigue.
 
 ---
 
@@ -106,11 +107,12 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 12. Wadliwy fallback i ignorowanie ograniczenia unikalności reliktów
+### 12. [ROZWIĄZANE] Wadliwy fallback i ignorowanie ograniczenia unikalności reliktów
 - **Lokalizacja:** [relic_chest_modifier.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/templates/modifiers/relic_chest_modifier.gd), linie 18–22, funkcja `apply_shop_effect`
 - **Krytyczne pytania & Problem:** Dlaczego w przypadku braku dostępnych reliktów o danej rzadkości system pozwala na ponowne wylosowanie i zduplikowanie reliktów oznaczonych jako `is_unique = true`?
 - **Logiczne uzasadnienie:** Fallback ten całkowicie niweczy znaczenie flagi `is_unique` zadeklarowanej w `RelicData`. Jeśli gracz posiada już wszystkie relikty z danej puli rzadkości, a gra wylosuje duplikat reliktu unikalnego (np. Magnetic Core), to metoda `add_relic` w `run_state.gd` po prostu zwiększy jego liczbę stosów (`stacks += 1`). Jednak unikalne relikty nie posiadają skalowania na poziomie kodu modyfikatorów, co spowoduje marnowanie zasobów gracza na bezużyteczne stosy.
 - **Sugerowana zmiana:** W sytuacji krytycznej (brak wolnych reliktów danej rzadkości) system powinien wylosować relikt o innej rzadkości lub zwrócić złoto graczowi, zamiast generować niefunkcjonalne duplikaty reliktów unikalnych.
+- **Status:** **[ROZWIĄZANE]** Zweryfikowano, że metoda `get_available_relic_templates()` w `run_state.gd` już teraz poprawnie filtruje posiadane unikalne relikty. Dodatkowo, w bazie danych dla każdej rzadkości zawsze istnieją relikty nieunikalne, które mogą być nieskończenie nakładane/stackowane, więc lista ta nigdy nie będzie pusta i nie ma ryzyka wylosowania duplikatu reliktu unikalnego. Kod nie wymaga modyfikacji.
 
 ---
 
