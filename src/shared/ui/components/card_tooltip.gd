@@ -56,6 +56,9 @@ func _set_mouse_filter_ignore_recursive(node: Node) -> void:
 	for child: Node in node.get_children():
 		_set_mouse_filter_ignore_recursive(child)
 
+func get_unit_instance() -> UnitInstance:
+	return _unit_instance
+
 func setup_for_unit(unit_instance: UnitInstance) -> void:
 	_unit_instance = unit_instance
 	_item_card = null
@@ -345,7 +348,6 @@ func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
 	
 	var border: ShaderBorderDecorator = ShaderBorderDecorator.new()
 	border.border_type = ShaderBorderDecorator.BorderType.DOUBLE
-	# border.border_color = Color(0.5, 0.55, 0.6) # Lighter steel grey border
 	border.interior_color = Color(1.0, 1.0, 1.0) # Solid white background
 	border.outer_border_width = 2
 	border.inner_border_width = 2

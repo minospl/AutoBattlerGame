@@ -77,10 +77,12 @@ func _ready() -> void:
 	player_team.team_units_loaded.connect(_on_units_loaded.bind(player_slots))
 	player_team.team_defeated.connect(_on_team_defeat)
 	player_team.gold_generated.connect(_on_gold_generated)
+	player_team.unit_stats_changed.connect(_on_player_unit_stats_changed)
 
 	# Connect signals from enemy_team
 	enemy_team.team_units_loaded.connect(_on_units_loaded.bind(enemy_slots))
 	enemy_team.team_defeated.connect(_on_enemy_defeat)
+	enemy_team.unit_stats_changed.connect(_on_enemy_unit_stats_changed)
 
 	# Connect UI Panels (setup model data and signals)
 	if player_panel:
@@ -202,11 +204,27 @@ func trigger_battle_start() -> void:
 
 func trigger_cast(source_idx: int) -> void:
 	player_team.execute_cast(source_idx, enemy_team)
-	_update_all_card_uis()
 
 func trigger_enemy_cast(source_idx: int) -> void:
 	enemy_team.execute_cast(source_idx, player_team)
-	_update_all_card_uis()
+
+func _on_player_unit_stats_changed(slot_idx: int) -> void:
+	if slot_idx < 0 or slot_idx >= player_slots.size():
+		return
+	var slot: BattleCardSlot = player_slots[slot_idx] as BattleCardSlot
+	var card: BattleCard = slot.get_card()
+	card.update_ui()
+	if preview_tooltip and preview_tooltip.visible and preview_tooltip.get_unit_instance() == card.unit_instance:
+		preview_tooltip.update_stats()
+
+func _on_enemy_unit_stats_changed(slot_idx: int) -> void:
+	if slot_idx < 0 or slot_idx >= enemy_slots.size():
+		return
+	var slot: BattleCardSlot = enemy_slots[slot_idx] as BattleCardSlot
+	var card: BattleCard = slot.get_card()
+	card.update_ui()
+	if preview_tooltip and preview_tooltip.visible and preview_tooltip.get_unit_instance() == card.unit_instance:
+		preview_tooltip.update_stats()
 
 func _update_all_card_uis() -> void:
 	for i: int in range(MAX_TEAM_SIZE):
@@ -215,8 +233,6 @@ func _update_all_card_uis() -> void:
 		if card is BattleCard and player_team.units[i]:
 			var b_card: BattleCard = card
 			b_card.update_ui()
-		else:
-			slot.update_placeholder()
 			
 	for i: int in range(MAX_TEAM_SIZE):
 		var slot: BattleCardSlot = enemy_slots[i] as BattleCardSlot
@@ -224,8 +240,6 @@ func _update_all_card_uis() -> void:
 		if card is BattleCard and enemy_team.units[i]:
 			var b_card: BattleCard = card
 			b_card.update_ui()
-		else:
-			slot.update_placeholder()
 
 	if preview_tooltip and preview_tooltip.visible:
 		preview_tooltip.update_stats()
@@ -447,8 +461,6 @@ func _update_team_slots_ui(slots_arr: Array[BattleCardSlot], loaded_units: Array
 			card.unit_instance = inst
 			card.hovered.connect(func(c: Control, h: bool) -> void: _on_card_hovered(c, h))
 			slots_arr[i].add_card(card)
-		else:
-			slots_arr[i].update_placeholder()
 
 func _on_units_loaded(loaded_units: Array[UnitInstance], slots: Array[BattleCardSlot]) -> void:
 	_update_team_slots_ui(slots, loaded_units)
