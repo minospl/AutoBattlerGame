@@ -556,3 +556,14 @@ func reset_for_new_run(p_lives: int = 10, p_day: int = 4, p_trophies: int = 3, p
 	
 	# Roll the shop for free
 	roll_shop(true)
+
+func add_random_relic(p_rarity: Rarity = null) -> void:
+	var available: Array[RelicData] = get_available_relic_templates(p_rarity)
+	if available.is_empty():
+		printerr("No relics found")
+		return
+		
+	var rolled_relic: RelicData = available[randi() % available.size()]
+	var relic_inst: RelicInstance = RelicInstance.new()
+	relic_inst.initialize(rolled_relic)
+	add_relic(relic_inst)

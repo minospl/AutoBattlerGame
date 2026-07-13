@@ -234,20 +234,7 @@ func _on_add_monster_requested() -> void:
 	add_unit_to_bench(instance)
 
 func _on_add_relic_requested() -> void:
-	if not run_state:
-		return
-		
-	var available: Array[RelicData] = run_state.get_available_relic_templates()
-	
-	if available.is_empty():
-		print("No relics found")
-		return
-		
-	var template: RelicData = available[randi() % available.size()]
-	if template:
-		var relic_inst: RelicInstance = RelicInstance.new()
-		relic_inst.initialize(template)
-		run_state.add_relic(relic_inst)
+	run_state.add_random_relic()
 
 func _on_restart_requested() -> void:
 	run_state.reset_for_new_run()

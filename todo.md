@@ -35,11 +35,12 @@ Ten dokument zawiera pełną listę zidentyfikowanych problemów architektoniczn
 
 ---
 
-### 4. Wyciek logiki losowania reliktów do klasy UI sklepu
+### 4. [ROZWIĄZANE] Wyciek logiki losowania reliktów do klasy UI sklepu
 - **Lokalizacja:** [shop_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd), linie 244–260, funkcja `_on_add_relic_requested`
 - **Krytyczne pytania & Problem:** Dlaczego algorytm filtrowania unikalnych reliktów i losowania z listy szablonów znajduje się bezpośrednio w kontrolerze interfejsu?
 - **Logiczne uzasadnienie:** Filtrowanie reliktów pod kątem tego, czy są unikalne (`is_unique`) oraz czy gracz już je posiada (`run_state.has_relic()`), a także losowanie za pomocą `randi()` to czysta logika gry (Model). `ShopScene` powinien jedynie wysyłać zapytanie o dodanie reliktu, natomiast to model powinien decydować, jaki relikt zostanie wylosowany i dodany do stanu rozgrywki.
-- **Sugerowana zmiana:** Zaimplementuj funkcję `roll_and_add_random_relic()` bezpośrednio w klasie `RunState` i wywołaj ją z poziomu `ShopScene`.
+- **Sugerowana zmiana:** Zaimplementuj funkcję `add_random_relic()` bezpośrednio w klasie `RunState` i wywołaj ją z poziomu `ShopScene`.
+- **Status:** **[ROZWIĄZANE]** Zaimplementowano uniwersalną metodę `RunState.add_random_relic(rarity)`. Kod w `ShopScene` (debug button) oraz w `RelicChestModifier` (obsługa skrzyń z reliktami) został uproszczony i odtąd deleguje losowanie bezpośrednio do modelu `RunState`, co ujednolica logikę gry.
 
 ---
 
