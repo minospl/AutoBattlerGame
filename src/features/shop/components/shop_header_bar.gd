@@ -5,6 +5,7 @@ signal add_monster_requested
 signal add_relic_requested
 signal restart_requested
 signal battle_requested
+signal compendium_requested
 
 @export var lives: int:
 	set(value):
@@ -30,6 +31,7 @@ signal battle_requested
 @onready var add_relic_btn: Button = %AddRelicButton
 @onready var restart_btn: Button = %RestartButton
 @onready var battle_btn: Button = %StartBattleButton
+@onready var compendium_btn: Button = %CompendiumButton
 @onready var lives_label: Label = %LivesLabel
 @onready var day_label: Label = %DayLabel
 @onready var trophies_label: Label = %TrophiesLabel
@@ -40,6 +42,7 @@ func _ready() -> void:
 	add_relic_btn.pressed.connect(func() -> void: add_relic_requested.emit())
 	restart_btn.pressed.connect(func() -> void: restart_requested.emit())
 	battle_btn.pressed.connect(func() -> void: battle_requested.emit())
+	compendium_btn.pressed.connect(func() -> void: compendium_requested.emit())
 	
 	# Apply visual styling programmatically to keep the presentation premium and clean
 	_apply_visual_styling()

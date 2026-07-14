@@ -31,3 +31,12 @@ const DESC_ELECTROCUTE: String = "#f1c40f" # Standardized Yellow for electrocute
 const DESC_GOLD: String = "#ffd700" # Gold color
 const DESC_CAST_SPEED: String = "#54a0ff" # Light blue for cast speed / cd reduction
 const DESC_UNIQUE: String = "#e61a33" # Ruby-red for unique rarity / roll references
+
+# Compendium Tab Buttons
+const TAB_ACTIVE_NORMAL: Color = Color(0.12, 0.45, 0.22, 1.0) # Green
+const TAB_ACTIVE_HOVER: Color = Color(0.15, 0.55, 0.27, 1.0)
+const TAB_ACTIVE_PRESSED: Color = Color(0.18, 0.65, 0.32, 1.0)
+
+const TAB_INACTIVE_NORMAL: Color = Color(0.18, 0.24, 0.35, 1.0) # Blue
+const TAB_INACTIVE_HOVER: Color = Color(0.23, 0.31, 0.45, 1.0)
+const TAB_INACTIVE_PRESSED: Color = Color(0.13, 0.18, 0.27, 1.0)

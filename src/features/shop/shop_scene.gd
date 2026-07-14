@@ -5,6 +5,8 @@ extends Control
 signal team_state_changed
 ## Signal emitted when the player wants to transition to battle
 signal battle_requested
+## Signal emitted when the player wants to view the compendium
+signal compendium_requested
 
 var active_slot_count: int:
 	get:
@@ -60,6 +62,7 @@ func _ready() -> void:
 	shop_header_bar.add_relic_requested.connect(_on_add_relic_requested)
 	shop_header_bar.restart_requested.connect(_on_restart_requested)
 	shop_header_bar.battle_requested.connect(_on_battle_requested)
+	shop_header_bar.compendium_requested.connect(func() -> void: compendium_requested.emit())
 	
 	# Connect shop panel signals
 	shop_panel.roll_requested.connect(_on_roll_requested)

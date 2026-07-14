@@ -1,0 +1,168 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://src/features/compendium/compendium_scene.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/shop_background.jpg" id="2_bg"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="3_decorator"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="4_button_decorator"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bg"]
+texture = ExtResource("2_bg")
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="CompendiumScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="BackgroundPanel" type="Panel" parent="."]
+self_modulate = Color(0.3, 0.3, 0.3, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_bg")
+
+[node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="HeaderHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderHBox"]
+layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.5)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 28
+text = "GALLERY & COMPENDIUM"
+
+[node name="Spacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BackButton" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Back"
+
+[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderHBox/BackButton"]
+script = ExtResource("4_button_decorator")
+color_normal = Color(0.45, 0.15, 0.15, 1)
+color_hover = Color(0.55, 0.2, 0.2, 1)
+color_pressed = Color(0.35, 0.1, 0.1, 1)
+
+[node name="SubHeaderHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TabsHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/SubHeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MonstersTab" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/SubHeaderHBox/TabsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Monsters"
+
+[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/SubHeaderHBox/TabsHBox/MonstersTab"]
+script = ExtResource("4_button_decorator")
+
+[node name="ItemsTab" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/SubHeaderHBox/TabsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Items"
+
+[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/SubHeaderHBox/TabsHBox/ItemsTab"]
+script = ExtResource("4_button_decorator")
+
+[node name="RelicsTab" type="Button" parent="BackgroundPanel/MarginContainer/VBoxContainer/SubHeaderHBox/TabsHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Relics"
+
+[node name="GameButtonDecorator" type="Node" parent="BackgroundPanel/MarginContainer/VBoxContainer/SubHeaderHBox/TabsHBox/RelicsTab"]
+script = ExtResource("4_button_decorator")
+
+
+
+[node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="GridPanel" type="PanelContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GridBorder" type="ColorRect" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridPanel"]
+layout_mode = 2
+script = ExtResource("3_decorator")
+
+[node name="GridMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="ScrollContainer" type="ScrollContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridPanel/GridMargin"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="GridMarginInner" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridPanel/GridMargin/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_right = 10
+
+[node name="GridContainer" type="GridContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/GridPanel/GridMargin/ScrollContainer/GridMarginInner"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 5
+
+[node name="PreviewPanel" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PreviewContainer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/PreviewPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

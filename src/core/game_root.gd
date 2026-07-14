@@ -3,6 +3,7 @@ extends Node
 
 @export var shop_scene_path: String = "res://src/features/shop/shop_scene.tscn"
 @export var battle_scene_path: String = "res://src/features/battle/battle_scene.tscn"
+@export var compendium_scene_path: String = "res://src/features/compendium/compendium_scene.tscn"
 
 const MAX_ACTIVE_TEAM_SIZE: int = 6
 const MAX_BENCH_SIZE: int = 6
@@ -128,6 +129,21 @@ func _go_to_shop() -> void:
 		if shop:
 			shop.setup(run_state)
 			shop.battle_requested.connect(_on_battle_requested)
+			shop.compendium_requested.connect(_on_compendium_requested)
+	)
+
+func _on_compendium_requested() -> void:
+	_go_to_compendium()
+
+func _on_compendium_back_requested() -> void:
+	_go_to_shop()
+
+func _go_to_compendium() -> void:
+	_change_scene(compendium_scene_path, func(compendium_node: Node) -> void:
+		var compendium: CompendiumScene = compendium_node as CompendiumScene
+		if compendium:
+			compendium.setup(run_state)
+			compendium.back_requested.connect(_on_compendium_back_requested)
 	)
 
 func _go_to_battle() -> void:
