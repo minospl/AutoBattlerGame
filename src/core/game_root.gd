@@ -4,15 +4,7 @@ extends Node
 @export var shop_scene_path: String = "res://src/features/shop/shop_scene.tscn"
 @export var battle_scene_path: String = "res://src/features/battle/battle_scene.tscn"
 @export var compendium_scene_path: String = "res://src/features/compendium/compendium_scene.tscn"
-
-const MAX_ACTIVE_TEAM_SIZE: int = 6
-const MAX_BENCH_SIZE: int = 6
-const MAX_SHOP_CARDS_SIZE: int = 4
-const STARTING_GOLD: int = 10
-const STARTING_LIVES: int = 10
-const STARTING_DAY: int = 1
-const STARTING_TROPHIES: int = 0
-const MAX_TROPHIES: int = 10
+@export var game_over_scene_path: String = "res://src/core/game_over_screen.tscn"
 
 var run_state: RunState
 var unit_templates: Array[UnitData] = []
@@ -74,16 +66,11 @@ func _load_resources_from_dir(path: String) -> Array[Resource]:
 func _initialize_new_run() -> void:
 	run_state = RunState.new()
 	run_state.setup_templates(unit_templates, item_templates, relic_templates)
-	run_state.active_team.resize(MAX_ACTIVE_TEAM_SIZE)
-	run_state.bench.resize(MAX_BENCH_SIZE)
-	run_state.shop_cards.resize(MAX_SHOP_CARDS_SIZE)
-	run_state.shop_frozen_statuses.resize(MAX_SHOP_CARDS_SIZE)
+	run_state.active_team.resize(RunState.MAX_ACTIVE_TEAM_SIZE)
+	run_state.bench.resize(RunState.MAX_BENCH_SIZE)
+	run_state.shop_cards.resize(RunState.MAX_SHOP_CARDS_SIZE)
+	run_state.shop_frozen_statuses.resize(RunState.MAX_SHOP_CARDS_SIZE)
 	run_state.shop_frozen_statuses.fill(false)
-	run_state.gold = STARTING_GOLD
-	run_state.lives = STARTING_LIVES
-	run_state.day = STARTING_DAY
-	run_state.trophies = STARTING_TROPHIES
-	run_state.max_trophies = MAX_TROPHIES
 	run_state.shop_level = 1
 	
 	# Find templates by unit name
@@ -99,7 +86,7 @@ func _initialize_new_run() -> void:
 	var crab: UnitData = find_template.call("River Crab")
 
 	var setup: Array[UnitData] = [titan, spellweaver, null, druid, crab, null]
-	for i: int in range(MAX_ACTIVE_TEAM_SIZE):
+	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
 		var temp: UnitData = setup[i]
 		if temp:
 			var instance: UnitInstance = UnitInstance.new()
@@ -130,7 +117,12 @@ func _go_to_shop() -> void:
 			shop.setup(run_state)
 			shop.battle_requested.connect(_on_battle_requested)
 			shop.compendium_requested.connect(_on_compendium_requested)
+			shop.restart_requested.connect(_on_shop_restart_requested)
 	)
+
+func _on_shop_restart_requested() -> void:
+	_initialize_new_run()
+	_go_to_shop()
 
 func _on_compendium_requested() -> void:
 	_go_to_compendium()
@@ -173,7 +165,12 @@ func _show_game_over(p_victory: bool) -> void:
 		current_scene.queue_free()
 		current_scene = null
 		
-	var go_screen: GameOverScreen = GameOverScreen.new()
+	var go_scene_res: PackedScene = load(game_over_scene_path) as PackedScene
+	if not go_scene_res:
+		printerr("Failed to load Game Over scene: ", game_over_scene_path)
+		return
+		
+	var go_screen: GameOverScreen = go_scene_res.instantiate() as GameOverScreen
 	add_child(go_screen)
 	current_scene = go_screen
 	

@@ -3,6 +3,12 @@ extends Resource
 
 const MAX_ACTIVE_TEAM_SIZE: int = 6
 const MAX_BENCH_SIZE: int = 6
+const MAX_SHOP_CARDS_SIZE: int = 4
+const STARTING_GOLD: int = 10
+const STARTING_LIVES: int = 10
+const STARTING_DAY: int = 1
+const STARTING_TROPHIES: int = 0
+const MAX_TROPHIES: int = 10
 
 func _init() -> void:
 	if active_team.is_empty():
@@ -46,31 +52,31 @@ var has_unique_potential: bool:
 	get:
 		return has_relic("Unique Potential")
 
-@export var gold: int = 10:
+@export var gold: int = STARTING_GOLD:
 	set(val):
 		if gold != val:
 			gold = val
 			gold_changed.emit(gold)
 
-@export var lives: int = 10:
+@export var lives: int = STARTING_LIVES:
 	set(val):
 		if lives != val:
 			lives = val
 			lives_changed.emit(lives)
 
-@export var day: int = 1:
+@export var day: int = STARTING_DAY:
 	set(val):
 		if day != val:
 			day = val
 			day_changed.emit(day)
 
-@export var trophies: int = 0:
+@export var trophies: int = STARTING_TROPHIES:
 	set(val):
 		if trophies != val:
 			trophies = val
 			trophies_changed.emit(trophies)
 
-@export var max_trophies: int = 10
+@export var max_trophies: int = MAX_TROPHIES
 
 @export var battle_speed: float = 1.0
 
@@ -320,11 +326,14 @@ func get_random_item_template_by_rarity(rarity_type: Rarity.Type) -> ItemData:
 	return matching[randi() % matching.size()]
 
 func roll_single_shop_card() -> Resource:
+	var rolled_rarity: Rarity.Type = roll_rarity()
+	if has_unique_potential and randf() < 0.1:
+		rolled_rarity = Rarity.Type.UNIQUE
+		
 	var spawn_item: bool = false
-	if not item_templates.is_empty() and randf() < 0.3:
+	if rolled_rarity != Rarity.Type.UNIQUE and not item_templates.is_empty() and randf() < 0.3:
 		spawn_item = true
 		
-	var rolled_rarity: Rarity.Type = roll_rarity()
 	var rolled_card: Resource = null
 	if spawn_item:
 		var template: ItemData = get_random_item_template_by_rarity(rolled_rarity)
@@ -335,9 +344,6 @@ func roll_single_shop_card() -> Resource:
 	else:
 		if unit_templates.is_empty():
 			return null
-			
-		if has_unique_potential and randf() < 0.1:
-			rolled_rarity = Rarity.Type.UNIQUE
 			
 		var template: UnitData = get_random_unit_template_by_rarity(rolled_rarity)
 		if template:
@@ -541,7 +547,7 @@ func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 		available.append(relic)
 	return available
 
-func reset_for_new_run(p_lives: int = 10, p_day: int = 1, p_trophies: int = 0, p_gold: int = 10) -> void:
+func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY, p_trophies: int = STARTING_TROPHIES, p_gold: int = STARTING_GOLD) -> void:
 	lives = p_lives
 	day = p_day
 	trophies = p_trophies

@@ -7,6 +7,8 @@ signal team_state_changed
 signal battle_requested
 ## Signal emitted when the player wants to view the compendium
 signal compendium_requested
+## Signal emitted when the player wants to restart the run
+signal restart_requested
 
 var active_slot_count: int:
 	get:
@@ -111,14 +113,7 @@ func setup(p_state: RunState) -> void:
 	run_state.trophies_changed.connect(_on_trophies_changed)
 	run_state.shop_slot_updated.connect(_on_shop_slot_updated)
 	run_state.shop_slot_freeze_changed.connect(_on_shop_slot_freeze_changed)
-	run_state.relics_changed.connect(func(relics: Array[RelicInstance]) -> void:
-		if relic_bar:
-			relic_bar.update_relics(relics)
-		if shop_panel:
-			shop_panel.has_unique_potential = run_state.has_unique_potential
-			# Force update of weights formatting
-			shop_panel.shop_weights = run_state.shop_weights
-	)
+	run_state.relics_changed.connect(_on_relics_changed)
 	
 	load_state_from_run()
 	
@@ -244,9 +239,7 @@ func _on_add_relic_requested() -> void:
 	run_state.add_random_relic()
 
 func _on_restart_requested() -> void:
-	run_state.reset_for_new_run()
-	populate_ui()
-	team_state_changed.emit()
+	restart_requested.emit()
 
 func _on_team_state_changed() -> void:
 	pass
@@ -382,6 +375,11 @@ func _on_shop_slot_freeze_changed(slot_index: int, is_frozen: bool) -> void:
 		if btn.button_pressed != is_frozen:
 			btn.set_pressed_no_signal(is_frozen)
 		slot.update_freeze_button_style()
+
+func _on_relics_changed(relics: Array[RelicInstance]) -> void:
+	relic_bar.update_relics(relics)
+	shop_panel.has_unique_potential = run_state.has_unique_potential
+	shop_panel.shop_weights = run_state.shop_weights
 
 func set_preview_card(card: Control) -> void:
 	if not preview_tooltip:

@@ -75,7 +75,7 @@ func update_border_colors() -> void:
 		border_rect.border_color = Color(0.9, 0.15, 0.15, 1.0)
 		border_rect.inner_border_color = Color(0.5, 0.05, 0.05, 1.0)
 	else:
-		var rarity_color: Color = unit_instance.data.rarity.border_color if (unit_instance and unit_instance.data and unit_instance.data.rarity and unit_instance.data.rarity.border_color != null) else GameColors.BORDER_OUTER_DEFAULT
+		var rarity_color: Color = unit_instance.data.rarity.border_color if unit_instance else GameColors.BORDER_OUTER_DEFAULT
 		border_rect.border_color = rarity_color
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 	border_rect.update_shader_parameters()

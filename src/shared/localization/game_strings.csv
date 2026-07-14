@@ -8,7 +8,7 @@ KEYWORD_POISON_DESC,Deals damage equal to the number of stacks every 1.0 second.
 KEYWORD_BURN_TITLE,Burn
 KEYWORD_BURN_DESC,"Deals damage equal to the number of stacks every 0.5 seconds, then decreases by 1 stack."
 KEYWORD_ELECTRO_TITLE,Electrocute
-KEYWORD_ELECTRO_DESC,Increases the next damage received by the team by the number of stacks.
+KEYWORD_ELECTRO_DESC,Increases physical damage received by the team by the number of stacks.
 KEYWORD_CAST_SPEED_TITLE,Cast Speed
 KEYWORD_CAST_SPEED_DESC,The speed at which this unit charges its action bar to perform actions.
 KEYWORD_GOLD_TITLE,Gold
