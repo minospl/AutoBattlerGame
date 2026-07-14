@@ -74,7 +74,7 @@ func _load_category(category: Category) -> void:
 	if not run_state:
 		return
 
-	var templates: Array[Resource] = []
+	var templates: Array[GameResourceData] = []
 	if category == Category.MONSTERS:
 		for t: UnitData in run_state.unit_templates:
 			templates.append(t)
@@ -86,7 +86,7 @@ func _load_category(category: Category) -> void:
 			templates.append(t)
 
 	# Sort templates by rarity first, then by name alphabetically
-	templates.sort_custom(func(a: Resource, b: Resource) -> bool:
+	templates.sort_custom(func(a: GameResourceData, b: GameResourceData) -> bool:
 		var w_a: int = _get_rarity_weight(a)
 		var w_b: int = _get_rarity_weight(b)
 		if w_a != w_b:
@@ -167,41 +167,11 @@ func _update_tab_buttons_styling(category: Category) -> void:
 	set_decorator_styling.call(items_tab, category == Category.ITEMS)
 	set_decorator_styling.call(relics_tab, category == Category.RELICS)
 
-func _get_rarity_weight(resource: Resource) -> int:
-	var rarity_res: Rarity = null
-	if resource is UnitData:
-		rarity_res = (resource as UnitData).rarity
-	elif resource is ItemData:
-		rarity_res = (resource as ItemData).rarity
-	elif resource is RelicData:
-		rarity_res = (resource as RelicData).rarity
-		
-	if not rarity_res:
-		return -1
-		
-	var rname: String = rarity_res.rarity_name.to_lower()
-	match rname:
-		"common":
-			return 0
-		"rare":
-			return 1
-		"epic":
-			return 2
-		"legendary":
-			return 3
-		"unique":
-			return 4
-		_:
-			return 5
+func _get_rarity_weight(resource: GameResourceData) -> int:
+	return resource.rarity.rarity_type
 
-func _get_resource_name(resource: Resource) -> String:
-	if resource is UnitData:
-		return (resource as UnitData).unit_name
-	if resource is ItemData:
-		return (resource as ItemData).item_name
-	if resource is RelicData:
-		return (resource as RelicData).relic_name
-	return ""
+func _get_resource_name(resource: GameResourceData) -> String:
+	return resource.display_name
 
 func _on_grid_container_resized() -> void:
 	_recalculate_grid_sizes()

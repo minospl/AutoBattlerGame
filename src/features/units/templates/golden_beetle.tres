@@ -12,7 +12,7 @@ script = ExtResource("5_modifier")
 
 [resource]
 script = ExtResource("4_data")
-unit_name = "Golden Beetle"
+display_name = "Golden Beetle"
 price = 2
 max_health = 25
 types = Array[ExtResource("1_type")]([ExtResource("3_type_beast")])
@@ -20,3 +20,4 @@ rarity = ExtResource("6_rarity")
 cast_speed = 3.0
 modifier = SubResource("Resource_golden_beetle_modifier")
 sprite = ExtResource("2_sprite")
+

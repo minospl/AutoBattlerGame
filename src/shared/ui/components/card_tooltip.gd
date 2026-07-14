@@ -176,10 +176,10 @@ func update_header() -> void:
 	if _unit_instance:
 		name_label.text = _unit_instance.get_unit_name().to_upper() + " [Lvl %d]" % _unit_instance.level
 	elif _item_card:
-		name_label.text = _item_card.data.item_name.to_upper() if _item_card.data else ""
+		name_label.text = _item_card.data.display_name.to_upper() if _item_card.data else ""
 	elif _relic_instance:
 		var relic_data: RelicData = _relic_instance.data
-		name_label.text = relic_data.relic_name.to_upper() if relic_data else ""
+		name_label.text = relic_data.display_name.to_upper() if relic_data else ""
 		var stacks: int = _relic_instance.stacks
 		if stacks > 1:
 			name_label.text += " [x%d]" % stacks

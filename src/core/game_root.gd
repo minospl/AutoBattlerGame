@@ -89,7 +89,7 @@ func _initialize_new_run() -> void:
 	# Find templates by unit name
 	var find_template: Callable = func(p_name: String) -> UnitData:
 		for t: UnitData in unit_templates:
-			if t.unit_name.to_lower() == p_name.to_lower():
+			if t.display_name.to_lower() == p_name.to_lower():
 				return t
 		return null
 

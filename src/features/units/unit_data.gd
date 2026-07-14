@@ -1,8 +1,5 @@
 class_name UnitData
-extends Resource
-
-## The name of the unit
-@export var unit_name: String
+extends GameResourceData
 
 ## Price of the unit card in the shop
 @export var price: int
@@ -31,14 +28,8 @@ extends Resource
 ## List of types associated with this unit (e.g. Beast, Dragon)
 @export var types: Array[UnitType]
 
-## Rarity of the unit (defines the card border color in UI)
-@export var rarity: Rarity
-
 ## How often the unit casts (in seconds)
 @export var cast_speed: float
 
 ## List of modifier (abilities) for this unit
 @export var modifier: UnitModifier
-
-## Optional custom texture/sprite for the unit artwork
-@export var sprite: Texture2D

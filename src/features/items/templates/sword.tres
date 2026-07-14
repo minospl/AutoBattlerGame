@@ -9,8 +9,9 @@ script = ExtResource("1_modifier")
 
 [resource]
 script = ExtResource("3_data")
-item_name = "Sword"
+display_name = "Sword"
 price = 2
 rarity = ExtResource("2_rarity")
 is_draggable = true
 modifier = SubResource("Resource_sword_modifier")
+

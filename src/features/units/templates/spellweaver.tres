@@ -13,7 +13,7 @@ target = 6
 
 [resource]
 script = ExtResource("unit_data")
-unit_name = "Spellweaver"
+display_name = "Spellweaver"
 price = 3
 max_health = 10
 types = Array[ExtResource("5_r15g0")]([ExtResource("unit_type")])
@@ -21,3 +21,4 @@ rarity = ExtResource("unit_rarity")
 cast_speed = 2.0
 modifier = SubResource("Resource_spellweaver_on_cast")
 sprite = ExtResource("sprite")
+

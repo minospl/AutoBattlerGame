@@ -10,8 +10,9 @@ target_rarity = ExtResource("2_rarity")
 
 [resource]
 script = ExtResource("3_data")
-item_name = "Legendary Chest"
+display_name = "Legendary Chest"
 price = 8
 rarity = ExtResource("2_rarity")
 is_clickable = true
 modifier = SubResource("Resource_legendary_chest_modifier")
+

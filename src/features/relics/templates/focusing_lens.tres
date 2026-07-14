@@ -9,6 +9,7 @@ script = ExtResource("1_modifier")
 
 [resource]
 script = ExtResource("3_data")
-relic_name = "Focusing Lens"
+display_name = "Focusing Lens"
 rarity = ExtResource("2_rarity")
 modifier = SubResource("Resource_focusing_lens_modifier")
+

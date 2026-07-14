@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="Rarity" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="Rarity" format=3 uid="uid://c5pcrxsy66nw0"]
 
-[ext_resource type="Script" path="res://src/features/units/rarity.gd" id="script"]
+[ext_resource type="Script" uid="uid://dij28a8kjudsc" path="res://src/features/units/rarity.gd" id="script"]
 
 [resource]
 script = ExtResource("script")
 rarity_name = "Rare"
 border_color = Color(0.19, 0.51, 0.81, 1)
+rarity_type = 1

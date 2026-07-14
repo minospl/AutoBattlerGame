@@ -44,7 +44,7 @@ func initialize(p_data: UnitData) -> void:
 	cast_speed = p_data.cast_speed if p_data else 1.0
 
 func get_unit_name() -> String:
-	return data.unit_name if data else "Unknown"
+	return data.display_name
 
 func get_max_health() -> int:
 	return health

@@ -474,7 +474,7 @@ func add_relic(relic: RelicInstance) -> void:
 	if not relic:
 		return
 		
-	if relic.data and relic.data.relic_name == "Magnetic Core":
+	if relic.data and relic.data.display_name == "Magnetic Core":
 		has_magnetic_core = true
 		
 	# Check if we already have this relic and increase stack count
@@ -536,7 +536,7 @@ func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 		if p_rarity and (not relic.rarity or relic.rarity.rarity_name != p_rarity.rarity_name):
 			continue
 		# Filter out unique relics (those with UNIQUE rarity) that are already owned
-		if relic.rarity.rarity_name == "Unique" and has_relic(relic.relic_name):
+		if relic.rarity.rarity_name == "Unique" and has_relic(relic.display_name):
 			continue
 		available.append(relic)
 	return available

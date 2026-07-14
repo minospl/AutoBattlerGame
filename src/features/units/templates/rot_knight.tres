@@ -12,7 +12,7 @@ trigger = 3
 
 [resource]
 script = ExtResource("4_unit_data_script")
-unit_name = "Rot Knight"
+display_name = "Rot Knight"
 price = 5
 max_health = 50
 attack = 6
@@ -20,3 +20,4 @@ types = Array[ExtResource("1_type_script")]([ExtResource("3_type")])
 rarity = ExtResource("5_rarity")
 cast_speed = 5
 modifier = SubResource("Resource_rot_knight_modifier")
+

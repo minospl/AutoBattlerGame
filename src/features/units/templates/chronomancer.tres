@@ -12,7 +12,7 @@ script = ExtResource("5_modifier")
 
 [resource]
 script = ExtResource("4_data")
-unit_name = "Chronomancer"
+display_name = "Chronomancer"
 price = 3
 max_health = 25
 types = Array[ExtResource("1_type")]([ExtResource("3_type_water")])
@@ -20,3 +20,4 @@ rarity = ExtResource("6_rarity")
 cast_speed = 2.5
 modifier = SubResource("Resource_chronomancer_modifier")
 sprite = ExtResource("2_sprite")
+

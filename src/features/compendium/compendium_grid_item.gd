@@ -4,7 +4,7 @@ extends PanelContainer
 signal hovered(item: CompendiumGridItem, is_hover: bool)
 signal level_changed(item: CompendiumGridItem)
 
-@export var data_resource: Resource:
+@export var data_resource: GameResourceData:
 	set(val):
 		data_resource = val
 		if is_inside_tree():
@@ -36,35 +36,22 @@ func update_ui() -> void:
 	
 	# 1. Determine border color based on rarity and configure border
 	var border_color: Color = GameColors.BORDER_OUTER_DEFAULT
-	var rarity_res: Rarity = data_resource.get("rarity")
-	if rarity_res:
-		border_color = rarity_res.border_color
+	border_color = data_resource.rarity.border_color
 		
-	if border_rect:
-		border_rect.border_color = border_color
-		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-		border_rect.interior_color = GameColors.WHITE_COLOR
-		border_rect.update_shader_parameters()
+	border_rect.border_color = border_color
+	border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
+	border_rect.interior_color = GameColors.WHITE_COLOR
+	border_rect.update_shader_parameters()
 		
 	# 2. Configure sprite or text fallback
-	var sprite_texture: Texture2D = data_resource.get("sprite") as Texture2D
-	if sprite_texture:
+	if data_resource.sprite:
 		if sprite_rect:
 			sprite_rect.visible = true
-			sprite_rect.texture = sprite_texture
+			sprite_rect.texture = data_resource.sprite
 	else:
 		if portrait_label:
 			portrait_label.visible = true
-			var fallback_text: String = ""
-			if data_resource is UnitData:
-				fallback_text = (data_resource as UnitData).unit_name.to_upper()
-			elif data_resource is ItemData:
-				var item_data: ItemData = data_resource as ItemData
-				fallback_text = "📦" if item_data.is_clickable else "🎁"
-			elif data_resource is RelicData:
-				fallback_text = (data_resource as RelicData).relic_name.to_upper()
-			
-			portrait_label.text = fallback_text
+			portrait_label.text = data_resource.display_name.to_upper()
 
 func _gui_input(event: InputEvent) -> void:
 	if not data_resource is UnitData:
@@ -72,15 +59,15 @@ func _gui_input(event: InputEvent) -> void:
 		
 	if event is InputEventMouseButton:
 		var mouse_event: InputEventMouseButton = event
-		if mouse_event.pressed:
-			if mouse_event.button_index == MOUSE_BUTTON_LEFT:
-				# Left click: increase level
-				_change_unit_level(1)
-				accept_event()
-			elif mouse_event.button_index == MOUSE_BUTTON_RIGHT:
-				# Right click: decrease level
-				_change_unit_level(-1)
-				accept_event()
+		if not mouse_event.pressed:
+			return
+
+		if mouse_event.button_index == MOUSE_BUTTON_LEFT:
+			_change_unit_level(1)
+			accept_event()
+		elif mouse_event.button_index == MOUSE_BUTTON_RIGHT:
+			_change_unit_level(-1)
+			accept_event()
 
 func _change_unit_level(delta: int) -> void:
 	var old_level: int = unit_level

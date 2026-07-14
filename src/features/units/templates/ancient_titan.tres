@@ -13,7 +13,7 @@ trigger = 1
 
 [resource]
 script = ExtResource("unit_data")
-unit_name = "Ancient Titan"
+display_name = "Ancient Titan"
 price = 4
 max_health = 20
 attack = 5
@@ -22,3 +22,4 @@ rarity = ExtResource("unit_rarity")
 cast_speed = 4.0
 modifier = SubResource("Resource_titan_battle_start")
 sprite = ExtResource("sprite")
+

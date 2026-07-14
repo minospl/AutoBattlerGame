@@ -14,7 +14,7 @@ target = 1
 
 [resource]
 script = ExtResource("unit_data")
-unit_name = "Forest Guardian"
+display_name = "Forest Guardian"
 price = 4
 max_health = 20
 base_shield = 4
@@ -23,3 +23,4 @@ rarity = ExtResource("unit_rarity")
 cast_speed = 3.0
 modifier = SubResource("Resource_guardian_battle_start")
 sprite = ExtResource("sprite")
+

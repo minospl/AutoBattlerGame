@@ -9,6 +9,7 @@ script = ExtResource("1_modifier")
 
 [resource]
 script = ExtResource("3_data")
-relic_name = "Golden Touch"
+display_name = "Golden Touch"
 rarity = ExtResource("2_rarity")
 modifier = SubResource("Resource_golden_touch_modifier")
+

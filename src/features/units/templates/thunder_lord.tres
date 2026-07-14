@@ -13,7 +13,7 @@ target = 1
 
 [resource]
 script = ExtResource("4_unit_data_script")
-unit_name = "Thunder Lord"
+display_name = "Thunder Lord"
 price = 5
 max_health = 45
 attack = 12
@@ -21,3 +21,4 @@ types = Array[ExtResource("1_type_script")]([ExtResource("3_type")])
 rarity = ExtResource("5_rarity")
 cast_speed = 4.0
 modifier = SubResource("Resource_thunder_lord_modifier")
+

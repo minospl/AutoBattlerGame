@@ -9,6 +9,7 @@ script = ExtResource("1_modifier")
 
 [resource]
 script = ExtResource("3_data")
-relic_name = "Unique Potential"
+display_name = "Unique Potential"
 rarity = ExtResource("2_rarity")
 modifier = SubResource("Resource_unique_potential_modifier")
+

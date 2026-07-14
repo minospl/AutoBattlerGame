@@ -5,7 +5,7 @@
 [ext_resource type="Resource" path="res://src/features/units/types/beast.tres" id="type_beast"]
 [ext_resource type="Resource" path="res://src/features/units/types/water.tres" id="type_water"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Resource" path="res://src/features/units/rarities/rare.tres" id="unit_rarity"]
+[ext_resource type="Resource" uid="uid://c5pcrxsy66nw0" path="res://src/features/units/rarities/rare.tres" id="unit_rarity"]
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="unit_type"]
 
 [sub_resource type="Resource" id="Resource_crab_take_dmg"]
@@ -14,7 +14,6 @@ trigger = 2
 
 [resource]
 script = ExtResource("unit_data")
-unit_name = "River Crab"
 price = 1
 max_health = 1
 attack = 1
@@ -24,7 +23,8 @@ base_shield = 1
 base_burn = 1
 base_electrocute = 1
 types = Array[ExtResource("unit_type")]([ExtResource("type_water"), ExtResource("type_beast")])
-rarity = ExtResource("unit_rarity")
 cast_speed = 1.0
 modifier = SubResource("Resource_crab_take_dmg")
+display_name = "River Crab"
+rarity = ExtResource("unit_rarity")
 sprite = ExtResource("sprite")

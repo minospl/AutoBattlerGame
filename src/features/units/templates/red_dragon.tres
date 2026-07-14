@@ -12,7 +12,7 @@ script = ExtResource("red_dragon_modifier")
 
 [resource]
 script = ExtResource("unit_data")
-unit_name = "Red Dragon"
+display_name = "Red Dragon"
 price = 5
 max_health = 15
 attack = 5
@@ -22,3 +22,4 @@ rarity = ExtResource("unit_rarity")
 cast_speed = 4.0
 modifier = SubResource("Resource_dragon_on_cast")
 sprite = ExtResource("sprite")
+

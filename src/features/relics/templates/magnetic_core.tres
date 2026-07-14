@@ -9,6 +9,7 @@ script = ExtResource("1_modifier")
 
 [resource]
 script = ExtResource("3_data")
-relic_name = "Magnetic Core"
+display_name = "Magnetic Core"
 rarity = ExtResource("2_rarity")
 modifier = SubResource("Resource_magnetic_core_modifier")
+

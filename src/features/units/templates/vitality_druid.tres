@@ -8,7 +8,7 @@
 
 [resource]
 script = ExtResource("unit_data")
-unit_name = "Vitality Druid"
+display_name = "Vitality Druid"
 price = 3
 max_health = 25
 base_heal = 10
@@ -16,3 +16,4 @@ types = Array[ExtResource("5_t5wx4")]([ExtResource("unit_type")])
 rarity = ExtResource("unit_rarity")
 cast_speed = 3.0
 sprite = ExtResource("sprite")
+
