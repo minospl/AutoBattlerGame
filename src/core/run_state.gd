@@ -136,21 +136,21 @@ func normalize_weights(p_weights: Array[float]) -> Array[float]:
 		p_weights = [1.0, 0.0, 0.0, 0.0]
 	return p_weights
 
-func roll_rarity_name() -> String:
+func roll_rarity() -> Rarity.Type:
 	var weights: Array[float] = shop_weights
 	var roll: float = randf()
 	var cumulative: float = 0.0
 	
 	cumulative += weights[0]
 	if roll < cumulative:
-		return "Common"
+		return Rarity.Type.COMMON
 	cumulative += weights[1]
 	if roll < cumulative:
-		return "Rare"
+		return Rarity.Type.RARE
 	cumulative += weights[2]
 	if roll < cumulative:
-		return "Epic"
-	return "Legendary"
+		return Rarity.Type.EPIC
+	return Rarity.Type.LEGENDARY
 
 func complete_battle(outcome: String) -> void:
 	if outcome == "victory":
@@ -273,23 +273,23 @@ func check_and_merge_units() -> Dictionary:
 
 # --- SHOP BUSINESS LOGIC & ROLLING ---
 
-func get_random_unit_template_by_rarity(rarity_name: String) -> UnitData:
+func get_random_unit_template_by_rarity(rarity_type: Rarity.Type) -> UnitData:
 	var matching: Array[UnitData] = []
 	for template: UnitData in unit_templates:
-		var r_name: String = template.rarity.rarity_name
+		var r_type: Rarity.Type = template.rarity.rarity_type
 
-		if r_name == "Unique":
-			if rarity_name == "Unique":
+		if r_type == Rarity.Type.UNIQUE:
+			if rarity_type == Rarity.Type.UNIQUE:
 				matching.append(template)
 			continue
 
-		if r_name == rarity_name:
+		if r_type == rarity_type:
 			matching.append(template)
 
 	if matching.is_empty():
 		for template: UnitData in unit_templates:
-			var r_name: String = template.rarity.rarity_name
-			if r_name != "Unique":
+			var r_type: Rarity.Type = template.rarity.rarity_type
+			if r_type != Rarity.Type.UNIQUE:
 				matching.append(template)
 				
 	if matching.is_empty():
@@ -297,21 +297,21 @@ func get_random_unit_template_by_rarity(rarity_name: String) -> UnitData:
 		
 	return matching[randi() % matching.size()]
 
-func get_random_item_template_by_rarity(rarity_name: String) -> ItemData:
+func get_random_item_template_by_rarity(rarity_type: Rarity.Type) -> ItemData:
 	var matching: Array[ItemData] = []
 	for template: ItemData in item_templates:
-		var r_name: String = template.rarity.rarity_name
+		var r_type: Rarity.Type = template.rarity.rarity_type
 			
-		if r_name == "Unique":
+		if r_type == Rarity.Type.UNIQUE:
 			continue
 			
-		if r_name == rarity_name:
+		if r_type == rarity_type:
 			matching.append(template)
 			
 	if matching.is_empty():
 		for template: ItemData in item_templates:
-			var r_name: String = template.rarity.rarity_name
-			if r_name != "Unique":
+			var r_type: Rarity.Type = template.rarity.rarity_type
+			if r_type != Rarity.Type.UNIQUE:
 				matching.append(template)
 				
 	if matching.is_empty():
@@ -324,7 +324,7 @@ func roll_single_shop_card() -> Resource:
 	if not item_templates.is_empty() and randf() < 0.3:
 		spawn_item = true
 		
-	var rolled_rarity: String = roll_rarity_name()
+	var rolled_rarity: Rarity.Type = roll_rarity()
 	var rolled_card: Resource = null
 	if spawn_item:
 		var template: ItemData = get_random_item_template_by_rarity(rolled_rarity)
@@ -337,7 +337,7 @@ func roll_single_shop_card() -> Resource:
 			return null
 			
 		if has_unique_potential and randf() < 0.1:
-			rolled_rarity = "Unique"
+			rolled_rarity = Rarity.Type.UNIQUE
 			
 		var template: UnitData = get_random_unit_template_by_rarity(rolled_rarity)
 		if template:
@@ -533,10 +533,10 @@ func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 		if not relic:
 			continue
 		# Filter by rarity if requested
-		if p_rarity and (not relic.rarity or relic.rarity.rarity_name != p_rarity.rarity_name):
+		if p_rarity and (not relic.rarity or relic.rarity.rarity_type != p_rarity.rarity_type):
 			continue
 		# Filter out unique relics (those with UNIQUE rarity) that are already owned
-		if relic.rarity.rarity_name == "Unique" and has_relic(relic.display_name):
+		if relic.rarity.rarity_type == Rarity.Type.UNIQUE and has_relic(relic.display_name):
 			continue
 		available.append(relic)
 	return available

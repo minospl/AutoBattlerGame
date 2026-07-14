@@ -32,12 +32,12 @@ func update_relics(relic_list: Array[RelicInstance]) -> void:
 	
 	# 1. Najpierw dodajemy wszystkie relikty, które NIE są unikalne
 	for relic: RelicInstance in relic_list:
-		if relic.data.rarity.rarity_name != "Unique":
+		if relic.data.rarity.rarity_type != Rarity.Type.UNIQUE:
 			sorted_list.append(relic)
 			
 	# 2. Następnie na koniec dodajemy wszystkie relikty typu Unique
 	for relic: RelicInstance in relic_list:
-		if relic.data.rarity.rarity_name == "Unique":
+		if relic.data.rarity.rarity_type == Rarity.Type.UNIQUE:
 			sorted_list.append(relic)
 			
 	# Renderujemy ikony na podstawie posortowanej listy
