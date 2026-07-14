@@ -58,12 +58,11 @@ func update_ui() -> void:
 			var fallback_text: String = ""
 			if data_resource is UnitData:
 				fallback_text = (data_resource as UnitData).unit_name.to_upper()
-				# fallback_text = (data_resource as UnitData).unit_name.left(1).to_upper()
 			elif data_resource is ItemData:
 				var item_data: ItemData = data_resource as ItemData
 				fallback_text = "📦" if item_data.is_clickable else "🎁"
 			elif data_resource is RelicData:
-				fallback_text = (data_resource as RelicData).relic_name.left(1).to_upper()
+				fallback_text = (data_resource as RelicData).relic_name.to_upper()
 			
 			portrait_label.text = fallback_text
 

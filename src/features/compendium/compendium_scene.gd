@@ -3,6 +3,12 @@ extends Control
 
 signal back_requested
 
+enum Category {
+	MONSTERS,
+	ITEMS,
+	RELICS
+}
+
 @onready var grid_container: GridContainer = %GridContainer
 @onready var preview_container: Control = %PreviewContainer
 @onready var back_button: Button = %BackButton
@@ -21,45 +27,43 @@ var tooltip_scene: PackedScene = preload("res://src/shared/ui/components/card_to
 func setup(p_state: RunState) -> void:
 	run_state = p_state
 	if is_node_ready():
-		_load_category("monsters")
+		_load_category(Category.MONSTERS)
 
 func _ready() -> void:
 	# Setup the side preview panel
 	preview_tooltip = tooltip_scene.instantiate() as CardTooltip
-	if preview_tooltip:
-		# Adjust sizes so the tooltip matches the 320px column width and stretches vertically
-		preview_tooltip.custom_minimum_size = Vector2(320, 0)
+	# Adjust sizes so the tooltip matches the 320px column width and stretches vertically
+	preview_tooltip.custom_minimum_size = Vector2(320, 0)
+	
+	var main_wrapper: Control = preview_tooltip.find_child("MainTooltipWrapper") as Control
+	if main_wrapper:
+		main_wrapper.custom_minimum_size = Vector2(320, 0)
+		main_wrapper.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		
-		var main_wrapper: Control = preview_tooltip.find_child("MainTooltipWrapper") as Control
-		if main_wrapper:
-			main_wrapper.custom_minimum_size = Vector2(320, 0)
-			main_wrapper.size_flags_vertical = Control.SIZE_EXPAND_FILL
-			
-		preview_tooltip.grow_horizontal = GROW_DIRECTION_BEGIN
-		preview_container.add_child(preview_tooltip)
-		preview_tooltip.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
-		
-		# Reset offsets so it perfectly fills the 320px column from top to bottom
-		preview_tooltip.offset_right = 0
-		preview_tooltip.offset_left = -320
-		preview_tooltip.offset_top = 0
-		preview_tooltip.offset_bottom = 0
-		
-		preview_tooltip.visible = false
+	preview_tooltip.grow_horizontal = GROW_DIRECTION_BEGIN
+	preview_container.add_child(preview_tooltip)
+	preview_tooltip.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
+	
+	# Reset offsets so it perfectly fills the 320px column from top to bottom
+	preview_tooltip.offset_right = 0
+	preview_tooltip.offset_left = -320
+	preview_tooltip.offset_top = 0
+	preview_tooltip.offset_bottom = 0
+	
+	preview_tooltip.visible = false
 
 	# Connect buttons
 	back_button.pressed.connect(func() -> void: back_requested.emit())
-	monsters_tab.pressed.connect(func() -> void: _load_category("monsters"))
-	items_tab.pressed.connect(func() -> void: _load_category("items"))
-	relics_tab.pressed.connect(func() -> void: _load_category("relics"))
+	monsters_tab.pressed.connect(func() -> void: _load_category(Category.MONSTERS))
+	items_tab.pressed.connect(func() -> void: _load_category(Category.ITEMS))
+	relics_tab.pressed.connect(func() -> void: _load_category(Category.RELICS))
 
 	grid_container.resized.connect(_on_grid_container_resized)
 
 	# Load default category if run_state has been injected early
-	if run_state:
-		_load_category("monsters")
+	_load_category(Category.MONSTERS)
 
-func _load_category(category: String) -> void:
+func _load_category(category: Category) -> void:
 	# Clear grid
 	for child: Node in grid_container.get_children():
 		child.queue_free()
@@ -71,13 +75,13 @@ func _load_category(category: String) -> void:
 		return
 
 	var templates: Array[Resource] = []
-	if category == "monsters":
+	if category == Category.MONSTERS:
 		for t: UnitData in run_state.unit_templates:
 			templates.append(t)
-	elif category == "items":
+	elif category == Category.ITEMS:
 		for t: ItemData in run_state.item_templates:
 			templates.append(t)
-	elif category == "relics":
+	elif category == Category.RELICS:
 		for t: RelicData in run_state.relic_templates:
 			templates.append(t)
 
@@ -143,29 +147,25 @@ func _update_preview(resource: Resource, p_level: int = 1) -> void:
 		preview_tooltip.setup_for_relic(inst)
 		preview_tooltip.visible = true
 
-func _update_tab_buttons_styling(category: String) -> void:
+func _update_tab_buttons_styling(category: Category) -> void:
 	var set_decorator_styling: Callable = func(btn: Button, is_active: bool) -> void:
 		var dec: GameButtonDecorator = btn.get_node_or_null("GameButtonDecorator") as GameButtonDecorator
 		var normal: Color = GameColors.TAB_ACTIVE_NORMAL if is_active else GameColors.TAB_INACTIVE_NORMAL
 		var hover: Color = GameColors.TAB_ACTIVE_HOVER if is_active else GameColors.TAB_INACTIVE_HOVER
 		var pressed: Color = GameColors.TAB_ACTIVE_PRESSED if is_active else GameColors.TAB_INACTIVE_PRESSED
 		
-		dec.color_normal = normal
 		dec.normal_color = normal
-		dec.color_hover = hover
 		dec.hover_color = hover
-		dec.color_pressed = pressed
 		dec.pressed_color = pressed
 		
-		if dec.mat:
-			var current_color: Color = normal
-			if btn.button_pressed or btn.is_hovered():
-				current_color = hover
-			dec.mat.set_shader_parameter("interior_color", current_color)
+		var current_color: Color = normal
+		if btn.button_pressed or btn.is_hovered():
+			current_color = hover
+		dec.mat.set_shader_parameter("interior_color", current_color)
 				
-	set_decorator_styling.call(monsters_tab, category == "monsters")
-	set_decorator_styling.call(items_tab, category == "items")
-	set_decorator_styling.call(relics_tab, category == "relics")
+	set_decorator_styling.call(monsters_tab, category == Category.MONSTERS)
+	set_decorator_styling.call(items_tab, category == Category.ITEMS)
+	set_decorator_styling.call(relics_tab, category == Category.RELICS)
 
 func _get_rarity_weight(resource: Resource) -> int:
 	var rarity_res: Rarity = null
