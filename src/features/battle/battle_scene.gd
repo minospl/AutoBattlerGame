@@ -228,7 +228,7 @@ func _on_player_unit_stats_changed(slot_idx: int) -> void:
 	var card: BattleCard = slot.get_card()
 	card.update_ui()
 	if preview_tooltip and preview_tooltip.visible and preview_tooltip.get_unit_instance() == card.unit_instance:
-		preview_tooltip.update_stats()
+		preview_tooltip.update_dynamic_content()
 
 func _on_enemy_unit_stats_changed(slot_idx: int) -> void:
 	if slot_idx < 0 or slot_idx >= enemy_slots.size():
@@ -237,7 +237,7 @@ func _on_enemy_unit_stats_changed(slot_idx: int) -> void:
 	var card: BattleCard = slot.get_card()
 	card.update_ui()
 	if preview_tooltip and preview_tooltip.visible and preview_tooltip.get_unit_instance() == card.unit_instance:
-		preview_tooltip.update_stats()
+		preview_tooltip.update_dynamic_content()
 
 func _update_all_card_uis() -> void:
 	for i: int in range(MAX_TEAM_SIZE):
@@ -255,7 +255,7 @@ func _update_all_card_uis() -> void:
 			b_card.update_ui()
 
 	if preview_tooltip and preview_tooltip.visible:
-		preview_tooltip.update_stats()
+		preview_tooltip.update_dynamic_content()
 
 func _process(delta: float) -> void:
 	if not _battle_start_triggered:

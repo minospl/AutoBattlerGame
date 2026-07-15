@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" path="res://src/shared/ui/components/card_tooltip.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
+[ext_resource type="Script" path="res://src/shared/ui/components/tooltip_stats_panel.gd" id="3_stats"]
+[ext_resource type="Script" path="res://src/shared/ui/components/tooltip_keywords_box.gd" id="4_keywords"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tooltip"]
 
@@ -22,6 +24,7 @@ visible = false
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/separation = 8
+script = ExtResource("4_keywords")
 
 [node name="MainTooltipWrapper" type="PanelContainer" parent="HBox"]
 unique_name_in_owner = true
@@ -47,14 +50,10 @@ theme_override_constants/margin_bottom = 12
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="HeaderMargin" type="MarginContainer" parent="HBox/MainTooltipWrapper/Padding/VBox"]
-layout_mode = 2
-theme_override_constants/margin_bottom = 4
-
-[node name="HeaderHBox" type="HBoxContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/HeaderMargin"]
+[node name="HeaderHBox" type="HBoxContainer" parent="HBox/MainTooltipWrapper/Padding/VBox"]
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="HBox/MainTooltipWrapper/Padding/VBox/HeaderMargin/HeaderHBox"]
+[node name="NameLabel" type="Label" parent="HBox/MainTooltipWrapper/Padding/VBox/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -64,7 +63,7 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 18
 text = "NAME"
 
-[node name="RarityLabel" type="Label" parent="HBox/MainTooltipWrapper/Padding/VBox/HeaderMargin/HeaderHBox"]
+[node name="RarityLabel" type="Label" parent="HBox/MainTooltipWrapper/Padding/VBox/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -127,31 +126,64 @@ stretch_mode = 5
 
 [node name="FallbackLabel" type="Label" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.2, 0.2, 0.22, 1)
-theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.45)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 14
 text = "?"
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 3
 
-[node name="StatsPanel" type="MarginContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
-unique_name_in_owner = true
+[node name="BadgeCenter" type="CenterContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 4
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 4
 
-[node name="StatsGrid" type="GridContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/StatsPanel"]
+[node name="BadgeList" type="VBoxContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/BadgeCenter"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="StatsPanelContainer" type="PanelContainer" parent="HBox/MainTooltipWrapper/Padding/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="StatsBorderRect" type="ColorRect" parent="HBox/MainTooltipWrapper/Padding/VBox/StatsPanelContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("2_decorator")
+border_type = 0
+border_color = Color(0.57, 0.58, 0.65, 1)
+interior_color = Color(1, 1, 1, 1)
+outer_border_width = 2
+border_indentation = 1
+
+[node name="StatsMargin" type="MarginContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/StatsPanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="StatsPanel" type="MarginContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/StatsPanelContainer/StatsMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("3_stats")
+
+[node name="StatsGrid" type="GridContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/StatsPanelContainer/StatsMargin/StatsPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 12
 columns = 2
 
-[node name="StatLabelTemplate" type="RichTextLabel" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/StatsPanel"]
+[node name="StatLabelTemplate" type="RichTextLabel" parent="HBox/MainTooltipWrapper/Padding/VBox/StatsPanelContainer/StatsMargin/StatsPanel"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
@@ -164,45 +196,6 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 clip_contents = false
-
-[node name="BadgeContainerPanel" type="PanelContainer" parent="HBox/MainTooltipWrapper/Padding/VBox"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="BadgeContainerBorderRect" type="ColorRect" parent="HBox/MainTooltipWrapper/Padding/VBox/BadgeContainerPanel"]
-unique_name_in_owner = true
-layout_mode = 2
-script = ExtResource("2_decorator")
-border_type = 0
-border_color = Color(0.57, 0.58, 0.65, 1)
-interior_color = Color(1, 1, 1, 1)
-outer_border_width = 2
-border_indentation = 1
-
-[node name="Margin" type="MarginContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/BadgeContainerPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 4
-
-[node name="Center" type="CenterContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/BadgeContainerPanel/Margin"]
-layout_mode = 2
-
-[node name="BadgePanel" type="PanelContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/BadgeContainerPanel/Margin/Center"]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="BadgeLabel" type="Label" parent="HBox/MainTooltipWrapper/Padding/VBox/BadgeContainerPanel/Margin/Center/BadgePanel"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 14
-text = "TYPE"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="DescPanel" type="PanelContainer" parent="HBox/MainTooltipWrapper/Padding/VBox"]
 unique_name_in_owner = true
@@ -238,6 +231,7 @@ clip_contents = false
 autowrap_mode = 2
 
 [node name="HelpPanel" type="PanelContainer" parent="HBox/MainTooltipWrapper/Padding/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="HelpBorderRect" type="ColorRect" parent="HBox/MainTooltipWrapper/Padding/VBox/HelpPanel"]

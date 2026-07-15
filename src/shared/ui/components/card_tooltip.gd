@@ -2,50 +2,50 @@ class_name CardTooltip
 extends MarginContainer
 
 const CHROMA_KEY_SHADER: Shader = preload("res://src/shared/shaders/chroma_key.gdshader")
+const TYPE_BADGE_SCENE: PackedScene = preload("res://src/shared/ui/components/type_badge.tscn")
+const BADGE_COLOR_ITEM: Color = Color(0.18, 0.45, 0.72, 1.0) # Sleek blue for items
+const BADGE_COLOR_RELIC: Color = Color(0.72, 0.45, 0.18, 1.0) # Gold-amber for relics
 
 @onready var border_rect: ShaderBorderDecorator = %BorderRect
 @onready var name_label: Label = %NameLabel
 @onready var rarity_label: Label = %RarityLabel
 @onready var sprite_rect: TextureRect = %SpriteRect
 @onready var fallback_label: Label = %FallbackLabel
-@onready var badge_panel: PanelContainer = %BadgePanel
-@onready var badge_label: Label = %BadgeLabel
-@onready var badge_container_panel: PanelContainer = %BadgeContainerPanel
-@onready var stats_panel: MarginContainer = %StatsPanel
-@onready var stats_grid: GridContainer = %StatsGrid
-@onready var stat_label_template: RichTextLabel = %StatLabelTemplate
+@onready var badge_list: VBoxContainer = %BadgeList
+@onready var stats_panel_container: PanelContainer = %StatsPanelContainer
+@onready var stats_panel: TooltipStatsPanel = %StatsPanel
 @onready var desc_panel: PanelContainer = %DescPanel
 @onready var desc_label: RichTextLabel = %DescLabel
 
 # Cache border panels as @onready to avoid runtime lookup issues
 @onready var portrait_border_rect: ShaderBorderDecorator = %PortraitBorderRect
 @onready var sprite_border_rect: ShaderBorderDecorator = %SpriteBorderRect
-@onready var badge_container_border_rect: ShaderBorderDecorator = %BadgeContainerBorderRect
+@onready var stats_border_rect: ShaderBorderDecorator = %StatsBorderRect
 @onready var desc_border_rect: ShaderBorderDecorator = %DescBorderRect
 @onready var help_border_rect: ShaderBorderDecorator = %HelpBorderRect
+@onready var help_panel: PanelContainer = %HelpPanel
 
 var _unit_instance: UnitInstance
-var _item_card: ItemInstance
+var _item_instance: ItemInstance
 var _relic_instance: RelicInstance
-var _rarity_name: String = "COMMON"
-var _rarity_color: Color = GameColors.BORDER_OUTER_DEFAULT
+var _keywords_count: int = 0
 
-@onready var keywords_vbox: VBoxContainer = %KeywordsVBox
+@onready var keywords_vbox: TooltipKeywordsBox = %KeywordsVBox
 @onready var main_tooltip_wrapper: PanelContainer = %MainTooltipWrapper
 
 func _ready() -> void:
 	if _unit_instance:
 		_setup_unit_ui()
 		_build_keywords()
-	elif _item_card:
+	elif _item_instance:
 		_setup_item_ui()
+		_build_keywords()
 	elif _relic_instance:
 		_setup_relic_ui()
+		_build_keywords()
 
 	_set_mouse_filter_ignore_recursive(self)
 	
-	# Make sure the parent container (PreviewContainer) also ignores mouse inputs
-	# as its invisible boundaries expand to fit the keywords column.
 	var parent_node: Node = get_parent()
 	if parent_node and parent_node is Control:
 		(parent_node as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -61,261 +61,139 @@ func get_unit_instance() -> UnitInstance:
 
 func setup_for_unit(unit_instance: UnitInstance) -> void:
 	_unit_instance = unit_instance
-	_item_card = null
+	_item_instance = null
 	_relic_instance = null
 	if is_node_ready():
 		_setup_unit_ui()
 		_build_keywords()
 
 func setup_for_item(item_card: ItemInstance) -> void:
-	_item_card = item_card
+	_item_instance = item_card
 	_unit_instance = null
 	_relic_instance = null
 	if is_node_ready():
 		_setup_item_ui()
-		if keywords_vbox:
-			for child: Node in keywords_vbox.get_children():
-				child.queue_free()
+		_build_keywords()
 
 func setup_for_relic(relic_instance: RelicInstance) -> void:
 	_relic_instance = relic_instance
 	_unit_instance = null
-	_item_card = null
+	_item_instance = null
 	if is_node_ready():
 		_setup_relic_ui()
-		if keywords_vbox:
-			for child: Node in keywords_vbox.get_children():
-				child.queue_free()
+		_build_keywords()
 
 func _setup_unit_ui() -> void:
-	if not _unit_instance:
-		return
-		
-	# Reset rarity state to defaults to prevent carry-over bugs
-	_rarity_name = "COMMON"
-	_rarity_color = GameColors.BORDER_OUTER_DEFAULT
-		
-	if _unit_instance.data and _unit_instance.data.rarity:
-		_rarity_name = _unit_instance.data.rarity.rarity_name.to_upper()
-		_rarity_color = _unit_instance.data.rarity.border_color
+	_setup_common_ui(_unit_instance.data)
 	
-	# Stats
-	stats_panel.visible = true
-		
-	update_header()
-	update_border()
-	update_sprite()
+	# Specyficzne dla jednostki:
+	name_label.text = _unit_instance.get_unit_name().to_upper() + " [Lvl %d]" % _unit_instance.level
+	stats_panel_container.visible = true
+	stats_panel.setup(_unit_instance)
+	
 	update_badge()
-	update_stats()
 	update_description()
 
 func _setup_item_ui() -> void:
-	if not _item_card:
-		return
-		
-	# Reset rarity state to defaults to prevent carry-over bugs
-	_rarity_name = "COMMON"
-	_rarity_color = GameColors.BORDER_OUTER_DEFAULT
-		
-	if _item_card.data and _item_card.data.rarity:
-		_rarity_name = _item_card.data.rarity.rarity_name.to_upper()
-		_rarity_color = _item_card.data.rarity.border_color
+	_setup_common_ui(_item_instance.data)
 	
-	# Items do not use the stats block or the type badge
-	stats_panel.visible = false
-	badge_panel.visible = false
-	if badge_container_panel:
-		badge_container_panel.visible = false
+	# Specyficzne dla przedmiotu:
+	stats_panel_container.visible = false
+	badge_list.visible = true
 
-	update_header()
-	update_border()
-	update_sprite()
+	update_badge()
 	update_description()
 
 func _setup_relic_ui() -> void:
-	if not _relic_instance:
-		return
+	_setup_common_ui(_relic_instance.data)
+	
+	# Specyficzne dla reliktu:
+	var stacks: int = _relic_instance.stacks
+	if stacks > 1:
+		name_label.text = _relic_instance.data.display_name.to_upper() + " [x%d]" % stacks
 		
-	# Reset rarity state to defaults
-	_rarity_name = "COMMON"
-	_rarity_color = GameColors.BORDER_OUTER_DEFAULT
-	
-	var relic_data: RelicData = _relic_instance.data
-	if relic_data and relic_data.rarity:
-		var rarity_res: Rarity = relic_data.rarity
-		if rarity_res:
-			_rarity_name = rarity_res.rarity_name.to_upper()
-			_rarity_color = rarity_res.border_color
-	
-	# Relics do not use stats block or type badge
-	stats_panel.visible = false
-	badge_panel.visible = false
-	if badge_container_panel:
-		badge_container_panel.visible = false
+	stats_panel_container.visible = false
+	badge_list.visible = true
 
-	update_header()
-	update_border()
-	update_sprite()
+	update_badge()
 	update_description()
+
+func _setup_common_ui(data: GameResourceData) -> void:
+	name_label.text = data.display_name.to_upper()
+	rarity_label.text = data.rarity.rarity_name.to_upper()
+	
+	var border_col: Color = data.rarity.border_color
+	if border_rect:
+		border_rect.interior_color = border_col
+		border_rect.update_shader_parameters()
+		
+	_update_sub_panel_borders(border_col.lightened(0.5))
+	_update_sprite(data)
 
 func _update_sub_panel_borders(border_col: Color) -> void:
 	var panels: Array[ShaderBorderDecorator] = [
 		portrait_border_rect,
 		sprite_border_rect,
-		badge_container_border_rect,
+		stats_border_rect,
 		desc_border_rect,
 		help_border_rect
 	]
 
 	for rect: ShaderBorderDecorator in panels:
-		if rect:
-			rect.border_color = border_col
-			rect.update_shader_parameters()
+		rect.border_color = border_col
+		rect.update_shader_parameters()
 
-func update_header() -> void:
-	if _unit_instance:
-		name_label.text = _unit_instance.get_unit_name().to_upper() + " [Lvl %d]" % _unit_instance.level
-	elif _item_card:
-		name_label.text = _item_card.data.display_name.to_upper() if _item_card.data else ""
-	elif _relic_instance:
-		var relic_data: RelicData = _relic_instance.data
-		name_label.text = relic_data.display_name.to_upper() if relic_data else ""
-		var stacks: int = _relic_instance.stacks
-		if stacks > 1:
-			name_label.text += " [x%d]" % stacks
-	rarity_label.text = _rarity_name
-
-func update_border() -> void:
-	if border_rect:
-		border_rect.border_color = GameColors.PANEL_BORDER_DEFAULT
-		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-		border_rect.interior_color = _rarity_color
-		border_rect.update_shader_parameters()
-		
-	_update_sub_panel_borders(_rarity_color.lightened(0.5))
-
-func update_sprite() -> void:
-	if _unit_instance:
-		if _unit_instance.data and _unit_instance.data.sprite:
-			sprite_rect.visible = true
-			fallback_label.visible = false
-			sprite_rect.texture = _unit_instance.data.sprite
-			if not sprite_rect.material:
-				var mat: ShaderMaterial = ShaderMaterial.new()
-				mat.shader = CHROMA_KEY_SHADER
-				sprite_rect.material = mat
-		else:
-			sprite_rect.visible = false
-			fallback_label.visible = true
-			fallback_label.text = _unit_instance.get_unit_name().left(1).to_upper()
-	elif _item_card:
+func _update_sprite(data: GameResourceData) -> void:
+	var sprite_tex: Texture2D = data.sprite
+	
+	if sprite_tex:
+		sprite_rect.visible = true
+		fallback_label.visible = false
+		sprite_rect.texture = sprite_tex
+		if not sprite_rect.material:
+			var mat: ShaderMaterial = ShaderMaterial.new()
+			mat.shader = CHROMA_KEY_SHADER
+			sprite_rect.material = mat
+	else:
 		sprite_rect.visible = false
 		fallback_label.visible = true
-		if _item_card.data and _item_card.data.is_clickable:
-			fallback_label.text = "📦"
-		else:
-			fallback_label.text = "🎁"
-	elif _relic_instance:
-		var relic_data: RelicData = _relic_instance.data
-		var sprite_tex: Texture2D = relic_data.sprite if relic_data else null
-		if sprite_tex:
-			sprite_rect.visible = true
-			fallback_label.visible = false
-			sprite_rect.texture = sprite_tex
-			if not sprite_rect.material:
-				var mat: ShaderMaterial = ShaderMaterial.new()
-				mat.shader = CHROMA_KEY_SHADER
-				sprite_rect.material = mat
-		else:
-			sprite_rect.visible = false
-			fallback_label.visible = true
-			fallback_label.text = "📦"
-
+		fallback_label.text = data.display_name.to_upper()
 
 func update_badge() -> void:
-	if not _unit_instance:
-		return
+	# Clear old badge nodes
+	for child: Node in badge_list.get_children():
+		child.queue_free()
 
-	var types: Array[UnitType] = _unit_instance.get_types()
-	if not types.is_empty():
-		badge_panel.visible = true
-		if badge_container_panel:
-			badge_container_panel.visible = true
-		var first_type: UnitType = types[0]
-		badge_label.text = first_type.type_name.to_upper()
-		
-		var flat_style: StyleBoxFlat = StyleBoxFlat.new()
-		flat_style.bg_color = first_type.color
-		flat_style.content_margin_left = 8
-		flat_style.content_margin_right = 8
-		flat_style.content_margin_top = 3
-		flat_style.content_margin_bottom = 3
-		badge_panel.add_theme_stylebox_override("panel", flat_style)
-	else:
-		badge_panel.visible = false
-		if badge_container_panel:
-			badge_container_panel.visible = false
+	var badges_to_create: Dictionary[String, Color] = {}
 
-func update_stats() -> void:
-	if not _unit_instance:
-		return
-		
-	var active_stats: PackedStringArray = PackedStringArray()
-	active_stats.append("%s [color=%s]HP[/color]" % [NumberFormatter.format_large_number(_unit_instance.get_max_health()), GameColors.DESC_HEALTH])
+	if _unit_instance:
+		for type: UnitType in _unit_instance.get_types():
+			badges_to_create[type.type_name.to_upper()] = type.color
+	if _item_instance:
+		badges_to_create["ITEM"] = BADGE_COLOR_ITEM
+	if _relic_instance:
+		badges_to_create["RELIC"] = BADGE_COLOR_RELIC
 
-	active_stats.append(str(_unit_instance.get_cast_speed()).trim_suffix(".0") + " [color=%s]CD[/color]" % GameColors.DESC_CAST_SPEED)
+	badge_list.visible = true
+	for text: String in badges_to_create:
+		var badge: TypeBadge = TYPE_BADGE_SCENE.instantiate()
+		badge_list.add_child(badge)
+		badge.setup(text, badges_to_create[text])
 
-	if _unit_instance.get_attack() > 0:
-		active_stats.append("%s [color=%s]ATK[/color]" % [NumberFormatter.format_large_number(_unit_instance.get_attack()), GameColors.DESC_ATTACK])
-	if _unit_instance.heal > 0:
-		active_stats.append("%s [color=%s]HEAL[/color]" % [NumberFormatter.format_large_number(_unit_instance.heal), GameColors.DESC_HEAL])
-	if _unit_instance.shield > 0:
-		active_stats.append("%s [color=%s]SHIELD[/color]" % [NumberFormatter.format_large_number(_unit_instance.shield), GameColors.DESC_SHIELD])
-	if _unit_instance.poison > 0:
-		active_stats.append("%s [color=%s]POISON[/color]" % [NumberFormatter.format_large_number(_unit_instance.poison), GameColors.DESC_POISON])
-	if _unit_instance.burn > 0:
-		active_stats.append("%s [color=%s]BURN[/color]" % [NumberFormatter.format_large_number(_unit_instance.burn), GameColors.DESC_BURN])
-	if _unit_instance.electrocute > 0:
-		active_stats.append("%s [color=%s]ELEC[/color]" % [NumberFormatter.format_large_number(_unit_instance.electrocute), GameColors.DESC_ELECTROCUTE])
-
-	# Node reuse (Object pooling) logic
-	var needed_labels: int = active_stats.size()
-	var existing_children: Array[Node] = stats_grid.get_children()
-	
-	# Add labels if we don't have enough
-	while existing_children.size() < needed_labels:
-		var new_lbl: RichTextLabel = stat_label_template.duplicate() as RichTextLabel
-		stats_grid.add_child(new_lbl)
-		existing_children.append(new_lbl)
-		
-	# Update all labels text and visibility
-	for idx: int in range(existing_children.size()):
-		var lbl: RichTextLabel = existing_children[idx] as RichTextLabel
-		if idx < needed_labels:
-			if idx < active_stats.size():
-				lbl.text = active_stats[idx]
-			else:
-				lbl.text = ""
-			lbl.visible = true
-		else:
-			lbl.visible = false
+func update_dynamic_content() -> void:
+	if _unit_instance and stats_panel_container.visible:
+		stats_panel.update_dynamic_stats(_unit_instance)
 
 func update_description() -> void:
 	var full_desc: String = ""
 	if _unit_instance:
-		if _unit_instance.data:
-			var modifier: UnitModifier = _unit_instance.data.modifier
-			if modifier:
-				full_desc += modifier.get_description(_unit_instance.level)
-	elif _item_card:
-		if _item_card.data and _item_card.data.modifier:
-			full_desc += _item_card.data.modifier.get_description()
-	elif _relic_instance:
-		var relic_data: RelicData = _relic_instance.data
-		if relic_data and relic_data.modifier:
-			var modifier: RelicModifier = relic_data.modifier
-			if modifier:
-				full_desc += modifier.get_description(_relic_instance)
+		var modifier: UnitModifier = _unit_instance.data.modifier
+		if modifier:
+			full_desc = modifier.get_description(_unit_instance.level)
+	if _item_instance:
+		full_desc = _item_instance.data.modifier.get_description()
+	if _relic_instance:
+		full_desc = _relic_instance.data.modifier.get_description(_relic_instance)
 			
 	if not full_desc.is_empty():
 		desc_panel.visible = true
@@ -331,67 +209,15 @@ func _process(_delta: float) -> void:
 func _build_keywords() -> void:
 	if not keywords_vbox:
 		return
-		
-	# Clear old nodes
-	for child: Node in keywords_vbox.get_children():
-		child.queue_free()
-		
-	var keywords: Array[Dictionary] = KeywordDatabase.get_keywords_for_unit(_unit_instance, _unit_instance.level)
-	for kw: Dictionary in keywords:
-		var panel: PanelContainer = _create_keyword_panel(str(kw["title"]), str(kw["desc"]))
-		keywords_vbox.add_child(panel)
+	_keywords_count = keywords_vbox.build_keywords(_unit_instance)
+	_update_help_panel_visibility()
 
-func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
-	panel.custom_minimum_size = Vector2(220, 0)
-	panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-	
-	var border: ShaderBorderDecorator = ShaderBorderDecorator.new()
-	border.border_type = ShaderBorderDecorator.BorderType.DOUBLE
-	border.interior_color = Color(1.0, 1.0, 1.0) # Solid white background
-	border.outer_border_width = 2
-	border.inner_border_width = 2
-	border.border_indentation = 1
-	panel.add_child(border)
-	
-	var margin: MarginContainer = MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 10)
-	margin.add_theme_constant_override("margin_right", 10)
-	margin.add_theme_constant_override("margin_top", 8)
-	margin.add_theme_constant_override("margin_bottom", 8)
-	
-	var vbox: VBoxContainer = VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 4)
-	
-	var title_lbl: Label = Label.new()
-	title_lbl.text = title.to_upper()
-	title_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2)) # Gold title
-	title_lbl.add_theme_font_size_override("font_size", 14)
-	title_lbl.add_theme_color_override("font_outline_color", Color(0.12, 0.12, 0.13)) # Dark outline
-	title_lbl.add_theme_constant_override("outline_size", 4)
-	vbox.add_child(title_lbl)
-	
-	var desc_lbl: RichTextLabel = RichTextLabel.new()
-	desc_lbl.bbcode_enabled = true
-	desc_lbl.text = "[color=#2c3e50][font_size=12]%s[/font_size][/color]" % desc
-	desc_lbl.fit_content = true
-	desc_lbl.selection_enabled = false
-	desc_lbl.scroll_active = false
-	vbox.add_child(desc_lbl)
-	
-	margin.add_child(vbox)
-	panel.add_child(margin)
-	
-	panel.ready.connect(func() -> void:
-		border.update_shader_parameters()
-	)
-	
-	_set_mouse_filter_ignore_recursive(panel)
-	return panel
-
+func _update_help_panel_visibility() -> void:
+	if not help_panel:
+		return
+	help_panel.visible = _keywords_count > 0
 
 func _update_keywords_visibility(show_keywords: bool) -> void:
 	if not keywords_vbox:
 		return
-	var has_keywords: bool = keywords_vbox.get_child_count() > 0
-	keywords_vbox.visible = show_keywords and has_keywords
+	keywords_vbox.visible = show_keywords and _keywords_count > 0

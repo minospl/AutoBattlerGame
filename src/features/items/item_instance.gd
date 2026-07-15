@@ -8,6 +8,9 @@ extends Resource
 func initialize(p_data: ItemData) -> void:
 	data = p_data
 
+func get_item_name() -> String:
+	return data.display_name
+
 ## Clone this item instance
 func clone() -> ItemInstance:
 	var new_inst: ItemInstance = ItemInstance.new()

@@ -12,6 +12,9 @@ func initialize(p_data: RelicData) -> void:
 	data = p_data
 	stacks = 1
 
+func get_relic_name() -> String:
+	return data.display_name
+
 static func has_relic(relic_list: Array[RelicInstance], p_name: String) -> bool:
 	for r: RelicInstance in relic_list:
 		if r.data.display_name == p_name:
