@@ -9,21 +9,23 @@ Dokument ten zawiera szczegółową analizę stanu obecnego projektu **AutoBattl
 Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu można podzielić na gotowe fundamenty oraz luki wymagające implementacji.
 
 ### A. Co stanowi fundament gry (Stan Gotowy)
-*   **Główna pętla gry (Core Loop):** Klasa [GameRoot](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/game_root.gd) sprawnie zarządza przełączaniem scen między sklepem ([ShopScene](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd)) a walką ([BattleScene](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_scene.gd)) oraz przekazuje stan rozgrywki ([RunState](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd)) poprzez wstrzykiwanie zależności (`setup()`), unikając globalnych autoloadów.
-*   **System Sklepu (Shop Mechanics):** Działa kupowanie jednostek (za 3g), zamrażanie (freeze) ofert, odświeżanie sklepu (roll za 1g), oraz sprzedaż jednostek z ławki lub drużyny. W pełni zaimplementowany jest algorytm łączenia jednostek (mergowanie 3 identycznych jednostek tego samego poziomu w jedną wyższego poziomu, maksymalnie do poziomu 3) w [RunState](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd).
-*   **Pozycjonowanie i Siatka 2x3:** Logiczna siatka drużyny (6 slotów) i ławki (8 slotów). Zależności pozycjonowania są rozwiązywane przez helper [TargetResolver](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/target_resolver.gd), co pozwala na precyzyjne nakładanie efektów (np. ADJACENT, HORIZONTAL, VERTICAL, UP, DOWN).
-*   **Mechanika Wspólnego Zdrowia (Shared Health):** W walce jednostki nie posiadają indywidualnego paska HP. Ich punkty życia są sumowane do wspólnej puli drużyny ([BattleTeam](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_team.gd)). Obrażenia (zarówno fizyczne, jak i od statusów) są zadawane całej drużynie.
-*   **Symulacja Walki:** System czasu rzeczywistego oparty o `cast_speed` każdej jednostki. Gdy pasek akcji się zapełni, jednostka wykonuje atak podstawowy, nakłada statusy lub leczy/nakłada tarcze. Zaimplementowano mechanikę zmęczenia (Fatigue) zadającą rosnące obrażenia Fibonacciego po 30 sekundach.
-*   **System Modyfikatorów i Szablonów:** Modułowa struktura, w której każdy modyfikator (np. [AncientTitanModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/templates/modifiers/ancient_titan_modifier.gd)) dziedziczy po [UnitModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/unit_modifier.gd) i sam definiuje swoje działanie. Istnieje 8 gotowych szablonów potworów (`.tres`) oraz ich modyfikatorów.
-*   **System Przedmiotów i Jedzenia (Item & Food System):** Wdrożono klasy bazowe [ItemData](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_data.gd), [ItemInstance](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_instance.gd) oraz [ItemModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_modifier.gd). Stworzono gotowe szablony jedzenia ([apple.tres](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/templates/apple.tres), [sword.tres](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/templates/sword.tres)), które spawnują się w sklepie (szansa 30%) i mogą być przeciągane na sojusznicze jednostki w celu stałego wzmocnienia statystyk.
+
+* **Główna pętla gry (Core Loop):** Klasa [GameRoot](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/game_root.gd) sprawnie zarządza przełączaniem scen między sklepem ([ShopScene](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd)) a walką ([BattleScene](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_scene.gd)) oraz przekazuje stan rozgrywki ([RunState](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd)) poprzez wstrzykiwanie zależności (`setup()`), unikając globalnych autoloadów.
+* **System Sklepu (Shop Mechanics):** Działa kupowanie jednostek (za 3g), zamrażanie (freeze) ofert, odświeżanie sklepu (roll za 1g), oraz sprzedaż jednostek z ławki lub drużyny. W pełni zaimplementowany jest algorytm łączenia jednostek (mergowanie 3 identycznych jednostek tego samego poziomu w jedną wyższego poziomu, maksymalnie do poziomu 3) w [RunState](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd).
+* **Pozycjonowanie i Siatka 2x3:** Logiczna siatka drużyny (6 slotów) i ławki (8 slotów). Zależności pozycjonowania są rozwiązywane przez helper [TargetResolver](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/target_resolver.gd), co pozwala na precyzyjne nakładanie efektów (np. ADJACENT, HORIZONTAL, VERTICAL, UP, DOWN).
+* **Mechanika Wspólnego Zdrowia (Shared Health):** W walce jednostki nie posiadają indywidualnego paska HP. Ich punkty życia są sumowane do wspólnej puli drużyny ([BattleTeam](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_team.gd)). Obrażenia (zarówno fizyczne, jak i od statusów) są zadawane całej drużynie.
+* **Symulacja Walki:** System czasu rzeczywistego oparty o `cast_speed` każdej jednostki. Gdy pasek akcji się zapełni, jednostka wykonuje atak podstawowy, nakłada statusy lub leczy/nakłada tarcze. Zaimplementowano mechanikę zmęczenia (Fatigue) zadającą rosnące obrażenia Fibonacciego po 30 sekundach.
+* **System Modyfikatorów i Szablonów:** Modułowa struktura, w której każdy modyfikator (np. [AncientTitanModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/templates/modifiers/ancient_titan_modifier.gd)) dziedziczy po [UnitModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/unit_modifier.gd) i sam definiuje swoje działanie. Istnieje 8 gotowych szablonów potworów (`.tres`) oraz ich modyfikatorów.
+* **System Przedmiotów i Jedzenia (Item & Food System):** Wdrożono klasy bazowe [ItemData](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_data.gd), [ItemInstance](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_instance.gd) oraz [ItemModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_modifier.gd). Stworzono gotowe szablony jedzenia ([apple.tres](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/templates/apple.tres), [sword.tres](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/templates/sword.tres)), które spawnują się w sklepie (szansa 30%) i mogą być przeciągane na sojusznicze jednostki w celu stałego wzmocnienia statystyk.
 
 ### B. Obszary brakujące (Do Zaimplementowania)
-*   **Relikty i Przedmioty Pasywne (Relics & Passive Items):** Choć jedzenie/przedmioty jednorazowe działają, brakuje reliktów (pasywnych modyfikatorów rozgrywki/walki wpływających na całą drużynę lub konkretne jednostki), które pomagają w rozgrywce (nie chodzi o tradycyjny ekwipunek typu hełm czy zbroja).
-*   **Elementy Dungeon Crawler:** W tytule gry widnieje "Dungeon", lecz obecnie brakuje jakiejkolwiek eksploracji lochów. Gra to liniowy ciąg losowych walk dzień po dniu. Brakuje mapy lochu (np. rozgałęzionego drzewka z punktami), wydarzeń losowych (Dungeon Events) oraz walk z bossami.
-*   **Typy Jednostek (Unit Types):** Klasa [UnitInstance](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/unit_instance.gd) pozwala na pobranie typów potwora (`get_types()`). Typy te nie będą zaimplementowane jako globalne, pasywne bonusy drużynowe (np. +X do ataku za posiadanie 3 potworów "Wodnych"). Zamiast tego będą wykorzystywane bezpośrednio wewnątrz modularnych modyfikatorów jednostek (np. +10 statystki "heal" dla sojusznika typu "Wodny").
-*   **System Zapisywania Gry (Save/Load):** Cały stan gry istnieje wyłącznie w pamięci podręcznej. Zamknięcie okna gry powoduje utratę postępu rozgrywki.
-*   **Dźwięk (Audio System):** Brak jakichkolwiek efektów dźwiękowych (SFX) dla kliknięć UI, przeciągania kart, ataków w walce, aktywacji modyfikatorów oraz muzyki w tle (BGM).
-*   **Efekty Wizualne (VFX) i Animacje:** Brak dedykowanych animacji trafień, pocisków, efektów zaklęć, trzęsienia ekranu przy silnych ciosach czy płynnych przejść fazy sklepu w fazę walki.
+
+* **Relikty i Przedmioty Pasywne (Relics & Passive Items):** Choć jedzenie/przedmioty jednorazowe działają, brakuje reliktów (pasywnych modyfikatorów rozgrywki/walki wpływających na całą drużynę lub konkretne jednostki), które pomagają w rozgrywce (nie chodzi o tradycyjny ekwipunek typu hełm czy zbroja).
+* **Elementy Dungeon Crawler:** W tytule gry widnieje "Dungeon", lecz obecnie brakuje jakiejkolwiek eksploracji lochów. Gra to liniowy ciąg losowych walk dzień po dniu. Brakuje mapy lochu (np. rozgałęzionego drzewka z punktami), wydarzeń losowych (Dungeon Events) oraz walk z bossami.
+* **Typy Jednostek (Unit Types):** Klasa [UnitInstance](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/unit_instance.gd) pozwala na pobranie typów potwora (`get_types()`). Typy te nie będą zaimplementowane jako globalne, pasywne bonusy drużynowe (np. +X do ataku za posiadanie 3 potworów "Wodnych"). Zamiast tego będą wykorzystywane bezpośrednio wewnątrz modularnych modyfikatorów jednostek (np. +10 statystki "heal" dla sojusznika typu "Wodny").
+* **System Zapisywania Gry (Save/Load):** Cały stan gry istnieje wyłącznie w pamięci podręcznej. Zamknięcie okna gry powoduje utratę postępu rozgrywki.
+* **Dźwięk (Audio System):** Brak jakichkolwiek efektów dźwiękowych (SFX) dla kliknięć UI, przeciągania kart, ataków w walce, aktywacji modyfikatorów oraz muzyki w tle (BGM).
+* **Efekty Wizualne (VFX) i Animacje:** Brak dedykowanych animacji trafień, pocisków, efektów zaklęć, trzęsienia ekranu przy silnych ciosach czy płynnych przejść fazy sklepu w fazę walki.
 
 ---
 
@@ -32,6 +34,7 @@ Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu m
 Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności zamknąć podstawowe systemy rozgrywki, następnie rozbudować warstwę zawartości ("Dungeon"), a na końcu dopracować doznania audiowizualne.
 
 ### Kamień Milowy 1: Faza MVP / Alfa (Grywalny Szkielet Rozgrywki)
+
 **Cel Główny:** Uruchomienie pełnego cyklu rozgrywki auto-battlera z działającymi przedmiotami oraz poprawkami typowania.
 
 | Kategoria | Zadania do wykonania | Priorytet |
@@ -47,6 +50,7 @@ Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności za
 ---
 
 ### Kamień Milowy 2: Faza Beta (Dungeon Crawler i Skalowanie Zawartości)
+
 **Cel Główny:** Dodanie elementu eksploracji lochów, urozmaicenie przeciwników i zaimplementowanie progresji trudności.
 
 | Kategoria | Zadania do wykonania | Priorytet |
@@ -62,6 +66,7 @@ Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności za
 ---
 
 ### Kamień Milowy 3: Polerowanie i Optymalizacja (UI/UX Premium, Muzyka, VFX)
+
 **Cel Główny:** Doprowadzenie gry do poziomu "Premium UX" poprzez bogate animacje, efekty cząsteczkowe i zbalansowane udźwiękowienie.
 
 | Kategoria | Zadania do wykonania | Priorytet |
@@ -75,6 +80,7 @@ Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności za
 ---
 
 ### Kamień Milowy 4: Wydanie (Balans i QA)
+
 **Cel Główny:** Osiągnięcie idealnego balansu, usunięcie błędów, wdrożenie Menu Głównego oraz systemu zapisu gry dla stabilnej dystrybucji.
 
 | Kategoria | Zadania do wykonania | Priorytet |
@@ -90,21 +96,21 @@ Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności za
 
 ---
 
-## 3. Przyszłe Rozszerzenia:
+## 3. Przyszłe Rozszerzenia
 
 ### **System reliktów**
 
 Na podstawie wymagań projektowych zdefiniowano następujące źródła pozyskiwania reliktów w grze, do zrealizowania w kolejnych fazach rozwoju (np. przy wdrażaniu lochów/eventów):
 
 1. **Zakup bezpośredni w sklepie (Wdrożone):**
-   - Kupowanie klikalnych przedmiotów-skrzyń w sklepie, które po zakupie losują i dodają relikt o określonej rzadkości (`Common`, `Rare`, `Epic`, `Legendary`).
+   * Kupowanie klikalnych przedmiotów-skrzyń w sklepie, które po zakupie losują i dodają relikt o określonej rzadkości (`Common`, `Rare`, `Epic`, `Legendary`).
 2. **Wydarzenia na mapie lochów (Kamień Milowy 2):**
-   - Zdarzenia tekstowe / eventy generowane automatycznie co 3 dni na mapie lochów (np. oferujące graczowi wybór reliktu spośród kilku wylosowanych propozycji).
+   * Zdarzenia tekstowe / eventy generowane automatycznie co 3 dni na mapie lochów (np. oferujące graczowi wybór reliktu spośród kilku wylosowanych propozycji).
 3. **Modyfikatory kart jednostek (Kamień Milowy 2 / Nowe modyfikatory):**
-   - Zdolności potworów wyzwalane na koniec walki (np. *"On victory/defeat get a [Rarity] relic of [Level] level"*).
+   * Zdolności potworów wyzwalane na koniec walki (np. *"On victory/defeat get a [Rarity] relic of [Level] level"*).
 
 ### **Zaawansowany System Statystyk (Stat Modifier Pattern)**
+
 Jako przyszły refaktor w ramach rozwoju gry (np. przy wdrażaniu dziesiątek nakładających się efektów, aury i czasowych debufów w Kamieniu Milowym 3):
-- **Wdrożenie modułowego systemu statystyk**: Przejście z uproszczonego podejścia "zmienna + dynamiczny getter" (np. `attack + ongoing_attack_bonus`) na pełny wzorzec **Stat Modifier**. Każda statystyka jednostki (zdrowie, atak, cast speed) stanie się osobnym obiektem (klasa `Stat`), który zarządza listą aktywnych modyfikatorów (`StatModifier` o typach FLAT i PERCENT) i automatycznie wylicza końcową wartość, co wyeliminuje ryzyko konfliktów przy nakładaniu się wielu różnych efektów.
 
-
+* **Wdrożenie modułowego systemu statystyk**: Przejście z uproszczonego podejścia "zmienna + dynamiczny getter" (np. `attack + ongoing_attack_bonus`) na pełny wzorzec **Stat Modifier**. Każda statystyka jednostki (zdrowie, atak, cast speed) stanie się osobnym obiektem (klasa `Stat`), który zarządza listą aktywnych modyfikatorów (`StatModifier` o typach FLAT i PERCENT) i automatycznie wylicza końcową wartość, co wyeliminuje ryzyko konfliktów przy nakładaniu się wielu różnych efektów.

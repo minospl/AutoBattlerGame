@@ -9,6 +9,7 @@ Gra łączy taktyczne zarządzanie drużyną jednostek w fazie sklepu z automaty
 ## 🎮 Pętla Rozgrywki (Core Loop)
 
 Rozgrywka opiera się na dwóch naprzemiennych fazach:
+
 1. **Faza sklepu (Shop)** – gracz zarządza złotem, kupuje i sprzedaje jednostki, kupuje jedzenie/przedmioty jednorazowe w celu ulepszenia statystyk jednostek oraz kupuje relikty (pasywne modyfikatory). Może także odświeżać ofertę (roll) oraz zamrażać (freeze) wybrane karty na kolejny dzień. Obowiązuje tu zasada łączenia jednostek (mergowanie 3 takich samych jednostek tego samego poziomu w 1 silniejszy, max poziom 3).
 2. **Faza walki (Battle)** – automatyczna symulacja starcia drużyny gracza z drużyną przeciwnika. Jednostki automatycznie ładują swoje paski akcji na podstawie prędkości wykonania (`cast_speed`) i wykonują ataki lub aktywują modyfikatory.
 
@@ -17,21 +18,27 @@ Rozgrywka opiera się na dwóch naprzemiennych fazach:
 ## ⚙️ Kluczowe Mechaniki
 
 ### Pozycjonowanie i Siatka 2x3
+
 Pozycjonowanie ma kluczowe znaczenie strategiczne, ponieważ wiele modyfikatorów jednostek działa obszarowo (np. nakładanie tarczy na sąsiadujące sloty). Zależności pozycjonowania są rozwiązywane dynamicznie za pomocą klasy `TargetResolver`.
 
 ### Wspólne Punkty Życia Drużyny (Shared Team Health)
+
 W walce jednostki nie posiadają indywidualnego paska HP.
+
 - Przy starcie walki zdrowie wszystkich aktywnych jednostek sumuje się we wspólną pulę zdrowia drużyny (`health` oraz `max_health` klasy `BattleTeam`).
 - Wszystkie otrzymywane obrażenia są odejmowane bezpośrednio od wspólnej puli zdrowia/tarczy całej drużyny.
 - Przegrana następuje, gdy wspólne zdrowie drużyny spadnie do `0`.
 
 ### Statusy (Status Effects)
+
 - **Poison (Trucizna):** Zadaje obrażenia równe liczbie ładunków co 1.0 sekundy.
 - **Burn (Oparzenie):** Zadaje obrażenia równe liczbie ładunków co 0.5 sekundy, po czym zmniejsza liczbę ładunków o 1.
 - **Electrocute (Porażenie):** Zwiększa otrzymywane obrażenia przez drużynę o wartość ładunku porażenia, gdy jednostka atakująca ma atak > 0.
 
 ### Obiektowy System Modyfikatorów
+
 Każda zdolność jednostki, przedmiotu czy reliktu jest zaimplementowana jako modularny modyfikator dziedziczący po `UnitModifier`, `ItemModifier` lub `RelicModifier`.
+
 - Zdolności definiują swoje wyzwalacze (np. `ON_BATTLE_START`, `ON_CAST`, `ON_DEATH`).
 - Zamiast centralnego kodu z instrukcją `match`, zachowanie modyfikatorów jest w pełni hermetyzowane we własnych skryptach (folder `templates/modifiers/`), co ułatwia dodawanie nowej zawartości.
 
@@ -39,7 +46,7 @@ Każda zdolność jednostki, przedmiotu czy reliktu jest zaimplementowana jako m
 
 ## 📁 Struktura Projektu
 
-```
+```text
 src/
 ├── assets/                  # Grafiki, animacje i inne zasoby wizualne
 ├── core/                    # Główny kontroler gry (GameRoot) oraz stan rozgrywki (RunState)
