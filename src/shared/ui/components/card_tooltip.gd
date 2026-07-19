@@ -31,7 +31,7 @@ var _relic_instance: RelicInstance
 var _keywords_count: int = 0
 
 @onready var keywords_vbox: TooltipKeywordsBox = %KeywordsVBox
-@onready var main_tooltip_wrapper: PanelContainer = %MainTooltipWrapper
+@onready var main_tooltip_wrapper: MarginContainer = %MainTooltipWrapper
 
 func _ready() -> void:
 	if _unit_instance:

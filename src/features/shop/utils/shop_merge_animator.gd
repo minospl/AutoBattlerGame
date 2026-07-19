@@ -15,7 +15,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	
 	# Get main slot and main card from shop
 	var main_slot: ShopCardSlot = shop.bench_slots[main_idx] if main_is_bench else shop.active_slots[main_idx]
-	var main_card: ShopCard = main_slot.get_card() as ShopCard
+	var main_card: UnitCard = main_slot.get_card() as UnitCard
 	
 	if main_card == null:
 		shop.populate_ui()
@@ -43,7 +43,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 		var rem_idx: int = rem.get("idx", 0)
 		var rem_slot: ShopCardSlot = shop.bench_slots[rem_idx] if rem_is_bench else shop.active_slots[rem_idx]
 		
-		var rem_card: ShopCard = rem_slot.get_card() as ShopCard
+		var rem_card: UnitCard = rem_slot.get_card() as UnitCard
 		if rem_card:
 			# Use the slot's CardContainer global position if layout hasn't run yet
 			var start_pos: Vector2 = rem_card.global_position
@@ -93,7 +93,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 		if not (info_val is Dictionary):
 			continue
 		var info: Dictionary = info_val
-		var card: ShopCard = info.get("card")
+		var card: UnitCard = info.get("card")
 		var start_pos: Vector2 = info.get("start_pos", Vector2.ZERO)
 		var card_size: Vector2 = info.get("size", Vector2.ZERO)
 		
@@ -126,7 +126,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	for i: int in range(overlay_removed.size()):
 		var info: Dictionary = overlay_removed[i]
 		var rot: float = 0.0 if i == 0 else 0.2
-		var info_card: ShopCard = info.get("card")
+		var info_card: UnitCard = info.get("card")
 		var info_start_pos: Vector2 = info.get("start_pos", Vector2.ZERO)
 		var info_card_size: Vector2 = info.get("size", Vector2.ZERO)
 		
@@ -143,7 +143,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 		if not (item_val is Dictionary):
 			continue
 		var item: Dictionary = item_val
-		var card: ShopCard = item.get("card")
+		var card: UnitCard = item.get("card")
 		var target_rot: float = item.get("target_rotation", 0.0)
 		
 		p1_tween.tween_property(card, "global_position", center_main_pos, 0.45)\
@@ -163,7 +163,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	# Tween the removed cards to center, rotating, fading out and shrinking to zero
 	for i: int in range(overlay_removed.size()):
 		var info: Dictionary = overlay_removed[i]
-		var card: ShopCard = info["card"]
+		var card: UnitCard = info["card"]
 		var final_pos: Vector2 = screen_center
 		
 		merge_tween.tween_property(card, "global_position", final_pos, 0.35)\
@@ -181,7 +181,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	var clean_chain: Tween = merge_tween.chain()
 	clean_chain.tween_callback(func() -> void:
 		for info_clean: Dictionary in overlay_removed:
-			var card_clean: ShopCard = info_clean.get("card")
+			var card_clean: UnitCard = info_clean.get("card")
 			if card_clean:
 				card_clean.queue_free()
 	)

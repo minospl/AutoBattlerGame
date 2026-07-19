@@ -2,8 +2,8 @@ class_name ForestGuardianModifier
 extends UnitModifier
 
 @export var value_1: int = 5
-@export var value_2: int = 5
-@export var value_3: int = 5
+@export var value_2: int = 10
+@export var value_3: int = 10
 
 func get_target(_p_level: int = 1) -> TargetType:
 	return TargetType.HORIZONTAL

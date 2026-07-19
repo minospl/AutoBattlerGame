@@ -92,6 +92,38 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
+[node name="FreezeShopButton" type="Button" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(26, 19)
+layout_mode = 2
+toggle_mode = true
+
+[node name="GameButtonDecorator" type="Node" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/FreezeShopButton"]
+script = ExtResource("7_button_decorator")
+margin_top = 3
+margin_bottom = 3
+margin_left = 8
+margin_right = 8
+color_normal = Color(0.18, 0.5, 0.72, 1)
+color_hover = Color(0.25, 0.65, 0.9, 1)
+color_pressed = Color(0.1, 0.4, 0.6, 1)
+
+[node name="ButtonText" type="RichTextLabel" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/FreezeShopButton"]
+layout_mode = 1
+anchors_preset = 8
+offset_top = -1.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+fit_content = true
+clip_contents = false
+autowrap_mode = 0
+text = "❄"
+
 [node name="RefreshShopButton" type="Button" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(26, 19)

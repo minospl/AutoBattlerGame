@@ -3,91 +3,42 @@ extends Control
 
 signal drag_hover_started(slot: ShopCardSlot, data: Dictionary)
 signal drag_hover_ended(slot: ShopCardSlot)
-signal card_dropped(dragged_card: Control, original_slot: ShopCardSlot, target_slot: ShopCardSlot)
-
-var is_drag_hovering: bool = false
-
-## If true, this slot is part of the active combat team. If false, it is on the bench.
-@export var is_active_team: bool = false
-
-## Index of the slot in the respective team/bench array
-@export var slot_index: int = 0
+signal item_dropped(item_card: ShopCardItem, original_slot: ShopCardSlot, target_slot: ShopCardSlot)
+signal unit_dropped(unit_card: UnitCard, original_slot: ShopCardSlot, target_slot: ShopCardSlot)
 
 @export var is_shop_slot: bool = false
+@export var is_active_team: bool = false
+@export var slot_index: int = 0
+@export var drag_drop_enabled: bool = true
 @export var price: int = 3:
 	set(val):
 		price = val
-		if has_node("%PriceLabel"):
-			var label: Label = get_node("%PriceLabel")
-			label.text = str(price) + "g"
-var is_frozen: bool = false
 
+var is_drag_hovering: bool = false
+var run_state: RunState = null
+var is_frozen: bool = false
 var is_highlighted: bool = false
 var is_targeted: bool = false
 
-@export var drag_drop_enabled: bool = true
-
-var run_state: RunState = null
-
-@onready var card_container: Control = $CardContainer
+@onready var card_container: PanelContainer = %CardContainer
 
 func _ready() -> void:
+	if is_shop_slot:
+		custom_minimum_size = Vector2(100, 122)
+		card_container.custom_minimum_size = Vector2(100, 122)
+	else:
+		custom_minimum_size = CardUIHelper.CARD_SIZE
+		card_container.custom_minimum_size = CardUIHelper.CARD_SIZE
+		
+	card_container.offset_top = 0
+	card_container.offset_bottom = card_container.custom_minimum_size.y
+	card_container.offset_right = card_container.custom_minimum_size.x
+	
 	# Connect tree notifications to toggle placeholder visibility and border visibility
 	card_container.child_entered_tree.connect(func(_node: Node) -> void: update_placeholder.call_deferred())
 	card_container.child_exiting_tree.connect(func(_node: Node) -> void: update_placeholder.call_deferred())
 	
 	update_placeholder()
-	
-	# Setup Shop Controls
-	if is_shop_slot:
-		custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_SHOP
-		var container: PanelContainer = get_node("%CardContainer") as PanelContainer
-		if container:
-			container.custom_minimum_size = CardUIHelper.CARD_SIZE
-			container.offset_top = 0
-			container.offset_bottom = CardUIHelper.CARD_SIZE.y
-			container.offset_right = CardUIHelper.CARD_SIZE.x
-			
-		if has_node("%ShopControls"):
-			var controls: Control = get_node("%ShopControls") as Control
-			controls.visible = true
-			controls.offset_top = CardUIHelper.CARD_SIZE.y + 3
-			controls.offset_bottom = CardUIHelper.CARD_SIZE.y + 23
-			controls.offset_right = CardUIHelper.CARD_SIZE.x
-			
-			var price_lbl: Label = get_node("%PriceLabel") as Label
-			if price_lbl:
-				price_lbl.text = str(price) + "g"
-			var freeze_btn: Button = get_node("%FreezeButton") as Button
-			if freeze_btn:
-				freeze_btn.toggled.connect(func(pressed: bool) -> void:
-					is_frozen = pressed
-					update_freeze_button_style()
-				)
-				update_freeze_button_style()
-	else:
-		custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_DEFAULT
-		var container: PanelContainer = get_node("%CardContainer") as PanelContainer
-		if container:
-			container.custom_minimum_size = CardUIHelper.CARD_SIZE
-			container.offset_top = 0
-			container.offset_bottom = CardUIHelper.CARD_SIZE.y
-			container.offset_right = CardUIHelper.CARD_SIZE.x
-			
-		if has_node("%ShopControls"):
-			var controls: Control = get_node("%ShopControls") as Control
-			controls.visible = false
-
-func update_freeze_button_style() -> void:
-	if not has_node("%FreezeButton"):
-		return
-	var btn: Button = get_node("%FreezeButton")
-	if is_frozen:
-		btn.add_theme_color_override("font_color", Color(0.3, 0.7, 1.0)) # Ice blue
-		btn.text = "❄"
-	else:
-		btn.remove_theme_color_override("font_color")
-		btn.text = "❄"
 
 func update_style(is_hovered: bool = false) -> void:
 	is_highlighted = is_hovered
@@ -200,7 +151,10 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 		if dict.has("card") and dict.has("original_slot"):
 			var dragged_card: Control = dict["card"]
 			var original_slot: ShopCardSlot = dict["original_slot"]
-			card_dropped.emit(dragged_card, original_slot, self)
+			if dragged_card is ShopCardItem:
+				item_dropped.emit(dragged_card as ShopCardItem, original_slot, self)
+			elif dragged_card is UnitCard:
+				unit_dropped.emit(dragged_card as UnitCard, original_slot, self)
 
 func add_card(card: Control) -> void:
 	if has_node("CardContainer"):

@@ -1,80 +1,31 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://src/features/shop/components/shop_card.gd" id="1_script"]
-[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
+[ext_resource type="PackedScene" uid="uid://ccmv3fktknktn" path="res://src/shared/ui/components/card_portrait.tscn" id="2_portrait"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="3_decorator"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_left"]
-bg_color = Color(0.75, 0.5, 0.2, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.25, 0.25, 1)
-corner_radius_top_left = 4
-corner_radius_bottom_left = 4
-anti_aliasing = false
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_right"]
-bg_color = Color(0.75, 0.5, 0.2, 1)
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.25, 0.25, 1)
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-anti_aliasing = false
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_top"]
-bg_color = Color(0.75, 0.5, 0.2, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_color = Color(0.3, 0.25, 0.25, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-anti_aliasing = false
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bottom"]
-bg_color = Color(0.75, 0.5, 0.2, 1)
-border_width_left = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.3, 0.25, 0.25, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_footer"]
+bg_color = Color(0.12, 0.12, 0.13, 0.85)
 corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
 anti_aliasing = false
 
-[node name="ShopCard" type="PanelContainer"]
-custom_minimum_size = Vector2(100, 100)
+[node name="ShopCard" type="VBoxContainer"]
+custom_minimum_size = Vector2(100, 122)
 offset_right = 100.0
-offset_bottom = 100.0
-mouse_filter = 1
+offset_bottom = 122.0
+theme_override_constants/separation = 0
 script = ExtResource("1_script")
 
-[node name="BorderRect" type="ColorRect" parent="."]
+[node name="CardWrapper" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
-script = ExtResource("2_decorator")
 
-[node name="PortraitCharLabel" type="Label" parent="."]
+[node name="CardPortrait" parent="CardWrapper" instance=ExtResource("2_portrait")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 1
-theme_override_colors/font_color = Color(1, 1, 1, 0.85)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.45)
-theme_override_constants/shadow_offset_x = 1
-theme_override_constants/shadow_offset_y = 1
-theme_override_font_sizes/font_size = 48
-text = "?"
-horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="SpriteRect" type="TextureRect" parent="."]
-unique_name_in_owner = true
-layout_mode = 2
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="CardWrapper"]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 5
@@ -82,40 +33,40 @@ theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CardWrapper/MarginContainer"]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
+[node name="Spacer" type="Control" parent="CardWrapper/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 
-[node name="StatsHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="StatsHBox" type="HBoxContainer" parent="CardWrapper/MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
 alignment = 1
 
-[node name="StatPanel" type="PanelContainer" parent="MarginContainer/VBoxContainer/StatsHBox"]
+[node name="StatPanel" type="PanelContainer" parent="CardWrapper/MarginContainer/VBoxContainer/StatsHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(30, 14)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="BorderRect" type="ColorRect" parent="MarginContainer/VBoxContainer/StatsHBox/StatPanel"]
+[node name="BorderRect" type="ColorRect" parent="CardWrapper/MarginContainer/VBoxContainer/StatsHBox/StatPanel"]
 layout_mode = 2
-script = ExtResource("2_decorator")
+script = ExtResource("3_decorator")
 border_type = 0
 outer_border_width = 2
 border_indentation = 2
 
-[node name="StatWrapper" type="Control" parent="MarginContainer/VBoxContainer/StatsHBox/StatPanel"]
+[node name="StatWrapper" type="Control" parent="CardWrapper/MarginContainer/VBoxContainer/StatsHBox/StatPanel"]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="StatLabel" type="Label" parent="MarginContainer/VBoxContainer/StatsHBox/StatPanel/StatWrapper"]
+[node name="StatLabel" type="Label" parent="CardWrapper/MarginContainer/VBoxContainer/StatsHBox/StatPanel/StatWrapper"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -134,68 +85,34 @@ text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Indicators" type="Control" parent="."]
+[node name="FooterPanel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(100, 22)
 layout_mode = 2
-mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_footer")
 
-[node name="TriggerTargetLeftIndicator" type="Panel" parent="Indicators"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(6, 20)
-layout_mode = 1
-anchors_preset = 4
-anchor_top = 0.5
-anchor_bottom = 0.5
-offset_left = -6.0
-offset_top = -10.0
-offset_bottom = 10.0
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_left")
+[node name="FooterMargin" type="MarginContainer" parent="FooterPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 2
 
-[node name="TriggerTargetRightIndicator" type="Panel" parent="Indicators"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(6, 20)
-layout_mode = 1
-anchors_preset = 6
-anchor_left = 1.0
-anchor_top = 0.5
-anchor_right = 1.0
-anchor_bottom = 0.5
-offset_top = -10.0
-offset_right = 6.0
-offset_bottom = 10.0
-grow_horizontal = 0
-grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_right")
+[node name="FooterHBox" type="HBoxContainer" parent="FooterPanel/FooterMargin"]
+layout_mode = 2
 
-[node name="TriggerTargetTopIndicator" type="Panel" parent="Indicators"]
+[node name="NameLabel" type="Label" parent="FooterPanel/FooterMargin/FooterHBox"]
 unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(20, 6)
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -10.0
-offset_top = -6.0
-offset_right = 10.0
-grow_horizontal = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_top")
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 11
+text = "Name"
+clip_text = true
 
-[node name="TriggerTargetBottomIndicator" type="Panel" parent="Indicators"]
+[node name="PriceLabel" type="Label" parent="FooterPanel/FooterMargin/FooterHBox"]
 unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(20, 6)
-layout_mode = 1
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -10.0
-offset_right = 10.0
-offset_bottom = 6.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxFlat_bottom")
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.72, 0.15, 1)
+theme_override_font_sizes/font_size = 11
+text = "3G"
+horizontal_alignment = 2

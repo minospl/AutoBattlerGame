@@ -167,7 +167,7 @@ static func setup_indicators(
 			   target_type == UnitModifier.TargetType.HORIZONTAL_PLUS or
 			   target_type == UnitModifier.TargetType.ALL)
 			   
-	var target_color: Color = Color(1.0, 0.85, 0.2) if is_plus else Color(1.0, 1.0, 1.0)
+	var target_color: Color = Color(1.0, 0.85, 0.2) if is_plus else Color(0.28, 0.31, 0.35, 1.0)
 	
 	var indicators: Array[Control] = []
 	if left_ind: indicators.append(left_ind)
@@ -230,41 +230,3 @@ static func show_relic_tooltip(tooltip: CardTooltip, relic: RelicInstance) -> vo
 static func hide_tooltip(tooltip: CardTooltip) -> void:
 	if tooltip:
 		tooltip.visible = false
-
-## Temporarily restored for backward-compatibility until Etap 4
-static func setup_item_visuals(
-	item_instance: ItemInstance,
-	portrait_label: Label,
-	sprite_rect: TextureRect,
-	border_rect: ShaderBorderDecorator
-) -> void:
-	if not item_instance:
-		return
-		
-	# 1. Outer Border style based on rarity
-	if border_rect:
-		var border_color: Color = Color(0.9, 0.6, 0.1) # Fallback to golden orange
-		if item_instance.data and item_instance.data.rarity:
-			border_color = item_instance.data.rarity.border_color
-		border_rect.border_color = border_color
-		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-		border_rect.interior_color = GameColors.WHITE_COLOR
-		border_rect.update_shader_parameters()
-		
-	# 2. Portrait setup
-	if item_instance.data and item_instance.data.sprite:
-		if sprite_rect:
-			sprite_rect.visible = true
-			sprite_rect.texture = item_instance.data.sprite
-		if portrait_label:
-			portrait_label.visible = false
-	else:
-		if sprite_rect:
-			sprite_rect.visible = false
-		if portrait_label:
-			portrait_label.visible = true
-			portrait_label.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
-			if item_instance.data and item_instance.data.is_clickable:
-				portrait_label.text = "📦" # Chest emoji for relic chests
-			else:
-				portrait_label.text = "🎁" # Gift emoji for regular food items

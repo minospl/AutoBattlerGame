@@ -1,38 +1,44 @@
 class_name ShopCardItem
-extends PanelContainer
+extends VBoxContainer
 
 signal hovered(card: ShopCardItem, is_hovered: bool)
 signal clicked(card: ShopCardItem)
 
+@export var price: int
+
 @export var item_instance: ItemInstance:
 	set(val):
 		item_instance = val
+		if item_instance and item_instance.data:
+			price = item_instance.data.price
 		if is_inside_tree():
 			update_ui()
 
-@onready var portrait_label: Label = %PortraitCharLabel
-@onready var sprite_rect: TextureRect = %SpriteRect
+@onready var card_portrait: CardPortrait = %CardPortrait
 var slot: ShopCardSlot = null
 
 func _ready() -> void:
-	custom_minimum_size = CardUIHelper.CARD_SIZE
+	custom_minimum_size = Vector2(100, 122)
 	update_ui()
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
-	tree_exiting.connect(_on_mouse_exited)
 
 func update_ui() -> void:
-	if not item_instance or not item_instance.data:
+	if not item_instance:
 		return
 		
-	# Delegate visual setup to shared CardUIHelper
-	CardUIHelper.setup_item_visuals(
-		item_instance,
-		portrait_label,
-		sprite_rect,
-		get_node_or_null("BorderRect") as ShaderBorderDecorator
-	)
-
+	card_portrait.setup_visuals(item_instance.data)
+	card_portrait.border_rect.interior_color = GameColors.WHITE_COLOR
+	card_portrait.border_rect.update_shader_parameters()
+	
+	# Configure name and price footer
+	var name_label: Label = %NameLabel as Label
+	if name_label and item_instance.data:
+		name_label.text = item_instance.data.display_name
+		
+	var price_label: Label = %PriceLabel as Label
+	if price_label:
+		price_label.text = str(price) + "G"
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	if item_instance and item_instance.data and item_instance.data.is_clickable:

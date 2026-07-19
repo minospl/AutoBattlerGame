@@ -3,9 +3,11 @@ extends PanelContainer
 
 signal roll_requested
 signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
+signal freeze_all_requested(freeze: bool)
 
 @onready var slots_hbox: HBoxContainer = %SlotsHBox
 @onready var refresh_shop_button: Button = %RefreshShopButton
+@onready var freeze_shop_button: Button = %FreezeShopButton
 @onready var gold_label: RichTextLabel = %GoldLabel
 @onready var sell_overlay: MarginContainer = %SellOverlay
 @onready var sell_panel: PanelContainer = %SellPanel
@@ -35,10 +37,17 @@ signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
 		has_unique_potential = val
 		_update_labels()
 
+@export var is_shop_frozen: bool = false:
+	set(val):
+		is_shop_frozen = val
+		if freeze_shop_button.button_pressed != is_shop_frozen:
+			freeze_shop_button.set_pressed_no_signal(is_shop_frozen)
+
 var slots: Array[ShopCardSlot] = []
 
 func _ready() -> void:
 	refresh_shop_button.pressed.connect(func() -> void: roll_requested.emit())
+	freeze_shop_button.toggled.connect(func(pressed: bool) -> void: freeze_all_requested.emit(pressed))
 		
 	# Sell Overlay styling
 	var sell_style: StyleBoxFlat = StyleBoxFlat.new()
@@ -69,7 +78,7 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 				var original_slot: ShopCardSlot = dict["original_slot"]
 				if original_slot and not original_slot.is_shop_slot: # Can only sell if it comes from team or bench (not a shop slot)
 					var card: Control = dict["card"]
-					if card is ShopCard: # Only sell Card (units)
+					if card is UnitCard: # Only sell Card (units)
 						return true
 	return false
 
@@ -87,10 +96,10 @@ func _notification(what: int) -> void:
 		var original_slot: ShopCardSlot = null
 		if DragManager.dragged_card_original_slot is ShopCardSlot:
 			original_slot = DragManager.dragged_card_original_slot
-		if card is ShopCard and original_slot and not original_slot.is_shop_slot:
-			var shop_card: ShopCard = card
-			if sell_label:
-				sell_label.text = "RELEASE TO SELL (+" + str(shop_card.price) + "g)"
+		if card is UnitCard and original_slot and not original_slot.is_shop_slot:
+			var unit_card: UnitCard = card as UnitCard
+			var sell_price: int = max(1, unit_card.unit_instance.data.price - 1)
+			sell_label.text = "RELEASE TO SELL (+" + str(sell_price) + "g)"
 			set_process(true)
 	elif what == NOTIFICATION_DRAG_END:
 		set_process(false)
@@ -135,5 +144,5 @@ func _update_labels() -> void:
 		gold_label.text = str(gold) + "[color=#f2b726]G[/color]"
 	if is_inside_tree() and shop_label:
 		shop_label.text = "SHOP LVL " + str(shop_level)
-	if is_inside_tree() and chance_label:
+	if is_inside_tree() and chance_label and shop_weights.size() > 0:
 		chance_label.text = _format_chance_text(shop_weights)

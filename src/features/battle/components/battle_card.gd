@@ -1,5 +1,5 @@
 class_name BattleCard
-extends PanelContainer
+extends MarginContainer
 
 signal hovered(card: BattleCard, is_hovered: bool)
 
@@ -31,11 +31,6 @@ func update_ui() -> void:
 		sprite_rect,
 		portrait_char_label
 	)
-	
-	# Since this is battle_card, it has NO border drawing. The container panel itself can be transparent.
-	# We override stylebox to Empty
-	var empty_style: StyleBoxEmpty = StyleBoxEmpty.new()
-	add_theme_stylebox_override("panel", empty_style)
 
 func _on_mouse_entered() -> void:
 	hovered.emit(self, true)

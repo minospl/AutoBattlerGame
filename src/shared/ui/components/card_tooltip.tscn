@@ -1,11 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://src/shared/ui/components/card_tooltip.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
 [ext_resource type="Script" path="res://src/shared/ui/components/tooltip_stats_panel.gd" id="3_stats"]
 [ext_resource type="Script" path="res://src/shared/ui/components/tooltip_keywords_box.gd" id="4_keywords"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tooltip"]
 
 [node name="CardTooltip" type="MarginContainer"]
 custom_minimum_size = Vector2(270, 0)
@@ -26,12 +24,11 @@ size_flags_vertical = 0
 theme_override_constants/separation = 8
 script = ExtResource("4_keywords")
 
-[node name="MainTooltipWrapper" type="PanelContainer" parent="HBox"]
+[node name="MainTooltipWrapper" type="MarginContainer" parent="HBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(270, 0)
 layout_mode = 2
 size_flags_vertical = 0
-theme_override_styles/panel = SubResource("StyleBoxEmpty_tooltip")
 
 [node name="BorderRect" type="ColorRect" parent="HBox/MainTooltipWrapper"]
 unique_name_in_owner = true

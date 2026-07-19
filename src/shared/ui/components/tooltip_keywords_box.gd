@@ -11,15 +11,14 @@ func build_keywords(unit_instance: UnitInstance) -> int:
 		
 	var keywords: Array[Dictionary] = KeywordDatabase.get_keywords_for_unit(unit_instance, unit_instance.level)
 	for kw: Dictionary in keywords:
-		var panel: PanelContainer = _create_keyword_panel(str(kw["title"]), str(kw["desc"]))
+		var panel: MarginContainer = _create_keyword_panel(str(kw["title"]), str(kw["desc"]))
 		add_child(panel)
 		
 	return keywords.size()
 
-func _create_keyword_panel(title: String, desc: String) -> PanelContainer:
-	var panel: PanelContainer = PanelContainer.new()
+func _create_keyword_panel(title: String, desc: String) -> MarginContainer:
+	var panel: MarginContainer = MarginContainer.new()
 	panel.custom_minimum_size = Vector2(220, 0)
-	panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	
 	var border: ShaderBorderDecorator = ShaderBorderDecorator.new()
 	border.border_type = ShaderBorderDecorator.BorderType.DOUBLE

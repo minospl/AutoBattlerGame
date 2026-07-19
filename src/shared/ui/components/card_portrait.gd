@@ -1,5 +1,5 @@
 class_name CardPortrait
-extends PanelContainer
+extends MarginContainer
 
 @onready var border_rect: ShaderBorderDecorator = $BorderRect
 @onready var card_sprite: CardSprite = %CardSprite

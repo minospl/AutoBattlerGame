@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="3_decorator"]
 [ext_resource type="PackedScene" uid="uid://cbdirectionindicatorsuid" path="res://src/shared/ui/components/direction_indicators.tscn" id="4_indicators"]
 
-[node name="UnitCard" type="PanelContainer"]
+[node name="UnitCard" type="MarginContainer"]
 custom_minimum_size = Vector2(100, 100)
 offset_right = 100.0
 offset_bottom = 100.0

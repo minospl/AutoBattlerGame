@@ -43,7 +43,7 @@ corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
 anti_aliasing = false
 
-[node name="BattleCard" type="PanelContainer"]
+[node name="BattleCard" type="MarginContainer"]
 custom_minimum_size = Vector2(100, 100)
 offset_right = 100.0
 offset_bottom = 100.0

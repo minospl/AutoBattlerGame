@@ -1,5 +1,5 @@
 class_name UnitCard
-extends PanelContainer
+extends MarginContainer
 
 signal hovered(card: UnitCard, is_hovered: bool)
 signal right_clicked(card: UnitCard)
