@@ -127,3 +127,12 @@ Podczas edycji lub rozbudowy tego projektu muszę bezwzględnie przestrzegać na
   * **Komunikacja "Sygnały w górę, funkcje w dół":** Aby uniknąć sztywnego sprzężenia (tight coupling) pod nieobecność Autoloadów, węzły-dzieci (szczególnie komponenty UI) nigdy nie wywołują bezpośrednio metod rodziców ani nie szukają ich w drzewie. Dzieci komunikują się w górę wyłącznie za pomocą sygnałów. Rodzice zarządzają dziećmi, wywołując ich funkcje bezpośrednio w dół hierarchii.
   * **Podział Logiki i UI:** Komponenty interfejsu (UI) wizualizują stan logiczny obiektów/zasobów. Wszelkie zmiany w UI muszą być synchronizowane z danymi w logicznych strukturach danych.
   * **Zachowanie Spójności Stylu (Premium UI):** Zmiany wizualne powinny zachowywać estetyczny, spójny styl graficzny zdefiniowany w motywach i kolorach klas wspólnych gry.
+
+* **Ścisłe trzymanie się wymagań i zakaz nadinterpretacji (No Over-Interpretation):**
+  * **Ścisłe posłuszeństwo instrukcjom:** Wprowadzaj wyłącznie te zmiany, o które użytkownik bezpośrednio poprosił. ZAKAZUJE SIĘ dodawania na własną rękę jakichkolwiek nieopisanych mechanik, zmiennych, wskaźników UI, o które użytkownik nie wnioskował.
+  * **Wątpliwości projektowe:** Jeśli makieta graficzna lub opis zadania wydaje się niejasny, asystent musi zadać pytanie wyjaśniające, zamiast zgadywać intencje i wdrażać domniemane rozwiązania.
+
+* **Ścisłe etapy i tempo pracy (Work Pacing & Boundaries):**
+  * **Zasada jednego kroku (Single-Step Execution):** Zaimplementuj wyłącznie JEDNO najmniejsze zadanie/etap z planu na raz. Po jego zakończeniu natychmiast zatrzymaj wywoływanie narzędzi, zgłoś wynik i czekaj na potwierdzenie użytkownika przed przejściem dalej.
+  * **Potwierdzanie przed edycją (Dry-Run Confirmation):** Przed każdą operacją modyfikującą lub tworzącą plik (np. `write_to_file`, `replace_file_content`), opisz co dokładnie zamierzasz zrobić i zapytaj użytkownika o zgodę. Nie wywołuj tych narzędzi, dopóki użytkownik nie napisze „zrób to” lub nie wyrazi na to jednoznacznej zgody.
+  * **Status mikro-zakresu:** Na początku każdej wypowiedzi podaj nagłówek z aktualnym, mikro-zakresem prac, aby użytkownik wiedział, co jest w tej chwili robione.
