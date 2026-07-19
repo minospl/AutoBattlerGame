@@ -133,6 +133,6 @@ Podczas edycji lub rozbudowy tego projektu muszę bezwzględnie przestrzegać na
   * **Wątpliwości projektowe:** Jeśli makieta graficzna lub opis zadania wydaje się niejasny, asystent musi zadać pytanie wyjaśniające, zamiast zgadywać intencje i wdrażać domniemane rozwiązania.
 
 * **Ścisłe etapy i tempo pracy (Work Pacing & Boundaries):**
-  * **Zasada jednego kroku (Single-Step Execution):** Zaimplementuj wyłącznie JEDNO najmniejsze zadanie/etap z planu na raz. Po jego zakończeniu natychmiast zatrzymaj wywoływanie narzędzi, zgłoś wynik i czekaj na potwierdzenie użytkownika przed przejściem dalej.
+  * **Zasada jednego kroku (Single-Step Execution):** Zaimplementuj wyłącznie JEDNO najmniejsze zadanie/etap z planu na raz o ile plan implementacji jest podzielony na etapy. Po jego zakończeniu natychmiast zatrzymaj wywoływanie narzędzi, zgłoś wynik i czekaj na potwierdzenie użytkownika przed przejściem dalej.
   * **Potwierdzanie przed edycją (Dry-Run Confirmation):** Przed każdą operacją modyfikującą lub tworzącą plik (np. `write_to_file`, `replace_file_content`), opisz co dokładnie zamierzasz zrobić i zapytaj użytkownika o zgodę. Nie wywołuj tych narzędzi, dopóki użytkownik nie napisze „zrób to” lub nie wyrazi na to jednoznacznej zgody.
   * **Status mikro-zakresu:** Na początku każdej wypowiedzi podaj nagłówek z aktualnym, mikro-zakresem prac, aby użytkownik wiedział, co jest w tej chwili robione.

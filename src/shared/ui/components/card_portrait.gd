@@ -1,4 +1,4 @@
-class_name CardVisuals
+class_name CardPortrait
 extends PanelContainer
 
 @onready var border_rect: ShaderBorderDecorator = $BorderRect
@@ -10,4 +10,4 @@ func setup_visuals(p_data: GameResourceData) -> void:
 		return
 
 	card_sprite.set_sprite(p_data.sprite, p_data.display_name)
-	border_rect.set_border_color(p_data.rarity.border_color)
+	border_rect.border_color = p_data.rarity.border_color

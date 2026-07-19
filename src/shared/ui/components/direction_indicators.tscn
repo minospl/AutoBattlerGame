@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://dp1xt3eaf0t6b"]
+
+[ext_resource type="Script" path="res://src/shared/ui/components/direction_indicators.gd" id="1_script"]
+[ext_resource type="Shader" path="res://src/shared/shaders/indicator_arrow.gdshader" id="2_shader"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_arrow"]
+shader = ExtResource("2_shader")
+shader_parameter/size = Vector2(16, 16)
+
+[node name="DirectionIndicators" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="TriggerTargetLeftIndicator" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_arrow")
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_vertical = 2
+pivot_offset = Vector2(8, 8)
+rotation = 3.14159
+mouse_filter = 2
+
+[node name="TriggerTargetRightIndicator" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_arrow")
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 0
+grow_vertical = 2
+pivot_offset = Vector2(8, 8)
+mouse_filter = 2
+
+[node name="TriggerTargetTopIndicator" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_arrow")
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+pivot_offset = Vector2(8, 8)
+rotation = 4.71239
+mouse_filter = 2
+
+[node name="TriggerTargetBottomIndicator" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_arrow")
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 0
+pivot_offset = Vector2(8, 8)
+rotation = 1.5708
+mouse_filter = 2
