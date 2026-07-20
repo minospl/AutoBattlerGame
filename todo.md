@@ -1,12 +1,8 @@
 # TODO: Analiza i Plan Poprawek Projektu AutoBattlerDungeonGame (Posortowane według Priorytetu)
 
-Wszystkie zadania z listy zostały przeanalizowane pod kątem kodu źródłowego i posortowane priorytetowo (od błędów blokujących rozgrywkę po szlify wizualne). Żadne z zadań nie jest obecnie wdrożone.
-
----
-
 ## 1. PRIORYTET 1: KRYTYCZNE BŁĘDY (Critical Bugs)
 
-### Zadanie A: Pusta drużyna gracza sprawia, że jest nieśmiertelny w walce (Dawne Zadanie 8)
+## Zadanie A: Pusta drużyna gracza sprawia, że jest nieśmiertelny w walce (Dawne Zadanie 8)
 
 - **Lokalizacja:** [battle_team_model.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_team_model.gd) (metoda `take_damage` linia 203), [battle_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_scene.gd) (metoda `trigger_battle_start`)
 - **Krytyczne pytania & Problem:** Rozpoczęcie walki bez jednostek w drużynie ustawia `max_health` i `health` na 0. Sprawdzenie `max_health > 0 and health <= 0` w `take_damage()` nigdy nie wchodzi, co blokuje koniec walki. Gra zawiesza się w nieskończonej pętli.
@@ -40,15 +36,15 @@ Wszystkie zadania z listy zostały przeanalizowane pod kątem kodu źródłowego
 
 ### Zadanie C: Przebudowa sklepu: Cena na karcie i globalne zamrażanie sklepu (Dawne Zadanie 5)
 
-- **Lokalizacja:** [shop_card_slot.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_slot.tscn), [shop_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card.tscn), [shop_panel.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_panel.tscn), [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd)
+- **Lokalizacja:** [shop_slot.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_slot.tscn), [shop_card_unit.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.tscn), [shop_panel.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_panel.tscn), [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd)
 - **Krytyczne pytania & Problem:** Każdy slot ma oddzielny przycisk "Freeze" i etykietę ceny na dole, co drastycznie zaśmieca UI sklepu. Dodatkowo sama karta potwora nie wyświetla swojej nazwy ani ceny bezpośrednio w swojej strukturze.
 - **Logiczne uzasadnienie:** Przeniesienie ceny na kartę potwora/przedmiotu i dodanie jednego, globalnego przycisku "Zamroź Sklep" (Freeze Shop) znacznie uprości UI/UX. Dostosowanie wyglądu karty do przygotowanego makiety (mockupu) poprawi czytelność i profesjonalizm gry.
 - **Sugerowana zmiana:**
   1. **Struktura karty (według makiety):**
      - **Górna sekcja (Portret):** Kontener z kolorowym tłem, zawierający sprite jednostki. Na dolnej krawędzi portretu na środku umieścić statystyki.
-     - **Dolna sekcja (Stopka):** Ciemnoszary pasek na dole karty z HBoxContainer. Po lewej stronie nazwa potwora, a po prawej cena (np. "$15" lub "3G").
-     - *Uwaga spójności:* Zmianę tę należy zastosować zarówno dla potworów ([shop_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card.tscn)), jak i dla przedmiotów ([shop_card_item.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_item.tscn)), aby zachować identyczny styl wizualny w sklepie.
-  2. **Usunięcie sterowania ze slotów:** Usunąć z `shop_card_slot.tscn` węzeł `%ShopControls` (freeze i cena pod slotem).
+     - **Dolna sekcja (Stopka):** Ciemnoszary pasek na dole karty z HBoxContainer. Po lewej stronie nazwa potwora, a po prawej cena (np. "$15" or "3G").
+     - *Uwaga spójności:* Zmianę tę należy zastosować zarówno dla potworów, jak i dla przedmiotów, aby zachować identyczny styl wizualny w sklepie.
+  2. **Usunięcie sterowania ze slotów:** Usunąć z `shop_slot.tscn` węzeł `%ShopControls` (freeze i cena pod slotem).
   3. **Panel sklepu:** W `shop_panel.tscn` dodać przycisk "Freeze Shop" obok przycisku "Roll".
   4. **Stan gry:** W `RunState` zamienić `shop_frozen_statuses: Array[bool]` na pojedynczą zmienną `is_shop_frozen: bool`. Zaktualizować logiczne metody `roll_shop()` i `complete_battle()`.
 
@@ -129,16 +125,15 @@ Wszystkie zadania z listy zostały przeanalizowane pod kątem kodu źródłowego
   2. Wystylizować w niej tło, marginesy, czcionki i ShaderBorderDecorator.
   3. W `tooltip_keywords_box.gd` załadować tę scenę i instancjonować ją za pomocą `instantiate()`, modyfikując tylko tekst.
 
-### Zadanie Q: Rozdzielenie kart na sklepowe i posiadane oraz wdrożenie kompozycji hierarchicznej
+### Zadanie Q [Częściowo wdrożone / W toku]: Rozdzielenie kart na sklepowe i posiadane oraz wdrożenie kompozycji hierarchicznej
 
-- **Lokalizacja:** [shop_card.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card.gd) i [shop_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card.tscn) (przebudowa na dedykowaną kartę sklepową), nowa scena `owned_card.tscn` i `owned_card.gd` (dla jednostek w drużynie/ławce), katalog `src/shared/ui/components/` (nowe komponenty wizualne)
-- **Krytyczne pytania & Problem:** Obecnie jedna klasa `ShopCard` i jej sloty obsługują zarówno jednostki w sklepie (klikalne, z ceną, bez indykatorów kierunku działania), jak i jednostki posiadane w drużynie/ławce (przeciągane, bez ceny, z indykatorami). Tworzy to konieczność warunkowego włączania/wyłączania wielu węzłów i komplikuje kod UI.
-- **Logiczne uzasadnienie:** Ponieważ karty w sklepie są wyłącznie klikalne i różnią się wizualnie od kart w drużynie (Zadanie C - makieta ze stopką), rozdzielenie ich na dwie wyspecjalizowane klasy/sceny drastycznie uprości kod. Aby uniknąć duplikacji kodu renderowania portretów i obramowań, należy wdrożyć kompozycję hierarchiczną (połączenie atomowych mikro-komponentów w złożony kontener portretu).
+- **Lokalizacja:** [shop_card_unit.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.gd) i [shop_card_unit.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.tscn) (karta sklepowa), [unit_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/unit_card.tscn) i [unit_card.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/unit_card.gd) (karta posiadana), katalog `src/shared/ui/components/` (komponenty wizualne)
+- **Krytyczne pytania & Problem:** W pierwotnym zamyśle jedna klasa obsługiwała oba typy kart. Wdrożono już dedykowane karty sklepowe (`ShopCardUnit`, `ShopCardItem`) oraz kartę posiadaną (`UnitCard`). Część komponentów (np. `card_sprite.tscn` oraz `card_portrait.tscn` będące odpowiednikiem `card_visuals`) również została wydzielona.
+- **Logiczne uzasadnienie:** Rozdzielenie logiki i prezentacji kart sklepowych i posiadanych ułatwia ich stylowanie (Zadanie C) oraz zarządzanie logiką Drag & Drop. Należy dokończyć reorganizację i refaktor pozostałych elementów zgodnie z tą hierarchią.
 - **Sugerowana zmiana:**
-  1. **Mikro-komponenty (Poziom 1):** Stworzyć niezależne sceny `card_sprite.tscn` (zawiera `TextureRect` ze sprite'em potwora i `Label` dla fallbacku pierwszej litery) oraz `card_border.tscn` (zawiera `ColorRect` z [ShaderBorderDecorator](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/decorators/shader_border_decorator.gd)).
-  2. **Złożony komponent prezentacji (Poziom 2):** Stworzyć scenę `card_visuals.tscn` (agregującą `card_sprite` i `card_border` w jeden portret z obramowaniem).
-  3. **Karta sklepowa (Poziom 3):** Przebudować `ShopCard` tak, aby zawierała `CardVisuals`, czerwoną plakietkę statystyki (stat badge) na dole portretu oraz stopkę z nazwą i ceną według makiety z Zadania C.
-  4. **Karta posiadana (Poziom 3):** Stworzyć nową scenę `owned_card.tscn` (zawierającą `CardVisuals`, dolny pasek statystyk `StatsHBox` oraz indykatory PNG kierunków z Zadania L). Ta scena będzie obsługiwała logikę Drag & Drop i fuzji w drużynie.
+  1. **Mikro-komponenty (Poziom 1):** Zweryfikować i dopracować niezależne sceny [card_sprite.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_sprite.tscn) oraz [card_portrait.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_portrait.tscn).
+  2. **Karta sklepowa (Poziom 3):** Dostosować [shop_card_unit.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.tscn) tak, aby poprawnie korzystała z `CardPortrait` oraz stopki z nazwą i ceną według makiety z Zadania C.
+  3. **Karta posiadana (Poziom 3):** Upewnić się, że [unit_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/unit_card.tscn) korzysta z `CardPortrait` oraz poprawnie wyświetla indykatory kierunków (korzystające z shadera) i obsługuje Drag & Drop.
 
 ---
 
@@ -157,18 +152,6 @@ Wszystkie zadania z listy zostały przeanalizowane pod kątem kodu źródłowego
 ---
 
 ## 5. PRIORYTET 5: ESTETYKA & UX (UX, Visuals & Polish)
-
-### Zadanie L: Zmiana indykatorów kierunku na obrazy PNG (Dawne Zadanie 1)
-
-- **Lokalizacja:** [shop_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card.tscn) (węzły indykatorów), [shop_card.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card.gd) (linie 18-21), [card_ui_helper.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/card_ui_helper.gd) (linie 130-181)
-- **Krytyczne pytania & Problem:** Obecnie indykatory kierunku działania zdolności to płaskie prostokątne panele `Panel` z kolorem tła typu Flat.
-- **Logiczne uzasadnienie:** Panele typu `Panel` wyglądają mało estetycznie. Użycie dedykowanego obrazu PNG strzałki (np. białej, którą można modulować kolorem) znacząco poprawi wizualną jakość Premium UI.
-- **Sugerowana zmiana:**
-  1. Stworzyć/dodać plik `indicator_arrow.png` do katalogu `src/assets/ui/`.
-  2. Zmienić typ węzłów indykatorów w `shop_card.tscn` z `Panel` na `TextureRect` (i ustawić teksturę na `indicator_arrow.png`).
-  3. Obrócić strzałki w edytorze dla poszczególnych kierunków (Top: 0°, Right: 90°, Bottom: 180°, Left: 270°).
-  4. W `card_ui_helper.gd` zachować modulację kolorów (`modulate`) na tych węzłach.
-  5. *Zachowanie układu:* Przy konwersji typów węzłów w edytorze należy zachować oryginalne kotwice (Anchors Presets) oraz offsety (marginesy) węzłów indykatorów, aby strzałki poprawnie wystawały poza obramowanie karty.
 
 ### Zadanie M: Sprzedaż przeciąganej karty za pomocą Prawego Kliknięcia (Dawne Zadanie 9)
 

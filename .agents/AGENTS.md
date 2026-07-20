@@ -38,16 +38,26 @@ Kod projektu jest podzielony modularnie w katalogu `src`:
 * `src/features/units/` – System jednostek/potworów:
   * `unit_data.gd` – Definicja szablonu jednostki (UnitData) jako zasób (Resource): statystyki bazowe, typy, rzadkość, prędkość ładowania, umiejętności.
   * `unit_instance.gd` – Instancja jednostki w czasie rzeczywistym.
-  * `unit_modifier.gd` – System zdolności (modyfikatorów), określający wyzwalacze (Trigger), cele (TargetType) oraz efekty (EffectType).
+  * `unit_modifier.gd` – System zdolności (modyfikatorów), określający wyzwalacze (Trigger), cele (TargetType).
+  * `rarity.gd`, `unit_type.gd` – Definicje pomocnicze rzadkości i typu potwora.
   * `templates/` – Gotowe szablony potworów (np. `ancient_titan.tres`, `wild_wolf.tres`, `river_crab.tres`).
+* `src/features/items/` – System przedmiotów/konsumabiliów kupowanych w sklepie:
+  * `item_data.gd` – Dane statyczne przedmiotu.
+  * `item_instance.gd` – Instancja zakupionego przedmiotu.
+  * `item_modifier.gd` – Efekty aplikowane na jednostkę przy użyciu przedmiotu.
+* `src/features/relics/` – System reliktów (pasywnych modyfikatorów gry):
+  * `relic_data.gd` – Dane statyczne reliktu.
+  * `relic_instance.gd` – Instancja posiadanego reliktu z liczbą ładunków/poziomem.
+  * `relic_modifier.gd` – Logika modyfikacji zasad na początku walki lub przy zdobyciu reliktu.
 * `src/features/shop/` – Mechanika sklepu:
   * `shop_scene.gd` – Główny interfejs i logika sklepu.
   * `components/` – Elementy UI sklepu: nagłówek (ShopHeaderBar), panele ławki i drużyny (BenchPanel, TeamPanel), sloty i karty (ShopCardSlot, ShopCard, ShopCardItem), oraz linia celowania modyfikatorów (TargetingLineOverlay).
 * `src/features/battle/` – Logika starć:
   * `battle_scene.gd` – Kontroler symulacji walki, pętla czasu rzeczywistego, zmęczenie, skalowanie prędkości (1x, 2x, 3x).
-  * `battle_team.gd` – Stan zdrowia i statusów całej drużyny w trakcie walki oraz aplikowanie efektów
-  * `src/shared/` – Elementy wspólne:
-  * `utils/` – Silnik modyfikatorów (`modifier_engine.gd`), wyznaczanie celów (`target_resolver.gd`) oraz pomocnik UI (`card_ui_helper.gd`).
+  * `battle_team_model.gd` – Stan zdrowia, statusów, pasywnych reliktów całej drużyny w trakcie walki oraz aplikowanie efektów.
+  * `battle_unit_instance.gd` – Dynamiczny wrapper jednostki w walce, przechowujący stan tymczasowych bonusów walki.
+* `src/shared/` – Elementy wspólne:
+  * `utils/` – Silnik modyfikatorów (`modifier_engine.gd`), wyznaczanie celów (`target_resolver.gd`), pomocnik UI (`card_ui_helper.gd`), globalna baza słów kluczowych (`keyword_database.gd`) oraz pomocnik formatowania liczb (`number_formatter.gd`).
   * `ui/` – Skórki interfejsu (game_theme.tres), dekoratory i komponenty tooltipów.
   * `shaders/` – Cieniowanie interfejsu (np. `hp_border.gdshader`).
 
@@ -62,6 +72,11 @@ Aktywna drużyna jest ułożona w siatkę o wymiarach 2 wiersze na 3 kolumny:
 
 * Sloty `0` (lewy), `1` (środkowy), `2` (prawy)
 * Sloty `3` (lewy), `4` (środkowy), `5` (prawy)
+
+Posiadane przez drużynę relikty mogą modyfikować zasięg i zachowanie celowania w `target_resolver.gd`:
+
+* **Magnetic Core**: Zmienia typ celowania `ADJACENT` (sąsiedzi) na `ALL` (wszyscy pozostali członkowie drużyny).
+* **Focusing Lens**: Zwiększa zasięg celowania liniowego: `LEFT` -> `LEFT_PLUS`, `RIGHT` -> `RIGHT_PLUS`, `HORIZONTAL` -> `HORIZONTAL_PLUS`.
 
 ### Walka i Czas Wykonania Akcji (Cast Speed)
 
@@ -88,7 +103,7 @@ Czas trwania walki wynosi 30 sekund. Po tym czasie co 1 sekundę obie drużyny o
 
 W fazie walki jednostki nie otrzymują obrażeń indywidualnie:
 
-* **Sumowanie Zdrowia:** Przy starcie walki (`load_team_units()`), punkty zdrowia (`health`) wszystkich aktywnych jednostek w drużynie są sumowane w jedną wspólną pulę zdrowia drużyny (`health` oraz `max_health` klasy `BattleTeam`).
+* **Sumowanie Zdrowia:** Przy starcie walki (`load_team_units()`), punkty zdrowia (`health`) wszystkich aktywnych jednostek w drużynie są sumowane w jedną wspólną pulę zdrowia drużyny (`health` oraz `max_health` klasy `BattleTeamModel`).
 * **Aplikowanie Obrażeń:** Wszystkie otrzymywane obrażenia (zarówno ataki fizyczne, jak i obrażenia od statusów Trucizny czy Oparzenia) są odejmowane bezpośrednio od wspólnej puli zdrowia/tarczy całej drużyny. Statystyki zdrowia poszczególnych potworów (`UnitInstance.health`) pozostają w trakcie walki nienaruszone przez otrzymywane obrażenia.
 * **Modyfikatory Statystyk:** Efekty modyfikatorów w walce (np. `BUFF_HEALTH`) mogą modyfikować statystyki konkretnej jednostki (`UnitInstance.health`) – jeśli zmiana ta ma charakter permanentny (`UnitModifier.Duration.PERMANENT`), to po zakończeniu walki zaktualizowana wartość zdrowia jednostki jest przepisywana z powrotem do stanu gry (`RunState`).
 * **Warunek Porażki:** Drużyna zostaje pokonana, a sygnał `team_defeated` wyemitowany, gdy wspólne zdrowie drużyny (`health`) spadnie do `0` lub poniżej.
@@ -97,7 +112,7 @@ W fazie walki jednostki nie otrzymują obrażeń indywidualnie:
 
 Każda jednostka z unikalną zdolnością posiada przypisany modyfikator dziedziczący po klasie bazowej `UnitModifier` (`src/features/units/unit_modifier.gd`):
 
-* **Modułowość i Hermetyzacja**: Zamiast jednego centralnego silnika z instrukcją `match`, zachowanie modyfikatora (akcja w walce) definiuje się w dedykowanym skrypcie w folderze `src/features/units/templates/modifiers/` poprzez nadpisanie metody `apply_modifier(source_idx: int, team_obj: BattleTeam) -> void`.
+* **Modułowość i Hermetyzacja**: Zamiast jednego centralnego silnika z instrukcją `match`, zachowanie modyfikatora (akcja w walce) definiuje się w dedykowanym skrypcie w folderze `src/features/units/templates/modifiers/` poprzez nadpisanie metody `apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void`.
 * **Dynamiczny Opis**: Modyfikatory nadpisują metodę `get_description() -> String` zwracającą sformatowany tekst tooltipu. Aby zachować spójność wizualną, do formatowania nazwy momentu aktywacji używa się metody klasy bazowej `get_trigger_name(p_trigger: Trigger = trigger) -> String` (np. `get_trigger_name()` lub `get_trigger_name(Trigger.ON_BATTLE_START)`).
 * **Zmienne Eksportowane (@export)**: Wszelkie wartości liczbowe modyfikatora (np. siła leczenia, wartość buffu) powinny być deklarowane jako `@export` klasy modyfikatora (np. `@export var health_buff: int = 5`). Umożliwia to łatwe zarządzanie nimi bezpośrednio z poziomu inspektora Godota w plikach szablonów `.tres`.
 
