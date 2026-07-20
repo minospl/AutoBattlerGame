@@ -2,7 +2,7 @@
 
 ## 1. PRIORYTET 1: KRYTYCZNE BŁĘDY (Critical Bugs)
 
-## Zadanie A: Pusta drużyna gracza sprawia, że jest nieśmiertelny w walce (Dawne Zadanie 8)
+## Zadanie A [**ZROBIONE**]: Pusta drużyna gracza sprawia, że jest nieśmiertelny w walce (Dawne Zadanie 8)
 
 - **Lokalizacja:** [battle_team_model.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_team_model.gd) (metoda `take_damage` linia 203), [battle_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_scene.gd) (metoda `trigger_battle_start`)
 - **Krytyczne pytania & Problem:** Rozpoczęcie walki bez jednostek w drużynie ustawia `max_health` i `health` na 0. Sprawdzenie `max_health > 0 and health <= 0` w `take_damage()` nigdy nie wchodzi, co blokuje koniec walki. Gra zawiesza się w nieskończonej pętli.
@@ -34,19 +34,16 @@
 
 ## 2. PRIORYTET 2: KLUCZOWA PRZEBUDOWA SKLEPU (Core Shop Restructuring)
 
-### Zadanie C: Przebudowa sklepu: Cena na karcie i globalne zamrażanie sklepu (Dawne Zadanie 5)
+### Zadanie C [**ZROBIONE**]: Przebudowa sklepu: Cena na karcie i globalne zamrażanie sklepu (Dawne Zadanie 5)
 
 - **Lokalizacja:** [shop_slot.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_slot.tscn), [shop_card_unit.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.tscn), [shop_panel.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_panel.tscn), [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd)
 - **Krytyczne pytania & Problem:** Każdy slot ma oddzielny przycisk "Freeze" i etykietę ceny na dole, co drastycznie zaśmieca UI sklepu. Dodatkowo sama karta potwora nie wyświetla swojej nazwy ani ceny bezpośrednio w swojej strukturze.
 - **Logiczne uzasadnienie:** Przeniesienie ceny na kartę potwora/przedmiotu i dodanie jednego, globalnego przycisku "Zamroź Sklep" (Freeze Shop) znacznie uprości UI/UX. Dostosowanie wyglądu karty do przygotowanego makiety (mockupu) poprawi czytelność i profesjonalizm gry.
-- **Sugerowana zmiana:**
-  1. **Struktura karty (według makiety):**
-     - **Górna sekcja (Portret):** Kontener z kolorowym tłem, zawierający sprite jednostki. Na dolnej krawędzi portretu na środku umieścić statystyki.
-     - **Dolna sekcja (Stopka):** Ciemnoszary pasek na dole karty z HBoxContainer. Po lewej stronie nazwa potwora, a po prawej cena (np. "$15" or "3G").
-     - *Uwaga spójności:* Zmianę tę należy zastosować zarówno dla potworów, jak i dla przedmiotów, aby zachować identyczny styl wizualny w sklepie.
-  2. **Usunięcie sterowania ze slotów:** Usunąć z `shop_slot.tscn` węzeł `%ShopControls` (freeze i cena pod slotem).
-  3. **Panel sklepu:** W `shop_panel.tscn` dodać przycisk "Freeze Shop" obok przycisku "Roll".
-  4. **Stan gry:** W `RunState` zamienić `shop_frozen_statuses: Array[bool]` na pojedynczą zmienną `is_shop_frozen: bool`. Zaktualizować logiczne metody `roll_shop()` i `complete_battle()`.
+- **Wdrożone rozwiązanie:**
+  1. **Struktura karty:** Przeniesiono cenę i nazwę bezpośrednio na stopkę karty ([shop_card_unit.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.gd)).
+  2. **Sterowanie slotami:** Usunięto przyciski zamrażania i etykiety cen z pojedynczych slotów.
+  3. **Globalny Freeze:** W panelu sklepu ([shop_panel.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_panel.gd)) dodano przycisk "Freeze Shop".
+  4. **Stan gry:** Zachowano tablicę `shop_frozen_statuses: Array[bool]` w [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd), co jest lepszym rozwiązaniem pod kątem UX (po zakupie jednostki nowo wylosowana karta w tym samym slocie nie jest automatycznie zamrażana). Globalny przycisk Freeze w UI odpowiednio synchronizuje stany w tablicy.
 
 ### Zadanie D: Zwiększenie liczby kart w sklepie z 4 do 5 (Dawne Zadanie 7)
 
@@ -139,7 +136,7 @@
 
 ## 4. PRIORYTET 4: MECHANIKI ROZGRYWKI (Gameplay Mechanics)
 
-### Zadanie K: Bazowe HP drużyny oraz relikty zwiększające je (Dawne Zadanie 10)
+### Zadanie K [**ZROBIONE**]: Bazowe HP drużyny oraz relikty zwiększające je (Dawne Zadanie 10)
 
 - **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd), [battle_team_model.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_team_model.gd) (metoda `load_team_units`)
 - **Krytyczne pytania & Problem:** Wspólne HP drużyny w walce zależy wyłącznie od sumy zdrowia poszczególnych potworów. Brak stałego, bazowego HP dla całej drużyny.
