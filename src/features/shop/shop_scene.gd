@@ -109,6 +109,7 @@ func setup(p_state: RunState) -> void:
 	run_state.shop_slot_updated.connect(_on_shop_slot_updated)
 	run_state.shop_slot_freeze_changed.connect(_on_shop_slot_freeze_changed)
 	run_state.relics_changed.connect(_on_relics_changed)
+	run_state.shop_size_changed.connect(_on_shop_size_changed)
 	shop_panel.freeze_all_requested.connect(_on_freeze_all_requested)
 	
 	load_state_from_run()
@@ -134,7 +135,7 @@ func setup(p_state: RunState) -> void:
 func create_slots() -> void:
 	bench_panel.create_slots(unit_slot_scene, bench_slot_count)
 	team_panel.create_slots(unit_slot_scene, active_slot_count)
-	shop_panel.create_slots(shop_slot_scene, 4)
+	shop_panel.create_slots(shop_slot_scene, run_state.MAX_SHOP_CARDS_SIZE)
 	
 	var all_slots: Array[UnitSlot] = []
 	all_slots.append_array(active_slots)
@@ -366,6 +367,10 @@ func _on_relics_changed(relics: Array[RelicInstance]) -> void:
 	relic_bar.update_relics(relics)
 	shop_panel.has_unique_potential = run_state.has_unique_potential
 	shop_panel.shop_weights = run_state.shop_weights
+
+func _on_shop_size_changed(new_size: int) -> void:
+	shop_panel.create_slots(shop_slot_scene, new_size)
+	load_state_from_run()
 
 func set_preview_card(card: Control) -> void:
 	if not preview_tooltip:

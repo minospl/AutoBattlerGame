@@ -3,7 +3,7 @@ extends Resource
 
 const MAX_ACTIVE_TEAM_SIZE: int = 6
 const MAX_BENCH_SIZE: int = 6
-const MAX_SHOP_CARDS_SIZE: int = 4
+const MAX_SHOP_CARDS_SIZE: int = 5
 const STARTING_GOLD: int = 10
 const STARTING_LIVES: int = 10
 const STARTING_DAY: int = 1
@@ -16,6 +16,11 @@ func _init() -> void:
 		active_team.resize(MAX_ACTIVE_TEAM_SIZE)
 	if bench.is_empty():
 		bench.resize(MAX_BENCH_SIZE)
+	if shop_cards.is_empty():
+		shop_cards.resize(MAX_SHOP_CARDS_SIZE)
+	if shop_frozen_statuses.is_empty():
+		shop_frozen_statuses.resize(MAX_SHOP_CARDS_SIZE)
+		shop_frozen_statuses.fill(false)
 
 signal gold_changed(p_gold: int)
 signal lives_changed(p_lives: int)
@@ -28,6 +33,7 @@ signal relics_changed(p_relics: Array[RelicInstance])
 signal relic_added(relic: RelicInstance)
 signal shop_card_generated(card: Resource)
 signal shop_rolled()
+signal shop_size_changed(p_new_size: int)
 
 var unit_templates: Array[UnitData] = []
 var item_templates: Array[ItemData] = []
@@ -478,6 +484,25 @@ func roll_shop(free: bool = false) -> void:
 			shop_cards[i] = roll_single_shop_card()
 			shop_slot_updated.emit(i, shop_cards[i])
 
+func change_shop_size(p_diff: int) -> void:
+	if p_diff == 0:
+		return
+		
+	var new_size: int = clampi(shop_cards.size() + p_diff, 1, 10)
+	var old_size: int = shop_cards.size()
+	if new_size == old_size:
+		return
+		
+	shop_cards.resize(new_size)
+	shop_frozen_statuses.resize(new_size)
+	
+	if new_size > old_size:
+		for i: int in range(old_size, new_size):
+			shop_cards[i] = roll_single_shop_card()
+			shop_frozen_statuses[i] = false
+			
+	shop_size_changed.emit(new_size)
+
 func add_relic(relic: RelicInstance) -> void:
 	if not relic:
 		return
@@ -496,9 +521,9 @@ func add_relic(relic: RelicInstance) -> void:
 			return
 			
 	relics.append(relic)
-	relics_changed.emit(relics)
 	if relic.data and relic.data.modifier:
 		relic.data.modifier.on_acquire(relic, self)
+	relics_changed.emit(relics)
 	relic_added.emit(relic)
 
 func buy_clickable_item(shop_slot_idx: int) -> bool:
