@@ -91,9 +91,9 @@ Walka odbywa się automatycznie w czasie rzeczywistym:
 
 ### Statusy (Status Effects)
 
-* **Poison (Trucizna):** Zadaje obrażenia równe liczbie ładunków trucizny co 1.0 sekundy.
-* **Burn (Oparzenie):** Zadaje obrażenia równe liczbie ładunków oparzenia co 0.5 sekundy, po czym liczba ładunków oparzenia zmniejsza się o 1.
-* **Electrocute (Porażenie):** Zwiększa kolejne otrzymywane obrażenia przez drużynę o wartość ładunku porażenia.
+* **Poison (Trucizna):** Zadaje obrażenia równe liczbie ładunków co 1.0 sekundy.
+* **Burn (Oparzenie):** Zadaje obrażenia równe liczbie ładunków co 0.5 sekundy, po czym zmniejsza liczbę ładunków o 1.
+* **Electrocute (Porażenie):** Zwiększa otrzymywane obrażenia przez drużynę o wartość ładunku porażenia, gdy jednostka atakująca ma atak > 0.
 
 ### Zmęczenie (Fatigue)
 
@@ -148,8 +148,7 @@ Podczas edycji lub rozbudowy tego projektu muszę bezwzględnie przestrzegać na
   * **Wątpliwości projektowe:** Jeśli makieta graficzna lub opis zadania wydaje się niejasny, asystent musi zadać pytanie wyjaśniające, zamiast zgadywać intencje i wdrażać domniemane rozwiązania.
 
 * **Ścisłe etapy i tempo pracy (Work Pacing & Boundaries):**
-  * **Zasada jednego kroku (Single-Step Execution):** Zaimplementuj wyłącznie JEDNO najmniejsze zadanie/etap z planu na raz o ile plan implementacji jest podzielony na etapy. Po jego zakończeniu natychmiast zatrzymaj wywoływanie narzędzi, zgłoś wynik i czekaj na potwierdzenie użytkownika przed przejściem dalej.
-  * **Status mikro-zakresu:** Na początku każdej wypowiedzi podaj nagłówek z aktualnym, mikro-zakresem prac, aby użytkownik wiedział, co jest w tej chwili robione.
+  * **Zasada jednego kroku (Single-Step Execution):** Zaimplementuj wyłącznie JEDNO najmniejsze logiczne zadanie/etap na raz, o ile plan implementacji jest podzielony na etapy. Zadanie to nie powinno być sztucznie ograniczane, jeśli jego kompletne wdrożenie wymaga spójnych modyfikacji. Po pełnym zakończeniu danego zadania/etapu natychmiast zatrzymaj wywoływanie narzędzi, zgłoś wynik i czekaj na potwierdzenie użytkownika.
 
 * **Styl Komunikacji (Communication Style):**
   * **Zwięzłość i Konkretność**: Zawsze odpowiadaj w sposób maksymalnie zwięzły, konkretny i bezpośrednio na temat (do celu). Unikaj zbędnego rozpisywania się, powtórzeń i nadmiernego tłumaczenia.
