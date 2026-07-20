@@ -9,6 +9,7 @@ const STARTING_LIVES: int = 10
 const STARTING_DAY: int = 1
 const STARTING_TROPHIES: int = 0
 const MAX_TROPHIES: int = 10
+const STARTING_BASE_HEALTH: int = 100
 
 func _init() -> void:
 	if active_team.is_empty():
@@ -43,6 +44,7 @@ func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relic
 @export var shop_frozen_statuses: Array[bool] = []
 @export var relics: Array[RelicInstance] = []
 @export var has_magnetic_core: bool = false
+@export var base_health: int = STARTING_BASE_HEALTH
 
 var has_focusing_lens: bool:
 	get:
@@ -487,6 +489,8 @@ func add_relic(relic: RelicInstance) -> void:
 	for existing: RelicInstance in relics:
 		if existing.data == relic.data:
 			existing.stacks += relic.stacks
+			if existing.data.modifier:
+				existing.data.modifier.on_acquire(relic, self)
 			relics_changed.emit(relics)
 			relic_added.emit(existing)
 			return
@@ -552,6 +556,7 @@ func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY,
 	day = p_day
 	trophies = p_trophies
 	gold = p_gold
+	base_health = STARTING_BASE_HEALTH
 	relics.clear()
 	has_magnetic_core = false
 	relics_changed.emit(relics)

@@ -126,6 +126,14 @@ func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 			
 	# Load state and backup
 	load_battle_team()
+	
+	if player_team.health <= 0:
+		show_battle_outcome("defeat")
+		return
+	if enemy_team.health <= 0:
+		show_battle_outcome("victory")
+		return
+		
 	match_timer = 30.0
 	fatigue_tick_timer = 0.0
 	fatigue_tick_count = 0
@@ -147,7 +155,7 @@ func load_battle_team() -> void:
 		else:
 			player_units.append(null)
 
-	player_team.load_team_units(player_units)
+	player_team.load_team_units(player_units, run_state.base_health)
 	
 	# Clone player relics from run_state to isolate battle simulation state
 	if run_state:
@@ -192,7 +200,7 @@ func load_enemy_team() -> void:
 			crab_instance.attack = 10
 			enemy_units[0] = crab_instance
 		
-	enemy_team.load_team_units(enemy_units)
+	enemy_team.load_team_units(enemy_units, RunState.STARTING_BASE_HEALTH)
 	ModifierEngine.update_ongoing_modifiers(player_team, enemy_team)
 	ModifierEngine.update_ongoing_modifiers(enemy_team, player_team)
 

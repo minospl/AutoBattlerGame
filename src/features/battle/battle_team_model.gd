@@ -88,7 +88,7 @@ func initialize(p_is_enemy: bool = false) -> void:
 	
 	_initialize_status_effects()
 
-func load_team_units(new_units: Array[UnitInstance]) -> void:
+func load_team_units(new_units: Array[UnitInstance], base_health_val: int = 0) -> void:
 	shield = 0
 	
 	if active_statuses.is_empty():
@@ -97,8 +97,8 @@ func load_team_units(new_units: Array[UnitInstance]) -> void:
 		for effect: StatusEffect in active_statuses.values():
 			effect.reset()
 	
-	health = 0
-	max_health = 0
+	health = base_health_val
+	max_health = base_health_val
 	
 	var num_units: int = mini(MAX_TEAM_SIZE, new_units.size())
 	for i: int in range(MAX_TEAM_SIZE):
@@ -200,7 +200,7 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 				
 	damage_taken.emit(actual_dmg, damage_type)
 		
-	if max_health > 0 and health <= 0:
+	if health <= 0:
 		team_defeated.emit()
 
 func heal(amount: int, source_slot_idx: int = -1) -> void:
