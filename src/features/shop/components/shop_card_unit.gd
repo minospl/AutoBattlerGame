@@ -1,8 +1,8 @@
-class_name ShopCard
+class_name ShopCardUnit
 extends VBoxContainer
 
-signal hovered(card: ShopCard, is_hovered: bool)
-signal clicked(card: ShopCard)
+signal hovered(card: ShopCardUnit, is_hovered: bool)
+signal clicked(card: ShopCardUnit)
 
 @export var price: int
 

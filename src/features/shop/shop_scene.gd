@@ -38,7 +38,7 @@ var relic_bar: RelicBar = null
 
 var shop_slot_scene: PackedScene = preload("res://src/features/shop/components/shop_slot.tscn")
 var unit_slot_scene: PackedScene = preload("res://src/features/shop/components/unit_slot.tscn")
-var card_scene: PackedScene = preload("res://src/features/shop/components/shop_card.tscn")
+var shop_card_unit_scene: PackedScene = preload("res://src/features/shop/components/shop_card_unit.tscn")
 var item_card_scene: PackedScene = preload("res://src/features/shop/components/shop_card_item.tscn")
 var unit_card_scene: PackedScene = preload("res://src/features/shop/components/unit_card.tscn")
 var tooltip_scene: PackedScene = preload("res://src/shared/ui/components/card_tooltip.tscn")
@@ -331,7 +331,7 @@ func _on_shop_slot_updated(slot_index: int, card_instance: Resource) -> void:
 		
 	if card_instance != null:
 		if card_instance is UnitInstance:
-			var card: ShopCard = card_scene.instantiate() as ShopCard
+			var card: ShopCardUnit = shop_card_unit_scene.instantiate() as ShopCardUnit
 			card.unit_instance = card_instance as UnitInstance
 			_connect_card_signals(card)
 			slot.add_card(card)
@@ -373,8 +373,8 @@ func set_preview_card(card: Control) -> void:
 		
 	current_hovered_card = card
 	
-	if card is ShopCard:
-		var shop_card: ShopCard = card
+	if card is ShopCardUnit:
+		var shop_card: ShopCardUnit = card
 		if shop_card.unit_instance:
 			CardUIHelper.show_tooltip(preview_tooltip, shop_card.unit_instance)
 	elif card is UnitCard:
@@ -445,8 +445,8 @@ func _on_unit_hovered(card: UnitCard, is_hovered: bool) -> void:
 					active_slots[t_idx].set_target_highlight(true)
 
 func _connect_card_signals(card: Control) -> void:
-	if card is ShopCard:
-		var shop_card: ShopCard = card
+	if card is ShopCardUnit:
+		var shop_card: ShopCardUnit = card
 		shop_card.hovered.connect(_on_card_hover_changed)
 		shop_card.clicked.connect(_on_card_clicked)
 	elif card is UnitCard:
@@ -505,7 +505,7 @@ func _on_slot_drag_hover_ended(slot: UnitSlot) -> void:
 		current_drag_hovered_slot = null
 		_clear_all_target_highlights()
 
-func _on_card_clicked(card: ShopCard) -> void:
+func _on_card_clicked(card: ShopCardUnit) -> void:
 	var original_slot: ShopSlot = card.slot
 	if not original_slot or not run_state:
 		return
@@ -595,7 +595,7 @@ func load_state_from_run() -> void:
 			
 		if item_or_unit != null:
 			if item_or_unit is UnitInstance:
-				var card: ShopCard = card_scene.instantiate() as ShopCard
+				var card: ShopCardUnit = shop_card_unit_scene.instantiate() as ShopCardUnit
 				var unit_inst: UnitInstance = item_or_unit as UnitInstance
 				card.unit_instance = unit_inst
 				_connect_card_signals(card)

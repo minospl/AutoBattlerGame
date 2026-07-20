@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://src/features/shop/components/shop_card.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/features/shop/components/shop_card_unit.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://ccmv3fktknktn" path="res://src/shared/ui/components/card_portrait.tscn" id="2_portrait"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="3_decorator"]
 
@@ -10,7 +10,7 @@ corner_radius_bottom_left = 4
 corner_radius_bottom_right = 4
 anti_aliasing = false
 
-[node name="ShopCard" type="VBoxContainer"]
+[node name="ShopCardUnit" type="VBoxContainer"]
 custom_minimum_size = Vector2(100, 122)
 offset_right = 100.0
 offset_bottom = 122.0
