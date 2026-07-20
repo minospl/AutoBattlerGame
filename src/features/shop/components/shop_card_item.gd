@@ -15,7 +15,8 @@ signal clicked(card: ShopCardItem)
 			update_ui()
 
 @onready var card_portrait: CardPortrait = %CardPortrait
-var slot: ShopCardSlot = null
+var slot: ShopSlot = null
+var affordability_validator: Callable = func() -> bool: return true
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(100, 122)
@@ -41,7 +42,10 @@ func update_ui() -> void:
 		price_label.text = str(price) + "G"
 
 func _get_drag_data(_at_position: Vector2) -> Variant:
-	if item_instance and item_instance.data and item_instance.data.is_clickable:
+	if item_instance.data.is_clickable:
+		return null
+		
+	if not affordability_validator.call():
 		return null
 		
 	# Keep the card in place but dim it visually so we can see the item while targeting
@@ -51,7 +55,7 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	var preview_wrapper: Control = Control.new()
 	set_drag_preview(preview_wrapper)
 	
-	var original_slot: ShopCardSlot = slot
+	var original_slot: ShopSlot = slot
 		
 	# Notify about the drag starting using DragManager
 	DragManager.notify_drag_started(self, original_slot)

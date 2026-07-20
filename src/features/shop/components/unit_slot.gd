@@ -1,34 +1,24 @@
-class_name ShopCardSlot
+class_name UnitSlot
 extends Control
 
-signal drag_hover_started(slot: ShopCardSlot, data: Dictionary)
-signal drag_hover_ended(slot: ShopCardSlot)
-signal item_dropped(item_card: ShopCardItem, original_slot: ShopCardSlot, target_slot: ShopCardSlot)
-signal unit_dropped(unit_card: UnitCard, original_slot: ShopCardSlot, target_slot: ShopCardSlot)
+signal drag_hover_started(slot: UnitSlot, data: Dictionary)
+signal drag_hover_ended(slot: UnitSlot)
+signal item_dropped(item_card: ShopCardItem, original_slot: ShopSlot, target_slot: UnitSlot)
+signal unit_dropped(unit_card: UnitCard, original_slot: UnitSlot, target_slot: UnitSlot)
 
-@export var is_shop_slot: bool = false
 @export var is_active_team: bool = false
 @export var slot_index: int = 0
 @export var drag_drop_enabled: bool = true
-@export var price: int = 3:
-	set(val):
-		price = val
 
 var is_drag_hovering: bool = false
-var run_state: RunState = null
-var is_frozen: bool = false
 var is_highlighted: bool = false
 var is_targeted: bool = false
 
 @onready var card_container: PanelContainer = %CardContainer
 
 func _ready() -> void:
-	if is_shop_slot:
-		custom_minimum_size = Vector2(100, 122)
-		card_container.custom_minimum_size = Vector2(100, 122)
-	else:
-		custom_minimum_size = CardUIHelper.CARD_SIZE
-		card_container.custom_minimum_size = CardUIHelper.CARD_SIZE
+	custom_minimum_size = CardUIHelper.CARD_SIZE
+	card_container.custom_minimum_size = CardUIHelper.CARD_SIZE
 		
 	card_container.offset_top = 0
 	card_container.offset_bottom = card_container.custom_minimum_size.y
@@ -95,20 +85,10 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 	if not drag_drop_enabled:
 		return false
 		
-	if is_shop_slot:
-		return false # Cannot drop cards into shop slots!
-		
 	if typeof(data) == TYPE_DICTIONARY:
 		var dict: Dictionary = data
 		if dict.has("card") and dict.has("original_slot"):
 			var dragged_card: Control = dict["card"]
-			var original_slot: ShopCardSlot = dict["original_slot"]
-			
-			# Check if the player has enough gold for a purchase
-			if original_slot and original_slot.is_shop_slot:
-				if run_state:
-					if run_state.gold < original_slot.price:
-						return false # Cannot afford this card
 			
 			# If the dragged card is food:
 			if dragged_card is ShopCardItem:
@@ -150,44 +130,40 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 		var dict: Dictionary = data
 		if dict.has("card") and dict.has("original_slot"):
 			var dragged_card: Control = dict["card"]
-			var original_slot: ShopCardSlot = dict["original_slot"]
 			if dragged_card is ShopCardItem:
+				var original_slot: ShopSlot = dict["original_slot"]
 				item_dropped.emit(dragged_card as ShopCardItem, original_slot, self)
-			elif dragged_card is UnitCard:
+			if dragged_card is UnitCard:
+				var original_slot: UnitSlot = dict["original_slot"]
 				unit_dropped.emit(dragged_card as UnitCard, original_slot, self)
 
-func add_card(card: Control) -> void:
+func add_card(card: UnitCard) -> void:
 	if has_node("CardContainer"):
 		card_container.add_child(card)
-		if "slot" in card:
-			card.set("slot", self)
-		if is_shop_slot and "price" in card:
-			price = card.get("price")
+		card.slot = self
 
-func remove_card(card: Control) -> void:
+func remove_card(card: UnitCard) -> void:
 	if has_node("CardContainer") and card.get_parent() == card_container:
 		card_container.remove_child(card)
-		if "slot" in card:
-			card.set("slot", null)
+		card.slot = null
 
 ## Returns the Card child node of this slot, if any. Otherwise returns null.
-func get_card() -> Control:
+func get_card() -> UnitCard:
 	if not has_node("CardContainer"):
 		return null
 	for child: Node in card_container.get_children():
-		if child.has_method("update_ui"):
-			return child as Control
+		if child is UnitCard:
+			return child as UnitCard
 	return null
 
 ## Check if slot is empty (treats hidden cards, e.g. during dragging, as empty)
 func is_empty() -> bool:
-	var card: Control = get_card()
+	var card: UnitCard = get_card()
 	return card == null or not card.visible
 
 ## Returns the UnitInstance from the card in this slot, or null
 func get_unit_instance() -> UnitInstance:
-	var card: Control = get_card()
-	if card and "unit_instance" in card:
-		var inst: UnitInstance = card.get("unit_instance")
-		return inst
+	var card: UnitCard = get_card()
+	if card:
+		return card.unit_instance
 	return null

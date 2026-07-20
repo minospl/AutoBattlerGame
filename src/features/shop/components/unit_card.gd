@@ -16,7 +16,7 @@ signal right_clicked(card: UnitCard)
 
 var is_highlighted: bool = false
 var is_targeted: bool = false
-var slot: ShopCardSlot = null
+var slot: UnitSlot = null
 
 func _ready() -> void:
 	custom_minimum_size = CardUIHelper.CARD_SIZE
@@ -65,7 +65,7 @@ func update_border_colors() -> void:
 		border_rect.inner_border_color = Color(0.5, 0.05, 0.05, 1.0)
 	else:
 		var rarity_color: Color = GameColors.BORDER_OUTER_DEFAULT
-		if unit_instance and unit_instance.data and unit_instance.data.rarity:
+		if unit_instance:
 			rarity_color = unit_instance.data.rarity.border_color
 		border_rect.border_color = rarity_color
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
@@ -93,11 +93,11 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 	preview_wrapper.z_index = 100
 	preview_wrapper.z_as_relative = false
 	preview_wrapper.add_child(preview)
-	preview.position = -custom_minimum_size / 2.0
+	preview.position = - custom_minimum_size / 2.0
 	
 	set_drag_preview(preview_wrapper)
 	
-	var original_slot: ShopCardSlot = slot
+	var original_slot: UnitSlot = slot
 	self.visible = false
 	if original_slot:
 		original_slot.update_placeholder()

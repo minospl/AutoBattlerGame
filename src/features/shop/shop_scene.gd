@@ -36,24 +36,25 @@ var relic_bar: RelicBar = null
 @onready var shop_panel: ShopPanel = %ShopPanel
 @onready var relic_bar_wrapper: Control = %RelicBarWrapper
 
-var slot_scene: PackedScene = preload("res://src/features/shop/components/shop_card_slot.tscn")
+var shop_slot_scene: PackedScene = preload("res://src/features/shop/components/shop_slot.tscn")
+var unit_slot_scene: PackedScene = preload("res://src/features/shop/components/unit_slot.tscn")
 var card_scene: PackedScene = preload("res://src/features/shop/components/shop_card.tscn")
 var item_card_scene: PackedScene = preload("res://src/features/shop/components/shop_card_item.tscn")
 var unit_card_scene: PackedScene = preload("res://src/features/shop/components/unit_card.tscn")
 var tooltip_scene: PackedScene = preload("res://src/shared/ui/components/card_tooltip.tscn")
 var overlay_script: Script = preload("res://src/features/shop/components/targeting_line_overlay.gd")
 
-var active_slots: Array[ShopCardSlot]:
+var active_slots: Array[UnitSlot]:
 	get:
 		return team_panel.slots
 
-var bench_slots: Array[ShopCardSlot]:
+var bench_slots: Array[UnitSlot]:
 	get:
 		return bench_panel.slots
 
 var preview_tooltip: CardTooltip
 var current_hovered_card: Control = null
-var current_drag_hovered_slot: ShopCardSlot = null
+var current_drag_hovered_slot: UnitSlot = null
 
 func _ready() -> void:
 	bench_panel.item_dropped.connect(_on_item_dropped)
@@ -99,14 +100,6 @@ func _ready() -> void:
 
 func setup(p_state: RunState) -> void:
 	run_state = p_state
-	
-	# Pass run_state to slots
-	var all_slots: Array[ShopCardSlot] = []
-	all_slots.append_array(active_slots)
-	all_slots.append_array(bench_slots)
-	all_slots.append_array(shop_panel.slots)
-	for slot: ShopCardSlot in all_slots:
-		slot.run_state = run_state
 		
 	# Connect signals from Model (RunState)
 	run_state.gold_changed.connect(_on_gold_changed)
@@ -139,17 +132,15 @@ func setup(p_state: RunState) -> void:
 
 ## Instantiate slot scenes and arrange them inside containers
 func create_slots() -> void:
-	bench_panel.create_slots(slot_scene, bench_slot_count)
-	team_panel.create_slots(slot_scene, active_slot_count)
-	shop_panel.create_slots(slot_scene, 4)
+	bench_panel.create_slots(unit_slot_scene, bench_slot_count)
+	team_panel.create_slots(unit_slot_scene, active_slot_count)
+	shop_panel.create_slots(shop_slot_scene, 4)
 	
-	var all_slots: Array[ShopCardSlot] = []
+	var all_slots: Array[UnitSlot] = []
 	all_slots.append_array(active_slots)
 	all_slots.append_array(bench_slots)
-	all_slots.append_array(shop_panel.slots)
 	
-	for slot: ShopCardSlot in all_slots:
-		# Connect drag hover signals for target highlighting preview
+	for slot: UnitSlot in all_slots:
 		slot.drag_hover_started.connect(_on_slot_drag_hover_started)
 		slot.drag_hover_ended.connect(_on_slot_drag_hover_ended)
 
@@ -172,14 +163,14 @@ func populate_ui() -> void:
 		return
 		
 	# Clear existing cards immediately
-	for slot: ShopCardSlot in active_slots:
-		var card: Control = slot.get_card()
+	for slot: UnitSlot in active_slots:
+		var card: UnitCard = slot.get_card()
 		if card:
 			slot.remove_card(card)
 			card.queue_free()
 			
-	for slot: ShopCardSlot in bench_slots:
-		var card: Control = slot.get_card()
+	for slot: UnitSlot in bench_slots:
+		var card: UnitCard = slot.get_card()
 		if card:
 			slot.remove_card(card)
 			card.queue_free()
@@ -249,7 +240,7 @@ func _on_roll_requested() -> void:
 	if run_state:
 		run_state.roll_shop(false)
 
-func _on_sell_card_requested(card: UnitCard, original_slot: ShopCardSlot) -> void:
+func _on_sell_card_requested(card: UnitCard, original_slot: UnitSlot) -> void:
 	# Execute in Model first
 	run_state.sell_unit(original_slot.slot_index, original_slot.is_active_team)
 	
@@ -260,25 +251,24 @@ func _on_sell_card_requested(card: UnitCard, original_slot: ShopCardSlot) -> voi
 	
 	team_state_changed.emit()
 
-func _on_item_dropped(_item_card: ShopCardItem, original_slot: ShopCardSlot, target_slot: ShopCardSlot) -> void:		
+func _on_item_dropped(_item_card: ShopCardItem, original_slot: ShopSlot, target_slot: UnitSlot) -> void:		
 	if original_slot == target_slot:
 		return
 		
 	# 1. Purchase from the Shop slot
-	if original_slot.is_shop_slot:
-		var target_idx: int = target_slot.slot_index
-		var target_is_active: bool = target_slot.is_active_team
-		
-		var applied: bool = run_state.apply_item(original_slot.slot_index, target_idx, target_is_active)
-		if applied:
-			# Incremental UI update: refresh the visual stats of the fed unit
-			var target_card: Control = target_slot.get_card()
-			if target_card and target_card.has_method("update_ui"):
-				target_card.call("update_ui")
-				
-			team_state_changed.emit()
+	var target_idx: int = target_slot.slot_index
+	var target_is_active: bool = target_slot.is_active_team
+	
+	var applied: bool = run_state.apply_item(original_slot.slot_index, target_idx, target_is_active)
+	if applied:
+		# Incremental UI update: refresh the visual stats of the fed unit
+		var target_card: Control = target_slot.get_card()
+		if target_card and target_card.has_method("update_ui"):
+			target_card.call("update_ui")
+			
+		team_state_changed.emit()
 
-func _on_unit_dropped(unit_card: UnitCard, original_slot: ShopCardSlot, target_slot: ShopCardSlot) -> void:		
+func _on_unit_dropped(unit_card: UnitCard, original_slot: UnitSlot, target_slot: UnitSlot) -> void:		
 	if original_slot == target_slot:
 		return
 			
@@ -291,7 +281,7 @@ func _on_unit_dropped(unit_card: UnitCard, original_slot: ShopCardSlot, target_s
 	run_state.swap_units(source_idx, source_is_active, dest_idx, dest_is_active)
 		
 	# Incremental UI update: physically swap card nodes in slots
-	var dest_card: Control = target_slot.get_card()
+	var dest_card: UnitCard = target_slot.get_card()
 	
 	original_slot.remove_card(unit_card)
 	if dest_card:
@@ -326,7 +316,7 @@ func _on_trophies_changed(new_trophies: int) -> void:
 func _on_shop_slot_updated(slot_index: int, card_instance: Resource) -> void:
 	if slot_index < 0 or slot_index >= shop_panel.slots.size():
 		return
-	var slot: ShopCardSlot = shop_panel.slots[slot_index] as ShopCardSlot
+	var slot: ShopSlot = shop_panel.slots[slot_index] as ShopSlot
 	
 	# Clear current card
 	var old_card: Control = slot.get_card()
@@ -348,6 +338,7 @@ func _on_shop_slot_updated(slot_index: int, card_instance: Resource) -> void:
 		elif card_instance is ItemInstance:
 			var card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
 			card.item_instance = card_instance as ItemInstance
+			card.affordability_validator = func() -> bool: return run_state.gold >= card.price
 			_connect_card_signals(card)
 			slot.add_card(card)
 	slot.update_placeholder()
@@ -355,7 +346,7 @@ func _on_shop_slot_updated(slot_index: int, card_instance: Resource) -> void:
 func _on_shop_slot_freeze_changed(slot_index: int, is_frozen: bool) -> void:
 	if slot_index < 0 or slot_index >= shop_panel.slots.size():
 		return
-	var slot: ShopCardSlot = shop_panel.slots[slot_index] as ShopCardSlot
+	var slot: ShopSlot = shop_panel.slots[slot_index] as ShopSlot
 	slot.is_frozen = is_frozen
 	
 	# Update shop panel's freeze all button state
@@ -410,9 +401,9 @@ func clear_preview_card(card: Control = null) -> void:
 		_on_unit_hovered(card as UnitCard, false)
 
 func _clear_all_target_highlights() -> void:
-	for slot: ShopCardSlot in active_slots:
+	for slot: UnitSlot in active_slots:
 		slot.set_target_highlight(false)
-	for slot: ShopCardSlot in bench_slots:
+	for slot: UnitSlot in bench_slots:
 		slot.set_target_highlight(false)
 
 func _on_unit_hovered(card: UnitCard, is_hovered: bool) -> void:
@@ -428,13 +419,13 @@ func _on_unit_hovered(card: UnitCard, is_hovered: bool) -> void:
 		return
 		
 	# Find which slot contains the hovered card
-	var source_slot: ShopCardSlot = null
-	for slot: ShopCardSlot in active_slots:
+	var source_slot: UnitSlot = null
+	for slot: UnitSlot in active_slots:
 		if slot.get_card() == card:
 			source_slot = slot
 			break
 	if not source_slot:
-		for slot: ShopCardSlot in bench_slots:
+		for slot: UnitSlot in bench_slots:
 			if slot.get_card() == card:
 				source_slot = slot
 				break
@@ -481,7 +472,7 @@ func _on_card_hover_changed(card: Control, is_hovered: bool) -> void:
 	else:
 		clear_preview_card(card)
 
-func _on_slot_drag_hover_started(slot: ShopCardSlot, data: Dictionary) -> void:
+func _on_slot_drag_hover_started(slot: UnitSlot, data: Dictionary) -> void:
 	current_drag_hovered_slot = slot
 	_clear_all_target_highlights()
 	
@@ -509,14 +500,14 @@ func _on_slot_drag_hover_started(slot: ShopCardSlot, data: Dictionary) -> void:
 		if t_idx < active_slots.size():
 			active_slots[t_idx].set_target_highlight(true)
 
-func _on_slot_drag_hover_ended(slot: ShopCardSlot) -> void:
+func _on_slot_drag_hover_ended(slot: UnitSlot) -> void:
 	if current_drag_hovered_slot == slot:
 		current_drag_hovered_slot = null
 		_clear_all_target_highlights()
 
 func _on_card_clicked(card: ShopCard) -> void:
-	var original_slot: ShopCardSlot = card.slot
-	if not original_slot or not original_slot.is_shop_slot or not run_state:
+	var original_slot: ShopSlot = card.slot
+	if not original_slot or not run_state:
 		return
 		
 	# Find target slot index (team first, then bench)
@@ -545,7 +536,7 @@ func _on_card_clicked(card: ShopCard) -> void:
 	var bought: bool = run_state.buy_unit(original_slot.slot_index, target_idx, target_is_active)
 	if bought:
 		# Incremental UI update: instantiate and add the card to the target slot
-		var target_slot: ShopCardSlot = active_slots[target_idx] if target_is_active else bench_slots[target_idx]
+		var target_slot: UnitSlot = active_slots[target_idx] if target_is_active else bench_slots[target_idx]
 		var new_card: UnitCard = unit_card_scene.instantiate() as UnitCard
 		new_card.unit_instance = unit_inst
 		_connect_card_signals(new_card)
@@ -556,8 +547,8 @@ func _on_card_clicked(card: ShopCard) -> void:
 		team_state_changed.emit()
 
 func _on_item_card_clicked(card: ShopCardItem) -> void:
-	var original_slot: ShopCardSlot = card.slot
-	if not original_slot or not original_slot.is_shop_slot or not run_state:
+	var original_slot: ShopSlot = card.slot
+	if not original_slot or not run_state:
 		return
 		
 	run_state.buy_clickable_item(original_slot.slot_index)
@@ -591,7 +582,7 @@ func load_state_from_run() -> void:
 	
 	# Recreate cards in shop slots
 	for i: int in range(shop_panel.slots.size()):
-		var slot: ShopCardSlot = shop_panel.slots[i] as ShopCardSlot
+		var slot: ShopSlot = shop_panel.slots[i] as ShopSlot
 		
 		# Clear current card
 		var old_card: Control = slot.get_card()
@@ -612,6 +603,7 @@ func load_state_from_run() -> void:
 			elif item_or_unit is ItemInstance:
 				var item_card: ShopCardItem = item_card_scene.instantiate() as ShopCardItem
 				item_card.item_instance = item_or_unit as ItemInstance
+				item_card.affordability_validator = func() -> bool: return run_state.gold >= item_card.price
 				_connect_card_signals(item_card)
 				slot.add_card(item_card)
 				
@@ -640,7 +632,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if key_event.keycode == KEY_S:
 			if current_hovered_card and current_hovered_card is UnitCard:
 				var unit_card: UnitCard = current_hovered_card as UnitCard
-				var slot: ShopCardSlot = unit_card.slot
+				var slot: UnitSlot = unit_card.slot
 				CardUIHelper.hide_tooltip(preview_tooltip)
 				_on_sell_card_requested(unit_card, slot)
 				current_hovered_card = null

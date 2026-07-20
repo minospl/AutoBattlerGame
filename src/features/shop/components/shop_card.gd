@@ -16,7 +16,7 @@ signal clicked(card: ShopCard)
 
 var is_highlighted: bool = false
 var is_targeted: bool = false
-var slot: ShopCardSlot = null
+var slot: ShopSlot = null
 
 func _ready() -> void:
 	custom_minimum_size = Vector2(100, 122)
@@ -71,7 +71,8 @@ func update_border_colors() -> void:
 		border_rect.inner_border_color = Color(0.5, 0.05, 0.05, 1.0)
 	else:
 		var rarity_color: Color = GameColors.BORDER_OUTER_DEFAULT
-		rarity_color = unit_instance.data.rarity.border_color
+		if unit_instance:
+			rarity_color = unit_instance.data.rarity.border_color
 		border_rect.border_color = rarity_color
 		border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 	border_rect.update_shader_parameters()

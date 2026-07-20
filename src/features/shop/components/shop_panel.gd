@@ -2,7 +2,7 @@ class_name ShopPanel
 extends PanelContainer
 
 signal roll_requested
-signal sell_card_requested(card: Control, original_slot: ShopCardSlot)
+signal sell_card_requested(card: Control, original_slot: UnitSlot)
 signal freeze_all_requested(freeze: bool)
 
 @onready var slots_hbox: HBoxContainer = %SlotsHBox
@@ -43,7 +43,7 @@ signal freeze_all_requested(freeze: bool)
 		if freeze_shop_button.button_pressed != is_shop_frozen:
 			freeze_shop_button.set_pressed_no_signal(is_shop_frozen)
 
-var slots: Array[ShopCardSlot] = []
+var slots: Array[ShopSlot] = []
 
 func _ready() -> void:
 	refresh_shop_button.pressed.connect(func() -> void: roll_requested.emit())
@@ -63,8 +63,7 @@ func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 	slots.clear()
 	
 	for i: int in range(slot_count):
-		var slot: ShopCardSlot = slot_scene.instantiate() as ShopCardSlot
-		slot.is_shop_slot = true
+		var slot: ShopSlot = slot_scene.instantiate() as ShopSlot
 		slot.slot_index = i
 		slots_hbox.add_child(slot)
 		slots.append(slot)
@@ -75,8 +74,8 @@ func _can_drop_data(_at_position: Vector2, data: Variant) -> bool:
 		if typeof(data) == TYPE_DICTIONARY:
 			var dict: Dictionary = data
 			if dict.has("original_slot") and dict.has("card"):
-				var original_slot: ShopCardSlot = dict["original_slot"]
-				if original_slot and not original_slot.is_shop_slot: # Can only sell if it comes from team or bench (not a shop slot)
+				var original_slot: UnitSlot = dict["original_slot"]
+				if original_slot: # Can only sell if it comes from team or bench
 					var card: Control = dict["card"]
 					if card is UnitCard: # Only sell Card (units)
 						return true
@@ -87,16 +86,16 @@ func _drop_data(_at_position: Vector2, data: Variant) -> void:
 		var dict: Dictionary = data
 		if dict.has("card") and dict.has("original_slot"):
 			var card: Control = dict["card"]
-			var original_slot: ShopCardSlot = dict["original_slot"]
+			var original_slot: UnitSlot = dict["original_slot"]
 			sell_card_requested.emit(card, original_slot)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_BEGIN: # Check if the dragged item is sellable by querying DragManager's static variables
 		var card: Control = DragManager.dragged_card
-		var original_slot: ShopCardSlot = null
-		if DragManager.dragged_card_original_slot is ShopCardSlot:
-			original_slot = DragManager.dragged_card_original_slot
-		if card is UnitCard and original_slot and not original_slot.is_shop_slot:
+		var original_slot: UnitSlot = null
+		if DragManager.dragged_card_original_slot is UnitSlot:
+			original_slot = DragManager.dragged_card_original_slot as UnitSlot
+		if card is UnitCard and original_slot:
 			var unit_card: UnitCard = card as UnitCard
 			var sell_price: int = max(1, unit_card.unit_instance.data.price - 1)
 			sell_label.text = "RELEASE TO SELL (+" + str(sell_price) + "g)"

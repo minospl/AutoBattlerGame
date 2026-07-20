@@ -14,7 +14,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	var main_idx: int = main_info.get("idx", 0)
 	
 	# Get main slot and main card from shop
-	var main_slot: ShopCardSlot = shop.bench_slots[main_idx] if main_is_bench else shop.active_slots[main_idx]
+	var main_slot: UnitSlot = shop.bench_slots[main_idx] if main_is_bench else shop.active_slots[main_idx]
 	var main_card: UnitCard = main_slot.get_card() as UnitCard
 	
 	if main_card == null:
@@ -41,7 +41,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 		var rem: Dictionary = rem_val
 		var rem_is_bench: bool = rem.get("is_bench", false)
 		var rem_idx: int = rem.get("idx", 0)
-		var rem_slot: ShopCardSlot = shop.bench_slots[rem_idx] if rem_is_bench else shop.active_slots[rem_idx]
+		var rem_slot: UnitSlot = shop.bench_slots[rem_idx] if rem_is_bench else shop.active_slots[rem_idx]
 		
 		var rem_card: UnitCard = rem_slot.get_card() as UnitCard
 		if rem_card:
