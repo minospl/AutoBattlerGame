@@ -100,6 +100,9 @@ func _ready() -> void:
 
 func setup(p_state: RunState) -> void:
 	run_state = p_state
+	
+	# Re-create slots using the actual dynamic state sizes
+	create_slots()
 		
 	# Connect signals from Model (RunState)
 	run_state.gold_changed.connect(_on_gold_changed)
@@ -112,16 +115,12 @@ func setup(p_state: RunState) -> void:
 	run_state.shop_size_changed.connect(_on_shop_size_changed)
 	shop_panel.freeze_all_requested.connect(_on_freeze_all_requested)
 	
+	# Fill any empty (null) shop slots on a new day or initialization
+	for i: int in range(run_state.shop_cards.size()):
+		if run_state.shop_cards[i] == null:
+			run_state.shop_cards[i] = run_state.roll_single_shop_card(i)
+			
 	load_state_from_run()
-	
-	# If this is a fresh setup with empty shop units, let's roll it!
-	var has_shop_cards: bool = false
-	for u: Resource in run_state.shop_cards:
-		if u != null:
-			has_shop_cards = true
-			break
-	if not has_shop_cards:
-		run_state.roll_shop(true)
 	
 	# Instantiate and add the targeting line overlay to draw on top of everything
 	var overlay: Control = Control.new()
@@ -135,7 +134,9 @@ func setup(p_state: RunState) -> void:
 func create_slots() -> void:
 	bench_panel.create_slots(unit_slot_scene, bench_slot_count)
 	team_panel.create_slots(unit_slot_scene, active_slot_count)
-	shop_panel.create_slots(shop_slot_scene, run_state.MAX_SHOP_CARDS_SIZE)
+	
+	var shop_size: int = run_state.shop_cards.size() if run_state else RunState.MAX_SHOP_CARDS_SIZE
+	shop_panel.create_slots(shop_slot_scene, shop_size)
 	
 	var all_slots: Array[UnitSlot] = []
 	all_slots.append_array(active_slots)
@@ -156,7 +157,6 @@ func check_for_unit_merges() -> void:
 		ShopMergeAnimator.animate_merge(self, merge, func() -> void:
 			check_for_unit_merges()
 		)
-
 
 ## Populate the UI based on external changes to logic data structures
 func populate_ui() -> void:
@@ -252,7 +252,7 @@ func _on_sell_card_requested(card: UnitCard, original_slot: UnitSlot) -> void:
 	
 	team_state_changed.emit()
 
-func _on_item_dropped(_item_card: ShopCardItem, original_slot: ShopSlot, target_slot: UnitSlot) -> void:		
+func _on_item_dropped(_item_card: ShopCardItem, original_slot: ShopSlot, target_slot: UnitSlot) -> void:
 	if original_slot == target_slot:
 		return
 		
@@ -269,7 +269,7 @@ func _on_item_dropped(_item_card: ShopCardItem, original_slot: ShopSlot, target_
 			
 		team_state_changed.emit()
 
-func _on_unit_dropped(unit_card: UnitCard, original_slot: UnitSlot, target_slot: UnitSlot) -> void:		
+func _on_unit_dropped(unit_card: UnitCard, original_slot: UnitSlot, target_slot: UnitSlot) -> void:
 	if original_slot == target_slot:
 		return
 			
@@ -365,7 +365,7 @@ func _on_freeze_all_requested(freeze: bool) -> void:
 
 func _on_relics_changed(relics: Array[RelicInstance]) -> void:
 	relic_bar.update_relics(relics)
-	shop_panel.has_unique_potential = run_state.has_unique_potential
+	shop_panel.unique_chance = run_state.unique_chance
 	shop_panel.shop_weights = run_state.shop_weights
 
 func _on_shop_size_changed(new_size: int) -> void:
@@ -574,7 +574,7 @@ func load_state_from_run() -> void:
 	
 	# Update shop level and chance weights in the shop panel
 	shop_panel.shop_level = run_state.shop_level
-	shop_panel.has_unique_potential = run_state.has_unique_potential
+	shop_panel.unique_chance = run_state.unique_chance
 	shop_panel.shop_weights = run_state.shop_weights
 	
 	# Ensure active team and bench size matches expectations
@@ -630,14 +630,21 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 	var key_event: InputEventKey = event as InputEventKey
 	if key_event and key_event.pressed and not key_event.echo:
-		if key_event.keycode == KEY_R:
-			_on_roll_requested()
-			return
-			
-		if key_event.keycode == KEY_S:
-			if current_hovered_card and current_hovered_card is UnitCard:
-				var unit_card: UnitCard = current_hovered_card as UnitCard
-				var slot: UnitSlot = unit_card.slot
-				CardUIHelper.hide_tooltip(preview_tooltip)
-				_on_sell_card_requested(unit_card, slot)
-				current_hovered_card = null
+
+		match key_event.keycode:
+			KEY_Q:
+				_on_add_monster_requested()
+			KEY_A:
+				_on_add_relic_requested()
+			KEY_Z:
+				if run_state:
+					run_state.add_all_relics()
+			KEY_R:
+				_on_roll_requested()
+			KEY_S:
+				if current_hovered_card and current_hovered_card is UnitCard:
+					var unit_card: UnitCard = current_hovered_card as UnitCard
+					var slot: UnitSlot = unit_card.slot
+					CardUIHelper.hide_tooltip(preview_tooltip)
+					_on_sell_card_requested(unit_card, slot)
+					current_hovered_card = null

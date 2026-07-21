@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/features/items/templates/modifiers/golden_apple_modifier.gd" id="1_modifier"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/unique.tres" id="2_rarity"]
+[ext_resource type="Script" path="res://src/features/items/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_golden_apple_modifier"]
+script = ExtResource("1_modifier")
+
+[resource]
+script = ExtResource("3_data")
+display_name = "Golden Apple"
+price = 5
+rarity = ExtResource("2_rarity")
+is_draggable = false
+is_clickable = true
+modifier = SubResource("Resource_golden_apple_modifier")

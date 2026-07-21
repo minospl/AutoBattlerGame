@@ -32,9 +32,9 @@ signal freeze_all_requested(freeze: bool)
 		shop_weights = val
 		_update_labels()
 
-@export var has_unique_potential: bool = false:
+@export var unique_chance: float = 0.0:
 	set(val):
-		has_unique_potential = val
+		unique_chance = val
 		_update_labels()
 
 @export var is_shop_frozen: bool = false:
@@ -123,7 +123,7 @@ func _process(_delta: float) -> void:
 
 func _format_chance_text(weights: Array[float]) -> String:
 	var parts: Array[String] = []
-	var w_scale: float = 0.9 if has_unique_potential else 1.0
+	var w_scale: float = 1.0 - unique_chance
 	
 	if weights.size() > 0 and weights[0] > 0.0:
 		parts.append("[color=#708094]C:%d%%[/color]" % roundi(weights[0] * w_scale * 100))
@@ -133,8 +133,8 @@ func _format_chance_text(weights: Array[float]) -> String:
 		parts.append("[color=#8059d6]E:%d%%[/color]" % roundi(weights[2] * w_scale * 100))
 	if weights.size() > 3 and weights[3] > 0.0:
 		parts.append("[color=#d69e2e]L:%d%%[/color]" % roundi(weights[3] * w_scale * 100))
-	if has_unique_potential:
-		parts.append("[color=#e61a33]U:10%[/color]")
+	if unique_chance > 0.0:
+		parts.append("[color=#e61a33]U:%d%%[/color]" % roundi(unique_chance * 100))
 
 	return " | ".join(parts)
 

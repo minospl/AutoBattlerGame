@@ -51,14 +51,18 @@ func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relic
 @export var relics: Array[RelicInstance] = []
 @export var has_magnetic_core: bool = false
 @export var base_health: int = STARTING_BASE_HEALTH
+@export var item_purchase_limit: int = 5
+@export var item_purchase_count: int = 0
 
 var has_focusing_lens: bool:
 	get:
 		return has_relic("Focusing Lens")
 
+@export var unique_chance: float = 0.0
+
 var has_unique_potential: bool:
 	get:
-		return has_relic("Unique Potential")
+		return unique_chance > 0.0
 
 @export var gold: int = STARTING_GOLD:
 	set(val):
@@ -167,6 +171,8 @@ func roll_rarity() -> Rarity.Type:
 	return Rarity.Type.LEGENDARY
 
 func complete_battle(outcome: String) -> void:
+	item_purchase_count = 0
+	
 	if outcome == "victory":
 		trophies += 1
 	elif outcome == "defeat":
@@ -316,9 +322,6 @@ func get_random_item_template_by_rarity(rarity_type: Rarity.Type) -> ItemData:
 	for template: ItemData in item_templates:
 		var r_type: Rarity.Type = template.rarity.rarity_type
 			
-		if r_type == Rarity.Type.UNIQUE:
-			continue
-			
 		if r_type == rarity_type:
 			matching.append(template)
 			
@@ -333,14 +336,16 @@ func get_random_item_template_by_rarity(rarity_type: Rarity.Type) -> ItemData:
 		
 	return matching[randi() % matching.size()]
 
-func roll_single_shop_card() -> Resource:
+func roll_single_shop_card(slot_idx: int) -> Resource:
 	var rolled_rarity: Rarity.Type = roll_rarity()
-	if has_unique_potential and randf() < 0.1:
+	if unique_chance > 0.0 and randf() < unique_chance:
 		rolled_rarity = Rarity.Type.UNIQUE
 		
 	var spawn_item: bool = false
-	if rolled_rarity != Rarity.Type.UNIQUE and not item_templates.is_empty() and randf() < 0.3:
-		spawn_item = true
+	var last_slot_idx: int = shop_cards.size() - 1
+	if slot_idx == last_slot_idx and item_purchase_count < item_purchase_limit:
+		if not item_templates.is_empty():
+			spawn_item = true
 		
 	var rolled_card: Resource = null
 	if spawn_item:
@@ -389,7 +394,7 @@ func buy_unit(shop_slot_idx: int, target_idx: int, target_is_active: bool) -> bo
 	target_array[target_idx] = unit
 	
 	# Refill shop slot immediately
-	shop_cards[shop_slot_idx] = roll_single_shop_card()
+	shop_cards[shop_slot_idx] = roll_single_shop_card(shop_slot_idx)
 	shop_frozen_statuses[shop_slot_idx] = false
 	
 	# Emit updates
@@ -425,9 +430,11 @@ func apply_item(shop_slot_idx: int, target_idx: int, target_is_active: bool) -> 
 		
 	# Execute purchase
 	gold -= cost
+	item_purchase_count += 1
 	
 	# Refill shop slot immediately
-	shop_cards[shop_slot_idx] = roll_single_shop_card()
+	shop_cards[shop_slot_idx] = null
+	shop_cards[shop_slot_idx] = roll_single_shop_card(shop_slot_idx)
 	shop_frozen_statuses[shop_slot_idx] = false
 	
 	# Emit updates
@@ -481,7 +488,7 @@ func roll_shop(free: bool = false) -> void:
 		
 	for i: int in range(shop_cards.size()):
 		if not shop_frozen_statuses[i]:
-			shop_cards[i] = roll_single_shop_card()
+			shop_cards[i] = roll_single_shop_card(i)
 			shop_slot_updated.emit(i, shop_cards[i])
 
 func change_shop_size(p_diff: int) -> void:
@@ -492,21 +499,35 @@ func change_shop_size(p_diff: int) -> void:
 	var old_size: int = shop_cards.size()
 	if new_size == old_size:
 		return
-		
-	shop_cards.resize(new_size)
-	shop_frozen_statuses.resize(new_size)
-	
+
+	# Add slot to the first
 	if new_size > old_size:
-		for i: int in range(old_size, new_size):
-			shop_cards[i] = roll_single_shop_card()
-			shop_frozen_statuses[i] = false
+		var diff: int = new_size - old_size
+		var new_cards: Array[Resource] = []
+		var new_frozen: Array[bool] = []
+		new_cards.resize(new_size)
+		new_frozen.resize(new_size)
+		
+		for i: int in range(old_size):
+			new_cards[i + diff] = shop_cards[i]
+			new_frozen[i + diff] = shop_frozen_statuses[i]
+			
+		for i: int in range(diff):
+			new_cards[i] = null
+			new_frozen[i] = false
+			
+		shop_cards = new_cards
+		shop_frozen_statuses = new_frozen
+		
+		for i: int in range(diff):
+			shop_cards[i] = roll_single_shop_card(i)
+	else:
+		shop_cards.resize(new_size)
+		shop_frozen_statuses.resize(new_size)
 			
 	shop_size_changed.emit(new_size)
 
-func add_relic(relic: RelicInstance) -> void:
-	if not relic:
-		return
-		
+func add_relic(relic: RelicInstance) -> void:		
 	if relic.data and relic.data.display_name == "Magnetic Core":
 		has_magnetic_core = true
 		
@@ -545,9 +566,11 @@ func buy_clickable_item(shop_slot_idx: int) -> bool:
 		
 	# Execute purchase
 	gold -= cost
+	item_purchase_count += 1
 	
 	# Refill shop slot immediately
-	shop_cards[shop_slot_idx] = roll_single_shop_card()
+	shop_cards[shop_slot_idx] = null
+	shop_cards[shop_slot_idx] = roll_single_shop_card(shop_slot_idx)
 	shop_frozen_statuses[shop_slot_idx] = false
 	
 	# Emit updates
@@ -610,3 +633,22 @@ func add_random_relic(p_rarity: Rarity = null) -> void:
 	var relic_inst: RelicInstance = RelicInstance.new()
 	relic_inst.initialize(rolled_relic)
 	add_relic(relic_inst)
+
+func add_all_relics() -> void:
+	for template: RelicData in relic_templates:			
+		var is_unique: bool = false
+		if template.rarity:
+			is_unique = (template.rarity.rarity_type == Rarity.Type.UNIQUE)
+			
+		var already_owned: bool = false
+		for relic: RelicInstance in relics:
+			if relic.data.display_name == template.display_name:
+				already_owned = true
+				break
+				
+		if is_unique and already_owned:
+			continue
+			
+		var relic_inst: RelicInstance = RelicInstance.new()
+		relic_inst.initialize(template)
+		add_relic(relic_inst)

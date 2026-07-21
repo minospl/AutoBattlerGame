@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/features/items/templates/modifiers/random_vial_modifier.gd" id="1_modifier"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/unique.tres" id="2_rarity"]
+[ext_resource type="Script" path="res://src/features/items/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_random_vial_modifier"]
+script = ExtResource("1_modifier")
+boost_amount = 5
+
+[resource]
+script = ExtResource("3_data")
+display_name = "Random Vial"
+price = 4
+rarity = ExtResource("2_rarity")
+is_draggable = true
+is_clickable = false
+modifier = SubResource("Resource_random_vial_modifier")

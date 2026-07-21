@@ -12,4 +12,3 @@ script = ExtResource("3_data")
 display_name = "Unique Potential"
 rarity = ExtResource("2_rarity")
 modifier = SubResource("Resource_unique_potential_modifier")
-

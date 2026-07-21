@@ -45,36 +45,31 @@
   3. **Globalny Freeze:** W panelu sklepu ([shop_panel.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_panel.gd)) dodano przycisk "Freeze Shop".
   4. **Stan gry:** Zachowano tablicę `shop_frozen_statuses: Array[bool]` w [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd), co jest lepszym rozwiązaniem pod kątem UX (po zakupie jednostki nowo wylosowana karta w tym samym slocie nie jest automatycznie zamrażana). Globalny przycisk Freeze w UI odpowiednio synchronizuje stany w tablicy.
 
-### Zadanie D: Zwiększenie liczby kart w sklepie z 4 do 5 (Dawne Zadanie 7)
+### Zadanie D [**ZROBIONE**]: Zwiększenie liczby kart w sklepie z 4 do 5 (Dawne Zadanie 7)
 
 - **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd) (linia 6), [shop_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd) (linia 143)
 - **Krytyczne pytania & Problem:** Liczba kart w sklepie jest na sztywno ustawiona na 4 w logice oraz w kodzie sceny sklepu.
 - **Logiczne uzasadnienie:** Większy sklep (5 kart) ułatwia graczowi zbieranie par/trójek jednostek i stabilizuje pętlę gry, redukując negatywny wpływ losowości.
-- **Sugerowana zmiana:**
-  1. W `run_state.gd` zmienić `const MAX_SHOP_CARDS_SIZE: int = 5`.
-  2. W `shop_scene.gd` w metodzie `create_slots()` zmienić hardkodowane `shop_panel.create_slots(slot_scene, 4)` na dynamiczne `shop_panel.create_slots(slot_scene, run_state.shop_cards.size())`.
+- **Wdrożone rozwiązanie:**
+  1. Zwiększono stałą `MAX_SHOP_CARDS_SIZE` do `5` w [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd) i dodano bezpieczną inicjalizację tablic w `_init()`.
+  2. Zmieniono hardkodowany rozmiar w [shop_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd) na dynamiczny `run_state.shop_cards.size()`.
 
-### Zadanie E: Limit zakupów przedmiotów w sklepie i jednostki/relikty go modyfikujące (Dawne Zadanie 6)
+### Zadanie E [**ZROBIONE**]: Limit zakupów przedmiotów w sklepie i jednostki/relikty go modyfikujące (Dawne Zadanie 6)
 
-- **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd) (metoda `roll_single_shop_card`, `buy_unit`, `apply_item`, `buy_clickable_item`)
-- **Krytyczne pytania & Problem:** Brak jakiegokolwiek limitu zakupów kart przedmiotów w sklepie na rundę. Gracz może w nieskończoność losować i kupować przedmioty.
-- **Logiczne uzasadnienie:** Narzucenie limitu (np. domyślnie max 1 zakupiony przedmiot na rundę sklepową) i ukrywanie przedmiotów po wyczerpaniu limitu zbalansuje mechanikę jedzenia. Dodanie reliktów/jednostek podnoszących ten limit stworzy interesujące synergie.
-- **Sugerowana zmiana:**
-  1. Dodać w `RunState` zmienne: `max_item_purchases = 1` oraz `items_purchased_this_turn = 0`.
-  2. Przy udanym zakupie przedmiotu inkrementować licznik zakupów. Resetować licznik na początku każdej rundy sklepu (przy przejściu dnia lub bezpłatnym odświeżeniu rundy).
-  3. Stworzyć relikt/modyfikator potwora modyfikujący wartość `max_item_purchases` (np. o +1).
+- **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd) (metoda `roll_single_shop_card`, `apply_item`, `buy_clickable_item`), modyfikatory reliktów
+- **Wdrożone rozwiązanie:**
+  1. Wprowadzono zmienne `item_purchase_limit` (domyślnie 1) oraz `item_purchase_count` do stanu gry. Resetowanie licznika następuje przy nowym dniu w `complete_battle()`.
+  2. Licznik `item_purchase_count` jest zwiększany po pomyślnym zakupie przedmiotu, co automatycznie wpływa na wylosowanie potwora na zwolnionym miejscu.
+  3. Stworzono unikalny relikt **Shopping Bag** o rzadkości Rare, który w metodzie `on_acquire()` zwiększa limit `item_purchase_limit`.
 
-### Zadanie F: Dedykowane miejsce na przedmioty w sklepie - ostatni slot (Dawne Zadanie 4)
+### Zadanie F [**ZROBIONE**]: Dedykowane miejsce na przedmioty w sklepie - ostatni slot (Dawne Zadanie 4)
 
-- **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd) (metoda `roll_single_shop_card` i pętla w `roll_shop()`)
-- **Krytyczne pytania & Problem:** Losowe pojawianie się przedmiotów w dowolnym slocie sklepu wprowadza zbyt duży chaos i blokuje losowanie potworów w kluczowych miejscach.
-- **Logiczne uzasadnienie:** Zastąpienie losowości stałym układem: pierwsze 4 sloty (indeksy 0-3) zawsze oferują jednostki potworów, a ostatni (indeks 4) zawsze oferuje przedmiot (jedzenie), dopóki nie zostanie wyczerpany limit zakupów przedmiotów z Zadania E. Po wyczerpaniu limitu ostatni slot oferuje potwora (lub pozostaje pusty).
-- **Sugerowana zmiana:**
-  1. Zmodyfikować logikę losowania kart w sklepie w `run_state.gd`. Metoda `roll_single_shop_card(slot_idx: int)` powinna przyjmować indeks slotu.
-  2. Jeśli `slot_idx == 4` (ostatni slot) oraz `items_purchased_this_turn < max_item_purchases`, ustawić na sztywno `spawn_item = true`.
-  3. Dla wszystkich pozostałych indeksów (`0`, `1`, `2`, `3`) ustawić `spawn_item = false` (zawsze losować potwora).
-  4. Jeśli limit zakupów przedmiotów został osiągnięty (`items_purchased_this_turn >= max_item_purchases`), ostatni slot (indeks 4) również powinien losować jednostkę (potwora), co sprawi, że przedmioty przestaną się pojawiać.
-  5. *Uwaga wyścigu stanów:* Inkrementacja licznika `items_purchased_this_turn` musi odbywać się bezwzględnie **przed** wywołaniem natychmiastowego uzupełnienia slotu w `apply_item()` / `buy_clickable_item()`, aby nowe losowanie poprawnie rozpoznało osiągnięcie limitu.
+- **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd) (metoda `roll_single_shop_card` i wywołania w `roll_shop()`, `buy_unit()`, `apply_item()`, `buy_clickable_item()`, `change_shop_size()`)
+- **Wdrożone rozwiązanie:**
+  1. Metoda `roll_single_shop_card(slot_idx: int) -> Resource` przyjmuje i weryfikuje dynamiczny indeks slotu.
+  2. Przedmioty losują się **wyłącznie** na ostatnim slocie sklepu (`slot_idx == shop_cards.size() - 1`) i tylko wtedy, gdy limit zakupów jedzenia nie został przekroczony.
+  3. Pierwsze sloty zawsze losują potwory.
+  4. Dodano mechanizm sprawdzający `has_any_item`, który zapobiega wylosowaniu drugiego przedmiotu (np. przy rozszerzaniu sklepu przez relikty, gdy zamrożony przedmiot przesunął się na wcześniejszą pozycję). Gwarantuje to obecność zawsze maksymalnie jednego przedmiotu w ofercie.
 
 ### Zadanie G: Poprawa skalowania szans rzadkości w sklepie (Dawne Zadanie 14)
 
@@ -122,15 +117,14 @@
   2. Wystylizować w niej tło, marginesy, czcionki i ShaderBorderDecorator.
   3. W `tooltip_keywords_box.gd` załadować tę scenę i instancjonować ją za pomocą `instantiate()`, modyfikując tylko tekst.
 
-### Zadanie Q [Częściowo wdrożone / W toku]: Rozdzielenie kart na sklepowe i posiadane oraz wdrożenie kompozycji hierarchicznej
+### Zadanie Q [**ZROBIONE**]: Rozdzielenie kart na sklepowe i posiadane oraz wdrożenie kompozycji hierarchicznej
 
 - **Lokalizacja:** [shop_card_unit.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.gd) i [shop_card_unit.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.tscn) (karta sklepowa), [unit_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/unit_card.tscn) i [unit_card.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/unit_card.gd) (karta posiadana), katalog `src/shared/ui/components/` (komponenty wizualne)
 - **Krytyczne pytania & Problem:** W pierwotnym zamyśle jedna klasa obsługiwała oba typy kart. Wdrożono już dedykowane karty sklepowe (`ShopCardUnit`, `ShopCardItem`) oraz kartę posiadaną (`UnitCard`). Część komponentów (np. `card_sprite.tscn` oraz `card_portrait.tscn` będące odpowiednikiem `card_visuals`) również została wydzielona.
-- **Logiczne uzasadnienie:** Rozdzielenie logiki i prezentacji kart sklepowych i posiadanych ułatwia ich stylowanie (Zadanie C) oraz zarządzanie logiką Drag & Drop. Należy dokończyć reorganizację i refaktor pozostałych elementów zgodnie z tą hierarchią.
-- **Sugerowana zmiana:**
-  1. **Mikro-komponenty (Poziom 1):** Zweryfikować i dopracować niezależne sceny [card_sprite.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_sprite.tscn) oraz [card_portrait.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_portrait.tscn).
-  2. **Karta sklepowa (Poziom 3):** Dostosować [shop_card_unit.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.tscn) tak, aby poprawnie korzystała z `CardPortrait` oraz stopki z nazwą i ceną według makiety z Zadania C.
-  3. **Karta posiadana (Poziom 3):** Upewnić się, że [unit_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/unit_card.tscn) korzysta z `CardPortrait` oraz poprawnie wyświetla indykatory kierunków (korzystające z shadera) i obsługuje Drag & Drop.
+- **Wdrożone rozwiązanie:**
+  1. **Mikro-komponenty:** Zweryfikowano sceny [card_sprite.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_sprite.tscn) oraz [card_portrait.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_portrait.tscn) – poprawnie odseparowują logikę wyświetlania od wyższych warstw.
+  2. **Karta sklepowa:** Scena [shop_card_unit.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.tscn) poprawnie importuje i używa `CardPortrait`, a także stopki z nazwą i ceną.
+  3. **Karta posiadana:** Scena [unit_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/unit_card.tscn) korzysta z `CardPortrait`, wyświetla dynamiczne wskaźniki kierunków `DirectionIndicators` oparte na shaderze oraz w pełni obsługuje Drag & Drop poprzez `_get_drag_data()` w integracji z `DragManager`.
 
 ---
 
