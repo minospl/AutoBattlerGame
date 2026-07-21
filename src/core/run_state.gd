@@ -633,22 +633,3 @@ func add_random_relic(p_rarity: Rarity = null) -> void:
 	var relic_inst: RelicInstance = RelicInstance.new()
 	relic_inst.initialize(rolled_relic)
 	add_relic(relic_inst)
-
-func add_all_relics() -> void:
-	for template: RelicData in relic_templates:			
-		var is_unique: bool = false
-		if template.rarity:
-			is_unique = (template.rarity.rarity_type == Rarity.Type.UNIQUE)
-			
-		var already_owned: bool = false
-		for relic: RelicInstance in relics:
-			if relic.data.display_name == template.display_name:
-				already_owned = true
-				break
-				
-		if is_unique and already_owned:
-			continue
-			
-		var relic_inst: RelicInstance = RelicInstance.new()
-		relic_inst.initialize(template)
-		add_relic(relic_inst)

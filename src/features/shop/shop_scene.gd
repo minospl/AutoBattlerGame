@@ -29,6 +29,7 @@ var gold: int:
 
 var run_state: RunState
 var relic_bar: RelicBar = null
+var debug_manager: DebugManager = null
 
 @onready var shop_header_bar: ShopHeaderBar = %ShopHeaderBar
 @onready var bench_panel: BenchPanel = %BenchPanel
@@ -63,8 +64,6 @@ func _ready() -> void:
 	team_panel.unit_dropped.connect(_on_unit_dropped)
 	
 	# Connect control panel signals
-	shop_header_bar.add_monster_requested.connect(_on_add_monster_requested)
-	shop_header_bar.add_relic_requested.connect(_on_add_relic_requested)
 	shop_header_bar.restart_requested.connect(_on_restart_requested)
 	shop_header_bar.battle_requested.connect(_on_battle_requested)
 	shop_header_bar.compendium_requested.connect(func() -> void: compendium_requested.emit())
@@ -100,6 +99,12 @@ func _ready() -> void:
 
 func setup(p_state: RunState) -> void:
 	run_state = p_state
+	
+	# Instantiate and setup DebugManager if running in editor/debug mode
+	if OS.is_debug_build():
+		debug_manager = DebugManager.new()
+		add_child(debug_manager)
+		debug_manager.setup(run_state, self)
 	
 	# Re-create slots using the actual dynamic state sizes
 	create_slots()
@@ -191,18 +196,6 @@ func populate_ui() -> void:
 			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
 
-## Add a unit to the first empty slot on the bench
-func add_unit_to_bench(unit: UnitInstance) -> bool:
-	if run_state == null:
-		return false
-	for i: int in range(bench_slot_count):
-		if run_state.bench[i] == null:
-			run_state.bench[i] = unit
-			populate_ui()
-			team_state_changed.emit()
-			return true
-	return false # Bench is full
-
 ## Empty all team and bench slots
 func clear_all() -> void:
 	if run_state == null:
@@ -214,28 +207,8 @@ func clear_all() -> void:
 	populate_ui()
 	team_state_changed.emit()
 
-func _on_add_monster_requested() -> void:
-	if not run_state or run_state.unit_templates.is_empty():
-		return
-		
-	# Pick random template
-	var template: UnitData = run_state.unit_templates[randi() % run_state.unit_templates.size()]
-	
-	# Create runtime instance
-	var instance: UnitInstance = UnitInstance.new()
-	instance.initialize(template)
-	
-	# Try to add to bench
-	add_unit_to_bench(instance)
-
-func _on_add_relic_requested() -> void:
-	run_state.add_random_relic()
-
 func _on_restart_requested() -> void:
 	restart_requested.emit()
-
-func _on_team_state_changed() -> void:
-	pass
 
 func _on_roll_requested() -> void:
 	if run_state:
@@ -457,19 +430,12 @@ func _connect_card_signals(card: Control) -> void:
 	elif card is UnitCard:
 		var unit_card: UnitCard = card
 		unit_card.hovered.connect(_on_card_hover_changed)
-		unit_card.right_clicked.connect(_on_card_right_clicked)
+		if debug_manager:
+			unit_card.gui_input.connect(debug_manager.on_card_gui_input.bind(unit_card))
 	elif card is ShopCardItem:
 		var item_card: ShopCardItem = card
 		item_card.hovered.connect(_on_card_hover_changed)
 		item_card.clicked.connect(_on_item_card_clicked)
-
-func _on_card_right_clicked(card: UnitCard) -> void:
-	card.unit_instance.level_up()
-	card.update_ui()
-	if preview_tooltip and preview_tooltip.visible and current_hovered_card == card:
-		CardUIHelper.show_tooltip(preview_tooltip, card.unit_instance)
-	check_for_unit_merges()
-	team_state_changed.emit()
 
 func _on_card_hover_changed(card: Control, is_hovered: bool) -> void:
 	if is_hovered:
@@ -625,26 +591,17 @@ func _on_battle_requested() -> void:
 	battle_requested.emit()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not run_state:
+	if not event is InputEventKey or not event.is_pressed() or event.is_echo():
 		return
 		
 	var key_event: InputEventKey = event as InputEventKey
-	if key_event and key_event.pressed and not key_event.echo:
-
-		match key_event.keycode:
-			KEY_Q:
-				_on_add_monster_requested()
-			KEY_A:
-				_on_add_relic_requested()
-			KEY_Z:
-				if run_state:
-					run_state.add_all_relics()
-			KEY_R:
-				_on_roll_requested()
-			KEY_S:
-				if current_hovered_card and current_hovered_card is UnitCard:
-					var unit_card: UnitCard = current_hovered_card as UnitCard
-					var slot: UnitSlot = unit_card.slot
-					CardUIHelper.hide_tooltip(preview_tooltip)
-					_on_sell_card_requested(unit_card, slot)
-					current_hovered_card = null
+	match key_event.keycode:
+		KEY_R:
+			_on_roll_requested()
+		KEY_S:
+			if current_hovered_card and current_hovered_card is UnitCard:
+				var unit_card: UnitCard = current_hovered_card as UnitCard
+				var slot: UnitSlot = unit_card.slot
+				CardUIHelper.hide_tooltip(preview_tooltip)
+				_on_sell_card_requested(unit_card, slot)
+				current_hovered_card = null

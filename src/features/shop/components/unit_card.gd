@@ -2,7 +2,6 @@ class_name UnitCard
 extends MarginContainer
 
 signal hovered(card: UnitCard, is_hovered: bool)
-signal right_clicked(card: UnitCard)
 
 @export var unit_instance: UnitInstance:
 	set(val):
@@ -116,10 +115,3 @@ func _get_drag_data(_at_position: Vector2) -> Variant:
 		"card": self,
 		"original_slot": original_slot
 	}
-
-func _gui_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
-		var mouse_event: InputEventMouseButton = event
-		if mouse_event.button_index == MOUSE_BUTTON_RIGHT and mouse_event.pressed:
-			right_clicked.emit(self)
-			accept_event()

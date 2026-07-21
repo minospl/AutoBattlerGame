@@ -1,8 +1,6 @@
 class_name ShopHeaderBar
 extends PanelContainer
 
-signal add_monster_requested
-signal add_relic_requested
 signal restart_requested
 signal battle_requested
 signal compendium_requested
@@ -27,8 +25,6 @@ signal compendium_requested
 		max_trophies = value
 		_update_labels()
 
-@onready var add_btn: Button = %AddUnitButton
-@onready var add_relic_btn: Button = %AddRelicButton
 @onready var restart_btn: Button = %RestartButton
 @onready var battle_btn: Button = %StartBattleButton
 @onready var compendium_btn: Button = %CompendiumButton
@@ -38,8 +34,6 @@ signal compendium_requested
 
 func _ready() -> void:	
 	# Connect local button signals
-	add_btn.pressed.connect(func() -> void: add_monster_requested.emit())
-	add_relic_btn.pressed.connect(func() -> void: add_relic_requested.emit())
 	restart_btn.pressed.connect(func() -> void: restart_requested.emit())
 	battle_btn.pressed.connect(func() -> void: battle_requested.emit())
 	compendium_btn.pressed.connect(func() -> void: compendium_requested.emit())

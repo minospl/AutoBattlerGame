@@ -33,24 +33,6 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="AddUnitButton" type="Button" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Add Random Unit"
-
-[node name="GameButtonDecorator" type="Node" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer/AddUnitButton"]
-script = ExtResource("4_button_decorator")
-
-[node name="AddRelicButton" type="Button" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Add Random Relic"
-
-[node name="GameButtonDecorator" type="Node" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer/AddRelicButton"]
-script = ExtResource("4_button_decorator")
-
 [node name="RestartButton" type="Button" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer"]
 unique_name_in_owner = true
 layout_mode = 2
