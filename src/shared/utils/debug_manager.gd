@@ -17,9 +17,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		KEY_1:
 			_add_random_monster()
 		KEY_2:
-			add_random_relic()
-		KEY_3:
 			add_all_relics()
+		KEY_3:
+			add_all_unique_relics()
 
 func _add_random_monster() -> void:
 	if not run_state or run_state.unit_templates.is_empty():
@@ -43,31 +43,26 @@ func _add_random_monster() -> void:
 			var sig: Signal = shop_scene.get("team_state_changed")
 			sig.emit()
 
-func add_random_relic(p_rarity: Rarity = null) -> void:
-	if run_state:
-		run_state.add_random_relic(p_rarity)
-
 func add_all_relics() -> void:
 	if not run_state:
 		return
 		
 	for template: RelicData in run_state.relic_templates:
-		if not template:
+		if template.rarity.rarity_type == Rarity.Type.UNIQUE and run_state.has_relic(template.display_name):
 			continue
 			
-		var is_unique: bool = false
-		if template.rarity:
-			is_unique = (template.rarity.rarity_type == Rarity.Type.UNIQUE)
+		var relic_inst: RelicInstance = RelicInstance.new()
+		relic_inst.initialize(template)
+		run_state.add_relic(relic_inst)
+
+func add_all_unique_relics() -> void:		
+	for template: RelicData in run_state.relic_templates:
+		if template.rarity.rarity_type != Rarity.Type.UNIQUE:
+			continue 
 			
-		var already_owned: bool = false
-		for existing: RelicInstance in run_state.relics:
-			if existing.data and existing.data.display_name == template.display_name:
-				already_owned = true
-				break
-				
-		if is_unique and already_owned:
+		if run_state.has_relic(template.display_name):
 			continue
-			
+
 		var relic_inst: RelicInstance = RelicInstance.new()
 		relic_inst.initialize(template)
 		run_state.add_relic(relic_inst)
