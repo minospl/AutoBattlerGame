@@ -7,9 +7,9 @@ extends Node
 @export var game_over_scene_path: String = "res://src/core/game_over_screen.tscn"
 
 var run_state: RunState
-var unit_templates: Array[UnitData] = []
-var item_templates: Array[ItemData] = []
-var relic_templates: Array[RelicData] = []
+@export var unit_templates: Array[UnitData] = []
+@export var item_templates: Array[ItemData] = []
+@export var relic_templates: Array[RelicData] = []
 var current_scene: Node = null
 
 func _ready() -> void:
@@ -20,25 +20,25 @@ func _ready() -> void:
 	_go_to_shop()
 
 func _load_unit_templates() -> void:
-	unit_templates.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/units/templates/")
 	for res: Resource in resources:
-		if res is UnitData:
-			unit_templates.append(res as UnitData)
+		var u_data: UnitData = res as UnitData
+		if u_data and not unit_templates.has(u_data):
+			unit_templates.append(u_data)
 
 func _load_item_templates() -> void:
-	item_templates.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/items/templates/")
 	for res: Resource in resources:
-		if res is ItemData:
-			item_templates.append(res as ItemData)
+		var i_data: ItemData = res as ItemData
+		if i_data and not item_templates.has(i_data):
+			item_templates.append(i_data)
 
 func _load_relic_templates() -> void:
-	relic_templates.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/relics/templates/")
 	for res: Resource in resources:
-		if res is RelicData:
-			relic_templates.append(res as RelicData)
+		var r_data: RelicData = res as RelicData
+		if r_data and not relic_templates.has(r_data):
+			relic_templates.append(r_data)
 
 func _load_resources_from_dir(path: String) -> Array[Resource]:
 	var list: Array[Resource] = []
@@ -51,14 +51,18 @@ func _load_resources_from_dir(path: String) -> Array[Resource]:
 	var file_name: String = dir.get_next()
 	while file_name != "":
 		if not dir.current_is_dir():
-			if file_name.ends_with(".tres") or file_name.ends_with(".res") or file_name.ends_with(".tres.remap") or file_name.ends_with(".res.remap"):
-				var clean_name: String = file_name
-				if file_name.ends_with(".remap"):
-					clean_name = file_name.left(file_name.length() - 6)
+			var clean_name: String = file_name
+			if clean_name.ends_with(".remap"):
+				clean_name = clean_name.left(clean_name.length() - 6)
+			elif clean_name.ends_with(".import"):
+				clean_name = clean_name.left(clean_name.length() - 7)
 				
-				var res: Resource = load(path + clean_name)
-				if res:
-					list.append(res)
+			if clean_name.ends_with(".tres") or clean_name.ends_with(".res"):
+				var full_path: String = path + clean_name
+				if ResourceLoader.exists(full_path):
+					var res: Resource = load(full_path)
+					if res and not list.has(res):
+						list.append(res)
 		file_name = dir.get_next()
 	dir.list_dir_end()
 	return list
@@ -76,7 +80,7 @@ func _initialize_new_run() -> void:
 	# Find templates by unit name
 	var find_template: Callable = func(p_name: String) -> UnitData:
 		for t: UnitData in unit_templates:
-			if t.display_name.to_lower() == p_name.to_lower():
+			if t and t.display_name.to_lower() == p_name.to_lower():
 				return t
 		return null
 

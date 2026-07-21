@@ -2,58 +2,74 @@
 
 [ext_resource type="Script" path="res://src/features/shop/components/bench_panel.gd" id="1_script"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/panel_header_decorator.gd" id="3_header_decorator"]
-[ext_resource type="PackedScene" uid="uid://cx8g0ytsq24b" path="res://src/shared/ui/components/panel_border.tscn" id="4_panel_border"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="4_shader_decorator"]
 
 [node name="BenchPanel" type="PanelContainer"]
 theme_type_variation = &"TransparentPanel"
 size_flags_horizontal = 4
 script = ExtResource("1_script")
 
-[node name="PanelBorder" parent="." instance=ExtResource("4_panel_border")]
+[node name="BackgroundOverlay" type="ColorRect" parent="."]
 layout_mode = 2
+script = ExtResource("4_shader_decorator")
+border_type = 0
+border_color = Color(1, 1, 1, 1)
+interior_color = Color(1, 1, 1, 1)
+border_indentation = 3
 
-[node name="BenchOuterMargin" type="MarginContainer" parent="PanelBorder/Content"]
+[node name="BenchOuterMargin" type="MarginContainer" parent="."]
 layout_mode = 2
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_right = 3
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_bottom = 0
 
-[node name="VBox" type="VBoxContainer" parent="PanelBorder/Content/BenchOuterMargin"]
+[node name="VBox" type="VBoxContainer" parent="BenchOuterMargin"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="BenchHeader" type="PanelContainer" parent="PanelBorder/Content/BenchOuterMargin/VBox"]
+[node name="BenchHeader" type="PanelContainer" parent="BenchOuterMargin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="PanelHeaderDecorator" type="Node" parent="PanelBorder/Content/BenchOuterMargin/VBox/BenchHeader"]
+[node name="PanelHeaderDecorator" type="Node" parent="BenchOuterMargin/VBox/BenchHeader"]
 script = ExtResource("3_header_decorator")
 header_color = Color(0.95, 0.72, 0.18, 1)
 
-[node name="Margin" type="MarginContainer" parent="PanelBorder/Content/BenchOuterMargin/VBox/BenchHeader"]
+[node name="Margin" type="MarginContainer" parent="BenchOuterMargin/VBox/BenchHeader"]
 layout_mode = 2
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_bottom = 6
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_right = 12
 
-[node name="BenchLabel" type="Label" parent="PanelBorder/Content/BenchOuterMargin/VBox/BenchHeader/Margin"]
+[node name="BenchLabel" type="Label" parent="BenchOuterMargin/VBox/BenchHeader/Margin"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "BENCH"
 
-[node name="BenchMargin" type="MarginContainer" parent="PanelBorder/Content/BenchOuterMargin/VBox"]
+[node name="BenchMargin" type="MarginContainer" parent="BenchOuterMargin/VBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="BenchHBox" type="HBoxContainer" parent="PanelBorder/Content/BenchOuterMargin/VBox/BenchMargin"]
+[node name="BenchHBox" type="HBoxContainer" parent="BenchOuterMargin/VBox/BenchMargin"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
+
+[node name="BorderOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+z_index = 1
+script = ExtResource("4_shader_decorator")
+border_type = 1
+border_color = Color(0.3, 0.25, 0.25, 1)
+interior_color = Color(0, 0, 0, 0)
+border_indentation = 3

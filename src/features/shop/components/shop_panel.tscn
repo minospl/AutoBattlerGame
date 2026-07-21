@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://src/shared/ui/decorators/panel_header_decorator.gd" id="5_header_decorator"]
 [ext_resource type="Shader" path="res://src/shared/shaders/screen_blur.gdshader" id="6_blur"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="7_button_decorator"]
-[ext_resource type="PackedScene" uid="uid://cx8g0ytsq24b" path="res://src/shared/ui/components/panel_border.tscn" id="8_panel_border"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="8_shader_decorator"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_blur"]
 shader = ExtResource("6_blur")
@@ -16,47 +16,52 @@ theme_type_variation = &"TransparentPanel"
 size_flags_horizontal = 4
 script = ExtResource("1_script")
 
-[node name="PanelBorder" parent="." instance=ExtResource("8_panel_border")]
+[node name="BackgroundOverlay" type="ColorRect" parent="."]
 layout_mode = 2
+script = ExtResource("8_shader_decorator")
+border_type = 0
+border_color = Color(1, 1, 1, 1)
+interior_color = Color(1, 1, 1, 1)
+border_indentation = 3
 
-[node name="ShopOuterMargin" type="MarginContainer" parent="PanelBorder/Content"]
+[node name="ShopOuterMargin" type="MarginContainer" parent="."]
 layout_mode = 2
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_right = 3
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_bottom = 0
 
-[node name="VBox" type="VBoxContainer" parent="PanelBorder/Content/ShopOuterMargin"]
+[node name="VBox" type="VBoxContainer" parent="ShopOuterMargin"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="ShopHeader" type="PanelContainer" parent="PanelBorder/Content/ShopOuterMargin/VBox"]
+[node name="ShopHeader" type="PanelContainer" parent="ShopOuterMargin/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 1
 
-[node name="PanelHeaderDecorator" type="Node" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader"]
+[node name="PanelHeaderDecorator" type="Node" parent="ShopOuterMargin/VBox/ShopHeader"]
 script = ExtResource("5_header_decorator")
 header_color = Color(0.2, 0.55, 0.85, 1)
 
-[node name="Margin" type="MarginContainer" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader"]
+[node name="Margin" type="MarginContainer" parent="ShopOuterMargin/VBox/ShopHeader"]
 layout_mode = 2
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_bottom = 4
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_right = 12
 
-[node name="HeaderHBox" type="HBoxContainer" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin"]
+[node name="HeaderHBox" type="HBoxContainer" parent="ShopOuterMargin/VBox/ShopHeader/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="ShopLabel" type="Label" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
+[node name="ShopLabel" type="Label" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "SHOP"
 
-[node name="ChanceLabel" type="RichTextLabel" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
+[node name="ChanceLabel" type="RichTextLabel" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
@@ -72,7 +77,7 @@ fit_content = true
 autowrap_mode = 0
 text = "C:100%"
 
-[node name="GoldLabel" type="RichTextLabel" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
+[node name="GoldLabel" type="RichTextLabel" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
@@ -87,18 +92,18 @@ bbcode_enabled = true
 fit_content = true
 autowrap_mode = 0
 
-[node name="Spacer" type="Control" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
+[node name="Spacer" type="Control" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 
-[node name="FreezeShopButton" type="Button" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
+[node name="FreezeShopButton" type="Button" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(26, 19)
 layout_mode = 2
 toggle_mode = true
 
-[node name="GameButtonDecorator" type="Node" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/FreezeShopButton"]
+[node name="GameButtonDecorator" type="Node" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/FreezeShopButton"]
 script = ExtResource("7_button_decorator")
 margin_top = 3
 margin_bottom = 3
@@ -108,7 +113,7 @@ color_normal = Color(0.18, 0.5, 0.72, 1)
 color_hover = Color(0.25, 0.65, 0.9, 1)
 color_pressed = Color(0.1, 0.4, 0.6, 1)
 
-[node name="ButtonText" type="RichTextLabel" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/FreezeShopButton"]
+[node name="ButtonText" type="RichTextLabel" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/FreezeShopButton"]
 layout_mode = 1
 anchors_preset = 8
 offset_top = -1.0
@@ -124,12 +129,12 @@ clip_contents = false
 autowrap_mode = 0
 text = "❄"
 
-[node name="RefreshShopButton" type="Button" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
+[node name="RefreshShopButton" type="Button" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(26, 19)
 layout_mode = 2
 
-[node name="GameButtonDecorator" type="Node" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/RefreshShopButton"]
+[node name="GameButtonDecorator" type="Node" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/RefreshShopButton"]
 script = ExtResource("7_button_decorator")
 margin_top = 3
 margin_bottom = 3
@@ -139,7 +144,7 @@ color_normal = Color(0.95, 0.6, 0.15, 1)
 color_hover = Color(1, 0.7, 0.2, 1)
 color_pressed = Color(0.8, 0.5, 0.1, 1)
 
-[node name="ButtonText" type="RichTextLabel" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/RefreshShopButton"]
+[node name="ButtonText" type="RichTextLabel" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox/RefreshShopButton"]
 layout_mode = 1
 anchors_preset = 8
 offset_top = -1.0
@@ -155,25 +160,36 @@ clip_contents = false
 autowrap_mode = 0
 text = "1[color=#f2b726]G[/color]"
 
-[node name="ShopMargin" type="MarginContainer" parent="PanelBorder/Content/ShopOuterMargin/VBox"]
+[node name="ShopMargin" type="MarginContainer" parent="ShopOuterMargin/VBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="ShopRows" type="VBoxContainer" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopMargin"]
+[node name="ShopRows" type="VBoxContainer" parent="ShopOuterMargin/VBox/ShopMargin"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="SlotsAlign" type="CenterContainer" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopMargin/ShopRows"]
+[node name="SlotsAlign" type="CenterContainer" parent="ShopOuterMargin/VBox/ShopMargin/ShopRows"]
 layout_mode = 2
 
-[node name="SlotsHBox" type="HBoxContainer" parent="PanelBorder/Content/ShopOuterMargin/VBox/ShopMargin/ShopRows/SlotsAlign"]
+[node name="SlotsHBox" type="HBoxContainer" parent="ShopOuterMargin/VBox/ShopMargin/ShopRows/SlotsAlign"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
+
+[node name="BorderOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+z_index = 1
+script = ExtResource("8_shader_decorator")
+border_type = 1
+border_color = Color(0.3, 0.25, 0.25, 1)
+interior_color = Color(0, 0, 0, 0)
+border_indentation = 3
 
 [node name="SellOverlay" type="MarginContainer" parent="."]
 unique_name_in_owner = true

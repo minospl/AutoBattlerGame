@@ -1,6 +1,8 @@
 class_name ShopHeaderBar
 extends PanelContainer
 
+const SHOP_HEADER_BG_SHADER: Shader = preload("res://src/shared/shaders/shop_header_bar_bg.gdshader")
+
 signal restart_requested
 signal battle_requested
 signal compendium_requested
@@ -59,7 +61,7 @@ func _apply_visual_styling() -> void:
 		
 	# 1. Apply background shader to HeaderContent instead of root
 	var panel_mat: ShaderMaterial = ShaderMaterial.new()
-	panel_mat.shader = load("res://src/shared/shaders/shop_header_bar_bg.gdshader")
+	panel_mat.shader = SHOP_HEADER_BG_SHADER
 	
 	# Connect to resized of HeaderContent to update shader size uniform
 	header_content.resized.connect(func() -> void:

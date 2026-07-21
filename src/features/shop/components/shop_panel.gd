@@ -12,7 +12,7 @@ signal freeze_all_requested(freeze: bool)
 @onready var sell_overlay: MarginContainer = %SellOverlay
 @onready var sell_panel: PanelContainer = %SellPanel
 @onready var sell_label: Label = %SellLabel
-@onready var border_decorator: ShaderBorderDecorator = $PanelBorder/BorderOverlay as ShaderBorderDecorator
+@onready var border_decorator: ShaderBorderDecorator = %BorderOverlay as ShaderBorderDecorator
 
 @export var gold: int = 10:
 	set(val):

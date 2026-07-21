@@ -17,6 +17,8 @@ extends Node
 @export var color_outer_border: Color = Color(0.3, 0.25, 0.25, 1.0) # PANEL_BORDER_DEFAULT
 @export var color_inner_border: Color = Color(1.0, 1.0, 1.0, 1.0) # WHITE
 
+const DOUBLE_BORDER_SHADER: Shader = preload("res://src/shared/shaders/double_border.gdshader")
+
 var parent_button: Button
 var border_rect: ColorRect
 var mat: ShaderMaterial
@@ -63,7 +65,7 @@ func _ready() -> void:
 	border_rect.anchors_preset = Control.PRESET_FULL_RECT
 	
 	mat = ShaderMaterial.new()
-	mat.shader = load("res://src/shared/shaders/double_border.gdshader")
+	mat.shader = DOUBLE_BORDER_SHADER
 	mat.set_shader_parameter("outer_border_color", outer_border_color)
 	mat.set_shader_parameter("inner_border_color", inner_border_color)
 	mat.set_shader_parameter("outer_border_width", outer_width)

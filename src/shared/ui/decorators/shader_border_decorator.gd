@@ -12,6 +12,9 @@ enum BorderType { SINGLE, DOUBLE }
 @export var border_indentation: int = 3
 @export var corner_color: Color = GameColors.TRANSPARENT
 
+const SINGLE_BORDER_SHADER: Shader = preload("res://src/shared/shaders/single_border.gdshader")
+const DOUBLE_BORDER_SHADER: Shader = preload("res://src/shared/shaders/double_border.gdshader")
+
 var shader_material: ShaderMaterial
 
 func _ready() -> void:
@@ -29,12 +32,8 @@ func _ready() -> void:
 		offset_right = 0
 		offset_bottom = 0
 		
-		# Load the proper shader
-		var shader: Shader = null
-		if border_type == BorderType.SINGLE:
-			shader = load("res://src/shared/shaders/single_border.gdshader") as Shader
-		else:
-			shader = load("res://src/shared/shaders/double_border.gdshader") as Shader
+		# Use preloaded shaders
+		var shader: Shader = SINGLE_BORDER_SHADER if border_type == BorderType.SINGLE else DOUBLE_BORDER_SHADER
 			
 		shader_material = ShaderMaterial.new()
 		shader_material.shader = shader
