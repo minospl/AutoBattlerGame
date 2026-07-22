@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bs1dk5l3afr6w"
-path="res://.godot/imported/holy_tree.jpg-9a1b5204bb6aab945391fb49b047b6f4.ctex"
+uid="uid://d2hyj5p7cso74"
+path="res://.godot/imported/holy_tree.png-3096354f5ea36b6db0a37a2602c560a3.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://src/assets/units/holy_tree.jpg"
-dest_files=["res://.godot/imported/holy_tree.jpg-9a1b5204bb6aab945391fb49b047b6f4.ctex"]
+source_file="res://src/assets/units/holy_tree.png"
+dest_files=["res://.godot/imported/holy_tree.png-3096354f5ea36b6db0a37a2602c560a3.ctex"]
 
 [params]
 

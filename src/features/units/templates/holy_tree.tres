@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_type"]
 [ext_resource type="Script" path="res://src/features/units/templates/modifiers/holy_tree_modifier.gd" id="holy_tree_modifier"]
-[ext_resource type="Texture2D" path="res://src/assets/units/holy_tree.jpg" id="sprite"]
+[ext_resource type="Texture2D" path="res://src/assets/units/holy_tree.png" id="sprite"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="type_plant"]

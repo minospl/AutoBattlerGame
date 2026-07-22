@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c5scbsbsg7d6b"
-path="res://.godot/imported/mystic_branch.jpg-1cf7bff878c58bfc3c42e33d7459d504.ctex"
+uid="uid://d25ed0wtfh2nx"
+path="res://.godot/imported/mystic_branch.png-3e69a164b0459b956b9b44b59fc6436b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://src/assets/units/mystic_branch.jpg"
-dest_files=["res://.godot/imported/mystic_branch.jpg-1cf7bff878c58bfc3c42e33d7459d504.ctex"]
+source_file="res://src/assets/units/mystic_branch.png"
+dest_files=["res://.godot/imported/mystic_branch.png-3e69a164b0459b956b9b44b59fc6436b.ctex"]
 
 [params]
 
