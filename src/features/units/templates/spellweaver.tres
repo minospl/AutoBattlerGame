@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_r15g0"]
 [ext_resource type="Script" uid="uid://c47iimbtxmm8n" path="res://src/features/units/templates/modifiers/spellweaver_modifier.gd" id="spellweaver_modifier"]
-[ext_resource type="Texture2D" uid="uid://slb7o5k78a8l" path="res://src/assets/units/spellweaver.jpg" id="sprite"]
+[ext_resource type="Texture2D" uid="uid://slb7o5k78a8l" path="res://src/assets/units/spellweaver.png" id="sprite"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Resource" path="res://src/features/units/rarities/rare.tres" id="unit_rarity"]
-[ext_resource type="Resource" path="res://src/features/units/types/humanoid.tres" id="type_humanoid"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/legendary.tres" id="unit_rarity"]
+[ext_resource type="Resource" path="res://src/features/units/types/dragon.tres" id="type_dragon"]
 [ext_resource type="Resource" path="res://src/features/units/types/arcane.tres" id="type_arcane"]
 
 [sub_resource type="Resource" id="Resource_spellweaver_on_cast"]
@@ -17,7 +17,7 @@ script = ExtResource("unit_data")
 display_name = "Spellweaver"
 price = 3
 max_health = 10
-types = Array[ExtResource("5_r15g0")]([ExtResource("type_humanoid"), ExtResource("type_arcane")])
+types = Array[ExtResource("5_r15g0")]([ExtResource("type_dragon"), ExtResource("type_arcane")])
 rarity = ExtResource("unit_rarity")
 cast_speed = 2.0
 modifier = SubResource("Resource_spellweaver_on_cast")

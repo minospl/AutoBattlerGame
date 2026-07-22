@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://slb7o5k78a8l"
-path="res://.godot/imported/spellweaver.jpg-a4e13f3d93b72ddce5ab8e25078a3a5f.ctex"
+uid="uid://ovnhmuj8o53"
+path="res://.godot/imported/spellweaver.png-b000159f0b822a15238c721a293d3312.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://src/assets/units/spellweaver.jpg"
-dest_files=["res://.godot/imported/spellweaver.jpg-a4e13f3d93b72ddce5ab8e25078a3a5f.ctex"]
+source_file="res://src/assets/units/spellweaver.png"
+dest_files=["res://.godot/imported/spellweaver.png-b000159f0b822a15238c721a293d3312.ctex"]
 
 [params]
 
