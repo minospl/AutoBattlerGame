@@ -25,3 +25,4 @@ rarity = ExtResource("unit_rarity")
 cast_speed = 7.0
 modifier = SubResource("Resource_holy_tree_modifier")
 sprite = ExtResource("sprite")
+sprite_scale = Vector2(0.9, 0.9)

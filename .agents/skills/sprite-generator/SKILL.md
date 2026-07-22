@@ -18,7 +18,7 @@ Używaj tego skilla, gdy użytkownik poprosi o przygotowanie promptu do wygenero
    - **Jednostka:** Usytuowana blisko dolnej krawędzi (`positioned low near bottom`).
    - **Przedmiot:** Wyśrodkowany (`centered on canvas`).
 3. **Tło i Cienie:** Bez cieni na ziemi (`NO GROUND SHADOW`, `NO DROP SHADOW`), bez podłoża/podłogi, bez ramek. Wyłącznie jednolite białe tło (`PURE SOLID FLAT WHITE BACKGROUND ONLY`).
-4. **Obrys (Outline):** Gruby, jednolicie 3-pikselowy czarny obrys krawędzi (`uniform 3-pixel thick solid black outer outline around the entire silhouette`, `heavy 3px black stroke contour`). Dla złożonych postaci unikać drobnych kropel/liści na zewnątrz i stosować zwięzłe bryły (`bold blocky shapes`), aby AI nie odchudzało obrysu.
+4. **Obrys (Outline):** Bardzo gruby, jednolicie 5-pikselowy czarny obrys krawędzi (`uniform 5-pixel thick solid black outer outline around the entire silhouette`, `heavy 5px black stroke contour`). Dla złożonych postaci unikać drobnych kropel/liści na zewnątrz i stosować zwięzłe bryły (`bold blocky shapes`), aby AI nie odchudzało obrysu.
 5. **Styl i Poziom Szczegółów:** 2D Pixel Art (`16-bit retro style`, `crisp low-res pixel grid`), zbalansowany poziom szczegółów (`balanced moderate detail level, clean readable character design`), proste cieniowanie dwutonowe (`flat cell shading`).
 
 ---
