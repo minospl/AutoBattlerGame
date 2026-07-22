@@ -1,12 +1,12 @@
-# Roadmapa Rozwoju i Analiza Architektoniczna: AutoBattlerDungeonGame
+# Roadmapa Rozwoju i Analiza Architektoniczna: AutoBattlerDungeonGame (Async PvP Auto-Battler)
 
-Dokument ten zawiera szczegółową analizę stanu obecnego projektu **AutoBattlerDungeonGame**, chronologiczny plan rozwoju (roadmapę) podzielony na kamienie milowe oraz ocenę ryzyka architektonicznego ze szczególnym uwzględnieniem restrykcyjnych reguł typowania w **Godot 4.7 (Forward Plus)**.
+Dokument ten zawiera szczegółową analizę stanu obecnego projektu **AutoBattlerDungeonGame**, chronologiczny plan rozwoju (roadmapę) dostosowany do trybu **Asynchronicznego PvP ($N$ Rund + Deathmatch)** oraz ocenę ryzyka architektonicznego ze szczególnym uwzględnieniem restrykcyjnych reguł typowania w **Godot 4.7 (Forward Plus)**.
 
 ---
 
 ## 1. Analiza Stanu Obecnego
 
-Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu można podzielić na gotowe fundamenty oraz luki wymagające implementacji.
+Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu można podzielić na gotowe fundamenty oraz luki wymagające implementacji w nowym trybie rozgrywki.
 
 ### A. Co stanowi fundament gry (Stan Gotowy)
 
@@ -17,100 +17,83 @@ Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu m
 * **Symulacja Walki:** System czasu rzeczywistego oparto o `cast_speed` każdej jednostki. Gdy pasek akcji się zapełni, jednostka wykonuje atak podstawowy, nakłada statusy lub leczy/nakłada tarcze. Zaimplementowano mechanikę zmęczenia (Fatigue) zadającą rosnące obrażenia Fibonacciego po 30 sekundach.
 * **System Modyfikatorów i Szablonów:** Modułowa struktura, w której każdy modyfikator (np. [AncientTitanModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/templates/modifiers/ancient_titan_modifier.gd)) dziedziczy po [UnitModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/unit_modifier.gd) i sam definiuje swoje działanie. Istnieje 8 gotowych szablonów potworów (`.tres`) oraz ich modyfikatorów.
 * **System Przedmiotów i Jedzenia (Item & Food System):** Wdrożono klasy bazowe [ItemData](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_data.gd), [ItemInstance](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_instance.gd) oraz [ItemModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/item_modifier.gd). Stworzono gotowe szablony jedzenia ([apple.tres](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/templates/apple.tres), [sword.tres](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/items/templates/sword.tres)), które spawnują się w sklepie (szansa 30%) i mogą być przeciągane na sojusznicze jednostki w celu stałego wzmocnienia statystyk.
-* **System Reliktów i Skrzyń (Relic & Chest System):** Wdrożono system pasywnych modyfikatorów rozgrywki/walki ([RelicData](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/relic_data.gd), [RelicInstance](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/relic_instance.gd) oraz [RelicModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/relic_modifier.gd)). Gracz może kupować skrzynie z reliktami o zróżnicowanej rzadkości w sklepie, a aktywne relikty modyfikują walkę, statystyki oraz zasady celowania (np. Magnetic Core przekształca ADJACENT na ALL, Focusing Lens rozszerza liniowe typy celowania).
+* **System Reliktów i Skrzyń (Relic & Chest System):** Wdrożono system pasywnych modyfikatorów rozgrywki/walki ([RelicData](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/relic_data.gd), [RelicInstance](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/relic_instance.gd) oraz [RelicModifier](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/relics/relic_modifier.gd)). Gracz może kupować skrzynie z reliktami o zróżnicowanej rzadkości w sklepie, a aktywne relikty modyfikują walkę, statystyki oraz zasady celowania.
 
-### B. Obszary brakujące (Do Zaimplementowania)
+### B. Nowy Kierunek Rozgrywki (Async PvP: $N$ Rund + Deathmatch)
 
-* **Elementy Dungeon Crawler:** W tytule gry widnieje "Dungeon", lecz obecnie brakuje jakiejkolwiek eksploracji lochów. Gra to liniowy ciąg losowych walk dzień po dniu. Brakuje mapy lochu (np. rozgałęzionego drzewka z punktami), wydarzeń losowych (Dungeon Events) oraz walk z bossami.
-* **Typy Jednostek (Unit Types):** Klasa [UnitInstance](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/units/unit_instance.gd) pozwala na pobranie typów potwora (`get_types()`). Typy te nie będą zaimplementowane jako globalne, pasywne bonusy drużynowe (np. +X do ataku za posiadanie 3 potworów "Wodnych"). Zamiast tego będą wykorzystywane bezpośrednio wewnątrz modularnych modyfikatorów jednostek (np. +10 statystki "heal" dla sojusznika typu "Wodny").
-* **System Zapisywania Gry (Save/Load):** Cały stan gry istnieje wyłącznie w pamięci podręcznej. Zamknięcie okna gry powoduje utratę postępu rozgrywki.
-* **Dźwięk (Audio System):** Brak jakichkolwiek efektów dźwiękowych (SFX) dla kliknięć UI, przeciągania kart, ataków w walce, aktywacji modyfikatorów oraz muzyki w tle (BGM).
-* **Efekty Wizualne (VFX) i Animacje:** Brak dedykowanych animacji trafień, pocisków, efektów zaklęć, trzęsienia ekranu przy silnych ciosach czy płynnych przejść fazy sklepu w fazę walki.
+* **System Żyć i Rund:** Gracz rozpoczyna rozgrywkę z pulą $N$ żyć (np. 5). Rozgrywka podstawowa trwa $N$ (np. 20) rund. Przegrana walka odejmuje 1 życie.
+* **Pula Przeciwników (Biegi Finalistów):** Przy rozpoczęciu nowej gry losowanych jest 7-8 przeciwników spośród graczy, którzy w swoich rozgrywkach **zdołali dotrzeć do fazy Deathmatch**. W rundach 1–$N$ walczysz z ich snapshotami z odpowiednich rund, a po $N$. rundzie staczasz finałowe starcia Deathmatch z ich ostatecznymi składami.
+* **Podgląd i Wybór Przeciwnika w Sklepie:** W fazie sklepu gracz ma wgląd w nadchodzącego przeciwnika (podgląd jego jednostek, pozycjonowania i wspólnego HP). Wylosowani rywale pozostają stałymi przeciwnikami i **mogą zostać zamienieni wyłącznie za pomocą specjalnego eventu/przedmiotu lub w momencie, gdy zostaną całkowicie pokonani/wyeliminowani z gry (stracą całe HP/życia).** Przeciwnicy są emulowani lokalnie z puli gotowych botów/buildów symulujących graczy docierających do Deathmatcha (bez backendu).
+* **Serializacja Stanu Drużyny:** Przygotowanie metod eksportujących (`to_dict()`) i importujących (`from_dict()`) układ drużyny w [RunState](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd) pod kątem przyszłego backendu.
 
 ---
 
 ## 2. Chronologiczna Roadmapa (Krok po Kroku)
 
-Poniższa roadmapa została ustrukturyzowana tak, aby w pierwszej kolejności zamknąć podstawowe systemy rozgrywki, następnie rozbudować warstwę zawartości ("Dungeon"), a na końcu dopracować doznania audiowizualne.
+### Kamień Milowy 1: Faza MVP / Alfa (Pętla Async PvP z Lokalną Emulacją)
 
-### Kamień Milowy 1: Faza MVP / Alfa (Grywalny Szkielet Rozgrywki)
-
-**Cel Główny:** Uruchomienie pełnego cyklu rozgrywki auto-battlera z działającymi przedmiotami oraz poprawkami typowania.
+**Cel Główny:** Przekształcenie trybu single-player w pętlę $N$ rund z systemem żyć, lokalnym generatorem snapshotów przeciwników i fazą Deathmatch.
 
 | Kategoria | Zadania do wykonania | Priorytet |
 | :--- | :--- | :--- |
-| **Mechanika** | **[x] Zunifikowany System Przedmiotów (Spawnowanie, Rzadkość i Modułowość):** Przebudowa przedmiotów na wzór potworów. Wdrożenie klas `ItemData`, `ItemInstance` oraz bazowej klasy `ItemModifier` (oddzielne skrypty dla efektów). Dodanie właściwości `is_draggable` (dla jedzenia/zwojów nakładanych na sojuszników) i `is_clickable` (dla natychmiastowych zakupów globalnych). Aktywacja generowania przedmiotów w sklepie (szansa 30% na slot przedmiotu) z przypisaną rzadkością (Rarity). | **Krytyczny** |
-| **Mechanika** | **[x] Poziom Sklepu (Shop Level):** Zaimplementowanie mechaniki poziomów sklepu. Ulepszanie sklepu (automatycznie z każdym dniem) zmienia wagi prawdopodobieństwa (szanse procentowe) losowania rzadszych kart przy odświeżaniu sklepu. | **Krytyczny** |
-| **UI / UX** | **[x] Tooltip Rzadkości Przedmiotów:** Dostosowanie tooltipu przedmiotu ([CardTooltip](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_tooltip.gd)), tak aby wyświetlał tekstową etykietę rzadkości (Common, Rare, Legendary) oraz zmieniał barwy obramowania i tekstów odpowiednio do rzadkości (na wzór kart jednostek). | **Krytyczny** |
-| **Refaktor** | **[x] Model-View separation:** Zmiana architektury aktualizacji sklepu tak, aby to logiczny `RunState` decydował o zmianach, a UI tylko je odzwierciedlało (RunState jako źródło prawdy, eliminacja błędów wyścigu). Zaimplementowano reaktywne sygnały aktualizacji, a widoki sklepu i walki są całkowicie sterowane przez model. | **Krytyczny** |
-| **Refaktor** | **[x] Poprawki Modyfikatorów (Typowanie i Null-Safety):** Dostosowanie istniejących skryptów modyfikatorów do ścisłego typowania w Godot 4.7 (bezpieczne rzutowanie `as UnitInstance` oraz guard clauses dla wartości `null` na wejściu). | **Krytyczny** |
-| **Mechanika** | **[x] Relikty / Przedmioty Pasywne:** Rozbudowa systemu o relikty (pasywne modyfikatory wpływające globalnie na rozgrywkę/walkę). | Opcjonalny |
-| **UI / UX** | **Galeria / Kompendium (Lista jednostek/przedmiotów/reliktów):** Nowa scena prezentująca listę wszystkich istniejących w grze jednostek, przedmiotów oraz reliktów wraz z ich statystykami i opisami (np. tymczasowo dostepna z widoku sklepu). | Opcjonalny |
+| **Mechanika** | **System Żyć i Licznika Rund (`RunState`):** *(Częściowo gotowe)* Zmienne `lives`, `day`, `trophies` i obsługa w `complete_battle()` istnieją w `RunState`. Wymagają dostosowania limitu do 5 żyć i $N$ rund podstawowych. | **Krytyczny** |
+| **Mechanika** | **Lokalny Generator Snapshotów (Opponent Emulator):** Stworzenie klasy emulującej 7-8 przeciwników pobieranych na start gry – wyłącznie spośród biegów graczy (botów), którzy dotarli do fazy Deathmatch. Generator dostarcza ich snapshoty z rund 1-$N$. | **Krytyczny** |
+| **Mechanika** | **Faza Deathmatch:** Logika przejścia po $N$. rundzie do finałowych starć eliminacyjnych (Deathmatch) z przetrwałymi przeciwnikami wybranymi na początku biegu. | **Krytyczny** |
+| **Mechanika** | **Serializacja Drużyny (`to_dict` / `from_dict`):** Dodanie obsługi przekształcania `RunState` i `UnitInstance` do/z formatu Dictionary/JSON pod kątem łatwego wysyłania/pobierania danych drużyn. | **Krytyczny** |
+| **Mechanika** | **[x] Zunifikowany System Przedmiotów (Spawnowanie, Rzadkość i Modułowość):** Przebudowa przedmiotów na wzór potworów. | **Zrobione** |
+| **Mechanika** | **[x] Poziom Sklepu (Shop Level):** Ulepszanie sklepu i wagi rzadkości. | **Zrobione** |
+| **UI / UX** | **Wskaźnik Żyć i Rund w Sklepie/Walce:** *(Częściowo gotowe)* `ShopHeaderBar` wyświetla już lives/day w sklepie. Należy dodać analogiczny wskaźnik do sceny walki `BattleScene` oraz powiadomienie o fazie Deathmatch. | **Krytyczny** |
+| **UI / UX & Mechanika** | **Panel Podglądu i Wyboru Przeciwnika w Sklepie:** Przycisk/panel w sklepie pozwalający podejrzeć skład, pozycjonowanie i HP rywala. Wylosowani przeciwnicy pozostają w puli i ulegają zmianie wyłącznie po ich wyeliminowaniu (0 HP) lub użyciu dedykowanego przedmiotu/eventu. | **Krytyczny** |
+| **Refaktor** | **[x] Model-View separation & Null-Safety:** Reaktywna architektura sklepu oraz poprawka typowania. | **Zrobione** |
+| **UI / UX** | **[x] Galeria / Kompendium:** Scena kompendium prezentująca listę wszystkich istniejących w grze jednostek, przedmiotów i reliktów ([CompendiumScene](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/compendium/compendium_scene.gd)). | **Zrobione** |
 
 ---
 
-### Kamień Milowy 2: Faza Beta (Dungeon Crawler i Skalowanie Zawartości)
+### Kamień Milowy 2: Rozbudowa Zawartości i Synergii
 
-**Cel Główny:** Dodanie elementu eksploracji lochów, urozmaicenie przeciwników i zaimplementowanie progresji trudności.
+**Cel Główny:** Znaczące rozszerzenie puli potworów, przedmiotów i reliktów, zapobiegające powstawaniu jednej zdominowanej "mety".
 
 | Kategoria | Zadania do wykonania | Priorytet |
 | :--- | :--- | :--- |
-| **Mechanika** | **Generator Mapy Lochu (Node Map):** Stworzenie generowanej proceduralnie mapy (drzewo połączonych punktów) z różnymi typami lokacji: Walka, Sklep, Wydarzenie Losowe (Event), Skarb, Boss. | **Krytyczny** |
-| **Mechanika** | **Wydarzenia Losowe (Events):** System tekstowych zdarzeń z wyborami (np. "Spotykasz rannego goblina. Oddaj 3 złota, by otrzymać losowy przedmiot lub zaatakuj go"). | **Krytyczny** |
-| **Mechanika** | **Walki z Bossami:** Unikalne walki na koniec każdego lochu z bossami posiadającymi specjalne, wieloetapowe modyfikatory walki. | **Krytyczny** |
-| **UI / UX** | **Ekran Mapy:** Interaktywny interfejs mapy lochów z płynnym przewijaniem i przejściami do odpowiednich scen. | **Krytyczny** |
-| **UI / UX** | **Ekran Wydarzeń:** Czytelny panel dialogowy z ilustracjami generowanymi dynamicznie lub klimatyczną grafiką retro. | **Krytyczny** |
-| **Mechanika** | **Nowe Jednostki i Modyfikatory:** Rozszerzenie puli potworów z 9 do 20+ oraz dodanie nowych mechanik celowania (np. atakowanie najsłabszego wroga, rykoszet). | Opcjonalny |
-| **Mechanika** | **System Trudności (Ascension / Nowa Gra+):** Wybór poziomów trudności przed startem rozgrywki (np. wrogowie z wyższym HP/atakiem, mniejsze zarobki złota, szybsze zmęczenie Fatigue), znacząco wpływający na regrywalność. | Opcjonalny |
+| **Mechanika** | **Rozbudowa Puli Potworów (do 25+):** Dodanie nowych potworów z unikalnymi modyfikatorami i mechanikami. | **Krytyczny** |
+| **Mechanika** | **Nowe Przedmioty i Relikty:** Dodanie 15+ nowych przedmiotów konsumpcyjnych i reliktów modyfikujących przebieg walki. | **Krytyczny** |
+| **UI / UX** | **Ekran Podsumowania Biegu (Run Summary):** Statystyki zebranych wygranych, wykres obrażeń (Damage Meter) i historia stoczonych walk. | Opcjonalny |
 
 ---
 
-### Kamień Milowy 3: Polerowanie i Optymalizacja (UI/UX Premium, Muzyka, VFX)
+### Kamień Milowy 3: Polerowanie UI/UX, VFX i Audio
 
-**Cel Główny:** Doprowadzenie gry do poziomu "Premium UX" poprzez bogate animacje, efekty cząsteczkowe i zbalansowane udźwiękowienie.
+**Cel Główny:** Doprowadzenie gry do poziomu "Premium UX" – bogate animacje, efekty cząsteczkowe i oprawa dźwiękowa.
 
 | Kategoria | Zadania do wykonania | Priorytet |
 | :--- | :--- | :--- |
-| **UI / UX** | **Efekty Wizualne (VFX) w Walce:** Dodanie linii uderzeń, efektów cząsteczkowych przy trafieniach krytycznych i zaklęciach, oraz trzęsienia ekranu (Screen Shake) zależnego od siły ciosu. | **Krytyczny** |
-| **UI / UX** | **Płynne Animacje UI:** Animowanie pojawiania się kart w sklepie, efektu zamrożenia (szron na karcie) oraz przejść między ekranami za pomocą biblioteki Tweens. | **Krytyczny** |
-| **Refaktor** | **Optymalizacja Wydajności:** Profilowanie pętli walki. Cache'owanie wywołań shaderów, optymalizacja drawcalli poprzez łączenie elementów UI. | **Krytyczny** |
-| **Refaktor** | **Optymalizacja pamięci:** Zapewnienie, że klonowane instancje jednostek w walce są poprawnie zwalniane z pamięci. | **Krytyczny** |
-| **UI / UX** | **Statystyki Walki (Damage Meter):** Podsumowanie po bitwie wyświetlające graficzny raport/wykres (zadany atak, uleczone zdrowie, przyjęte tarcze) dla każdego potwora w drużynie. | Opcjonalny |
+| **UI / UX** | **Efekty Wizualne (VFX) w Walce:** Dodanie linii uderzeń, efektów cząsteczkowych przy trafieniach krytycznych i zaklęciach, oraz trzęsienia ekranu (Screen Shake). | **Krytyczny** |
+| **UI / UX** | **Płynne Animacje UI:** Animowanie pojawiania się kart w sklepie, zamrażania oraz przejść między ekranami za pomocą Tweens. | **Krytyczny** |
+| **Refaktor** | **Optymalizacja Wydajności i Pamięci:** Profilowanie walki, cache'owanie shaderów, czyszczenie instancji jednostek. | **Krytyczny** |
+| **UI / UX** | **Menedżer Dźwięku (Audio System):** Dodanie muzyki adaptacyjnej (Sklep/Walka/Deathmatch) i efektów SFX. | **Krytyczny** |
 
 ---
 
-### Kamień Milowy 4: Wydanie (Balans i QA)
+### Kamień Milowy 4: Serwer Backend, Balans i Wydanie
 
-**Cel Główny:** Osiągnięcie idealnego balansu, usunięcie błędów, wdrożenie Menu Głównego oraz systemu zapisu gry dla stabilnej dystrybucji.
+**Cel Główny:** Wdrożenie prawdziwego chmurowego backendu dla snapshotów graczy, zbalansowanie rozgrywki i dystrybucja.
 
 | Kategoria | Zadania do wykonania | Priorytet |
 | :--- | :--- | :--- |
-| **Mechanika** | **Balansowanie Statystyk:** Przetestowanie i zbalansowanie kosztów złota, przyrostu statystyk przy level-upach oraz siły modyfikatorów. | **Krytyczny** |
-| **UI / UX** | **Menu Główne (Start Menu):** Stworzenie sceny startowej z logiem gry, przyciskami "Nowa Gra", "Kontynuuj" (aktywne tylko gdy istnieje zapis) oraz "Wyjdź". Integracja z `GameRoot` w celu przejścia do nowej gry lub załadowania istniejącej. | **Krytyczny** |
-| **Mechanika** | **System Zapisu (Save/Load):** Napisanie menedżera zapisu, który serializuje obiekt `RunState` do pliku `user://savegame.json` lub `.tres` i wczytuje go przy starcie gry, umożliwiając kontynuację rozgrywki wywołaną przyciskiem "Kontynuuj". | **Krytyczny** |
-| **UI / UX** | **Menu Ustawień (Settings Panel):** Implementacja panelu konfiguracji (suwaki głośności dla Muzyki/SFX, wybór trybu pełnoekranowego, rozdzielczości ekranu oraz zmiana języka). | **Krytyczny** |
-| **UI / UX** | **Menedżer Dźwięku (Audio System):** Dodanie muzyki adaptacyjnej (spokojna w sklepie, dynamiczna w walce) oraz SFX (kupowanie, odświeżanie, uderzenie miecza, leczenie) na samym końcu prac nad grą. | **Krytyczny** |
-| **Błędy / QA** | **Testy Automatyczne:** Napisanie testów jednostkowych (Unit Tests) symulujących 1000 automatycznych walk w tle w celu wykrycia ewentualnych nieskończonych pętli lub awarii silnika. | **Krytyczny** |
-| **Refaktor** | **Finalna Weryfikacja Typowania:** Pełny przegląd kodu w poszukiwaniu ostrzeżeń kompilatora Godota w celu wyeliminowania ryzykownych rzutowań w locie. | **Krytyczny** |
-| **UI / UX** | **Wersje Językowe (Localization):** Dokończenie systemu lokalizacji (polski/angielski) przy użyciu wbudowanego w Godot mechanizmu tłumaczeń. | Opcjonalny |
+| **Backend** | **Moduł Komunikacji Chmurowej (Network / API):** Integracja z backendem (np. Supabase / REST API). Przy rozpoczęciu gry pobieranie 7-8 biegów graczy zakwalifikowanych do Deathmatcha. Wysyłanie snapshotu własnej drużyny na serwer po ukończeniu rund. | **Krytyczny** |
+| **Mechanika** | **Balansowanie Statystyk:** Przetestowanie i zbalansowanie $N$ rund, szans na rzadkości kart, przyrostów złota i siły reliktów. | **Krytyczny** |
+| **UI / UX** | **Menu Główne i Ustawienia:** Stworzenie sceny startowej z logiem gry, przyciskami "Nowa Gra", profil gracza oraz opcjami audio/wideo. | **Krytyczny** |
+| **Błędy / QA** | **Testy Automatyczne:** Napisanie testów jednostkowych (Unit Tests) symulujących 1000 automatycznych walk w tle w celu wykrycia nieskończonych pętli lub awarii silnika. | **Krytyczny** |
+| **UI / UX** | **Lokalizacja (Localization):** Dokończenie systemu lokalizacji (polski/angielski). | Opcjonalny |
 
 ---
 
 ## 3. Przyszłe Rozszerzenia
 
-### **System reliktów**
+### **System reliktów i nagród**
 
-Na podstawie wymagań projektowych zdefiniowano następujące źródła pozyskiwania reliktów w grze, do zrealizowania w kolejnych fazach rozwoju (np. przy wdrażaniu lochów/eventów):
-
-1. **Zakup bezpośredni w sklepie (Wdrożone):**
-   * Kupowanie klikalnych przedmiotów-skrzyń w sklepie, które po zakupie losują i dodają relikt o określonej rzadkości (`Common`, `Rare`, `Epic`, `Legendary`).
-2. **Wydarzenia na mapie lochów (Kamień Milowy 2):**
-   * Zdarzenia tekstowe / eventy generowane automatycznie co 3 dni na mapie lochów (np. oferujące graczowi wybór reliktu spośród kilku wylosowanych propozycji).
-3. **Modyfikatory kart jednostek (Kamień Milowy 2 / Nowe modyfikatory):**
-   * Zdolności potworów wyzwalane na koniec walki (np. *"On victory/defeat get a [Rarity] relic of [Level] level"*).
+* Eventy (np. po 5., 10. i 15. rundzie) gdzie można dostać unikalne relikty/jednostki/gold/odnowic hp/zwiekszyc base health/itd...
 
 ### **Zaawansowany System Statystyk (Stat Modifier Pattern)**
 
-Jako przyszły refaktor w ramach rozwoju gry (np. przy wdrażaniu dziesiątek nakładających się efektów, aury i czasowych debufów w Kamieniu Milowym 3):
-
-* **Wdrożenie modułowego systemu statystyk**: Przejście z uproszczonego podejścia "zmienna + dynamiczny getter" (np. `attack + ongoing_attack_bonus`) na pełny wzorzec **Stat Modifier**. Każda statystyka jednostki (zdrowie, atak, cast speed) stanie się osobnym obiektem (klasa `Stat`), który zarządza listą aktywnych modyfikatorów (`StatModifier` o typach FLAT i PERCENT) i automatycznie wylicza końcową wartość, co wyeliminuje ryzyko konfliktów przy nakładaniu się wielu różnych efektów.
+Wzorce modyfikacji statystyk (`Stat` oraz `StatModifier` o typach FLAT i PERCENT) zapobiegające konfliktom przy nakładaniu dziesiątek równoległych efektów.

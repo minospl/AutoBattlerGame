@@ -20,11 +20,11 @@ Podczas edycji i analizy kodu zawsze przestrzegaj tych zasad:
 
 ## 1. Czym jest ten projekt?
 
-**AutoBattlerDungeonGame** to gra typu auto-battler z elementami dungeon crawler, rozwijana w silniku **Godot 4.7 (Forward Plus)** przy użyciu języka **GDScript**.
-Główna pętla gry składa się z dwóch naprzemiennych faz:
+**AutoBattlerDungeonGame** to gra typu **asynchroniczny PvP auto-battler** (inspirowana grami typu Super Auto Pets / 9 Kings / TFT), rozwijana w silniku **Godot 4.7 (Forward Plus)** przy użyciu języka **GDScript**.
+Główna pętla gry opiera się na $N$ rundach podstawowych przeciwko snapshotom biegów graczy (którzy dotarli do fazy finałowej) oraz finałowej fazie **Deathmatch**:
 
-1. **Faza sklepu (Shop)** – gracz zarządza zasobami (złotem), kupuje potwory oraz przedmioty (np. Apple, Sword), umieszcza je w aktywnej drużynie (siatka 2x3) lub na ławce rezerwowych (8 miejsc) oraz może zamrażać (freeze) oferty.
-2. **Faza walki (Battle)** – automatyczna symulacja starcia drużyny gracza z drużyną przeciwnika. Jednostki automatycznie ładują swoje paski akcji i wykonują akcje, nakładając statusy i wyzwalając modyfikatory.
+1. **Faza sklepu (Shop)** – gracz zarządza złotem, kupuje potwory i przedmioty, buduje drużynę (siatka 2x3), zarządza ławką (6 miejsc), zamraża oferty oraz **posiada podgląd nadchodzącego przeciwnika (jego drużyny, pozycjonowania i HP)** z możliwością wymiany rywala za pomocą eventów/przedmiotów.
+2. **Faza walki (Battle)** – automatyczna symulacja starcia drużyny gracza ze snapshotem przeciwnika. Obrażenia zadawane są do wspólnego HP drużyny. Porażka odejmuje 1 życie z puli (domyślnie 5 żyć). Po przetrwaniu $N$ rund następuje faza finałowa **Deathmatch**.
 
 ---
 
