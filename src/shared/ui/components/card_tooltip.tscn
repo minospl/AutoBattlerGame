@@ -4,6 +4,8 @@
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
 [ext_resource type="Script" path="res://src/shared/ui/components/tooltip_stats_panel.gd" id="3_stats"]
 [ext_resource type="Script" path="res://src/shared/ui/components/tooltip_keywords_box.gd" id="4_keywords"]
+[ext_resource type="PackedScene" uid="uid://ccmv3fktknktn" path="res://src/shared/ui/components/card_portrait.tscn" id="5_portrait"]
+
 
 [node name="CardTooltip" type="MarginContainer"]
 custom_minimum_size = Vector2(270, 0)
@@ -94,48 +96,16 @@ theme_override_constants/margin_bottom = 8
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="SpriteFrame" type="PanelContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
-custom_minimum_size = Vector2(80, 80)
+[node name="SpriteFrame" type="Control" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
+custom_minimum_size = Vector2(76, 76)
 layout_mode = 2
 
-[node name="SpriteBorderRect" type="ColorRect" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame"]
+[node name="CardPortrait" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame" instance=ExtResource("5_portrait")]
 unique_name_in_owner = true
-z_index = 1
-layout_mode = 2
-script = ExtResource("2_decorator")
-border_type = 1
-border_color = Color(0.57, 0.58, 0.65, 1)
-inner_border_color = Color(0.88, 0.89, 0.91, 1)
-interior_color = Color(1, 1, 1, 0)
+layout_mode = 1
 outer_border_width = 2
 inner_border_width = 2
 border_indentation = 1
-
-[node name="Center" type="CenterContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame"]
-layout_mode = 2
-
-[node name="SpriteRect" type="TextureRect" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(76, 76)
-layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="FallbackLabel" type="Label" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox/SpriteFrame/Center"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.45)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
-theme_override_constants/outline_size = 4
-theme_override_font_sizes/font_size = 14
-text = "?"
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
 
 [node name="BadgeCenter" type="CenterContainer" parent="HBox/MainTooltipWrapper/Padding/VBox/PortraitPanel/Margin/ArtworkHBox"]
 layout_mode = 2

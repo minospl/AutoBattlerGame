@@ -3,14 +3,63 @@ extends ColorRect
 
 enum BorderType { SINGLE, DOUBLE }
 
-@export var border_type: BorderType = BorderType.DOUBLE
-@export var border_color: Color = GameColors.PANEL_BORDER_DEFAULT
-@export var inner_border_color: Color = GameColors.BORDER_INNER_DEFAULT
-@export var interior_color: Color = GameColors.TRANSPARENT
-@export var outer_border_width: int = 3
-@export var inner_border_width: int = 3
-@export var border_indentation: int = 3
-@export var corner_color: Color = GameColors.TRANSPARENT
+@export var border_type: BorderType = BorderType.DOUBLE:
+	set(value):
+		border_type = value
+		if is_node_ready() and shader_material:
+			var shader: Shader = SINGLE_BORDER_SHADER if border_type == BorderType.SINGLE else DOUBLE_BORDER_SHADER
+			shader_material.shader = shader
+			update_shader_parameters()
+
+@export var border_color: Color = GameColors.PANEL_BORDER_DEFAULT:
+	set(value):
+		border_color = value
+		if is_node_ready() and shader_material:
+			var param: String = "border_color" if border_type == BorderType.SINGLE else "outer_border_color"
+			shader_material.set_shader_parameter(param, border_color)
+
+@export var inner_border_color: Color = GameColors.BORDER_INNER_DEFAULT:
+	set(value):
+		inner_border_color = value
+		if is_node_ready() and shader_material:
+			shader_material.set_shader_parameter("inner_border_color", inner_border_color)
+
+@export var interior_color: Color = GameColors.TRANSPARENT:
+	set(value):
+		interior_color = value
+		if is_node_ready() and shader_material:
+			shader_material.set_shader_parameter("interior_color", interior_color)
+
+@export var outer_border_width: int = 3:
+	set(value):
+		outer_border_width = value
+		if is_node_ready() and shader_material:
+			var param: String = "border_width" if border_type == BorderType.SINGLE else "outer_border_width"
+			shader_material.set_shader_parameter(param, outer_border_width)
+
+@export var inner_border_width: int = 3:
+	set(value):
+		inner_border_width = value
+		if is_node_ready() and shader_material:
+			shader_material.set_shader_parameter("inner_border_width", inner_border_width)
+
+@export var border_indentation: int = 3:
+	set(value):
+		border_indentation = value
+		if is_node_ready() and shader_material:
+			if border_type == BorderType.SINGLE:
+				shader_material.set_shader_parameter("border_indentation", border_indentation)
+			if border_type == BorderType.DOUBLE:
+				shader_material.set_shader_parameter("outer_border_indentation", border_indentation)
+				shader_material.set_shader_parameter("inner_border_indentation", border_indentation)
+
+@export var corner_color: Color = GameColors.TRANSPARENT:
+	set(value):
+		corner_color = value
+		if is_node_ready() and shader_material:
+			shader_material.set_shader_parameter("corner_color", corner_color)
+
+
 
 const SINGLE_BORDER_SHADER: Shader = preload("res://src/shared/shaders/single_border.gdshader")
 const DOUBLE_BORDER_SHADER: Shader = preload("res://src/shared/shaders/double_border.gdshader")

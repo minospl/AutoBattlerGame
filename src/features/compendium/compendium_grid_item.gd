@@ -12,9 +12,7 @@ signal level_changed(item: CompendiumGridItem)
 
 var unit_level: int = 1
 
-@onready var portrait_label: Label = %PortraitCharLabel
-@onready var sprite_rect: TextureRect = %SpriteRect
-@onready var border_rect: ShaderBorderDecorator = %BorderRect
+@onready var card_portrait: CardPortrait = %CardPortrait
 
 func _ready() -> void:
 	custom_minimum_size = CardUIHelper.CARD_SIZE
@@ -28,30 +26,9 @@ func update_ui() -> void:
 	if not data_resource:
 		return
 		
-	# Reset defaults
-	if portrait_label:
-		portrait_label.visible = false
-	if sprite_rect:
-		sprite_rect.visible = false
-	
-	# 1. Determine border color based on rarity and configure border
-	var border_color: Color = GameColors.BORDER_OUTER_DEFAULT
-	border_color = data_resource.rarity.border_color
-		
-	border_rect.border_color = border_color
-	border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
-	border_rect.interior_color = GameColors.WHITE_COLOR
-	border_rect.update_shader_parameters()
-		
-	# 2. Configure sprite or text fallback
-	if data_resource.sprite:
-		if sprite_rect:
-			sprite_rect.visible = true
-			sprite_rect.texture = data_resource.sprite
-	else:
-		if portrait_label:
-			portrait_label.visible = true
-			portrait_label.text = data_resource.display_name.to_upper()
+	if card_portrait:
+		card_portrait.setup_visuals(data_resource)
+
 
 func _gui_input(event: InputEvent) -> void:
 	if not data_resource is UnitData:

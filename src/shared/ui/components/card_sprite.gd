@@ -1,8 +1,8 @@
 class_name CardSprite
 extends Control
 
-@onready var texture_rect: TextureRect = $TextureRect
-@onready var fallback_label: Label = $FallbackLabel
+@onready var texture_rect: TextureRect = %TextureRect
+@onready var fallback_label: Label = %FallbackLabel
 
 ## Sets the sprite texture or falls back to displaying the full unit/item name
 func set_sprite(p_texture: Texture2D, p_name: String, p_offset: Vector2 = Vector2.ZERO, p_scale: Vector2 = Vector2.ONE) -> void:

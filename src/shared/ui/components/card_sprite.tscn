@@ -13,6 +13,7 @@ mouse_filter = 2
 script = ExtResource("1_script")
 
 [node name="TextureRect" type="TextureRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,14 +24,23 @@ mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="FallbackLabel" type="Label" parent="."]
-visible = false
+[node name="FallbackMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="FallbackLabel" type="Label" parent="FallbackMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.45)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
@@ -40,4 +50,4 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 vertical_alignment = 1
-autowrap_mode = 2
+autowrap_mode = 3

@@ -1,7 +1,6 @@
 class_name CardTooltip
 extends MarginContainer
 
-const CHROMA_KEY_SHADER: Shader = preload("res://src/shared/shaders/chroma_key.gdshader")
 const TYPE_BADGE_SCENE: PackedScene = preload("res://src/shared/ui/components/type_badge.tscn")
 const BADGE_COLOR_ITEM: Color = Color(0.18, 0.45, 0.72, 1.0) # Sleek blue for items
 const BADGE_COLOR_RELIC: Color = Color(0.72, 0.45, 0.18, 1.0) # Gold-amber for relics
@@ -9,8 +8,7 @@ const BADGE_COLOR_RELIC: Color = Color(0.72, 0.45, 0.18, 1.0) # Gold-amber for r
 @onready var border_rect: ShaderBorderDecorator = %BorderRect
 @onready var name_label: Label = %NameLabel
 @onready var rarity_label: Label = %RarityLabel
-@onready var sprite_rect: TextureRect = %SpriteRect
-@onready var fallback_label: Label = %FallbackLabel
+@onready var card_portrait: CardPortrait = %CardPortrait
 @onready var badge_list: VBoxContainer = %BadgeList
 @onready var stats_panel_container: PanelContainer = %StatsPanelContainer
 @onready var stats_panel: TooltipStatsPanel = %StatsPanel
@@ -19,7 +17,6 @@ const BADGE_COLOR_RELIC: Color = Color(0.72, 0.45, 0.18, 1.0) # Gold-amber for r
 
 # Cache border panels as @onready to avoid runtime lookup issues
 @onready var portrait_border_rect: ShaderBorderDecorator = %PortraitBorderRect
-@onready var sprite_border_rect: ShaderBorderDecorator = %SpriteBorderRect
 @onready var stats_border_rect: ShaderBorderDecorator = %StatsBorderRect
 @onready var desc_border_rect: ShaderBorderDecorator = %DescBorderRect
 @onready var help_border_rect: ShaderBorderDecorator = %HelpBorderRect
@@ -133,7 +130,6 @@ func _setup_common_ui(data: GameResourceData) -> void:
 func _update_sub_panel_borders(border_col: Color) -> void:
 	var panels: Array[ShaderBorderDecorator] = [
 		portrait_border_rect,
-		sprite_border_rect,
 		stats_border_rect,
 		desc_border_rect,
 		help_border_rect
@@ -144,20 +140,8 @@ func _update_sub_panel_borders(border_col: Color) -> void:
 		rect.update_shader_parameters()
 
 func _update_sprite(data: GameResourceData) -> void:
-	var sprite_tex: Texture2D = data.sprite
-	
-	if sprite_tex:
-		sprite_rect.visible = true
-		fallback_label.visible = false
-		sprite_rect.texture = sprite_tex
-		if not sprite_rect.material:
-			var mat: ShaderMaterial = ShaderMaterial.new()
-			mat.shader = CHROMA_KEY_SHADER
-			sprite_rect.material = mat
-	else:
-		sprite_rect.visible = false
-		fallback_label.visible = true
-		fallback_label.text = data.display_name.to_upper()
+	if card_portrait:
+		card_portrait.setup_visuals(data)
 
 func update_badge() -> void:
 	# Clear old badge nodes
