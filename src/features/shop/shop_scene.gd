@@ -43,7 +43,6 @@ var shop_card_unit_scene: PackedScene = preload("res://src/features/shop/compone
 var item_card_scene: PackedScene = preload("res://src/features/shop/components/shop_card_item.tscn")
 var unit_card_scene: PackedScene = preload("res://src/features/shop/components/unit_card.tscn")
 var tooltip_scene: PackedScene = preload("res://src/shared/ui/components/card_tooltip.tscn")
-var overlay_script: Script = preload("res://src/features/shop/components/targeting_line_overlay.gd")
 
 var active_slots: Array[UnitSlot]:
 	get:
@@ -129,10 +128,8 @@ func setup(p_state: RunState) -> void:
 	load_state_from_run()
 	
 	# Instantiate and add the targeting line overlay to draw on top of everything
-	var overlay: Control = Control.new()
+	var overlay: TargetingLineOverlay = TargetingLineOverlay.new()
 	overlay.name = "TargetingLineOverlay"
-	overlay.set_script(overlay_script)
-	overlay.set("parent_scene", self)
 	overlay.z_index = 10
 	add_child(overlay)
 

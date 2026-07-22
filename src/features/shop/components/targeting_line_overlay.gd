@@ -1,23 +1,32 @@
+class_name TargetingLineOverlay
 extends Control
 
-var _was_dragging: bool = false
+var active_card: Control = null
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_process(false)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_DRAG_BEGIN:
+		if DragManager.dragged_card is ShopCardItem:
+			active_card = DragManager.dragged_card
+			set_process(true)
+			queue_redraw()
+	elif what == NOTIFICATION_DRAG_END:
+		if active_card != null:
+			active_card = null
+			set_process(false)
+			queue_redraw()
 
 func _process(_delta: float) -> void:
-	var is_dragging: bool = DragManager.dragged_card is ShopCardItem
-	if is_dragging:
+	if active_card:
 		queue_redraw()
-		_was_dragging = true
-	elif _was_dragging:
-		queue_redraw() # Clear canvas one last time
-		_was_dragging = false
 
 func _draw() -> void:
-	if DragManager.dragged_card is ShopCardItem:
-		var dragged_card: Control = DragManager.dragged_card
+	if active_card:
+		var dragged_card: Control = active_card
 		
 		# Draw the Hearthstone-style food targeting line
 		var start_pos: Vector2 = dragged_card.global_position + dragged_card.size / 2.0
@@ -171,4 +180,3 @@ func _get_bezier_point(p0: Vector2, p1: Vector2, p2: Vector2, t: float) -> Vecto
 	var q0: Vector2 = p0.lerp(p1, t)
 	var q1: Vector2 = p1.lerp(p2, t)
 	return q0.lerp(q1, t)
-

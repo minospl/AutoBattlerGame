@@ -124,6 +124,15 @@
   2. **Karta sklepowa:** Scena [shop_card_unit.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_unit.tscn) poprawnie importuje i używa `CardPortrait`, a także stopki z nazwą i ceną.
   3. **Karta posiadana:** Scena [unit_card.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/unit_card.tscn) korzysta z `CardPortrait`, wyświetla dynamiczne wskaźniki kierunków `DirectionIndicators` oparte na shaderze oraz w pełni obsługuje Drag & Drop poprzez `_get_drag_data()` w integracji z `DragManager`.
 
+### Zadanie R [**ZROBIONE**]: Aktywacja TargetingLineOverlay oparta na zdarzeniach (Event-Driven Overlay)
+
+- **Lokalizacja:** [targeting_line_overlay.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/targeting_line_overlay.gd), [shop_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd), [shop_card_item.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_card_item.gd)
+- **Krytyczne pytania & Problem:** Nakładka `TargetingLineOverlay` istnieje cały czas w scenie i co klatkę sprawdza w `_process()` czy przeciągana karta to `ShopCardItem`, mimo że linia celowania potrzebna jest wyłącznie dla przedmiotów.
+- **Logiczne uzasadnienie:** Przepisanie na architekturę opartą na zdarzeniach wyeliminuje zbędne odpytywanie typu karty w pętli dla kart jednostek (`UnitCard` / `ShopCardUnit`) i ograniczy działanie nakładki wyłącznie do aktywnego przeciągania przedmiotu.
+- **Sugerowana zmiana:**
+  1. Aktywować / włączać `TargetingLineOverlay` w [shop_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd) wyłącznie po odebraniu zdarzenia rozpoczęcia przeciągania z `ShopCardItem`.
+  2. Wyłączać lub usuwać nakładkę natychmiast po zakończeniu przeciągania (`drag_ended`).
+
 ---
 
 ## 4. PRIORYTET 4: MECHANIKI ROZGRYWKI (Gameplay Mechanics)
