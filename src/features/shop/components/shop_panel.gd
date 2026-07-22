@@ -125,6 +125,8 @@ func _format_chance_text(weights: Array[float]) -> String:
 	var parts: Array[String] = []
 	var w_scale: float = 1.0 - unique_chance
 	
+	parts.append("[b][color=#e0e0e0][LVL %d][/color][/b]" % shop_level)
+
 	if weights.size() > 0 and weights[0] > 0.0:
 		parts.append("[color=#708094]C:%d%%[/color]" % roundi(weights[0] * w_scale * 100))
 	if weights.size() > 1 and weights[1] > 0.0:
@@ -136,12 +138,12 @@ func _format_chance_text(weights: Array[float]) -> String:
 	if unique_chance > 0.0:
 		parts.append("[color=#e61a33]U:%d%%[/color]" % roundi(unique_chance * 100))
 
-	return " | ".join(parts)
+	return " ".join([parts[0], " | ".join(parts.slice(1))]) if parts.size() > 1 else parts[0]
 
 func _update_labels() -> void:
 	if is_inside_tree() and gold_label:
 		gold_label.text = str(gold) + "[color=#f2b726]G[/color]"
 	if is_inside_tree() and shop_label:
-		shop_label.text = "SHOP LVL " + str(shop_level)
+		shop_label.text = "SHOP"
 	if is_inside_tree() and chance_label and shop_weights.size() > 0:
 		chance_label.text = _format_chance_text(shop_weights)

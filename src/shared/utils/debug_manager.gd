@@ -17,7 +17,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		KEY_1:
 			_add_random_monster()
 		KEY_2:
-			add_all_relics()
+			add_all_non_unique_relics()
 		KEY_3:
 			add_all_unique_relics()
 
@@ -43,12 +43,12 @@ func _add_random_monster() -> void:
 			var sig: Signal = shop_scene.get("team_state_changed")
 			sig.emit()
 
-func add_all_relics() -> void:
+func add_all_non_unique_relics() -> void:
 	if not run_state:
 		return
 		
 	for template: RelicData in run_state.relic_templates:
-		if template.rarity.rarity_type == Rarity.Type.UNIQUE and run_state.has_relic(template.display_name):
+		if template.rarity.rarity_type == Rarity.Type.UNIQUE:
 			continue
 			
 		var relic_inst: RelicInstance = RelicInstance.new()

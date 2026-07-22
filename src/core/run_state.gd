@@ -4,6 +4,7 @@ extends Resource
 const MAX_ACTIVE_TEAM_SIZE: int = 6
 const MAX_BENCH_SIZE: int = 6
 const MAX_SHOP_CARDS_SIZE: int = 5
+const ITEM_PURCHASE_LIMIT: int = 2
 const STARTING_GOLD: int = 10
 const STARTING_LIVES: int = 10
 const STARTING_DAY: int = 1
@@ -51,8 +52,12 @@ func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relic
 @export var relics: Array[RelicInstance] = []
 @export var has_magnetic_core: bool = false
 @export var base_health: int = STARTING_BASE_HEALTH
-@export var item_purchase_limit: int = 5
+@export var item_purchase_limit: int = ITEM_PURCHASE_LIMIT
 @export var item_purchase_count: int = 0
+@export var max_trophies: int = MAX_TROPHIES
+@export var battle_speed: float = 1.0
+@export var disabled_rarities: Array[Rarity.Type] = []
+@export var rarity_config: ShopRarityConfig = ShopRarityConfig.new()
 
 var has_focusing_lens: bool:
 	get:
@@ -88,56 +93,14 @@ var has_unique_potential: bool:
 			trophies = val
 			trophies_changed.emit(trophies)
 
-@export var max_trophies: int = MAX_TROPHIES
-
-@export var battle_speed: float = 1.0
-
 @export var shop_level: int = 1:
 	set(val):
 		if shop_level != val:
 			shop_level = val
 			shop_level_changed.emit(shop_level)
 
-const DAILY_SHOP_WEIGHTS: Dictionary = {
-	1: [1.00, 0.00, 0.00, 0.00],
-	2: [0.95, 0.05, 0.00, 0.00],
-	3: [0.90, 0.10, 0.00, 0.00],
-	4: [0.85, 0.15, 0.00, 0.00],
-	5: [0.80, 0.20, 0.00, 0.00],
-	6: [0.75, 0.25, 0.00, 0.00],
-	7: [0.70, 0.30, 0.00, 0.00],
-	8: [0.65, 0.30, 0.05, 0.00],
-	9: [0.60, 0.30, 0.10, 0.00],
-	10: [0.55, 0.30, 0.15, 0.00],
-	11: [0.50, 0.30, 0.20, 0.00],
-	12: [0.45, 0.30, 0.25, 0.00],
-	13: [0.40, 0.30, 0.30, 0.00],
-	14: [0.35, 0.30, 0.30, 0.05],
-	15: [0.30, 0.30, 0.30, 0.10],
-	16: [0.20, 0.30, 0.35, 0.15],
-	17: [0.15, 0.30, 0.35, 0.20],
-	18: [0.10, 0.30, 0.35, 0.25],
-	19: [0.10, 0.30, 0.35, 0.25],
-	20: [0.10, 0.25, 0.35, 0.30],
-	21: [0.10, 0.20, 0.35, 0.35],
-	22: [0.10, 0.15, 0.35, 0.40],
-	23: [0.10, 0.10, 0.35, 0.45],
-	24: [0.10, 0.10, 0.30, 0.50],
-	25: [0.10, 0.10, 0.25, 0.55],
-	26: [0.10, 0.10, 0.20, 0.60],
-	27: [0.10, 0.10, 0.15, 0.65],
-	28: [0.10, 0.10, 0.10, 0.70]
-}
-
 func get_base_shop_weights() -> Array[float]:
-	var level_clamped: int = clampi(shop_level, 1, 28)
-	var w: Variant = DAILY_SHOP_WEIGHTS.get(level_clamped, [0.10, 0.10, 0.10, 0.70])
-	var typed_w: Array[float] = []
-	if w is Array:
-		for val: Variant in w:
-			if val is float:
-				typed_w.append(val)
-	return typed_w
+	return rarity_config.get_weights_for_day(shop_level, disabled_rarities)
 
 var shop_weights: Array[float]:
 	get:

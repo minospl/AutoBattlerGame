@@ -1,7 +1,7 @@
 class_name UniquePotentialRelic
 extends RelicModifier
 
-@export var unique_chance_bonus: float = 0.5
+@export var unique_chance_bonus: float = 0.05
 
 func on_acquire(_relic_inst: RelicInstance, run_state: RunState) -> void:
 	run_state.unique_chance += unique_chance_bonus

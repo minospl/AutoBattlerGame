@@ -71,7 +71,7 @@
   3. Pierwsze sloty zawsze losują potwory.
   4. Dodano mechanizm sprawdzający `has_any_item`, który zapobiega wylosowaniu drugiego przedmiotu (np. przy rozszerzaniu sklepu przez relikty, gdy zamrożony przedmiot przesunął się na wcześniejszą pozycję). Gwarantuje to obecność zawsze maksymalnie jednego przedmiotu w ofercie.
 
-### Zadanie G: Poprawa skalowania szans rzadkości w sklepie (Dawne Zadanie 14)
+### Zadanie G [**ZROBIONE**]: Poprawa skalowania szans rzadkości w sklepie (Dawne Zadanie 14)
 
 - **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd) (słownik `DAILY_SHOP_WEIGHTS`)
 - **Krytyczne pytania & Problem:** Szanse na wylosowanie kart o rzadkości Rare/Epic/Legendary rosną bardzo wolno (Legendary pojawia się dopiero od 14 dnia z szansą 5%).

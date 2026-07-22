@@ -113,6 +113,7 @@ func setup(p_state: RunState) -> void:
 	run_state.gold_changed.connect(_on_gold_changed)
 	run_state.lives_changed.connect(_on_lives_changed)
 	run_state.day_changed.connect(_on_day_changed)
+	run_state.shop_level_changed.connect(_on_shop_level_changed)
 	run_state.trophies_changed.connect(_on_trophies_changed)
 	run_state.shop_slot_updated.connect(_on_shop_slot_updated)
 	run_state.shop_slot_freeze_changed.connect(_on_shop_slot_freeze_changed)
@@ -167,6 +168,12 @@ func check_for_unit_merges() -> void:
 func populate_ui() -> void:
 	if run_state == null:
 		return
+		
+	if shop_panel:
+		shop_panel.gold = run_state.gold
+		shop_panel.shop_level = run_state.shop_level
+		shop_panel.shop_weights = run_state.shop_weights
+		shop_panel.unique_chance = run_state.unique_chance
 		
 	# Clear existing cards immediately
 	for slot: UnitSlot in active_slots:
@@ -282,6 +289,14 @@ func _on_lives_changed(new_lives: int) -> void:
 func _on_day_changed(new_day: int) -> void:
 	if shop_header_bar:
 		shop_header_bar.day = new_day
+	if shop_panel and run_state:
+		shop_panel.shop_level = run_state.shop_level
+		shop_panel.shop_weights = run_state.shop_weights
+
+func _on_shop_level_changed(new_level: int) -> void:
+	if shop_panel and run_state:
+		shop_panel.shop_level = new_level
+		shop_panel.shop_weights = run_state.shop_weights
 
 func _on_trophies_changed(new_trophies: int) -> void:
 	if shop_header_bar:
@@ -338,8 +353,10 @@ func _on_freeze_all_requested(freeze: bool) -> void:
 
 func _on_relics_changed(relics: Array[RelicInstance]) -> void:
 	relic_bar.update_relics(relics)
-	shop_panel.unique_chance = run_state.unique_chance
-	shop_panel.shop_weights = run_state.shop_weights
+	if shop_panel and run_state:
+		shop_panel.unique_chance = run_state.unique_chance
+		shop_panel.shop_level = run_state.shop_level
+		shop_panel.shop_weights = run_state.shop_weights
 
 func _on_shop_size_changed(new_size: int) -> void:
 	shop_panel.create_slots(shop_slot_scene, new_size)
