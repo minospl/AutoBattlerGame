@@ -4,6 +4,9 @@ extends GameResourceData
 ## Price of the unit card in the shop
 @export var price: int
 
+## Whether this unit card can appear in the shop
+@export var can_appear_in_shop: bool = true
+
 ## Base maximum health
 @export var max_health: int
 

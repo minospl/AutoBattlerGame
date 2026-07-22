@@ -72,6 +72,28 @@ func clone() -> UnitInstance:
 	new_inst.cast_speed = cast_speed
 	return new_inst
 
+func evolve(p_new_data: UnitData) -> void:
+	if not p_new_data:
+		return
+	var prev_health: int = health
+	var prev_attack: int = attack
+	var prev_heal: int = heal
+	var prev_shield: int = shield
+	var prev_burn: int = burn
+	var prev_electrocute: int = electrocute
+	var prev_poison: int = poison
+
+	data = p_new_data
+	level = 1
+	health = p_new_data.max_health + prev_health
+	attack = p_new_data.attack + prev_attack
+	heal = p_new_data.base_heal + prev_heal
+	shield = p_new_data.base_shield + prev_shield
+	burn = p_new_data.base_burn + prev_burn
+	electrocute = p_new_data.base_electrocute + prev_electrocute
+	poison = p_new_data.base_poison + prev_poison
+	cast_speed = p_new_data.cast_speed
+
 func level_up() -> void:
 	if level >= 3:
 		return
@@ -84,3 +106,6 @@ func level_up() -> void:
 		shield += data.base_shield
 		burn += data.base_burn
 		electrocute += data.base_electrocute
+		
+	if level == 3 and data.modifier and data.modifier.has_method("evolve"):
+		data.modifier.call("evolve", self)

@@ -4,6 +4,8 @@ extends RefCounted
 static func get_random_unit_template_by_rarity(p_run_state: RunState, rarity_type: Rarity.Type) -> UnitData:
 	var matching: Array[UnitData] = []
 	for template: UnitData in p_run_state.unit_templates:
+		if not template.can_appear_in_shop:
+			continue
 		var r_type: Rarity.Type = template.rarity.rarity_type
 
 		if r_type == Rarity.Type.UNIQUE:
@@ -16,6 +18,8 @@ static func get_random_unit_template_by_rarity(p_run_state: RunState, rarity_typ
 
 	if matching.is_empty():
 		for template: UnitData in p_run_state.unit_templates:
+			if not template.can_appear_in_shop:
+				continue
 			var r_type: Rarity.Type = template.rarity.rarity_type
 			if r_type != Rarity.Type.UNIQUE:
 				matching.append(template)
