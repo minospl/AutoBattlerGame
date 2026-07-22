@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_leg82"]
 [ext_resource type="Script" uid="uid://boffntwppcp1i" path="res://src/features/units/templates/modifiers/ancient_titan_modifier.gd" id="ancient_titan_modifier"]
 [ext_resource type="Texture2D" uid="uid://dse6x7xr1yaxh" path="res://src/assets/units/ancient_titan.jpg" id="sprite"]
-[ext_resource type="Resource" path="res://src/features/units/types/water.tres" id="type_water"]
+[ext_resource type="Resource" path="res://src/features/units/types/earth.tres" id="type_earth"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/epic.tres" id="unit_rarity"]
 
@@ -17,7 +17,7 @@ display_name = "Ancient Titan"
 price = 4
 max_health = 20
 attack = 5
-types = Array[ExtResource("5_leg82")]([ExtResource("type_water")])
+types = Array[ExtResource("5_leg82")]([ExtResource("type_earth")])
 rarity = ExtResource("unit_rarity")
 cast_speed = 4.0
 modifier = SubResource("Resource_titan_battle_start")

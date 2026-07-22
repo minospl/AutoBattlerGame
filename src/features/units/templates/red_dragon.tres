@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/legendary.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/dragon.tres" id="unit_type"]
+[ext_resource type="Resource" path="res://src/features/units/types/fire.tres" id="type_fire"]
 
 [sub_resource type="Resource" id="Resource_dragon_on_cast"]
 script = ExtResource("red_dragon_modifier")
@@ -17,7 +18,7 @@ price = 5
 max_health = 15
 attack = 5
 base_burn = 5
-types = Array[ExtResource("5_6ml12")]([ExtResource("unit_type")])
+types = Array[ExtResource("5_6ml12")]([ExtResource("unit_type"), ExtResource("type_fire")])
 rarity = ExtResource("unit_rarity")
 cast_speed = 4.0
 modifier = SubResource("Resource_dragon_on_cast")

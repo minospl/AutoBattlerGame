@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/rare.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="unit_type"]
+[ext_resource type="Resource" path="res://src/features/units/types/fairy.tres" id="type_fairy"]
 
 [resource]
 script = ExtResource("unit_data")
@@ -12,7 +13,7 @@ display_name = "Vitality Druid"
 price = 3
 max_health = 25
 base_heal = 10
-types = Array[ExtResource("5_t5wx4")]([ExtResource("unit_type")])
+types = Array[ExtResource("5_t5wx4")]([ExtResource("unit_type"), ExtResource("type_fairy")])
 rarity = ExtResource("unit_rarity")
 cast_speed = 3.0
 sprite = ExtResource("sprite")

@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/epic.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="unit_type"]
+[ext_resource type="Resource" path="res://src/features/units/types/earth.tres" id="type_earth"]
 
 [sub_resource type="Resource" id="Resource_guardian_battle_start"]
 script = ExtResource("forest_guardian_modifier")
@@ -18,9 +19,8 @@ display_name = "Forest Guardian"
 price = 4
 max_health = 20
 base_shield = 4
-types = Array[ExtResource("5_h4lgg")]([ExtResource("unit_type")])
+types = Array[ExtResource("5_h4lgg")]([ExtResource("unit_type"), ExtResource("type_earth")])
 rarity = ExtResource("unit_rarity")
 cast_speed = 3.0
 modifier = SubResource("Resource_guardian_battle_start")
 sprite = ExtResource("sprite")
-
