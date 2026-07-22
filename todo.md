@@ -82,16 +82,14 @@
 
 ## 3. PRIORYTET 3: REFAKTORYZACJA ARCHITEKTURY (Architecture & Refactoring)
 
-### Zadanie H: Refaktoryzacja i odchudzenie RunState: Wprowadzenie Helperów (Dawne Zadanie 11)
+### Zadanie H [**ZROBIONE**]: Refaktoryzacja i odchudzenie RunState: Wprowadzenie Helperów (Dawne Zadanie 11)
 
-- **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd)
-- **Krytyczne pytania & Problem:** Plik `run_state.gd` zawiera ponad 580 linii kodu i miesza czysty stan gry z logiką generowania przeciwników, mergowania jednostek oraz całą logiką sklepu.
-- **Logiczne uzasadnienie:** `RunState` powinien być przede wszystkim strukturą danych (Modelem). Przeniesienie skomplikowanej logiki biznesowej do dedykowanych helperów (statycznych lub jako komponenty) poprawi czytelność kodu i ułatwi jego testowanie.
-- **Sugerowana zmiana:**
-  1. Stworzyć `EnemyTeamGenerator.gd` i wydzielić tam metodę `generate_enemy_team()`.
-  2. Stworzyć `TeamHelper.gd` i przenieść tam metodę mergowania jednostek `check_and_merge_units()`.
-  3. Stworzyć `ShopHelper.gd` i przenieść tam logikę losowania, kupowania oraz nakładania przedmiotów.
-  4. *Architektura:* Wszystkie metody pomocnicze w helperach powinny być zadeklarowane jako **statyczne** (np. `static func ...`) i przyjmować `RunState` jako argument (Dependency Injection), co zapobiegnie powstawaniu cyklicznych referencji i wyciekom pamięci w Godocie.
+- **Lokalizacja:** [run_state.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/core/run_state.gd), [enemy_team_generator.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/enemy_team_generator.gd), [team_helper.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/team_helper.gd), [shop_helper.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/shop_helper.gd)
+- **Wdrożone rozwiązanie:**
+  1. Stworzono `EnemyTeamGenerator.gd` z czystą metodą statyczną `generate_enemy_team(day, unit_templates)`.
+  2. Stworzono `TeamHelper.gd` ze statycznymi metodami `check_and_merge_units`, `swap_units`, `sell_unit` i `sync_battle_team_stats`.
+  3. Stworzono `ShopHelper.gd` ze statycznymi metodami obsługi losowania, kupowania potworów, jedzenia i zamrażania kart.
+  4. W `RunState` zastąpiono złożoną logikę zwięzłymi fasadami delegującymi, zachowując 100% wstecznej kompatybilności API.
 
 ### Zadanie I: Dodanie Enuma dla "damage_type" (Dawne Zadanie 3)
 
