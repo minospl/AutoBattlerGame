@@ -1,4 +1,4 @@
-class_name HolyTreeModifier
+class_name MysticSentinelModifier
 extends UnitModifier
 
 @export var value_1: int = 5

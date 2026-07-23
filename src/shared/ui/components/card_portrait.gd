@@ -33,7 +33,7 @@ func setup_visuals(p_data: GameResourceData) -> void:
 	if not p_data:
 		return
 
-	card_sprite.set_sprite(p_data.sprite, p_data.display_name, p_data.sprite_offset, p_data.sprite_scale)
+	card_sprite.set_sprite(p_data.sprite, p_data.display_name)
 	border_rect.border_color = p_data.rarity.border_color
 	border_rect.outer_border_width = outer_border_width
 	border_rect.inner_border_width = inner_border_width

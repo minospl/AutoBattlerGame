@@ -1,28 +1,25 @@
-[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://c8holy_tree_uid"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://lbqju156xxbs"]
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_type"]
-[ext_resource type="Script" path="res://src/features/units/templates/modifiers/holy_tree_modifier.gd" id="holy_tree_modifier"]
-[ext_resource type="Texture2D" path="res://src/assets/units/holy_tree.png" id="sprite"]
+[ext_resource type="Script" path="res://src/features/units/templates/modifiers/mystic_sapling_modifier.gd" id="mystic_sapling_modifier"]
+[ext_resource type="Texture2D" path="res://src/assets/units/mystic_sapling.png" id="sprite"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="type_plant"]
 [ext_resource type="Resource" path="res://src/features/units/types/fairy.tres" id="type_fairy"]
 
-[sub_resource type="Resource" id="Resource_holy_tree_modifier"]
-script = ExtResource("holy_tree_modifier")
-trigger = 0
+[sub_resource type="Resource" id="Resource_mystic_sapling_modifier"]
+script = ExtResource("mystic_sapling_modifier")
 
 [resource]
 script = ExtResource("unit_data")
-display_name = "Holy Tree"
-can_appear_in_shop = false
-price = 4
-max_health = 100
+display_name = "Mystic Sapling"
+price = 3
+max_health = 20
 attack = 0
-base_heal = 20
+base_heal = 5
 types = Array[ExtResource("5_type")]([ExtResource("type_plant"), ExtResource("type_fairy")])
 rarity = ExtResource("unit_rarity")
-cast_speed = 7.0
-modifier = SubResource("Resource_holy_tree_modifier")
+cast_speed = 3.0
+modifier = SubResource("Resource_mystic_sapling_modifier")
 sprite = ExtResource("sprite")
-sprite_scale = Vector2(0.9, 0.9)
