@@ -5,8 +5,6 @@ const CARD_SIZE: Vector2 = Vector2(100, 100)
 const CARD_SLOT_SIZE_DEFAULT: Vector2 = Vector2(100, 100)
 const CARD_SLOT_SIZE_SHOP: Vector2 = Vector2(100, 125)
 
-const CHROMA_KEY_SHADER: Shader = preload("res://src/shared/shaders/chroma_key.gdshader")
-
 ## Visual composition method for backward-compatibility
 static func setup_card_visuals(
 	unit_instance: UnitInstance,
@@ -114,24 +112,15 @@ static func setup_portrait(unit_instance: UnitInstance, sprite_rect: TextureRect
 	if not sprite_rect or not fallback_label:
 		return
 		
-	if unit_instance.data and unit_instance.data.sprite:
+	if unit_instance.data.sprite:
 		sprite_rect.visible = true
 		fallback_label.visible = false
 		sprite_rect.texture = unit_instance.data.sprite
-		
-		if not sprite_rect.material:
-			var mat: ShaderMaterial = ShaderMaterial.new()
-			mat.shader = CHROMA_KEY_SHADER
-			sprite_rect.material = mat
 	else:
 		sprite_rect.visible = false
 		fallback_label.visible = true
-		if unit_instance.data and not unit_instance.get_unit_name().is_empty():
-			fallback_label.text = unit_instance.get_unit_name().left(1).to_upper()
-			fallback_label.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
-		else:
-			fallback_label.text = "?"
-			fallback_label.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
+		fallback_label.text = unit_instance.get_unit_name().left(1).to_upper()
+		fallback_label.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
 
 ## Configures backdrop shader for stat labels
 static func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: Vector2) -> void:
