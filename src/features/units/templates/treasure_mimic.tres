@@ -1,23 +1,22 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://dnu2mb1xsj702"]
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="1_type"]
-[ext_resource type="Texture2D" uid="uid://ccx767gegwo2k" path="res://src/assets/units/golden_beetle.jpg" id="2_sprite"]
+[ext_resource type="Texture2D" path="res://src/assets/units/treasure_mimic.png" id="2_sprite"]
 [ext_resource type="Resource" path="res://src/features/units/types/beast.tres" id="3_type_beast"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="4_data"]
-[ext_resource type="Script" uid="uid://dui4upfycxjbk" path="res://src/features/units/templates/modifiers/golden_beetle_modifier.gd" id="5_modifier"]
+[ext_resource type="Script" uid="uid://dui4upfycxjbk" path="res://src/features/units/templates/modifiers/treasure_mimic_modifier.gd" id="5_modifier"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="6_rarity"]
 
-[sub_resource type="Resource" id="Resource_golden_beetle_modifier"]
+[sub_resource type="Resource" id="Resource_treasure_mimic_modifier"]
 script = ExtResource("5_modifier")
 
 [resource]
 script = ExtResource("4_data")
-display_name = "Golden Beetle"
+display_name = "Treasure Mimic"
 price = 2
 max_health = 25
 types = Array[ExtResource("1_type")]([ExtResource("3_type_beast")])
 rarity = ExtResource("6_rarity")
 cast_speed = 3.0
-modifier = SubResource("Resource_golden_beetle_modifier")
+modifier = SubResource("Resource_treasure_mimic_modifier")
 sprite = ExtResource("2_sprite")
-

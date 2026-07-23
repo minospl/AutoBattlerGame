@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://jarijafj3qru"]
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="1_type"]
-[ext_resource type="Texture2D" uid="uid://ckf1q51cu0wh" path="res://src/assets/units/chronomancer.jpg" id="2_sprite"]
+[ext_resource type="Texture2D" path="res://src/assets/units/chronomancer.png" id="2_sprite"]
 [ext_resource type="Resource" path="res://src/features/units/types/humanoid.tres" id="type_humanoid"]
 [ext_resource type="Resource" path="res://src/features/units/types/arcane.tres" id="type_arcane"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="4_data"]
@@ -21,4 +21,3 @@ rarity = ExtResource("6_rarity")
 cast_speed = 2.5
 modifier = SubResource("Resource_chronomancer_modifier")
 sprite = ExtResource("2_sprite")
-

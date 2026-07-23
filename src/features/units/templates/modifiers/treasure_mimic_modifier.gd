@@ -1,4 +1,4 @@
-class_name GoldenBeetleModifier
+class_name TreasureMimicModifier
 extends UnitModifier
 
 @export var value_1: int = 1

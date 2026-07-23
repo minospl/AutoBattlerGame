@@ -69,6 +69,10 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	if main_container and main_container is Control:
 		main_start_pos = (main_container as Control).global_position
 	var main_size: Vector2 = main_card.size
+	if main_size == Vector2.ZERO:
+		main_size = main_card.custom_minimum_size
+	if main_size == Vector2.ZERO:
+		main_size = CardUIHelper.CARD_SIZE
 		
 	# Lock custom_minimum_size to preserve the exact starting dimensions
 	main_card.custom_minimum_size = main_size
@@ -84,7 +88,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	shop.add_child(main_card)
 	main_card.global_position = main_start_pos
 	main_card.z_index = 999
-	main_card.pivot_offset = Vector2.ZERO
+	main_card.pivot_offset = main_size / 2.0
 	main_card.rotation = 0.0
 	main_card.scale = Vector2(1.0, 1.0)
 	
@@ -217,11 +221,16 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 				if parent:
 					parent.remove_child(main_card)
 				
-				# Perform the Level 2 UI/visual update here upon landing
-				main_card.update_ui()
+				# Reset card transformations and minimum size
+				main_card.scale = Vector2.ONE
+				main_card.rotation = 0.0
+				main_card.pivot_offset = Vector2.ZERO
+				main_card.custom_minimum_size = CardUIHelper.CARD_SIZE
 				main_card.z_index = 0
 		
+				# Re-add card to slot before update_ui so it is inside the scene tree
 				main_slot.add_card(main_card)	
+				main_card.update_ui()
 				main_slot.update_placeholder()
 				
 				dim_rect.queue_free()

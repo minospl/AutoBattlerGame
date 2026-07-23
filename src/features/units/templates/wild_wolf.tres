@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://dp2g3kt7lqgoi"]
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_mbm7u"]
-[ext_resource type="Texture2D" uid="uid://dxbv827eab23l" path="res://src/assets/units/wild_wolf.jpg" id="sprite"]
+[ext_resource type="Texture2D" path="res://src/assets/units/wild_wolf.png" id="sprite"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/beast.tres" id="unit_type"]
@@ -23,4 +23,4 @@ rarity = ExtResource("unit_rarity")
 cast_speed = 3.0
 modifier = SubResource("Resource_wolf_battle_start")
 sprite = ExtResource("sprite")
-
+sprite_offset = Vector2(0, -5)

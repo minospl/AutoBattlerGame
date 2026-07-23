@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccx767gegwo2k"
-path="res://.godot/imported/golden_beetle.jpg-02adbc2eff80e40fc947724b9413f7b0.ctex"
+uid="uid://congr7wles8v1"
+path="res://.godot/imported/treasure_mimic.png-f3de3550994bc187ab7f975d961e0364.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://src/assets/units/golden_beetle.jpg"
-dest_files=["res://.godot/imported/golden_beetle.jpg-02adbc2eff80e40fc947724b9413f7b0.ctex"]
+source_file="res://src/assets/units/treasure_mimic.png"
+dest_files=["res://.godot/imported/treasure_mimic.png-f3de3550994bc187ab7f975d961e0364.ctex"]
 
 [params]
 

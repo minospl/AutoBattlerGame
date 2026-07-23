@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://bxrxv3shk2m6h"]
 
 [ext_resource type="Script" uid="uid://c8q17x0uif75o" path="res://src/features/units/templates/modifiers/river_crab_modifier.gd" id="river_crab_modifier"]
-[ext_resource type="Texture2D" uid="uid://b23wvhuylcon8" path="res://src/assets/units/river_crab.jpg" id="sprite"]
+[ext_resource type="Texture2D" path="res://src/assets/units/river_crab.png" id="sprite"]
 [ext_resource type="Resource" path="res://src/features/units/types/beast.tres" id="type_beast"]
 [ext_resource type="Resource" path="res://src/features/units/types/water.tres" id="type_water"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
