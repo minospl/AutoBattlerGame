@@ -8,8 +8,8 @@ var is_frozen: bool = false
 @onready var card_container: PanelContainer = %CardContainer
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(100, 122)
-	card_container.custom_minimum_size = Vector2(100, 122)
+	custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_SHOP
+	card_container.custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_SHOP
 	card_container.offset_top = 0
 	card_container.offset_bottom = card_container.custom_minimum_size.y
 	card_container.offset_right = card_container.custom_minimum_size.x

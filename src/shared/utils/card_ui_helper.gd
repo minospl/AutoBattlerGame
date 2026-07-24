@@ -3,7 +3,7 @@ extends Object
 
 const CARD_SIZE: Vector2 = Vector2(100, 100)
 const CARD_SLOT_SIZE_DEFAULT: Vector2 = Vector2(100, 100)
-const CARD_SLOT_SIZE_SHOP: Vector2 = Vector2(100, 125)
+const CARD_SLOT_SIZE_SHOP: Vector2 = Vector2(100, 90)
 
 ## Visual composition method for backward-compatibility
 static func setup_card_visuals(

@@ -19,7 +19,7 @@ var is_targeted: bool = false
 var slot: ShopSlot = null
 
 func _ready() -> void:
-	custom_minimum_size = Vector2(100, 122)
+	custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_SHOP
 	update_ui()
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
@@ -36,6 +36,10 @@ func update_ui() -> void:
 	portrait.setup_visuals(unit_instance.data)
 	portrait.border_rect.interior_color = GameColors.WHITE_COLOR
 	portrait.border_rect.update_shader_parameters()
+	
+	var texture_rect: TextureRect = portrait.find_child("TextureRect", true, false)
+	if texture_rect:
+		texture_rect.offset_top = -20.0
 		
 	# 3. Configure name and price footer
 	var name_label: Label = %NameLabel as Label

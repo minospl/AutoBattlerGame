@@ -11,14 +11,14 @@ corner_radius_bottom_right = 4
 anti_aliasing = false
 
 [node name="ShopCardUnit" type="VBoxContainer"]
-custom_minimum_size = Vector2(100, 122)
+custom_minimum_size = Vector2(100, 95)
 offset_right = 100.0
-offset_bottom = 122.0
+offset_bottom = 95.0
 theme_override_constants/separation = 0
 script = ExtResource("1_script")
 
 [node name="CardWrapper" type="MarginContainer" parent="."]
-custom_minimum_size = Vector2(100, 100)
+custom_minimum_size = Vector2(100, 70)
 layout_mode = 2
 
 [node name="CardPortrait" parent="CardWrapper" instance=ExtResource("2_portrait")]
@@ -31,7 +31,7 @@ mouse_filter = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 3
+theme_override_constants/margin_bottom = -5
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CardWrapper/MarginContainer"]
 layout_mode = 2
@@ -48,6 +48,7 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
 alignment = 1
+z_index = 1
 
 [node name="StatPanel" type="PanelContainer" parent="CardWrapper/MarginContainer/VBoxContainer/StatsHBox"]
 unique_name_in_owner = true
@@ -86,7 +87,7 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="FooterPanel" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(100, 22)
+custom_minimum_size = Vector2(100, 25)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_footer")
 

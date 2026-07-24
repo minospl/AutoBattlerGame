@@ -29,7 +29,7 @@ layout_mode = 2
 theme_override_constants/margin_left = 3
 theme_override_constants/margin_right = 3
 theme_override_constants/margin_top = 5
-theme_override_constants/margin_bottom = 0
+theme_override_constants/margin_bottom = 5
 
 [node name="VBox" type="VBoxContainer" parent="ShopOuterMargin"]
 layout_mode = 2

@@ -64,7 +64,7 @@ alignment = 1
 [node name="ContentMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox"]
 layout_mode = 2
 theme_override_constants/margin_left = 32
-theme_override_constants/margin_bottom = -10
+theme_override_constants/margin_bottom = 8
 
 [node name="ContentVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin"]
 layout_mode = 2
