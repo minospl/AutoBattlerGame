@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://src/features/units/templates/modifiers/mystic_sentinel_modifier.gd" id="mystic_sentinel_modifier"]
 [ext_resource type="Texture2D" path="res://src/assets/units/mystic_sentinel.png" id="sprite"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="unit_rarity"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/legendary.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="type_plant"]
 [ext_resource type="Resource" path="res://src/features/units/types/fairy.tres" id="type_fairy"]
 

@@ -242,3 +242,28 @@ static func change_shop_size(p_run_state: RunState, p_diff: int) -> void:
 		p_run_state.shop_frozen_statuses.resize(new_size)
 			
 	p_run_state.notify_shop_size_changed(new_size)
+
+static func handle_unit_evolution(p_run_state: RunState, p_old_data: UnitData, p_new_data: UnitData) -> void:
+	if p_old_data:
+		for t: UnitData in p_run_state.unit_templates:
+			if t.display_name == p_old_data.display_name:
+				t.can_appear_in_shop = false
+				break
+				
+	if p_new_data:
+		for t: UnitData in p_run_state.unit_templates:
+			if t.display_name == p_new_data.display_name:
+				t.can_appear_in_shop = true
+				break
+				
+	reroll_slots_with_unit_data(p_run_state, p_old_data)
+
+static func reroll_slots_with_unit_data(p_run_state: RunState, p_old_data: UnitData) -> void:
+	for i: int in range(p_run_state.shop_cards.size()):
+		if p_run_state.shop_cards[i] is not UnitInstance:
+			continue
+			
+		var card: UnitInstance = p_run_state.shop_cards[i]
+		if card.data.display_name == p_old_data.display_name:
+			p_run_state.shop_cards[i] = roll_single_shop_card(p_run_state, i)
+			p_run_state.notify_shop_slot_updated(i, p_run_state.shop_cards[i])

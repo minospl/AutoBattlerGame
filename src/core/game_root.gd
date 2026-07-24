@@ -20,25 +20,25 @@ func _ready() -> void:
 	_go_to_shop()
 
 func _load_unit_templates() -> void:
+	unit_templates.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/units/templates/")
-	for res: Resource in resources:
-		var u_data: UnitData = res as UnitData
-		if u_data and not unit_templates.has(u_data):
-			unit_templates.append(u_data)
+	for res: UnitData in resources:
+		if not unit_templates.has(res):
+			unit_templates.append(res)
 
 func _load_item_templates() -> void:
+	item_templates.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/items/templates/")
-	for res: Resource in resources:
-		var i_data: ItemData = res as ItemData
-		if i_data and not item_templates.has(i_data):
-			item_templates.append(i_data)
+	for res: ItemData in resources:
+		if not item_templates.has(res):
+			item_templates.append(res)
 
 func _load_relic_templates() -> void:
+	relic_templates.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/relics/templates/")
-	for res: Resource in resources:
-		var r_data: RelicData = res as RelicData
-		if r_data and not relic_templates.has(r_data):
-			relic_templates.append(r_data)
+	for res: RelicData in resources:
+		if not relic_templates.has(res):
+			relic_templates.append(res)
 
 func _load_resources_from_dir(path: String) -> Array[Resource]:
 	var list: Array[Resource] = []
@@ -47,27 +47,22 @@ func _load_resources_from_dir(path: String) -> Array[Resource]:
 		printerr("Failed to open directory: ", path)
 		return list
 		
-	dir.list_dir_begin()
-	var file_name: String = dir.get_next()
-	while file_name != "":
-		if not dir.current_is_dir():
-			var clean_name: String = file_name
-			if clean_name.ends_with(".remap"):
-				clean_name = clean_name.left(clean_name.length() - 6)
-			elif clean_name.ends_with(".import"):
-				clean_name = clean_name.left(clean_name.length() - 7)
-				
-			if clean_name.ends_with(".tres") or clean_name.ends_with(".res"):
-				var full_path: String = path + clean_name
-				if ResourceLoader.exists(full_path):
-					var res: Resource = load(full_path)
-					if res and not list.has(res):
-						list.append(res)
-		file_name = dir.get_next()
-	dir.list_dir_end()
+	for file_name: String in dir.get_files():
+		var clean_name: String = file_name
+		if file_name.ends_with(".remap"):
+			clean_name = file_name.left(file_name.length() - 6)
+			
+		if clean_name.ends_with(".tres"):
+			var full_path: String = path + clean_name
+			if ResourceLoader.exists(full_path):
+				var res: Resource = ResourceLoader.load(full_path, "", ResourceLoader.CACHE_MODE_REPLACE)
+				if res and not list.has(res):
+					list.append(res)
+					
 	return list
 
 func _initialize_new_run() -> void:
+	_load_unit_templates()
 	run_state = RunState.new()
 	run_state.setup_templates(unit_templates, item_templates, relic_templates)
 	run_state.active_team.resize(RunState.MAX_ACTIVE_TEAM_SIZE)

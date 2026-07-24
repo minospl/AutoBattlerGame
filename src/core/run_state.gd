@@ -56,7 +56,11 @@ var item_templates: Array[ItemData] = []
 var relic_templates: Array[RelicData] = []
 
 func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relics: Array[RelicData] = []) -> void:
-	unit_templates = p_units
+	unit_templates.clear()
+	for u: UnitData in p_units:
+		if u:
+			# var dup: UnitData = u.duplicate(true) as UnitData
+			unit_templates.append(u.duplicate(true))
 	item_templates = p_items
 	relic_templates = p_relics
 

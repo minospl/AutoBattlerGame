@@ -46,7 +46,10 @@ static func check_and_merge_units(p_run_state: RunState) -> Dictionary:
 			var raw_obj: Object = main_info.get("unit")
 			var main_unit: UnitInstance = raw_obj as UnitInstance
 			if main_unit:
+				var old_data: UnitData = main_unit.data
 				main_unit.level_up()
+				if main_unit.data != old_data:
+					ShopHelper.handle_unit_evolution(p_run_state, old_data, main_unit.data)
 			
 			var removed_list: Array = []
 			for j: int in range(1, 3):
