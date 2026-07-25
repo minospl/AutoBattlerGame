@@ -15,7 +15,7 @@ func tick(delta: float) -> void:
 			timer -= tick_interval
 			var damage: int = stacks
 			stacks = max(0, stacks - 1)
-			team.take_damage(damage, "burn")
+			team.take_damage(damage, BattleTeamModel.DamageType.BURN)
 			if stacks == 0:
 				team.remove_status(status_type)
 				return

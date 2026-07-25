@@ -91,7 +91,7 @@
   3. Stworzono `ShopHelper.gd` ze statycznymi metodami obsługi losowania, kupowania potworów, jedzenia i zamrażania kart.
   4. W `RunState` zastąpiono złożoną logikę zwięzłymi fasadami delegującymi, zachowując 100% wstecznej kompatybilności API.
 
-### Zadanie I: Dodanie Enuma dla "damage_type" (Dawne Zadanie 3)
+### Zadanie I [**ZROBIONE**]: Dodanie Enuma dla "damage_type" (Dawne Zadanie 3)
 
 - **Lokalizacja:** [battle_team_model.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/battle_team_model.gd) (metoda `take_damage` linia 153, oraz sygnał `damage_taken` linia 20), [status_effect.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/battle/status/status_effect.gd) (metoda `modify_incoming_damage` linia 26)
 - **Krytyczne pytania & Problem:** Typy obrażeń ("physical", "poison", "burn", "fatigue") przekazywane są jako zwykłe stringi, co grozi literówkami i utrudnia weryfikację typów.

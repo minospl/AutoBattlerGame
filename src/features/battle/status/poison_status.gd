@@ -13,5 +13,5 @@ func tick(delta: float) -> void:
 		timer += delta
 		if timer >= tick_interval:
 			timer -= tick_interval
-			team.take_damage(stacks, "poison")
+			team.take_damage(stacks, BattleTeamModel.DamageType.POISON)
 		team.emit_status_changed(status_type, stacks, get_cooldown_ratio())

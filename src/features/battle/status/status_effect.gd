@@ -23,7 +23,7 @@ func add_stacks(amount: int) -> void:
 func tick(_delta: float) -> void:
 	pass
 
-func modify_incoming_damage(amount: int, _damage_type: String) -> int:
+func modify_incoming_damage(amount: int, _damage_type: BattleTeamModel.DamageType) -> int:
 	return amount
 
 func get_cooldown_ratio() -> float:

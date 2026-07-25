@@ -292,8 +292,8 @@ func advance_simulation(delta: float) -> void:
 			var stage: int = floori((fatigue_tick_count - 1) / 3.0) + 1
 			var dmg: int = get_fibonacci(stage + 1)
 			
-			player_team.take_damage(dmg, "fatigue")
-			enemy_team.take_damage(dmg, "fatigue")
+			player_team.take_damage(dmg, BattleTeamModel.DamageType.FATIGUE)
+			enemy_team.take_damage(dmg, BattleTeamModel.DamageType.FATIGUE)
 
 	# Tick statuses
 	player_team.tick_statuses(delta)

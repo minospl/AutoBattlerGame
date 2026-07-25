@@ -2,6 +2,13 @@ class_name BattleTeamModel
 extends RefCounted
 
 # Signals for communicating with BattleScene controller
+enum DamageType {
+	PHYSICAL,
+	POISON,
+	BURN,
+	FATIGUE
+}
+
 enum SpawnTarget {
 	TEAM_HEALTH_BAR,
 	SLOT,
@@ -17,7 +24,7 @@ signal team_defeated()
 signal gold_generated(amount: int, slot_idx: int)
 signal unit_casted(source_idx: int)
 signal unit_attacked(source_idx: int)
-signal damage_taken(amount: int, damage_type: String)
+signal damage_taken(amount: int, damage_type: DamageType)
 signal unit_stats_changed(slot_idx: int)
 
 const MAX_TEAM_SIZE: int = 6
@@ -150,7 +157,7 @@ func execute_cast(source_idx: int, opponent: BattleTeamModel) -> void:
 	
 	unit_casted.emit(source_idx)
 
-func take_damage(amount: int, damage_type: String = "physical") -> void:
+func take_damage(amount: int, damage_type: DamageType = DamageType.PHYSICAL) -> void:
 	if amount <= 0:
 		return
 		
@@ -165,9 +172,9 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 		
 	# Determine health damage popup color (red for health damage, status colors if applicable)
 	var text_color: Color = Color(GameColors.DESC_ATTACK) # default red
-	if damage_type == "poison":
+	if damage_type == DamageType.POISON:
 		text_color = Color(GameColors.DESC_POISON)
-	elif damage_type == "burn":
+	elif damage_type == DamageType.BURN:
 		text_color = Color(GameColors.DESC_BURN)
 	else:
 		text_color = Color(GameColors.DESC_ATTACK)
@@ -193,7 +200,7 @@ func take_damage(amount: int, damage_type: String = "physical") -> void:
 	if damage_to_health > 0:
 		floating_text_requested.emit("-" + NumberFormatter.format_large_number(damage_to_health), text_color, SpawnTarget.TEAM_HEALTH_BAR, 0)
 	
-	if damage_type == "physical":
+	if damage_type == DamageType.PHYSICAL:
 		for i: int in range(MAX_TEAM_SIZE):
 			if units[i]:
 				ModifierEngine.trigger_unit_modifier(i, self, UnitModifier.Trigger.ON_TAKE_DAMAGE)
