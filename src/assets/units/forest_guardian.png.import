@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bwnog4oti80ip"
-path="res://.godot/imported/red_dragon.jpg-edd510767ef9fb4ce6b7e962a5565973.ctex"
+uid="uid://cbsdtc1dthvae"
+path="res://.godot/imported/forest_guardian.png-abd3f071ba236117e4ed6d51d8935080.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://src/assets/units/red_dragon.jpg"
-dest_files=["res://.godot/imported/red_dragon.jpg-edd510767ef9fb4ce6b7e962a5565973.ctex"]
+source_file="res://src/assets/units/forest_guardian.png"
+dest_files=["res://.godot/imported/forest_guardian.png-abd3f071ba236117e4ed6d51d8935080.ctex"]
 
 [params]
 

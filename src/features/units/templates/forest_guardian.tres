@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ck1sovh6kc7b2" path="res://src/features/units/unit_type.gd" id="5_h4lgg"]
 [ext_resource type="Script" uid="uid://dg7e4qh8o5uvl" path="res://src/features/units/templates/modifiers/forest_guardian_modifier.gd" id="forest_guardian_modifier"]
-[ext_resource type="Texture2D" uid="uid://bwnt24wp1rkt8" path="res://src/assets/units/forest_guardian.jpg" id="sprite"]
+[ext_resource type="Texture2D" path="res://src/assets/units/forest_guardian.png" id="sprite"]
 [ext_resource type="Script" uid="uid://bt0u85cq5kbxu" path="res://src/features/units/unit_data.gd" id="unit_data"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/epic.tres" id="unit_rarity"]
 [ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="unit_type"]
