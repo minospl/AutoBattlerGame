@@ -10,3 +10,6 @@ func on_acquire(_relic_inst: RelicInstance, run_state: RunState) -> void:
 
 func get_description(_relic_inst: RelicInstance = null) -> String:
 	return "Increases your shop level by [color=%s]+%d[/color], but Legendary cards will no longer appear." % [GameColors.DESC_GOLD, bonus_levels]
+
+func get_implied_keywords() -> Array[String]:
+	return []

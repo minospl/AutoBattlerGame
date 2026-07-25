@@ -9,7 +9,6 @@ const KEYWORD_MAP: Dictionary = {
 	"burn": { "title": "KEYWORD_BURN_TITLE", "desc": "KEYWORD_BURN_DESC" },
 	"electrocute": { "title": "KEYWORD_ELECTRO_TITLE", "desc": "KEYWORD_ELECTRO_DESC" },
 	"cast_speed": { "title": "KEYWORD_CAST_SPEED_TITLE", "desc": "KEYWORD_CAST_SPEED_DESC" },
-	"gold": { "title": "KEYWORD_GOLD_TITLE", "desc": "KEYWORD_GOLD_DESC" },
 
 	# Target Types
 	"target_self": { "title": "KEYWORD_TARGET_SELF_TITLE", "desc": "KEYWORD_TARGET_SELF_DESC" },
@@ -29,6 +28,7 @@ const KEYWORD_MAP: Dictionary = {
 	"trigger_battle_start": { "title": "KEYWORD_TRIGGER_BATTLE_START_TITLE", "desc": "KEYWORD_TRIGGER_BATTLE_START_DESC" },
 	"trigger_cast": { "title": "KEYWORD_TRIGGER_CAST_TITLE", "desc": "KEYWORD_TRIGGER_CAST_DESC" },
 	"trigger_take_damage": { "title": "KEYWORD_TRIGGER_TAKE_DAMAGE_TITLE", "desc": "KEYWORD_TRIGGER_TAKE_DAMAGE_DESC" },
+	"ongoing": { "title": "KEYWORD_ONGOING_TITLE", "desc": "KEYWORD_ONGOING_DESC" },
 
 	# Durations
 	"duration_permanent": { "title": "KEYWORD_DURATION_PERMANENT_TITLE", "desc": "KEYWORD_DURATION_PERMANENT_DESC" },
@@ -62,6 +62,8 @@ static func get_keywords_for_unit(unit: UnitInstance, lvl: int) -> Array[Diction
 				list.append(_get_keyword_entry("trigger_cast"))
 			UnitModifier.Trigger.ON_TAKE_DAMAGE:
 				list.append(_get_keyword_entry("trigger_take_damage"))
+			UnitModifier.Trigger.ONGOING:
+				list.append(_get_keyword_entry("ongoing"))
 				
 		# Target Type (resolved dynamically via get_target(lvl), SELF is bypassed to reduce clutter)
 		var target_type: UnitModifier.TargetType = unit_modifier.get_target(lvl)
@@ -94,10 +96,45 @@ static func get_keywords_for_unit(unit: UnitInstance, lvl: int) -> Array[Diction
 			var implied: Array[String] = unit_modifier.call("get_implied_keywords")
 			for kw_key: String in implied:
 				var str_key: String = str(kw_key)
-				if not _has_keyword(list, str_key):
+				if _has_valid_keyword(str_key) and not _has_keyword(list, str_key):
 					list.append(_get_keyword_entry(str_key))
 
 	return list
+
+static func get_keywords_for_item(item: ItemInstance) -> Array[Dictionary]:
+	var list: Array[Dictionary] = []
+	if not item or not item.data or not item.data.modifier:
+		return list
+
+	var item_modifier: ItemModifier = item.data.modifier
+	if item_modifier.has_method("get_implied_keywords"):
+		var implied: Variant = item_modifier.call("get_implied_keywords")
+		if implied is Array:
+			for kw_key: Variant in implied:
+				var str_key: String = str(kw_key)
+				if _has_valid_keyword(str_key) and not _has_keyword(list, str_key):
+					list.append(_get_keyword_entry(str_key))
+
+	return list
+
+static func get_keywords_for_relic(relic: RelicInstance) -> Array[Dictionary]:
+	var list: Array[Dictionary] = []
+	if not relic or not relic.data or not relic.data.modifier:
+		return list
+
+	var relic_modifier: RelicModifier = relic.data.modifier
+	if relic_modifier.has_method("get_implied_keywords"):
+		var implied: Variant = relic_modifier.call("get_implied_keywords")
+		if implied is Array:
+			for kw_key: Variant in implied:
+				var str_key: String = str(kw_key)
+				if _has_valid_keyword(str_key) and not _has_keyword(list, str_key):
+					list.append(_get_keyword_entry(str_key))
+
+	return list
+
+static func _has_valid_keyword(key: String) -> bool:
+	return KEYWORD_MAP.has(key)
 
 static func _get_keyword_entry(key: String) -> Dictionary:
 	var entry: Dictionary = KEYWORD_MAP[key]
@@ -107,6 +144,8 @@ static func _get_keyword_entry(key: String) -> Dictionary:
 	}
 
 static func _has_keyword(list: Array[Dictionary], key: String) -> bool:
+	if not KEYWORD_MAP.has(key):
+		return false
 	var entry: Dictionary = KEYWORD_MAP[key]
 	var title_to_check: String = TranslationServer.translate(str(entry["title"]))
 	for item: Dictionary in list:

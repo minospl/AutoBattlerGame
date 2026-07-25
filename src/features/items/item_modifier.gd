@@ -13,4 +13,6 @@ func apply_unit_effect(_target_unit: UnitInstance) -> void:
 func get_description() -> String:
 	return ""
 
-
+## Returns keyword keys implied by this modifier for tooltips
+func get_implied_keywords() -> Array[String]:
+	return []

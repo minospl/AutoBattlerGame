@@ -205,13 +205,9 @@ func load_enemy_team() -> void:
 	ModifierEngine.update_ongoing_modifiers(enemy_team, player_team)
 
 func trigger_battle_start() -> void:
-	var has_resonance_stone: bool = player_team.has_relic("Resonance Stone")
-	var player_triggers: int = 2 if has_resonance_stone else 1
-
 	for i: int in range(MAX_TEAM_SIZE):
 		if player_team.units[i]:
-			for t: int in range(player_triggers):
-				ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
+			ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
 		if enemy_team.units[i]:
 			ModifierEngine.trigger_unit_modifier(i, enemy_team, UnitModifier.Trigger.ON_BATTLE_START)
 			

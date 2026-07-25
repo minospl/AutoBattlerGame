@@ -119,6 +119,7 @@ func setup(p_state: RunState) -> void:
 	run_state.shop_slot_freeze_changed.connect(_on_shop_slot_freeze_changed)
 	run_state.relics_changed.connect(_on_relics_changed)
 	run_state.shop_size_changed.connect(_on_shop_size_changed)
+	run_state.base_health_changed.connect(func(_val: int) -> void: _update_team_hp())
 	shop_panel.freeze_all_requested.connect(_on_freeze_all_requested)
 	
 	# Fill any empty (null) shop slots on a new day or initialization
@@ -367,6 +368,7 @@ func _on_relics_changed(relics: Array[RelicInstance]) -> void:
 		shop_panel.unique_chance = run_state.unique_chance
 		shop_panel.shop_level = run_state.shop_level
 		shop_panel.shop_weights = run_state.shop_weights
+	_update_team_hp()
 
 func _on_shop_size_changed(new_size: int) -> void:
 	shop_panel.create_slots(shop_slot_scene, new_size)

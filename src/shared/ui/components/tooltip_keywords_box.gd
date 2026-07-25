@@ -18,3 +18,33 @@ func build_keywords(unit_instance: UnitInstance) -> int:
 		add_child(panel)
 		
 	return keywords.size()
+
+func build_keywords_for_item(item_instance: ItemInstance) -> int:
+	for child: Node in get_children():
+		child.queue_free()
+		
+	if not item_instance:
+		return 0
+		
+	var keywords: Array[Dictionary] = KeywordDatabase.get_keywords_for_item(item_instance)
+	for kw: Dictionary in keywords:
+		var panel: KeywordPanel = KEYWORD_PANEL_SCENE.instantiate()
+		panel.setup(str(kw["title"]), str(kw["desc"]))
+		add_child(panel)
+		
+	return keywords.size()
+
+func build_keywords_for_relic(relic_instance: RelicInstance) -> int:
+	for child: Node in get_children():
+		child.queue_free()
+		
+	if not relic_instance:
+		return 0
+		
+	var keywords: Array[Dictionary] = KeywordDatabase.get_keywords_for_relic(relic_instance)
+	for kw: Dictionary in keywords:
+		var panel: KeywordPanel = KEYWORD_PANEL_SCENE.instantiate()
+		panel.setup(str(kw["title"]), str(kw["desc"]))
+		add_child(panel)
+		
+	return keywords.size()

@@ -161,7 +161,7 @@
   2. W `shop_scene.gd` dodać helper liczący sumę HP: `run_state.base_health` + suma `max_health` wszystkich aktywnych potworów w `run_state.active_team`.
   3. Wywoływać tę kalkulację w `populate_ui()` oraz podpiąć pod sygnał `team_state_changed`.
 
-### Zadanie P: Słowa kluczowe (keywords) dla Ongoing, Reliktów oraz Przedmiotów (Dawne Zadanie 13)
+### Zadanie P [**ZROBIONE**]: Słowa kluczowe (keywords) dla Ongoing, Reliktów oraz Przedmiotów (Dawne Zadanie 13)
 
 - **Lokalizacja:** [keyword_database.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/keyword_database.gd), [tooltip_keywords_box.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/tooltip_keywords_box.gd), [card_tooltip.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_tooltip.gd)
 - **Krytyczne pytania & Problem:** Słowa kluczowe wyświetlają się w tooltipie tylko po najechaniu na jednostki. Przedmioty i relikty nie wyświetlają definicji powiązanych z nimi mechanik.

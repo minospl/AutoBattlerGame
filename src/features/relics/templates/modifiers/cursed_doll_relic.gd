@@ -11,4 +11,7 @@ func on_battle_start(relic_inst: RelicInstance, _player_team: BattleTeamModel, e
 func get_description(relic_inst: RelicInstance = null) -> String:
 	var current_stacks: int = relic_inst.stacks if relic_inst else 1
 	var total_stacks: int = electrocute_stacks * current_stacks
-	return "At the start of battle, apply [color=%s]%d Electrocute[/color] stacks to the enemy team." % [GameColors.DESC_ELECTROCUTE, total_stacks]
+	return "%s\nApply [color=%s]%d Electrocute[/color] stacks to the enemy team." % [get_trigger_name("On Battle Start"), GameColors.DESC_ELECTROCUTE, total_stacks]
+
+func get_implied_keywords() -> Array[String]:
+	return ["electrocute", "trigger_battle_start"]

@@ -10,7 +10,11 @@ static func trigger_unit_modifier(source_idx: int, team_obj: BattleTeamModel, tr
 
 	var modifier: UnitModifier = unit.data.modifier
 	if modifier.trigger == trigger_type:
-		modifier.apply_modifier(source_idx, team_obj)
+		var repeat_count: int = 1
+		if trigger_type == UnitModifier.Trigger.ON_BATTLE_START and team_obj.has_relic("Resonance Stone"):
+			repeat_count = 2
+		for _i: int in range(repeat_count):
+			modifier.apply_modifier(source_idx, team_obj)
 
 static func update_ongoing_modifiers(team_obj: BattleTeamModel, opponent: BattleTeamModel) -> void:
 	for i: int in range(team_obj.units.size()):

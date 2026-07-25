@@ -193,7 +193,14 @@ func _process(_delta: float) -> void:
 func _build_keywords() -> void:
 	if not keywords_vbox:
 		return
-	_keywords_count = keywords_vbox.build_keywords(_unit_instance)
+	if _unit_instance:
+		_keywords_count = keywords_vbox.build_keywords(_unit_instance)
+	elif _item_instance:
+		_keywords_count = keywords_vbox.build_keywords_for_item(_item_instance)
+	elif _relic_instance:
+		_keywords_count = keywords_vbox.build_keywords_for_relic(_relic_instance)
+	else:
+		_keywords_count = 0
 	_update_help_panel_visibility()
 
 func _update_help_panel_visibility() -> void:

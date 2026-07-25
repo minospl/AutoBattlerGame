@@ -8,3 +8,6 @@ func on_acquire(_relic_inst: RelicInstance, run_state: RunState) -> void:
 
 func get_description(_relic_inst: RelicInstance = null) -> String:
 	return "Increases the number of slots in the shop by [color=%s]+%d[/color]." % [GameColors.DESC_GOLD, extra_slots]
+
+func get_implied_keywords() -> Array[String]:
+	return []

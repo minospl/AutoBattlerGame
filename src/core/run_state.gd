@@ -35,6 +35,7 @@ signal relic_added(relic: RelicInstance)
 signal shop_card_generated(card: Resource)
 signal shop_rolled()
 signal shop_size_changed(p_new_size: int)
+signal base_health_changed(p_base_health: int)
 
 func notify_shop_slot_updated(p_slot_index: int, p_card_instance: Resource) -> void:
 	shop_slot_updated.emit(p_slot_index, p_card_instance)
@@ -70,7 +71,10 @@ func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relic
 @export var shop_frozen_statuses: Array[bool] = []
 @export var relics: Array[RelicInstance] = []
 @export var has_magnetic_core: bool = false
-@export var base_health: int = STARTING_BASE_HEALTH
+@export var base_health: int = STARTING_BASE_HEALTH:
+	set(val):
+		base_health = val
+		base_health_changed.emit(base_health)
 @export var item_purchase_limit: int = ITEM_PURCHASE_LIMIT
 @export var item_purchase_count: int = 0
 @export var max_trophies: int = MAX_TROPHIES

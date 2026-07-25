@@ -6,4 +6,7 @@ func on_acquire(_relic_inst: RelicInstance, run_state: RunState) -> void:
 		run_state.disabled_rarities.append(Rarity.Type.COMMON)
 
 func get_description(_relic_inst: RelicInstance = null) -> String:
-	return "Common rarity cards no longer appear in the shop. Their chances are distributed among higher rarities."
+	return "Common rarity cards no longer appear in the shop."
+
+func get_implied_keywords() -> Array[String]:
+	return []
