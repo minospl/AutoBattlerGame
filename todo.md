@@ -105,7 +105,7 @@
 
   2. Przekształcić sygnatury metod przyjmujących `damage_type: String` na typ enuma i zaktualizować warunki porównujące.
 
-### Zadanie J: Przeniesienie stylu TooltipKeywordsBox do pliku sceny .tscn (Dawne Zadanie 16)
+### Zadanie J [**ZROBIONE**]: Przeniesienie stylu TooltipKeywordsBox do pliku sceny .tscn (Dawne Zadanie 16)
 
 - **Lokalizacja:** [tooltip_keywords_box.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/tooltip_keywords_box.gd) (metoda `_create_keyword_panel`)
 - **Krytyczne pytania & Problem:** Struktura panelu słowa kluczowego jest w całości tworzona i stylowana imperatywnie w kodzie, co utrudnia edycję wizualną.
