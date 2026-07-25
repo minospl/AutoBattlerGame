@@ -1,0 +1,21 @@
+class_name WaterSlimeModifier
+extends UnitModifier
+
+@export var value_1: int = 5
+@export var value_2: int = 10
+@export var value_3: int = 20
+
+func get_modifier_value(p_level: int = 1) -> float:
+	match p_level:
+		1: return float(value_1)
+		2: return float(value_2)
+		3: return float(value_3)
+	return float(value_1)
+
+func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
+	var unit: UnitInstance = team_obj.units[source_idx]
+	var current_level: int = unit.level if unit else 1
+	team_obj.buff_unit_heal_power(source_idx, int(get_modifier_value(current_level)), true)
+
+func get_description(p_level: int = 1) -> String:
+	return "%s\nGain [color=%s]+%d HEAL[/color]" % [get_trigger_name(trigger), GameColors.DESC_HEAL, int(get_modifier_value(p_level))]

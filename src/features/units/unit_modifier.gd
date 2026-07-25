@@ -5,7 +5,8 @@ enum Trigger {
 	ON_CAST,
 	ON_BATTLE_START,
 	ON_TAKE_DAMAGE,
-	ONGOING
+	ONGOING,
+	ON_BATTLE_END,
 }
 
 enum TargetType {
@@ -33,14 +34,16 @@ func apply_modifier(_source_idx: int, _team_obj: BattleTeamModel) -> void:
 func get_trigger_name(p_trigger: Trigger = trigger) -> String:
 	var name: String = "???"
 	match p_trigger:
-		Trigger.ON_CAST:
-			name = "On Cast"
 		Trigger.ON_BATTLE_START:
-			name = "On Battle Start"
+			name = "ON BATTLE START"
+		Trigger.ON_BATTLE_END:
+			name = "ON BATTLE END"
+		Trigger.ON_CAST:
+			name = "ON CAST"
 		Trigger.ON_TAKE_DAMAGE:
-			name = "On Take Damage"
+			name = "ON TAKE DAMAGE"
 		Trigger.ONGOING:
-			name = "Ongoing"
+			name = "ONGOING"
 
 	return "[color=%s]%s[/color]" % [GameColors.DESC_TRIGGER, name]
 

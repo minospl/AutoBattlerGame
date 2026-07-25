@@ -1,9 +1,9 @@
-class_name AncientTitanModifier
+class_name PlantSlimeModifier
 extends UnitModifier
 
 @export var value_1: int = 5
 @export var value_2: int = 10
-@export var value_3: int = 25
+@export var value_3: int = 20
 
 func get_modifier_value(p_level: int = 1) -> float:
 	match p_level:
@@ -18,4 +18,4 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	team_obj.buff_unit_max_health(source_idx, int(get_modifier_value(current_level)), true)
 
 func get_description(p_level: int = 1) -> String:
-	return "%s\nGain [color=%s]+%d Health[/color] permanently" % [get_trigger_name(), GameColors.DESC_HEALTH, int(get_modifier_value(p_level))]
+	return "%s\nGain [color=%s]+%d HP[/color]" % [get_trigger_name(trigger), GameColors.DESC_HEALTH, int(get_modifier_value(p_level))]

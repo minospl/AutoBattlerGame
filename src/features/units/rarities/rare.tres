@@ -6,4 +6,4 @@
 script = ExtResource("script")
 rarity_name = "Rare"
 border_color = Color(0.19, 0.51, 0.81, 1)
-rarity_type = 1
+rarity_type = 2

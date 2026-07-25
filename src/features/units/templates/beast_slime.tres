@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="UnitData" format=3]
+
+[ext_resource type="Script" path="res://src/features/units/templates/modifiers/beast_slime_modifier.gd" id="modifier_script"]
+[ext_resource type="Resource" path="res://src/features/units/types/beast.tres" id="type_beast"]
+[ext_resource type="Resource" path="res://src/features/units/types/slime.tres" id="type_slime"]
+[ext_resource type="Script" path="res://src/features/units/unit_data.gd" id="unit_data"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/uncommon.tres" id="unit_rarity"]
+[ext_resource type="Script" path="res://src/features/units/unit_type.gd" id="unit_type"]
+
+[sub_resource type="Resource" id="Resource_beast_slime_mod"]
+script = ExtResource("modifier_script")
+trigger = 4
+
+[resource]
+script = ExtResource("unit_data")
+display_name = "Beast Slime"
+price = 2
+max_health = 20
+attack = 5
+types = Array[ExtResource("unit_type")]([ExtResource("type_beast"), ExtResource("type_slime")])
+rarity = ExtResource("unit_rarity")
+cast_speed = 3.0
+modifier = SubResource("Resource_beast_slime_mod")

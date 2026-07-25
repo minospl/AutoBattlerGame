@@ -79,12 +79,12 @@ func _initialize_new_run() -> void:
 				return t
 		return null
 
-	var titan: UnitData = find_template.call("Ancient Titan")
+	var dragon_slime: UnitData = find_template.call("Dragon Slime")
+	var plant_slime: UnitData = find_template.call("Plant Slime")
+	var forest_guardian: UnitData = find_template.call("Forest Guardian")
 	var spellweaver: UnitData = find_template.call("Spellweaver")
-	var sapling: UnitData = find_template.call("Mystic Sapling")
-	var crab: UnitData = find_template.call("River Crab")
 
-	var setup: Array[UnitData] = [titan, spellweaver, null, sapling, crab, null]
+	var setup: Array[UnitData] = [dragon_slime, plant_slime, forest_guardian, spellweaver, null, null]
 	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
 		var temp: UnitData = setup[i]
 		if temp:

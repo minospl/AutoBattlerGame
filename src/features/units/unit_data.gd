@@ -36,3 +36,9 @@ extends GameResourceData
 
 ## List of modifier (abilities) for this unit
 @export var modifier: UnitModifier
+
+func has_type(p_type_name: String) -> bool:
+	for t: UnitType in types:
+		if t.type_name.to_lower() == p_type_name.to_lower():
+			return true
+	return false

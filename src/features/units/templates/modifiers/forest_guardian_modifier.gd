@@ -1,34 +1,50 @@
 class_name ForestGuardianModifier
 extends UnitModifier
 
-@export var value_1: int = 5
-@export var value_2: int = 10
-@export var value_3: int = 10
+@export var shield_value_1: int = 5
+@export var shield_value_2: int = 5
+@export var shield_value_3: int = 10
+
+@export var hp_value_1: int = 0
+@export var hp_value_2: int = 5
+@export var hp_value_3: int = 10
 
 func get_target(_p_level: int = 1) -> TargetType:
 	return TargetType.HORIZONTAL
 
-func get_modifier_value(p_level: int = 1) -> float:
+func get_shield_value(p_level: int = 1) -> int:
 	match p_level:
-		1: return float(value_1)
-		2: return float(value_2)
-		3: return float(value_3)
-	return float(value_1)
+		1: return shield_value_1
+		2: return shield_value_2
+		3: return shield_value_3
+	return shield_value_1
 
-func is_permanent(p_level: int) -> bool:
-	return p_level >= 3
+func get_hp_value(p_level: int = 1) -> int:
+	match p_level:
+		1: return hp_value_1
+		2: return hp_value_2
+		3: return hp_value_3
+	return hp_value_1
 
 func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	var unit: UnitInstance = team_obj.units[source_idx]
 	var current_level: int = unit.level if unit else 1
 	var current_target: TargetType = get_target(current_level)
-	var buff: int = int(get_modifier_value(current_level))
-	var permanent: bool = is_permanent(current_level)
+	var shield_buff: int = get_shield_value(current_level)
+	var hp_buff: int = get_hp_value(current_level)
+	
 	for idx: int in TargetResolver.get_target_indices(source_idx, current_target, team_obj.has_magnetic_core, team_obj.has_focusing_lens):
-		team_obj.add_unit_shield(idx, buff, permanent)
+		if shield_buff > 0:
+			team_obj.add_unit_shield(idx, shield_buff, true)
+		if hp_buff > 0:
+			team_obj.buff_unit_max_health(idx, hp_buff, true)
 
 func get_description(p_level: int = 1) -> String:
-	var target_str: String = "[color=%s]HORIZONTAL[/color] allies" % GameColors.DESC_TARGET
-	var buff: int = int(get_modifier_value(p_level))
-	var duration_str: String = "permanently" if is_permanent(p_level) else "for this battle"
-	return "%s\nGive %s [color=%s]+%d Shield[/color] %s" % [get_trigger_name(), target_str, GameColors.DESC_SHIELD, buff, duration_str]
+	var shield_buff: int = get_shield_value(p_level)
+	var hp_buff: int = get_hp_value(p_level)
+
+	var hp_buff_string: String = ""
+	if hp_buff > 0:
+		hp_buff_string = "and [color=%s]+%d HP[/color]" % [GameColors.DESC_HEALTH, hp_buff]
+	
+	return "%s\nGive [color=%s]HORIZONTAL[/color] allies [color=%s]+%d SHIELD[/color] %s permanently." % [get_trigger_name(), GameColors.DESC_TARGET, GameColors.DESC_SHIELD, shield_buff, hp_buff_string]

@@ -55,6 +55,9 @@ func get_attack() -> int:
 func get_types() -> Array[UnitType]:
 	return data.types if data else []
 
+func has_type(p_type_name: String) -> bool:
+	return data.has_type(p_type_name)
+
 func get_cast_speed() -> float:
 	return cast_speed
 

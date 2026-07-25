@@ -55,6 +55,7 @@ func notify_shop_size_changed(p_new_size: int) -> void:
 var unit_templates: Array[UnitData] = []
 var item_templates: Array[ItemData] = []
 var relic_templates: Array[RelicData] = []
+var pending_on_battle_end: bool = false
 
 func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relics: Array[RelicData] = []) -> void:
 	unit_templates.clear()

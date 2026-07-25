@@ -33,4 +33,4 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 func get_description(p_level: int = 1) -> String:
 	var target_str: String = "[color=%s]HORIZONTAL[/color] allies" % GameColors.DESC_TARGET
 	var values: Array = [get_trigger_name(), target_str, GameColors.DESC_ATTACK, int(get_attack_value(p_level)), GameColors.DESC_SHIELD, int(get_shield_value(p_level))]
-	return "%s\nGive %s [color=%s]+%d Attack[/color] and [color=%s]+%d Shield[/color] for this battle" % values
+	return "%s\nGive %s [color=%s]+%d ATK[/color] and [color=%s]+%d SHIELD[/color] for this battle" % values

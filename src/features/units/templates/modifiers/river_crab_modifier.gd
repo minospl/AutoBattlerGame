@@ -18,4 +18,4 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	team_obj.buff_unit_attack(source_idx, int(get_modifier_value(current_level)))
 
 func get_description(p_level: int = 1) -> String:
-	return "%s\nGain [color=%s]+%d Attack[/color] for this battle" % [get_trigger_name(), GameColors.DESC_ATTACK, int(get_modifier_value(p_level))]
+	return "%s\nGain [color=%s]+%d ATK[/color] for this battle" % [get_trigger_name(), GameColors.DESC_ATTACK, int(get_modifier_value(p_level))]

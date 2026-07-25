@@ -50,6 +50,8 @@ func _ready() -> void:
 	freeze_shop_button.toggled.connect(func(pressed: bool) -> void: freeze_all_requested.emit(pressed))
 		
 	# Sell Overlay styling
+	sell_overlay.z_index = 1
+	border_decorator.z_index = 2
 	var sell_style: StyleBoxFlat = StyleBoxFlat.new()
 	sell_style.bg_color = Color(0.292, 0.245, 0.092, 0.85)
 	sell_panel.add_theme_stylebox_override("panel", sell_style)

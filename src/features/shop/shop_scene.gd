@@ -55,8 +55,13 @@ var bench_slots: Array[UnitSlot]:
 var preview_tooltip: CardTooltip
 var current_hovered_card: Control = null
 var current_drag_hovered_slot: UnitSlot = null
+var floating_text_manager: FloatingTextManager = null
 
 func _ready() -> void:
+	floating_text_manager = FloatingTextManager.new()
+	floating_text_manager.name = "FloatingTextManager"
+	floating_text_manager.z_index = 20
+	add_child(floating_text_manager)
 	bench_panel.item_dropped.connect(_on_item_dropped)
 	bench_panel.unit_dropped.connect(_on_unit_dropped)
 	team_panel.item_dropped.connect(_on_item_dropped)
@@ -134,6 +139,42 @@ func setup(p_state: RunState) -> void:
 	overlay.name = "TargetingLineOverlay"
 	overlay.z_index = 10
 	add_child(overlay)
+
+func _process(_delta: float) -> void:
+	if run_state.pending_on_battle_end:
+		_trigger_on_battle_end_modifiers()
+
+func show_floating_text_on_slot(slot: UnitSlot, text: String, color: Color) -> void:
+	if not slot or not floating_text_manager:
+		return
+	var pos: Vector2 = slot.global_position + (slot.size * 0.5)
+	floating_text_manager.show_popup(text, color, pos)
+
+func _trigger_on_battle_end_modifiers() -> void:
+	if not run_state.pending_on_battle_end:
+		return
+	run_state.pending_on_battle_end = false
+
+	var temp_team: BattleTeamModel = BattleTeamModel.new()
+	temp_team.initialize(false)
+	temp_team.load_team_units(run_state.active_team)
+	temp_team.floating_text_requested.connect(func(text: String, color: Color, target: BattleTeamModel.SpawnTarget, key: Variant) -> void:
+		if target == BattleTeamModel.SpawnTarget.SLOT and key is int:
+			var idx: int = key
+			if idx >= 0 and idx < active_slots.size():
+				show_floating_text_on_slot(active_slots[idx], text, color)
+	)
+	var triggered: bool = false
+	for i: int in range(temp_team.units.size()):
+		if temp_team.units[i]:
+			var unit: UnitInstance = temp_team.units[i]
+			if unit.data and unit.data.modifier and unit.data.modifier.trigger == UnitModifier.Trigger.ON_BATTLE_END:
+				ModifierEngine.trigger_unit_modifier(i, temp_team, UnitModifier.Trigger.ON_BATTLE_END)
+				triggered = true
+	if triggered:
+		run_state.sync_battle_team_stats(temp_team.units)
+		populate_ui()
+	temp_team.cleanup()
 
 ## Instantiate slot scenes and arrange them inside containers
 func create_slots() -> void:
@@ -250,6 +291,16 @@ func _on_item_dropped(_item_card: ShopCardItem, original_slot: ShopSlot, target_
 	# 1. Purchase from the Shop slot
 	var target_idx: int = target_slot.slot_index
 	var target_is_active: bool = target_slot.is_active_team
+	var target_array: Array[UnitInstance] = run_state.active_team if target_is_active else run_state.bench
+	var unit_before: UnitInstance = target_array[target_idx] if (target_idx >= 0 and target_idx < target_array.size()) else null
+	
+	var prev_hp: int = unit_before.health if unit_before else 0
+	var prev_atk: int = unit_before.attack if unit_before else 0
+	var prev_shield: int = unit_before.shield if unit_before else 0
+	var prev_poison: int = unit_before.poison if unit_before else 0
+	var prev_burn: int = unit_before.burn if unit_before else 0
+	var prev_electrocute: int = unit_before.electrocute if unit_before else 0
+	var prev_heal: int = unit_before.heal if unit_before else 0
 	
 	var applied: bool = run_state.apply_item(original_slot.slot_index, target_idx, target_is_active)
 	if applied:
@@ -257,6 +308,23 @@ func _on_item_dropped(_item_card: ShopCardItem, original_slot: ShopSlot, target_
 		var target_card: Control = target_slot.get_card()
 		if target_card and target_card.has_method("update_ui"):
 			target_card.call("update_ui")
+			
+		var unit_after: UnitInstance = target_array[target_idx]
+		if unit_after:
+			if unit_after.health > prev_hp:
+				show_floating_text_on_slot(target_slot, "+%d HP" % (unit_after.health - prev_hp), Color(GameColors.DESC_HEALTH))
+			if unit_after.attack > prev_atk:
+				show_floating_text_on_slot(target_slot, "+%d ATK" % (unit_after.attack - prev_atk), Color(GameColors.DESC_ATTACK))
+			if unit_after.shield > prev_shield:
+				show_floating_text_on_slot(target_slot, "+%d Shield" % (unit_after.shield - prev_shield), Color(GameColors.DESC_SHIELD))
+			if unit_after.poison > prev_poison:
+				show_floating_text_on_slot(target_slot, "+%d Poison" % (unit_after.poison - prev_poison), Color(GameColors.DESC_POISON))
+			if unit_after.burn > prev_burn:
+				show_floating_text_on_slot(target_slot, "+%d Burn" % (unit_after.burn - prev_burn), Color(GameColors.DESC_BURN))
+			if unit_after.electrocute > prev_electrocute:
+				show_floating_text_on_slot(target_slot, "+%d Electrocute" % (unit_after.electrocute - prev_electrocute), Color(GameColors.DESC_ELECTROCUTE))
+			if unit_after.heal > prev_heal:
+				show_floating_text_on_slot(target_slot, "+%d Heal Power" % (unit_after.heal - prev_heal), Color(GameColors.DESC_HEAL))
 			
 		team_state_changed.emit()
 

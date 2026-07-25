@@ -36,8 +36,8 @@
 
 ## 4. Etapy Implementacji
 
-* [ ] **Krok 1:** Utworzenie pliku zasobu typu `slime.tres` w `src/features/units/types/`.
-* [ ] **Krok 2:** Utworzenie szablonów wariantów Slime'ów w `src/features/units/templates/` (przypisanych do typu `Slime`).
+* [x] **Krok 1:** Utworzenie pliku zasobu typu `slime.tres` w `src/features/units/types/`.
+* [x] **Krok 2:** Utworzenie szablonów i skryptów modyfikatorów wariantów Slime'ów w `src/features/units/templates/` (Earth, Plant, Water, Dragon, Beast, Toxic, Electric, Fire).
 * [ ] **Krok 3:** Implementacja skryptu sprawdzającego warunek fuzji 6 różnych Slime'ów po rundzie (`RunState` / `ShopScene`).
 * [ ] **Krok 4:** Stworzenie szablonu oraz skryptu modyfikatora dla `Rainbow Slime`.
 * [ ] **Krok 5:** Testy integracyjne i balans.

@@ -25,4 +25,4 @@ func apply_ongoing(source_idx: int, team_obj: BattleTeamModel, opponent: BattleT
 
 func get_description(p_level: int = 1) -> String:
 	var bonus: int = int(get_modifier_value(p_level))
-	return "%s\nGains [color=%s]+%d Attack[/color] for every stack of Poison, Burn, or Electrocute on the opponent team." % [get_trigger_name(), GameColors.DESC_ATTACK, bonus]
+	return "%s\nGains [color=%s]+%d ATK[/color] for every stack of [color=%s]POISON[/color], [color=%s]BURN[/color], or [color=%s]ELECTROCUTE[/color] on the opponent team." % [get_trigger_name(), GameColors.DESC_ATTACK, bonus, GameColors.DESC_POISON, GameColors.DESC_BURN, GameColors.DESC_ELECTROCUTE]

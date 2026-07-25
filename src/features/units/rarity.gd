@@ -3,6 +3,7 @@ extends Resource
 
 enum Type {
 	COMMON,
+	UNCOMMON,
 	RARE,
 	EPIC,
 	LEGENDARY,

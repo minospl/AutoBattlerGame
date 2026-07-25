@@ -418,6 +418,7 @@ func _on_pause_pressed() -> void:
 func sync_stats_to_run_state() -> void:
 	if run_state != null:
 		run_state.sync_battle_team_stats(player_team.units)
+		run_state.pending_on_battle_end = true
 
 func _on_exit_pressed() -> void:
 	sync_stats_to_run_state()

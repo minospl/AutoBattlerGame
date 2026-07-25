@@ -8,4 +8,4 @@ func apply_unit_effect(target_unit: UnitInstance) -> void:
 		target_unit.attack += attack_boost
 
 func get_description() -> String:
-	return "Give a unit [color=%s]+%d Attack[/color]." % [GameColors.DESC_ATTACK, attack_boost]
+	return "Give a unit [color=%s]+%d ATK[/color]." % [GameColors.DESC_ATTACK, attack_boost]

@@ -20,17 +20,28 @@ const PORTRAIT_FALLBACK_TEXT: Color = Color(0.2, 0.2, 0.2, 0.75)
 
 # Tooltip Description Formatting Colors (Hex Strings)
 const DESC_TRIGGER: String = "#f2b726" # Standardized bright gold for all triggers
-const DESC_TARGET: String = "#ffffff" # Standardized bright blue for all targets/directions
+const DESC_TARGET: String = "#f2b726" # Standardized bright blue for all targets/directions
 const DESC_ATTACK: String = "#c0392b" # Standardized green for Attack buffs
 const DESC_HEALTH: String = "#27ae60" # Standardized dark red for Health buffs
-const DESC_HEAL: String = "#27ae60" # Standardized green for heals
+const DESC_HEAL: String = "#1e88e5" # Standardized blue for heals
 const DESC_SHIELD: String = "#b3b3b3" # Standardized blue for Shield buffs
 const DESC_POISON: String = "#8e44ad" # Standardized purple for poison
 const DESC_BURN: String = "#e67e22" # Standardized Orange for burn
 const DESC_ELECTROCUTE: String = "#f1c40f" # Standardized Yellow for electrocute
 const DESC_GOLD: String = "#ffd700" # Gold color
-const DESC_CAST_SPEED: String = "#54a0ff" # Light blue for cast speed / cd reduction
+const DESC_CAST_SPEED: String = "#ffffff" # White/default text color for cast speed / cd reduction
 const DESC_UNIQUE: String = "#e61a33" # Ruby-red for unique rarity / roll references
+
+# Unit Type Description Formatting Colors (Hex Strings)
+const DESC_TYPE_EARTH: String = "#78350f" # Earth brown
+const DESC_TYPE_PLANT: String = "#2ecc71" # Plant green
+const DESC_TYPE_WATER: String = "#1e88e5" # Water blue
+const DESC_TYPE_DRAGON: String = "#e61a33" # Dragon red
+const DESC_TYPE_BEAST: String = "#d35400" # Beast orange
+const DESC_TYPE_TOXIC: String = "#8e44ad" # Toxic purple
+const DESC_TYPE_ELECTRIC: String = "#f1c40f" # Electric yellow
+const DESC_TYPE_FIRE: String = "#e67e22" # Fire orange-red
+const DESC_TYPE_SLIME: String = "#949eab" # Slime grey
 
 # Compendium Tab Buttons
 const TAB_ACTIVE_NORMAL: Color = Color(0.12, 0.45, 0.22, 1.0) # Green

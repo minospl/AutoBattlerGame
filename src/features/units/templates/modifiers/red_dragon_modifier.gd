@@ -15,7 +15,7 @@ func get_modifier_value(p_level: int = 1) -> float:
 func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	var unit: UnitInstance = team_obj.units[source_idx]
 	var current_level: int = unit.level if unit else 1
-	team_obj.buff_unit_attack(source_idx, int(get_modifier_value(current_level)), true)
+	team_obj.buff_unit_burn(source_idx, int(get_modifier_value(current_level)), true)
 
 func get_description(p_level: int = 1) -> String:
-	return "%s\nGain [color=%s]+%d Attack[/color] permanently" % [get_trigger_name(), GameColors.DESC_ATTACK, int(get_modifier_value(p_level))]
+	return "%s\nGain [color=%s]+%d BURN[/color] permanently" % [get_trigger_name(), GameColors.DESC_BURN, int(get_modifier_value(p_level))]

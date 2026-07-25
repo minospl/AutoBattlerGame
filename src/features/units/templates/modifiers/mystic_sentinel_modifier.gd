@@ -24,4 +24,4 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 func get_description(p_level: int = 1) -> String:
 	var target_str: String = "[color=%s]ALL[/color] allies" % GameColors.DESC_TARGET
 	var heal_buff: int = get_heal_value(p_level)
-	return "%s\nGrant %s [color=%s]+%d Heal[/color] stat permanently." % [get_trigger_name(Trigger.ON_CAST), target_str, GameColors.DESC_HEAL, heal_buff]
+	return "%s\nGrant %s [color=%s]+%d HEAL[/color] stat permanently." % [get_trigger_name(Trigger.ON_CAST), target_str, GameColors.DESC_HEAL, heal_buff]
