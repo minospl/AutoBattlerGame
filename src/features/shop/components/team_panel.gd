@@ -5,8 +5,12 @@ signal item_dropped(item_card: ShopCardItem, original_slot: ShopSlot, target_slo
 signal unit_dropped(unit_card: UnitCard, original_slot: UnitSlot, target_slot: UnitSlot)
 
 @onready var grid_container: GridContainer = %GridContainer
+@onready var team_hp_label: Label = %TeamHPLabel
 
 var slots: Array[UnitSlot] = []
+
+func update_team_hp(hp_value: int) -> void:
+	team_hp_label.text = NumberFormatter.format_large_number(hp_value)
 
 func create_slots(slot_scene: PackedScene, slot_count: int) -> void:
 	for child: Node in grid_container.get_children():

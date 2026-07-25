@@ -1,6 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://dm0yq7hsqt4l"]
 
 [ext_resource type="Script" path="res://src/features/shop/components/team_panel.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/heart_icon.png" id="2_heart"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/panel_header_decorator.gd" id="3_header_decorator"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="4_shader_decorator"]
 
@@ -30,6 +31,7 @@ theme_override_constants/separation = 0
 
 [node name="TeamHeader" type="PanelContainer" parent="TeamOuterMargin/VBox"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 
 [node name="PanelHeaderDecorator" type="Node" parent="TeamOuterMargin/VBox/TeamHeader"]
@@ -38,17 +40,44 @@ header_color = Color(0.89, 0.31, 0.44, 1)
 
 [node name="Margin" type="MarginContainer" parent="TeamOuterMargin/VBox/TeamHeader"]
 layout_mode = 2
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_bottom = 6
 theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 0
 
-[node name="TeamLabel" type="Label" parent="TeamOuterMargin/VBox/TeamHeader/Margin"]
+[node name="HeaderHBox" type="HBoxContainer" parent="TeamOuterMargin/VBox/TeamHeader/Margin"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TeamLabel" type="Label" parent="TeamOuterMargin/VBox/TeamHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "TEAM"
+vertical_alignment = 1
+
+[node name="HPContainer" type="HBoxContainer" parent="TeamOuterMargin/VBox/TeamHeader/Margin/HeaderHBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="HPIcon" type="TextureRect" parent="TeamOuterMargin/VBox/TeamHeader/Margin/HeaderHBox/HPContainer"]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_heart")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TeamHPLabel" type="Label" parent="TeamOuterMargin/VBox/TeamHeader/Margin/HeaderHBox/HPContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+vertical_alignment = 1
 
 [node name="TeamMargin" type="MarginContainer" parent="TeamOuterMargin/VBox"]
 layout_mode = 2

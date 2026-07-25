@@ -37,6 +37,7 @@ theme_override_constants/separation = 0
 
 [node name="ShopHeader" type="PanelContainer" parent="ShopOuterMargin/VBox"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 mouse_filter = 1
 
@@ -46,13 +47,14 @@ header_color = Color(0.2, 0.55, 0.85, 1)
 
 [node name="Margin" type="MarginContainer" parent="ShopOuterMargin/VBox/ShopHeader"]
 layout_mode = 2
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_bottom = 4
 theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 0
 
 [node name="HeaderHBox" type="HBoxContainer" parent="ShopOuterMargin/VBox/ShopHeader/Margin"]
 layout_mode = 2
+size_flags_vertical = 4
 theme_override_constants/separation = 6
 
 [node name="ShopLabel" type="Label" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]

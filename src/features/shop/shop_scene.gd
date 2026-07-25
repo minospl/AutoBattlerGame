@@ -61,6 +61,7 @@ func _ready() -> void:
 	bench_panel.unit_dropped.connect(_on_unit_dropped)
 	team_panel.item_dropped.connect(_on_item_dropped)
 	team_panel.unit_dropped.connect(_on_unit_dropped)
+	team_state_changed.connect(_update_team_hp)
 	
 	# Connect control panel signals
 	shop_header_bar.restart_requested.connect(_on_restart_requested)
@@ -199,6 +200,18 @@ func populate_ui() -> void:
 			card.unit_instance = run_state.bench[i]
 			_connect_card_signals(card)
 			bench_slots[i].add_card(card)
+			
+	_update_team_hp()
+
+func _calculate_total_team_hp() -> int:
+	var total_hp: int = run_state.base_health
+	for unit: UnitInstance in run_state.active_team:
+		if unit: 
+			total_hp += unit.get_max_health()
+	return total_hp
+
+func _update_team_hp() -> void:
+	team_panel.update_team_hp(_calculate_total_team_hp())
 
 ## Empty all team and bench slots
 func clear_all() -> void:

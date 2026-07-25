@@ -151,17 +151,7 @@
 
 ## 5. PRIORYTET 5: ESTETYKA & UX (UX, Visuals & Polish)
 
-### Zadanie M: Sprzedaż przeciąganej karty za pomocą Prawego Kliknięcia (Dawne Zadanie 9)
-
-- **Lokalizacja:** [shop_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd) (metoda `_input`), [shop_panel.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/components/shop_panel.gd) (tekst w overlayu)
-- **Krytyczne pytania & Problem:** Gracz może sprzedać kartę tylko poprzez upuszczenie jej na panel sklepu.
-- **Logiczne uzasadnienie:** Umożliwienie natychmiastowej sprzedaży poprzez prawy klik w trakcie przeciągania (drag) znacznie zwiększa dynamikę i komfort gry (QoL).
-- **Sugerowana zmiana:**
-  1. W `shop_scene.gd` nadpisać `_input(event: InputEvent) -> void`.
-  2. Jeśli `event` to kliknięcie prawego przycisku myszy i `DragManager.dragged_card` nie jest nullem, a jego oryginalny slot nie był sklepem, wywołać `_on_sell_card_requested(...)` i zakończyć przeciąganie.
-  3. W `shop_panel.gd` w powiadomieniu `NOTIFICATION_DRAG_BEGIN` zmienić tekst na: `"RELEASE OR RIGHT-CLICK TO SELL (+" + str(shop_card.price) + "g)"`.
-
-### Zadanie N: Wyświetlanie HP drużyny w scenie sklepu (Dawne Zadanie 2)
+### Zadanie N [**ZROBIONE**]: Wyświetlanie HP drużyny w scenie sklepu (Dawne Zadanie 2)
 
 - **Lokalizacja:** [shop_scene.tscn](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.tscn) (sekcja drużyny), [shop_scene.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/shop_scene.gd) (metoda `populate_ui`)
 - **Krytyczne pytania & Problem:** Sklep nie wyświetla sumarycznych punktów życia drużyny.
