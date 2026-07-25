@@ -12,27 +12,35 @@ func get_modifier_value(p_level: int = 1) -> float:
 		3: return float(value_3)
 	return float(value_1)
 
-func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
-	var source_unit: UnitInstance = team_obj.units[source_idx]
-	var current_level: int = source_unit.level if source_unit else 1
-	var times: int = int(get_modifier_value(current_level))
-	
-	for i: int in range(team_obj.units.size()):
-		if i == source_idx:
+func apply_shop_modifier(source_idx: int, team_units: Array) -> void:
+	if source_idx < 0 or source_idx >= team_units.size() or team_units[source_idx] == null:
+		return
+	var my_unit: UnitInstance = team_units[source_idx]
+	if not my_unit:
+		return
+
+	var valid_targets: Array[Dictionary] = []
+	for i: int in range(team_units.size()):
+		if team_units[i] == null:
 			continue
-		var target_unit: UnitInstance = team_obj.units[i]
-		if not target_unit:
+		var unit: UnitInstance = team_units[i]
+		if not unit:
 			continue
-		var is_slime: bool = false
-		for t: UnitType in target_unit.data.types:
-			if t.type_name.to_lower() == "slime":
-				is_slime = true
-				break
+			
+		if i != source_idx and unit.data.modifier is DragonSlimeModifier:
+			if unit.level > my_unit.level or (unit.level == my_unit.level and i < source_idx):
+				return
 				
-		if is_slime and target_unit.has_type("slime"):
-			for _rep: int in range(times):
-				target_unit.data.modifier.apply_modifier(i, team_obj)
+		if i != source_idx and unit.has_type("Slime") and unit.data.modifier.trigger == Trigger.ON_BATTLE_END and not (unit.data.modifier is DragonSlimeModifier):
+			valid_targets.append({"idx": i, "mod": unit.data.modifier})
+
+	var times: int = int(get_modifier_value(my_unit.level))
+	for entry: Dictionary in valid_targets:
+		var target_mod: UnitModifier = entry["mod"]
+		var target_idx: int = entry["idx"]
+		for _rep: int in range(times):
+			target_mod.apply_shop_modifier(target_idx, team_units)
 
 func get_description(p_level: int = 1) -> String:
-	var times: int = int(get_modifier_value(p_level))
-	return "%s\nTrigger [color=%s]ALL[/color] other [color=%s]SLIME[/color] modifiers %dx" % [get_trigger_name(trigger), GameColors.DESC_TARGET, GameColors.DESC_TYPE_SLIME, times]
+	var times: int = int(get_modifier_value(p_level)) + 1
+	return "%s\nTrigger [color=%s]ALL[/color] [color=%s]SLIME[/color] modifiers %dx" % [get_trigger_name(trigger), GameColors.DESC_TARGET, GameColors.DESC_TYPE_SLIME, times]

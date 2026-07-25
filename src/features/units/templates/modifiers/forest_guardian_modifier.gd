@@ -35,7 +35,7 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	
 	for idx: int in TargetResolver.get_target_indices(source_idx, current_target, team_obj.has_magnetic_core, team_obj.has_focusing_lens):
 		if shield_buff > 0:
-			team_obj.add_unit_shield(idx, shield_buff, true)
+			team_obj.buff_unit_shield(idx, shield_buff, true)
 		if hp_buff > 0:
 			team_obj.buff_unit_max_health(idx, hp_buff, true)
 

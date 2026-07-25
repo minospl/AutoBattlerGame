@@ -28,7 +28,7 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	var current_level: int = unit.level if unit else 1
 	for idx: int in TargetResolver.get_target_indices(source_idx, TargetType.HORIZONTAL, team_obj.has_magnetic_core, team_obj.has_focusing_lens):
 		team_obj.buff_unit_attack(idx, int(get_attack_value(current_level)), false)
-		team_obj.add_unit_shield(idx, int(get_shield_value(current_level)), false)
+		team_obj.buff_unit_shield(idx, int(get_shield_value(current_level)), false)
 
 func get_description(p_level: int = 1) -> String:
 	var target_str: String = "[color=%s]HORIZONTAL[/color] allies" % GameColors.DESC_TARGET

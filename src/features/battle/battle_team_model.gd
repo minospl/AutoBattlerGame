@@ -320,7 +320,7 @@ func buff_unit_max_health(slot_idx: int, amount: int, permanent: bool = false) -
 	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " HP", Color(GameColors.DESC_HEALTH))
 	unit_stats_changed.emit(slot_idx)
 
-func add_unit_shield(slot_idx: int, amount: int, permanent: bool = false) -> void:
+func buff_unit_shield(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
 		return
 	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance
@@ -364,7 +364,7 @@ func buff_unit_electrocute(slot_idx: int, amount: int, permanent: bool = false) 
 	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Electrocute", Color(GameColors.DESC_ELECTROCUTE))
 	unit_stats_changed.emit(slot_idx)
 
-func buff_unit_heal_power(slot_idx: int, amount: int, permanent: bool = false) -> void:
+func buff_unit_heal(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:
 		return
 	var b_unit: BattleUnitInstance = units[slot_idx] as BattleUnitInstance

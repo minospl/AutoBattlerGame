@@ -22,6 +22,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			add_all_unique_relics()
 		KEY_4:
 			run_state.gold += 100
+		KEY_5:
+			if run_state:
+				run_state.shop_level += 1
 
 func _add_random_monster() -> void:
 	if not run_state or run_state.unit_templates.is_empty():

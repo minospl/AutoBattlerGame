@@ -5,7 +5,7 @@ extends ItemModifier
 
 func apply_unit_effect(target_unit: UnitInstance) -> void:
 	if target_unit:
-		target_unit.attack += attack_boost
+		target_unit.buff_attack(attack_boost)
 
 func get_description() -> String:
 	return "Give a unit [color=%s]+%d ATK[/color]." % [GameColors.DESC_ATTACK, attack_boost]

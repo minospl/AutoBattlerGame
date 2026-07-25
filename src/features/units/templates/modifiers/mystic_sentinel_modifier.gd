@@ -19,7 +19,7 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	var unit: UnitInstance = team_obj.units[source_idx]
 	var heal_buff: int = get_heal_value(unit.level)
 	for idx: int in TargetResolver.get_target_indices(source_idx, get_target(unit.level), team_obj.has_magnetic_core, team_obj.has_focusing_lens):
-		team_obj.buff_unit_heal_power(idx, heal_buff, true)
+		team_obj.buff_unit_heal(idx, heal_buff, true)
 
 func get_description(p_level: int = 1) -> String:
 	var target_str: String = "[color=%s]ALL[/color] allies" % GameColors.DESC_TARGET

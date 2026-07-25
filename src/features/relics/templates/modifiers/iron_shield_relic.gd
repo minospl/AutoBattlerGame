@@ -8,7 +8,7 @@ func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, _e
 		var total_shield: int = shield_amount * relic_inst.stacks
 		for idx: int in [0, 1, 2]:
 			if player_team.units[idx]:
-				player_team.add_unit_shield(idx, total_shield)
+				player_team.buff_unit_shield(idx, total_shield)
 
 func get_description(relic_inst: RelicInstance = null) -> String:
 	var current_stacks: int = relic_inst.stacks if relic_inst else 1

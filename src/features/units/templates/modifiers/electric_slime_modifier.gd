@@ -12,10 +12,9 @@ func get_modifier_value(p_level: int = 1) -> float:
 		3: return float(value_3)
 	return float(value_1)
 
-func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
-	var unit: UnitInstance = team_obj.units[source_idx]
-	var current_level: int = unit.level if unit else 1
-	team_obj.buff_unit_electrocute(source_idx, int(get_modifier_value(current_level)), true)
+func apply_shop_modifier(source_idx: int, team_units: Array) -> void:
+	var target_unit: UnitInstance = team_units[source_idx]
+	target_unit.buff_electrocute(int(get_modifier_value(target_unit.level)))
 
 func get_description(p_level: int = 1) -> String:
 	return "%s\nGain [color=%s]+%d ELECTROCUTE[/color]" % [get_trigger_name(trigger), GameColors.DESC_ELECTROCUTE, int(get_modifier_value(p_level))]

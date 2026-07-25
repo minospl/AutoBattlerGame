@@ -31,6 +31,50 @@ extends Resource
 ## Cast speed (on cast cooldown)
 @export var cast_speed: float
 
+signal stat_buffed(stat_type: StatType.Type, amount: int)
+
+func buff_health(amount: int) -> void:
+	if amount <= 0:
+		return
+	health += amount
+	stat_buffed.emit(StatType.Type.HP, amount)
+
+func buff_attack(amount: int) -> void:
+	if amount <= 0:
+		return
+	attack += amount
+	stat_buffed.emit(StatType.Type.ATK, amount)
+
+func buff_heal(amount: int) -> void:
+	if amount <= 0:
+		return
+	heal += amount
+	stat_buffed.emit(StatType.Type.HEAL, amount)
+
+func buff_shield(amount: int) -> void:
+	if amount <= 0:
+		return
+	shield += amount
+	stat_buffed.emit(StatType.Type.SHIELD, amount)
+
+func buff_poison(amount: int) -> void:
+	if amount <= 0:
+		return
+	poison += amount
+	stat_buffed.emit(StatType.Type.POISON, amount)
+
+func buff_burn(amount: int) -> void:
+	if amount <= 0:
+		return
+	burn += amount
+	stat_buffed.emit(StatType.Type.BURN, amount)
+
+func buff_electrocute(amount: int) -> void:
+	if amount <= 0:
+		return
+	electrocute += amount
+	stat_buffed.emit(StatType.Type.ELECTROCUTE, amount)
+
 ## Initialize the instance using a template
 func initialize(p_data: UnitData) -> void:
 	data = p_data
