@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("unit_type")
-type_name = "Fairy"
-color = Color(0.93, 0.28, 0.6, 1)
+type_name = "Electric"
+color = Color(0.95, 0.85, 0.15, 1)

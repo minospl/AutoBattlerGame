@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("unit_type")
-type_name = "Humanoid"
-color = Color(0.01, 0.52, 0.78, 1)
+type_name = "Slime"
+color = Color(0.2, 0.85, 0.45, 1)

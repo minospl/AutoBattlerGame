@@ -4,5 +4,5 @@
 
 [resource]
 script = ExtResource("unit_type")
-type_name = "Arcane"
-color = Color(0.75, 0.15, 0.83, 1)
+type_name = "Toxic"
+color = Color(0.55, 0.15, 0.75, 1)

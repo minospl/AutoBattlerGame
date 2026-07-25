@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/features/units/unit_type.gd" id="1_type_script"]
 [ext_resource type="Script" path="res://src/features/units/templates/modifiers/thunder_lord_modifier.gd" id="2_modifier_script"]
-[ext_resource type="Resource" path="res://src/features/units/types/humanoid.tres" id="type_humanoid"]
+[ext_resource type="Resource" path="res://src/features/units/types/electric.tres" id="type_electric"]
 [ext_resource type="Script" path="res://src/features/units/unit_data.gd" id="4_unit_data_script"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/unique.tres" id="5_rarity"]
 
@@ -17,7 +17,7 @@ display_name = "Thunder Lord"
 price = 5
 max_health = 45
 attack = 12
-types = Array[ExtResource("1_type_script")]([ExtResource("type_humanoid")])
+types = Array[ExtResource("1_type_script")]([ExtResource("type_electric")])
 rarity = ExtResource("5_rarity")
 cast_speed = 4.0
 modifier = SubResource("Resource_thunder_lord_modifier")
