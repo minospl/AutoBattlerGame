@@ -95,6 +95,19 @@ Walka odbywa się automatycznie w czasie rzeczywistym:
 * **Burn (Oparzenie):** Zadaje obrażenia równe liczbie ładunków co 0.5 sekundy, po czym zmniejsza liczbę ładunków o 1.
 * **Electrocute (Porażenie):** Zwiększa otrzymywane obrażenia przez drużynę o wartość ładunku porażenia, gdy jednostka atakująca ma atak > 0.
 
+### Typy Jednostek i Archetypy (Unit Types)
+
+W grze zdefiniowane jest 8 typów jednostek o ściśle określonych rolach i mechanikach:
+
+* **Earth:** Shield.
+* **Plant:** Max HP.
+* **Water:** Heal/Cleanse (usuwanie negatywnych statusów).
+* **Dragon:** Unique mods (unikalne modyfikatory i mechaniki akcji).
+* **Beast:** Physical Damage.
+* **Toxic:** Poison.
+* **Electric:** Electrocute.
+* **Fire:** Burn.
+
 ### Zmęczenie (Fatigue)
 
 Czas trwania walki wynosi 30 sekund. Po tym czasie co 1 sekundę obie drużyny otrzymują obrażenia fatigue, które rosną z każdym krokiem zgodnie z ciągiem Fibonacciego.

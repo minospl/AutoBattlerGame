@@ -43,6 +43,17 @@ W walce jednostki nie posiadają indywidualnego paska HP.
 - **Burn (Oparzenie):** Zadaje obrażenia równe liczbie ładunków co 0.5 sekundy, po czym zmniejsza liczbę ładunków o 1.
 - **Electrocute (Porażenie):** Zwiększa otrzymywane obrażenia przez drużynę o wartość ładunku porażenia, gdy jednostka atakująca ma atak > 0.
 
+### Typy Jednostek i Archetypy (Unit Types)
+
+- **Earth:** Shield.
+- **Plant:** Max HP.
+- **Water:** Heal/Cleanse (usuwanie negatywnych statusów).
+- **Dragon:** Unique mods (unikalne modyfikatory i mechaniki akcji).
+- **Beast:** Physical Damage.
+- **Toxic:** Poison.
+- **Electric:** Electrocute.
+- **Fire:** Burn.
+
 ### Obiektowy System Modyfikatorów
 
 Każda zdolność jednostki, przedmiotu czy reliktu jest zaimplementowana jako modularny modyfikator dziedziczący po `UnitModifier`, `ItemModifier` lub `RelicModifier`.

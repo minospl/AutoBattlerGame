@@ -161,16 +161,6 @@
   2. W `shop_scene.gd` dodać helper liczący sumę HP: `run_state.base_health` + suma `max_health` wszystkich aktywnych potworów w `run_state.active_team`.
   3. Wywoływać tę kalkulację w `populate_ui()` oraz podpiąć pod sygnał `team_state_changed`.
 
-### Zadanie O: Zmiana animacji scalania (merge) do samych sprite'ów jednostek (Dawne Zadanie 12)
-
-- **Lokalizacja:** [shop_merge_animator.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/shop/utils/shop_merge_animator.gd)
-- **Krytyczne pytania & Problem:** Obecnie animacja mergowania odczepia z layoutu całe karty (z ramkami i tekstem), co wygląda nienaturalnie.
-- **Logiczne uzasadnienie:** Animowanie samych grafik/sprite'ów jednostek latających i łączących się w punkcie centralnym wygląda o wiele czystej, profesjonalniej i dynamiczniej.
-- **Sugerowana zmiana:**
-  1. Zamiast odczepiać i animować całe węzły `ShopCard`, pobrać teksturę sprite'a z kart.
-  2. Karty w slotach tymczasowo ukryć.
-  3. Stworzyć tymczasowe, mniejsze węzły `TextureRect` ze sprite'ami potworów na globalnych pozycjach kart i je animować do środka, po czym wywołać błysk fuzji i w docelowym slocie odsłonić zaktualizowaną kartę.
-
 ### Zadanie P: Słowa kluczowe (keywords) dla Ongoing, Reliktów oraz Przedmiotów (Dawne Zadanie 13)
 
 - **Lokalizacja:** [keyword_database.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/utils/keyword_database.gd), [tooltip_keywords_box.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/tooltip_keywords_box.gd), [card_tooltip.gd](file:///d:/Projekty/AutoBattlerDungeonGame/src/shared/ui/components/card_tooltip.gd)
