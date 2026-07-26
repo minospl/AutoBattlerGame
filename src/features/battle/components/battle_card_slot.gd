@@ -9,6 +9,7 @@ extends Control
 @onready var empty_border_rect: ShaderBorderDecorator = %EmptyBorderRect
 
 var is_targeted: bool = false
+var _cooldown_material: ShaderMaterial = null
 
 func _ready() -> void:
 	# Configure sizes dynamically based on CardUIHelper
@@ -24,14 +25,24 @@ func _ready() -> void:
 		if cooldown:
 			cooldown.custom_minimum_size = Vector2(8, CardUIHelper.CARD_SIZE.y)
 			
+	if cooldown_fill:
+		cooldown_fill.anchor_top = 0.0
+		cooldown_fill.anchor_bottom = 1.0
+		var shader_res: Shader = load("res://src/shared/shaders/cooldown_fill.gdshader") as Shader
+		if shader_res:
+			_cooldown_material = ShaderMaterial.new()
+			_cooldown_material.shader = shader_res
+			_cooldown_material.set_shader_parameter("fill_color", Color(0.18, 0.53, 0.88, 0.85))
+			_cooldown_material.set_shader_parameter("progress", 0.0)
+			cooldown_fill.material = _cooldown_material
+
 	# Initialize slot placeholder state
 	update_placeholder()
 
 func set_cast_progress(ratio: float) -> void:
-	if cooldown_fill:
-		# Cooldown fills bottom-to-top.
-		# anchor_bottom = 1.0, anchor_top = 1.0 - ratio
-		cooldown_fill.anchor_top = 1.0 - clamp(ratio, 0.0, 1.0)
+	var clamped_ratio: float = clamp(ratio, 0.0, 1.0)
+	if _cooldown_material:
+		_cooldown_material.set_shader_parameter("progress", clamped_ratio)
 
 func set_target_highlight(active: bool) -> void:
 	is_targeted = active
