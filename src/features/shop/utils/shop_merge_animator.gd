@@ -107,6 +107,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 		card.pivot_offset = card_size / 2.0
 		card.rotation = 0.0
 		card.scale = Vector2(1.0, 1.0)
+		card.update_ui()
 		
 		overlay_removed.append({
 			"card": card,
@@ -181,13 +182,23 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 			.set_ease(Tween.EASE_IN)
 		merge_tween.tween_property(card, "modulate:a", 0.0, 0.35)
 		
-	# Callback to clean up removed cards (runs immediately after Phase 2 finishes)
+	# Callback to clean up removed cards and reveal updated main card immediately in center
 	var clean_chain: Tween = merge_tween.chain()
 	clean_chain.tween_callback(func() -> void:
 		for info_clean: Dictionary in overlay_removed:
 			var card_clean: UnitCard = info_clean.get("card")
 			if card_clean:
 				card_clean.queue_free()
+		
+		if is_instance_valid(main_card):
+			main_card.update_ui()
+			var pop_tween: Tween = shop.create_tween()
+			pop_tween.tween_property(main_card, "scale", Vector2(1.5, 1.5), 0.1)\
+				.set_trans(Tween.TRANS_BACK)\
+				.set_ease(Tween.EASE_OUT)
+			pop_tween.tween_property(main_card, "scale", Vector2(1.35, 1.35), 0.15)\
+				.set_trans(Tween.TRANS_QUAD)\
+				.set_ease(Tween.EASE_IN_OUT)
 	)
 
 	# 0.5s Timer

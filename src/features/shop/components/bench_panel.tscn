@@ -30,7 +30,7 @@ theme_override_constants/separation = 0
 
 [node name="BenchHeader" type="PanelContainer" parent="BenchOuterMargin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 34)
+custom_minimum_size = Vector2(0, 30)
 layout_mode = 2
 
 [node name="PanelHeaderDecorator" type="Node" parent="BenchOuterMargin/VBox/BenchHeader"]

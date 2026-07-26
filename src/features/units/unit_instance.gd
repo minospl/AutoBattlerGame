@@ -150,7 +150,7 @@ func evolve(p_new_data: UnitData) -> void:
 	poison = p_new_data.base_poison + bonus_poison
 	cast_speed = p_new_data.cast_speed
 
-func level_up() -> void:
+func level_up(p_other_units: Array[UnitInstance] = []) -> void:
 	if level >= 3:
 		return
 	level += 1
@@ -162,6 +162,24 @@ func level_up() -> void:
 		shield += data.base_shield
 		burn += data.base_burn
 		electrocute += data.base_electrocute
-		
+
+		for other: UnitInstance in p_other_units:
+			if other and other.data:
+				var other_base_health: int = other.data.max_health * (level - 1)
+				var other_base_attack: int = other.data.attack * (level - 1)
+				var other_base_heal: int = other.data.base_heal * (level - 1)
+				var other_base_shield: int = other.data.base_shield * (level - 1)
+				var other_base_burn: int = other.data.base_burn * (level - 1)
+				var other_base_electrocute: int = other.data.base_electrocute * (level - 1)
+				var other_base_poison: int = other.data.base_poison * (level - 1)
+
+				health += maxi(0, other.health - other_base_health)
+				attack += maxi(0, other.attack - other_base_attack)
+				heal += maxi(0, other.heal - other_base_heal)
+				shield += maxi(0, other.shield - other_base_shield)
+				burn += maxi(0, other.burn - other_base_burn)
+				electrocute += maxi(0, other.electrocute - other_base_electrocute)
+				poison += maxi(0, other.poison - other_base_poison)
+
 	if level == 3 and data.modifier and data.modifier.has_method("evolve"):
 		data.modifier.call("evolve", self)
