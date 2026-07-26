@@ -10,6 +10,7 @@
 [sub_resource type="Resource" id="Resource_dragon_slime_mod"]
 script = ExtResource("modifier_script")
 trigger = 4
+is_exclusive = true
 
 [resource]
 script = ExtResource("unit_data")

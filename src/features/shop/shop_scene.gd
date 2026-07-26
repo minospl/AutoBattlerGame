@@ -154,6 +154,8 @@ func _trigger_on_battle_end_modifiers() -> void:
 	run_state.pending_on_battle_end = false
 	await get_tree().process_frame
 
+	_check_and_execute_slime_fusion()
+
 	for i: int in range(run_state.active_team.size()):
 		var unit: UnitInstance = run_state.active_team[i]
 		if not unit or not unit.data.modifier:
@@ -161,6 +163,66 @@ func _trigger_on_battle_end_modifiers() -> void:
 			
 		if unit.data.modifier.trigger == UnitModifier.Trigger.ON_BATTLE_END:
 			unit.data.modifier.apply_shop_modifier(i, run_state.active_team)
+
+func _check_and_execute_slime_fusion() -> bool:
+	if run_state.active_team.size() < 6:
+		return false
+
+	for u: UnitInstance in run_state.active_team + run_state.bench:
+		if u and u.get_unit_name() == "Rainbow Slime":
+			return false
+
+	var unique_slimes: Dictionary[UnitData, UnitInstance] = {}
+	for i: int in range(run_state.active_team.size()):
+		var unit: UnitInstance = run_state.active_team[i]
+		if unit and unit.has_type("Slime"):
+			unique_slimes[unit.data] = unit
+
+	if unique_slimes.size() < 6:
+		return false
+
+	var rainbow_template: UnitData = load("res://src/features/units/templates/rainbow_slime.tres")
+	var rainbow_inst: UnitInstance = UnitInstance.new()
+	rainbow_inst.initialize(rainbow_template)
+
+	var absorbed_list: Array[Dictionary] = []
+	for i: int in range(run_state.active_team.size()):
+		var slime_inst: UnitInstance = run_state.active_team[i]
+		rainbow_inst.absorb_bonus_stats_from(slime_inst)
+		absorbed_list.append({
+			"unit_data": slime_inst.data,
+			"level": slime_inst.level
+		})
+
+	var custom_mod: RainbowSlimeModifier = rainbow_inst.data.modifier.duplicate() as RainbowSlimeModifier
+	if custom_mod:
+		custom_mod.absorbed_units = absorbed_list
+		rainbow_inst.data = rainbow_inst.data.duplicate() as UnitData
+		rainbow_inst.data.modifier = custom_mod
+
+	var merge_anim_data: Dictionary = {
+		"main": { "is_bench": false, "idx": 0 },
+		"removed": [
+			{ "is_bench": false, "idx": 1 },
+			{ "is_bench": false, "idx": 2 },
+			{ "is_bench": false, "idx": 3 },
+			{ "is_bench": false, "idx": 4 },
+			{ "is_bench": false, "idx": 5 }
+		]
+	}
+
+	var main_card: UnitCard = active_slots[0].get_card() as UnitCard
+	if main_card:
+		main_card.unit_instance = rainbow_inst
+
+	run_state.active_team[0] = rainbow_inst
+	for i: int in range(1, run_state.active_team.size()):
+		run_state.active_team[i] = null
+
+	ShopMergeAnimator.animate_merge(self, merge_anim_data, func() -> void:
+		load_state_from_run()
+	)
+	return true
 
 ## Instantiate slot scenes and arrange them inside containers
 func create_slots() -> void:

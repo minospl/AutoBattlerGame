@@ -28,6 +28,7 @@ const DESC_ELECTROCUTE: String = "#f1c40f" # Standardized Yellow for electrocute
 const DESC_GOLD: String = "#ffd700" # Gold color
 const DESC_ITEM: String = "#2e73b8" # Sleek blue matching BADGE_COLOR_ITEM
 const DESC_CAST_SPEED: String = "#ffffff" # White/default text color for cast speed / cd reduction
+const DESC_EXCLUSIVE: String = "#e61a33" # Red highlight for exclusive keyword
 
 # Rarity Description Formatting Colors (Hex Strings)
 const DESC_COMMON: String = "#708094" # Grey for common rarity

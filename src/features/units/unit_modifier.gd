@@ -26,8 +26,12 @@ enum TargetType {
 
 @export var trigger: Trigger
 @export var target: TargetType = TargetType.SELF
+@export var is_exclusive: bool = false
 
 func apply_shop_modifier(_source_idx: int, _team_units: Array) -> void:
+	pass
+
+func apply_effect(_target_unit: UnitInstance, _level: int) -> void:
 	pass
 
 func apply_modifier(_source_idx: int, _team_obj: BattleTeamModel) -> void:

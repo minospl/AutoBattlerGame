@@ -12,9 +12,12 @@ func get_modifier_value(p_level: int = 1) -> float:
 		3: return float(value_3)
 	return float(value_1)
 
+func apply_effect(target_unit: UnitInstance, level: int) -> void:
+	target_unit.buff_heal(int(get_modifier_value(level)))
+
 func apply_shop_modifier(source_idx: int, team_units: Array) -> void:
 	var target_unit: UnitInstance = team_units[source_idx]
-	target_unit.buff_heal(int(get_modifier_value(target_unit.level)))
+	apply_effect(target_unit, target_unit.level)
 
 func get_description(p_level: int = 1) -> String:
 	return "%s\nGain [color=%s]+%d HEAL[/color]" % [get_trigger_name(trigger), GameColors.DESC_HEAL, int(get_modifier_value(p_level))]

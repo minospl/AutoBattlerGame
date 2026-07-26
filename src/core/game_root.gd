@@ -79,12 +79,14 @@ func _initialize_new_run() -> void:
 				return t
 		return null
 
-	var dragon_slime: UnitData = find_template.call("Dragon Slime")
+	var water_slime: UnitData = find_template.call("Water Slime")
 	var plant_slime: UnitData = find_template.call("Plant Slime")
-	var forest_guardian: UnitData = find_template.call("Forest Guardian")
-	var spellweaver: UnitData = find_template.call("Spellweaver")
+	var earth_slime: UnitData = find_template.call("Earth Slime")
+	var toxic_slime: UnitData = find_template.call("Toxic Slime")
+	var fire_slime: UnitData = find_template.call("Fire Slime")
+	var dragon_slime: UnitData = find_template.call("Dragon Slime")
 
-	var setup: Array[UnitData] = [dragon_slime, plant_slime, forest_guardian, spellweaver, null, null]
+	var setup: Array[UnitData] = [water_slime, plant_slime, earth_slime, toxic_slime, fire_slime, dragon_slime]
 	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
 		var temp: UnitData = setup[i]
 		if temp:

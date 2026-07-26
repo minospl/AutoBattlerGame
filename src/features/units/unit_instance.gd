@@ -123,32 +123,9 @@ func evolve(p_new_data: UnitData) -> void:
 	if not p_new_data:
 		return
 
-	var old_base_health: int = (data.max_health * level)
-	var old_base_attack: int = (data.attack * level)
-	var old_base_heal: int = (data.base_heal * level)
-	var old_base_shield: int = (data.base_shield * level)
-	var old_base_burn: int = (data.base_burn * level)
-	var old_base_electrocute: int = (data.base_electrocute * level)
-	var old_base_poison: int = (data.base_poison * level)
-
-	var bonus_health: int = maxi(0, health - old_base_health)
-	var bonus_attack: int = maxi(0, attack - old_base_attack)
-	var bonus_heal: int = maxi(0, heal - old_base_heal)
-	var bonus_shield: int = maxi(0, shield - old_base_shield)
-	var bonus_burn: int = maxi(0, burn - old_base_burn)
-	var bonus_electrocute: int = maxi(0, electrocute - old_base_electrocute)
-	var bonus_poison: int = maxi(0, poison - old_base_poison)
-
-	data = p_new_data
-	level = 1
-	health = p_new_data.max_health + bonus_health
-	attack = p_new_data.attack + bonus_attack
-	heal = p_new_data.base_heal + bonus_heal
-	shield = p_new_data.base_shield + bonus_shield
-	burn = p_new_data.base_burn + bonus_burn
-	electrocute = p_new_data.base_electrocute + bonus_electrocute
-	poison = p_new_data.base_poison + bonus_poison
-	cast_speed = p_new_data.cast_speed
+	var old_clone: UnitInstance = clone()
+	initialize(p_new_data)
+	absorb_bonus_stats_from(old_clone)
 
 func level_up(p_other_units: Array[UnitInstance] = []) -> void:
 	if level >= 3:
@@ -164,22 +141,24 @@ func level_up(p_other_units: Array[UnitInstance] = []) -> void:
 		electrocute += data.base_electrocute
 
 		for other: UnitInstance in p_other_units:
-			if other and other.data:
-				var other_base_health: int = other.data.max_health * (level - 1)
-				var other_base_attack: int = other.data.attack * (level - 1)
-				var other_base_heal: int = other.data.base_heal * (level - 1)
-				var other_base_shield: int = other.data.base_shield * (level - 1)
-				var other_base_burn: int = other.data.base_burn * (level - 1)
-				var other_base_electrocute: int = other.data.base_electrocute * (level - 1)
-				var other_base_poison: int = other.data.base_poison * (level - 1)
-
-				health += maxi(0, other.health - other_base_health)
-				attack += maxi(0, other.attack - other_base_attack)
-				heal += maxi(0, other.heal - other_base_heal)
-				shield += maxi(0, other.shield - other_base_shield)
-				burn += maxi(0, other.burn - other_base_burn)
-				electrocute += maxi(0, other.electrocute - other_base_electrocute)
-				poison += maxi(0, other.poison - other_base_poison)
+			absorb_bonus_stats_from(other)
 
 	if level == 3 and data.modifier and data.modifier.has_method("evolve"):
 		data.modifier.call("evolve", self)
+
+func absorb_bonus_stats_from(other: UnitInstance) -> void:
+	var base_hp: int = other.data.max_health * other.level
+	var base_atk: int = other.data.attack * other.level
+	var base_heal: int = other.data.base_heal * other.level
+	var base_shield: int = other.data.base_shield * other.level
+	var base_burn: int = other.data.base_burn * other.level
+	var base_elec: int = other.data.base_electrocute * other.level
+	var base_poi: int = other.data.base_poison * other.level
+
+	health += maxi(0, other.health - base_hp)
+	attack += maxi(0, other.attack - base_atk)
+	heal += maxi(0, other.heal - base_heal)
+	shield += maxi(0, other.shield - base_shield)
+	burn += maxi(0, other.burn - base_burn)
+	electrocute += maxi(0, other.electrocute - base_elec)
+	poison += maxi(0, other.poison - base_poi)

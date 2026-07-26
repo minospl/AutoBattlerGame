@@ -43,4 +43,4 @@ func apply_shop_modifier(source_idx: int, team_units: Array) -> void:
 
 func get_description(p_level: int = 1) -> String:
 	var times: int = int(get_modifier_value(p_level)) + 1
-	return "%s\nTrigger [color=%s]ALL[/color] [color=%s]SLIME[/color] modifiers %dx" % [get_trigger_name(trigger), GameColors.DESC_TARGET, GameColors.DESC_TYPE_SLIME, times]
+	return "%s\n[color=%s]EXCLUSIVE[/color] Trigger [color=%s]ALL[/color] [color=%s]SLIME[/color] modifiers %dx" % [get_trigger_name(trigger), GameColors.DESC_EXCLUSIVE, GameColors.DESC_TARGET, GameColors.DESC_TYPE_SLIME, times]

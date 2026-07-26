@@ -33,6 +33,12 @@ const KEYWORD_MAP: Dictionary = {
 	# Durations
 	"duration_permanent": { "title": "KEYWORD_DURATION_PERMANENT_TITLE", "desc": "KEYWORD_DURATION_PERMANENT_DESC" },
 	"duration_battle": { "title": "KEYWORD_DURATION_BATTLE_TITLE", "desc": "KEYWORD_DURATION_BATTLE_DESC" },
+
+	# Modifiers
+	"exclusive": {
+		"title": "EXCLUSIVE",
+		"desc": "Exclusive effects do not stack in the team.\nOnly one effect triggers from the unit with the highest level (LVL)."
+	},
 }
 
 static func get_keywords_for_unit(unit: UnitInstance, lvl: int) -> Array[Dictionary]:
@@ -90,6 +96,9 @@ static func get_keywords_for_unit(unit: UnitInstance, lvl: int) -> Array[Diction
 				list.append(_get_keyword_entry("target_horizontal_plus"))
 			UnitModifier.TargetType.ALL:
 				list.append(_get_keyword_entry("target_all"))
+
+		if unit_modifier.is_exclusive and not _has_keyword(list, "exclusive"):
+			list.append(_get_keyword_entry("exclusive"))
 
 		# 3. Dynamic keywords declared by the modifier script itself
 		if unit_modifier.has_method("get_implied_keywords"):
