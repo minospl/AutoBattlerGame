@@ -393,7 +393,7 @@ func buff_unit_cast_speed(slot_idx: int, amount: float, permanent: bool = false)
 				reduction_str = str(int(roundf(actual_reduction)))
 			else:
 				reduction_str = "%.1f" % actual_reduction
-			spawn_floating_text_on_slot(slot_idx, "-" + reduction_str, Color(GameColors.DESC_CAST_SPEED))
+			spawn_floating_text_on_slot(slot_idx, "-" + reduction_str + "s", Color(GameColors.DESC_CAST_SPEED))
 	unit_stats_changed.emit(slot_idx)
 
 func add_unit_gold(slot_idx: int, amount: int) -> void:
