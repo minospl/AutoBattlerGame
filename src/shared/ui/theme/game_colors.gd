@@ -15,9 +15,6 @@ const SLOT_HOVER_INNER_BORDER: Color = Color(0.718, 0.99, 0.721, 1) # Light gree
 const WHITE_COLOR: Color = Color(1, 1, 1, 1.0) # Solid off-white
 const TRANSPARENT: Color = Color(0, 0, 0, 0.0) # Transparent
 
-# Card portrait fallback text color
-const PORTRAIT_FALLBACK_TEXT: Color = Color(0.2, 0.2, 0.2, 0.75)
-
 # Tooltip Description Formatting Colors (Hex Strings)
 const DESC_TRIGGER: String = "#f2b726" # Standardized bright gold for all triggers
 const DESC_TARGET: String = "#f2b726" # Standardized bright blue for all targets/directions
