@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://src/features/units/types/plant.tres" id="type_plant"]
 [ext_resource type="Resource" path="res://src/features/units/types/slime.tres" id="type_slime"]
 [ext_resource type="Script" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Resource" path="res://src/features/units/rarities/common.tres" id="unit_rarity"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/uncommon.tres" id="unit_rarity"]
 [ext_resource type="Script" path="res://src/features/units/unit_type.gd" id="unit_type"]
 
 [sub_resource type="Resource" id="Resource_plant_slime_mod"]
@@ -14,7 +14,7 @@ trigger = 4
 [resource]
 script = ExtResource("unit_data")
 display_name = "Plant Slime"
-price = 1
+price = 2
 max_health = 20
 attack = 0
 types = Array[ExtResource("unit_type")]([ExtResource("type_plant"), ExtResource("type_slime")])

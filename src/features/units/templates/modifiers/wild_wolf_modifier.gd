@@ -21,7 +21,7 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 	for idx: int in TargetResolver.get_target_indices(source_idx, current_target, team_obj.has_magnetic_core, team_obj.has_focusing_lens):
 		var target_unit: UnitInstance = team_obj.units[idx]
 		if target_unit and target_unit.has_type("Beast"):
-			team_obj.buff_unit_attack(idx, buff, false)
+			team_obj.buff_unit_attack(idx, buff, true)
 
 func get_description(p_level: int = 1) -> String:
 	var target_str: String = "[color=%s]ADJACENT[/color] [color=%s]BEAST[/color] allies" % [GameColors.DESC_TARGET, GameColors.DESC_TYPE_BEAST]

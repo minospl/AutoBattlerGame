@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://src/features/items/templates/modifiers/shield_elixir_modifier.gd" id="1_modifier"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/uncommon.tres" id="2_rarity"]
+[ext_resource type="Script" path="res://src/features/items/item_data.gd" id="3_data"]
+
+[sub_resource type="Resource" id="Resource_shield_elixir_modifier"]
+script = ExtResource("1_modifier")
+shield_boost = 5
+
+[resource]
+script = ExtResource("3_data")
+display_name = "Shield Elixir"
+price = 3
+rarity = ExtResource("2_rarity")
+is_clickable = false
+modifier = SubResource("Resource_shield_elixir_modifier")

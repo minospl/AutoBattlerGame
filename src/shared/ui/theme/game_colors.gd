@@ -29,8 +29,16 @@ const DESC_POISON: String = "#8e44ad" # Standardized purple for poison
 const DESC_BURN: String = "#e67e22" # Standardized Orange for burn
 const DESC_ELECTROCUTE: String = "#f1c40f" # Standardized Yellow for electrocute
 const DESC_GOLD: String = "#ffd700" # Gold color
+const DESC_ITEM: String = "#2e73b8" # Sleek blue matching BADGE_COLOR_ITEM
 const DESC_CAST_SPEED: String = "#ffffff" # White/default text color for cast speed / cd reduction
-const DESC_UNIQUE: String = "#e61a33" # Ruby-red for unique rarity / roll references
+
+# Rarity Description Formatting Colors (Hex Strings)
+const DESC_COMMON: String = "#708094" # Grey for common rarity
+const DESC_UNCOMMON: String = "#33bf59" # Green for uncommon rarity
+const DESC_RARE: String = "#3082cf" # Blue for rare rarity
+const DESC_EPIC: String = "#8059d6" # Purple for epic rarity
+const DESC_LEGENDARY: String = "#d69e2e" # Gold for legendary rarity
+const DESC_UNIQUE: String = "#e61a33" # Ruby-red for unique rarity
 
 # Unit Type Description Formatting Colors (Hex Strings)
 const DESC_TYPE_EARTH: String = "#78350f" # Earth brown

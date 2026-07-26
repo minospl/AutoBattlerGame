@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://src/features/units/types/earth.tres" id="type_earth"]
 [ext_resource type="Resource" path="res://src/features/units/types/slime.tres" id="type_slime"]
 [ext_resource type="Script" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Resource" path="res://src/features/units/rarities/uncommon.tres" id="unit_rarity"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/rare.tres" id="unit_rarity"]
 [ext_resource type="Script" path="res://src/features/units/unit_type.gd" id="unit_type"]
 
 [sub_resource type="Resource" id="Resource_earth_slime_mod"]
@@ -14,7 +14,7 @@ trigger = 4
 [resource]
 script = ExtResource("unit_data")
 display_name = "Earth Slime"
-price = 2
+price = 3
 max_health = 20
 attack = 0
 base_shield = 5

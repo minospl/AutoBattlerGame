@@ -2,7 +2,7 @@ class_name ResonanceStoneRelic
 extends RelicModifier
 
 func get_description(_relic_inst: RelicInstance = null) -> String:
-	return "Units %s modifiers trigger [color=%s]2 times[/color]." % [get_trigger_name("On Battle Start"), GameColors.DESC_TARGET]
+	return "Units %s modifiers trigger [color=%s]2 TIMES[/color]." % [get_trigger_name("ON BATTLE START"), GameColors.DESC_TARGET]
 
 func get_implied_keywords() -> Array[String]:
 	return ["trigger_battle_start"]

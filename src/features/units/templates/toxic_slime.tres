@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://src/features/units/types/toxic.tres" id="type_toxic"]
 [ext_resource type="Resource" path="res://src/features/units/types/slime.tres" id="type_slime"]
 [ext_resource type="Script" path="res://src/features/units/unit_data.gd" id="unit_data"]
-[ext_resource type="Resource" path="res://src/features/units/rarities/rare.tres" id="unit_rarity"]
+[ext_resource type="Resource" path="res://src/features/units/rarities/epic.tres" id="unit_rarity"]
 [ext_resource type="Script" path="res://src/features/units/unit_type.gd" id="unit_type"]
 
 [sub_resource type="Resource" id="Resource_toxic_slime_mod"]
@@ -14,7 +14,7 @@ trigger = 4
 [resource]
 script = ExtResource("unit_data")
 display_name = "Toxic Slime"
-price = 3
+price = 4
 max_health = 20
 attack = 0
 base_poison = 2

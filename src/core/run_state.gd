@@ -36,6 +36,7 @@ signal shop_card_generated(card: Resource)
 signal shop_rolled()
 signal shop_size_changed(p_new_size: int)
 signal base_health_changed(p_base_health: int)
+signal battle_completed(outcome: String)
 
 func notify_shop_slot_updated(p_slot_index: int, p_card_instance: Resource) -> void:
 	shop_slot_updated.emit(p_slot_index, p_card_instance)
@@ -146,16 +147,27 @@ func roll_rarity() -> Rarity.Type:
 	var roll: float = randf()
 	var cumulative: float = 0.0
 	
-	cumulative += weights[0]
-	if roll < cumulative:
-		return Rarity.Type.COMMON
-	cumulative += weights[1]
-	if roll < cumulative:
-		return Rarity.Type.RARE
-	cumulative += weights[2]
-	if roll < cumulative:
-		return Rarity.Type.EPIC
-	return Rarity.Type.LEGENDARY
+	if weights.size() > 0:
+		cumulative += weights[0]
+		if roll < cumulative:
+			return Rarity.Type.COMMON
+	if weights.size() > 1:
+		cumulative += weights[1]
+		if roll < cumulative:
+			return Rarity.Type.UNCOMMON
+	if weights.size() > 2:
+		cumulative += weights[2]
+		if roll < cumulative:
+			return Rarity.Type.RARE
+	if weights.size() > 3:
+		cumulative += weights[3]
+		if roll < cumulative:
+			return Rarity.Type.EPIC
+	if weights.size() > 4:
+		cumulative += weights[4]
+		if roll < cumulative:
+			return Rarity.Type.LEGENDARY
+	return Rarity.Type.COMMON
 
 func complete_battle(outcome: String) -> void:
 	item_purchase_count = 0
@@ -172,6 +184,8 @@ func complete_battle(outcome: String) -> void:
 		for i: int in range(shop_cards.size()):
 			if not shop_frozen_statuses[i]:
 				shop_cards[i] = null
+				
+	battle_completed.emit(outcome)
 
 func is_victory() -> bool:
 	return trophies >= max_trophies

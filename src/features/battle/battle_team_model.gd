@@ -303,7 +303,7 @@ func buff_unit_attack(slot_idx: int, amount: int, permanent: bool = false) -> vo
 		b_unit.attack += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.attack += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " ATK", Color(GameColors.DESC_ATTACK))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_ATTACK))
 	unit_stats_changed.emit(slot_idx)
 
 func buff_unit_max_health(slot_idx: int, amount: int, permanent: bool = false) -> void:
@@ -317,7 +317,7 @@ func buff_unit_max_health(slot_idx: int, amount: int, permanent: bool = false) -
 	max_health += amount
 	health += amount
 	health_changed.emit(health, max_health, shield)
-	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " HP", Color(GameColors.DESC_HEALTH))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_HEALTH))
 	unit_stats_changed.emit(slot_idx)
 
 func buff_unit_shield(slot_idx: int, amount: int, permanent: bool = false) -> void:
@@ -328,7 +328,7 @@ func buff_unit_shield(slot_idx: int, amount: int, permanent: bool = false) -> vo
 		b_unit.shield += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.shield += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Shield", Color(GameColors.DESC_SHIELD))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_SHIELD))
 	unit_stats_changed.emit(slot_idx)
 
 func buff_unit_poison(slot_idx: int, amount: int, permanent: bool = false) -> void:
@@ -339,7 +339,7 @@ func buff_unit_poison(slot_idx: int, amount: int, permanent: bool = false) -> vo
 		b_unit.poison += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.poison += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Poison", Color(GameColors.DESC_POISON))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_POISON))
 	unit_stats_changed.emit(slot_idx)
 
 func buff_unit_burn(slot_idx: int, amount: int, permanent: bool = false) -> void:
@@ -350,7 +350,7 @@ func buff_unit_burn(slot_idx: int, amount: int, permanent: bool = false) -> void
 		b_unit.burn += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.burn += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Burn", Color(GameColors.DESC_BURN))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_BURN))
 	unit_stats_changed.emit(slot_idx)
 
 func buff_unit_electrocute(slot_idx: int, amount: int, permanent: bool = false) -> void:
@@ -361,7 +361,7 @@ func buff_unit_electrocute(slot_idx: int, amount: int, permanent: bool = false) 
 		b_unit.electrocute += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.electrocute += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Electrocute", Color(GameColors.DESC_ELECTROCUTE))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_ELECTROCUTE))
 	unit_stats_changed.emit(slot_idx)
 
 func buff_unit_heal(slot_idx: int, amount: int, permanent: bool = false) -> void:
@@ -372,7 +372,7 @@ func buff_unit_heal(slot_idx: int, amount: int, permanent: bool = false) -> void
 		b_unit.heal += amount
 		if permanent and b_unit.base_unit:
 			b_unit.base_unit.heal += amount
-	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Heal Power", Color(GameColors.DESC_HEAL))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_HEAL))
 	unit_stats_changed.emit(slot_idx)
 
 func buff_unit_cast_speed(slot_idx: int, amount: float, permanent: bool = false) -> void:
@@ -393,7 +393,7 @@ func buff_unit_cast_speed(slot_idx: int, amount: float, permanent: bool = false)
 				reduction_str = str(int(roundf(actual_reduction)))
 			else:
 				reduction_str = "%.1f" % actual_reduction
-			spawn_floating_text_on_slot(slot_idx, "-" + reduction_str + "s CD", Color(GameColors.DESC_CAST_SPEED))
+			spawn_floating_text_on_slot(slot_idx, "-" + reduction_str, Color(GameColors.DESC_CAST_SPEED))
 	unit_stats_changed.emit(slot_idx)
 
 func add_unit_gold(slot_idx: int, amount: int) -> void:
@@ -402,7 +402,7 @@ func add_unit_gold(slot_idx: int, amount: int) -> void:
 
 	gold_generated.emit(amount)
 
-	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount) + " Gold", Color(GameColors.DESC_GOLD))
+	spawn_floating_text_on_slot(slot_idx, "+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_GOLD))
 
 func has_relic(p_name: String) -> bool:
 	return RelicInstance.has_relic(active_relics, p_name)

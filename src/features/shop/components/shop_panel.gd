@@ -127,18 +127,20 @@ func _format_chance_text(weights: Array[float]) -> String:
 	var parts: Array[String] = []
 	var w_scale: float = 1.0 - unique_chance
 	
-	parts.append("[b][color=#e0e0e0][LVL %d][/color][/b]" % shop_level)
+	parts.append("[b][color=#e0e0e0]LVL %d[/color][/b]" % shop_level)
 
 	if weights.size() > 0 and weights[0] > 0.0:
-		parts.append("[color=#708094]C:%d%%[/color]" % roundi(weights[0] * w_scale * 100))
+		parts.append("[b][color=#708094]%d%%[/color][/b]" % roundi(weights[0] * w_scale * 100))
 	if weights.size() > 1 and weights[1] > 0.0:
-		parts.append("[color=#3082cf]R:%d%%[/color]" % roundi(weights[1] * w_scale * 100))
+		parts.append("[b][color=#4caf50]%d%%[/color][/b]" % roundi(weights[1] * w_scale * 100))
 	if weights.size() > 2 and weights[2] > 0.0:
-		parts.append("[color=#8059d6]E:%d%%[/color]" % roundi(weights[2] * w_scale * 100))
+		parts.append("[b][color=#3082cf]%d%%[/color][/b]" % roundi(weights[2] * w_scale * 100))
 	if weights.size() > 3 and weights[3] > 0.0:
-		parts.append("[color=#d69e2e]L:%d%%[/color]" % roundi(weights[3] * w_scale * 100))
+		parts.append("[b][color=#8059d6]%d%%[/color][/b]" % roundi(weights[3] * w_scale * 100))
+	if weights.size() > 4 and weights[4] > 0.0:
+		parts.append("[b][color=#d69e2e]%d%%[/color][/b]" % roundi(weights[4] * w_scale * 100))
 	if unique_chance > 0.0:
-		parts.append("[color=#e61a33]U:%d%%[/color]" % roundi(unique_chance * 100))
+		parts.append("[b][color=#e61a33]%d%%[/color][/b]" % roundi(unique_chance * 100))
 
 	return " ".join([parts[0], " | ".join(parts.slice(1))]) if parts.size() > 1 else parts[0]
 
