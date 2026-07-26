@@ -119,8 +119,7 @@ static func setup_portrait(unit_instance: UnitInstance, sprite_rect: TextureRect
 	else:
 		sprite_rect.visible = false
 		fallback_label.visible = true
-		fallback_label.text = unit_instance.get_unit_name().left(1).to_upper()
-		fallback_label.add_theme_color_override("font_color", GameColors.PORTRAIT_FALLBACK_TEXT)
+		fallback_label.text = unit_instance.get_unit_name().to_upper()
 
 ## Configures backdrop shader for stat labels
 static func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: Vector2) -> void:
