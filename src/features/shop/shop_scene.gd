@@ -211,17 +211,13 @@ func _check_and_execute_slime_fusion() -> bool:
 		]
 	}
 
-	var main_card: UnitCard = active_slots[0].get_card() as UnitCard
-	if main_card:
-		main_card.unit_instance = rainbow_inst
-
 	run_state.active_team[0] = rainbow_inst
 	for i: int in range(1, run_state.active_team.size()):
 		run_state.active_team[i] = null
 
 	ShopMergeAnimator.animate_merge(self, merge_anim_data, func() -> void:
 		load_state_from_run()
-	)
+	, rainbow_inst)
 	return true
 
 ## Instantiate slot scenes and arrange them inside containers

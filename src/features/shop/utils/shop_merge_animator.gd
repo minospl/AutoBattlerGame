@@ -2,7 +2,7 @@ class_name ShopMergeAnimator
 extends Object
 
 ## Animates three matching cards merging into a higher tier card in the center.
-static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable) -> void:
+static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable, new_unit_instance: UnitInstance = null) -> void:
 	var main_info: Dictionary = merge.get("main", {})
 	var removed_list: Array = merge.get("removed", [])
 	
@@ -124,13 +124,13 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	all_animating.append({
 		"card": main_card,
 		"start_pos": main_start_pos,
-		"target_rotation": 0.0,
+		"target_rotation": 0,
 		"size": main_size
 	})
 	
 	for i: int in range(overlay_removed.size()):
 		var info: Dictionary = overlay_removed[i]
-		var rot: float = 0.0 if i == 0 else 0.2
+		var rot: float = 0.2
 		var info_card: UnitCard = info.get("card")
 		var info_start_pos: Vector2 = info.get("start_pos", Vector2.ZERO)
 		var info_card_size: Vector2 = info.get("size", Vector2.ZERO)
@@ -142,11 +142,9 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 			"size": info_card_size
 		})
 		
-	# --- PHASE 1: Pull to Center (Triangle Position) ---
+	# --- PHASE 1: Pull to Center ---
 	var p1_tween: Tween = shop.create_tween().set_parallel(true)
 	for item_val: Variant in all_animating:
-		if not (item_val is Dictionary):
-			continue
 		var item: Dictionary = item_val
 		var card: UnitCard = item.get("card")
 		var target_rot: float = item.get("target_rotation", 0.0)
@@ -163,7 +161,7 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 	merge_tween.tween_property(main_card, "scale", Vector2(1.35, 1.35), 0.35)\
 		.set_trans(Tween.TRANS_QUAD)\
 		.set_ease(Tween.EASE_IN_OUT)
-	merge_tween.tween_property(main_card, "rotation", 0.0, 0.35)
+	merge_tween.tween_property(main_card, "rotation", 0, 0.35)
 	
 	# Tween the removed cards to center, rotating, fading out and shrinking to zero
 	for i: int in range(overlay_removed.size()):
@@ -191,6 +189,8 @@ static func animate_merge(shop: ShopScene, merge: Dictionary, callback: Callable
 				card_clean.queue_free()
 		
 		if is_instance_valid(main_card):
+			if new_unit_instance:
+				main_card.unit_instance = new_unit_instance
 			main_card.update_ui()
 			var pop_tween: Tween = shop.create_tween()
 			pop_tween.tween_property(main_card, "scale", Vector2(1.5, 1.5), 0.1)\
