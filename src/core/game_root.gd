@@ -92,6 +92,7 @@ func _initialize_new_run() -> void:
 		if temp:
 			var instance: UnitInstance = UnitInstance.new()
 			instance.initialize(temp)
+			instance.level = randi_range(1, 3)
 			run_state.active_team[i] = instance
 		else:
 			run_state.active_team[i] = null
