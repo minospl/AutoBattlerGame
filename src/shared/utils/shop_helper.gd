@@ -194,12 +194,19 @@ static func toggle_freeze_shop_slot(p_run_state: RunState, slot_idx: int) -> voi
 	p_run_state.shop_frozen_statuses[slot_idx] = next_status
 	p_run_state.notify_shop_slot_freeze_changed(slot_idx, next_status)
 
-static func roll_shop(p_run_state: RunState, free: bool = false) -> void:
-	if not free:
-		if p_run_state.gold < 1:
-			return
-		p_run_state.gold -= 1
-		
+static func is_shop_frozen(p_run_state: RunState) -> bool:
+	return not p_run_state.shop_frozen_statuses.has(false)
+
+static func request_shop_roll(p_run_state: RunState) -> void:
+	if is_shop_frozen(p_run_state):
+		return
+
+	if p_run_state.gold < 1:
+		return
+	p_run_state.gold -= 1
+	roll_shop(p_run_state)
+
+static func roll_shop(p_run_state: RunState) -> void:
 	p_run_state.notify_shop_rolled()
 		
 	for i: int in range(p_run_state.shop_cards.size()):

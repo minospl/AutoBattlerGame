@@ -25,6 +25,13 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="FrozenOverlay" type="ColorRect" parent="CardWrapper"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.18, 0.55, 0.85, 0.22)
+
 [node name="MarginContainer" type="MarginContainer" parent="CardWrapper"]
 layout_mode = 2
 mouse_filter = 2

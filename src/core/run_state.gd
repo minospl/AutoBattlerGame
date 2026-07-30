@@ -231,8 +231,11 @@ func sell_unit(slot_idx: int, is_active: bool) -> void:
 func toggle_freeze_shop_slot(slot_idx: int) -> void:
 	ShopHelper.toggle_freeze_shop_slot(self, slot_idx)
 
-func roll_shop(free: bool = false) -> void:
-	ShopHelper.roll_shop(self, free)
+func request_shop_roll() -> void:
+	ShopHelper.request_shop_roll(self)
+
+func roll_shop() -> void:
+	ShopHelper.roll_shop(self)
 
 func change_shop_size(p_diff: int) -> void:
 	ShopHelper.change_shop_size(self, p_diff)
@@ -302,7 +305,7 @@ func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY,
 	shop_frozen_statuses.fill(false)
 	
 	# Roll the shop for free
-	roll_shop(true)
+	roll_shop()
 
 func add_random_relic(p_rarity: Rarity = null) -> void:
 	var available: Array[RelicData] = get_available_relic_templates(p_rarity)

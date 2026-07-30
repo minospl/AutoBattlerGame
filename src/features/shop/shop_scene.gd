@@ -333,8 +333,7 @@ func _on_restart_requested() -> void:
 	restart_requested.emit()
 
 func _on_roll_requested() -> void:
-	if run_state:
-		run_state.roll_shop(false)
+	run_state.request_shop_roll()
 
 func _on_sell_card_requested(card: UnitCard, original_slot: UnitSlot) -> void:
 	# Execute in Model first

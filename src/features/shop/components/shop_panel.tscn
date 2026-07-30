@@ -102,7 +102,7 @@ mouse_filter = 2
 
 [node name="FreezeShopButton" type="Button" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(26, 19)
+custom_minimum_size = Vector2(60, 19)
 layout_mode = 2
 toggle_mode = true
 
@@ -130,7 +130,7 @@ bbcode_enabled = true
 fit_content = true
 clip_contents = false
 autowrap_mode = 0
-text = "❄"
+text = "FREEZE"
 
 [node name="RefreshShopButton" type="Button" parent="ShopOuterMargin/VBox/ShopHeader/Margin/HeaderHBox"]
 unique_name_in_owner = true

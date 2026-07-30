@@ -3,7 +3,10 @@ extends Control
 
 @export var slot_index: int = 0
 
-var is_frozen: bool = false
+var is_frozen: bool = false:
+	set(val):
+		is_frozen = val
+		_update_frozen_ui()
 
 @onready var card_container: PanelContainer = %CardContainer
 
@@ -29,12 +32,19 @@ func update_placeholder() -> void:
 			border_rect.border_color = GameColors.BORDER_OUTER_DEFAULT
 			border_rect.inner_border_color = GameColors.BORDER_INNER_DEFAULT
 			border_rect.update_shader_parameters()
+	_update_frozen_ui()
+
+func _update_frozen_ui() -> void:
+	var card: Control = get_card()
+	if card and card.has_method("set_frozen"):
+		card.call("set_frozen", is_frozen)
 
 func add_card(card: Control) -> void:
 	if has_node("CardContainer"):
 		card_container.add_child(card)
 		if "slot" in card:
 			card.set("slot", self)
+		_update_frozen_ui.call_deferred()
 
 func remove_card(card: Control) -> void:
 	if has_node("CardContainer") and card.get_parent() == card_container:

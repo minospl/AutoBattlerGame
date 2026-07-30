@@ -50,6 +50,12 @@ func update_ui() -> void:
 		
 	update_border_colors()
 
+@onready var frozen_overlay: ColorRect = %FrozenOverlay as ColorRect
+
+func set_frozen(p_frozen: bool) -> void:
+	if frozen_overlay:
+		frozen_overlay.visible = p_frozen
+
 func set_highlight(active: bool) -> void:
 	is_highlighted = active
 	update_border_colors()

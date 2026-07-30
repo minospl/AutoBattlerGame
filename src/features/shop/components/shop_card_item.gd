@@ -45,6 +45,12 @@ func update_ui() -> void:
 	if price_label:
 		price_label.text = str(price) + "G"
 
+@onready var frozen_overlay: ColorRect = %FrozenOverlay as ColorRect
+
+func set_frozen(p_frozen: bool) -> void:
+	if frozen_overlay:
+		frozen_overlay.visible = p_frozen
+
 func _get_drag_data(_at_position: Vector2) -> Variant:
 	if item_instance.data.is_clickable:
 		return null
