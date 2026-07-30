@@ -8,7 +8,7 @@ const CARD_SLOT_SIZE_SHOP: Vector2 = Vector2(100, 90)
 ## Visual composition method for backward-compatibility
 static func setup_card_visuals(
 	unit_instance: UnitInstance,
-	stats_hbox: HBoxContainer,
+	stats_bar: UnitStatsBar,
 	sprite_rect: TextureRect,
 	fallback_label: Label,
 	left_ind: Control = null,
@@ -16,102 +16,16 @@ static func setup_card_visuals(
 	top_ind: Control = null,
 	bottom_ind: Control = null
 ) -> void:
-	if not unit_instance:
-		return
-		
-	if stats_hbox:
-		setup_stats(unit_instance, stats_hbox)
-		
-	if sprite_rect and fallback_label:
-		setup_portrait(unit_instance, sprite_rect, fallback_label)
-		
+	setup_stats(unit_instance, stats_bar)
+	setup_portrait(unit_instance, sprite_rect, fallback_label)
 	setup_indicators(unit_instance, left_ind, right_ind, top_ind, bottom_ind)
 
-## Configures combat stats inside a stats HBox container
-static func setup_stats(unit_instance: UnitInstance, stats_hbox: HBoxContainer) -> void:
-	if not unit_instance or not stats_hbox:
-		return
-		
-	# Gather active combat stats
-	var candidates: Array[Dictionary] = []
-	if unit_instance.get_attack() > 0:
-		candidates.append({
-			"value": unit_instance.get_attack(),
-			"color": Color(GameColors.DESC_ATTACK),
-			"priority": 0
-		})
-	if unit_instance.heal > 0:
-		candidates.append({
-			"value": unit_instance.heal,
-			"color": Color(GameColors.DESC_HEAL),
-			"priority": 1
-		})
-	if unit_instance.shield > 0:
-		candidates.append({
-			"value": unit_instance.shield,
-			"color": Color(GameColors.DESC_SHIELD),
-			"priority": 2
-		})
-	if unit_instance.poison > 0:
-		candidates.append({
-			"value": unit_instance.poison,
-			"color": Color(GameColors.DESC_POISON),
-			"priority": 3
-		})
-	if unit_instance.burn > 0:
-		candidates.append({
-			"value": unit_instance.burn,
-			"color": Color(GameColors.DESC_BURN),
-			"priority": 4
-		})
-	if unit_instance.electrocute > 0:
-		candidates.append({
-			"value": unit_instance.electrocute,
-			"color": Color(GameColors.DESC_ELECTROCUTE),
-			"priority": 5
-		})
-
-	# Sort: highest value first
-	candidates.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		if a.value != b.value:
-			return a.value > b.value
-		return a.priority < b.priority
-	)
-
-	# Keep top 3 stats
-	var active_stats: Array[Dictionary] = []
-	active_stats.assign(candidates.slice(0, 3))
-
-	var stat_size: Vector2 = Vector2(30, 16)
-	var template_panel: PanelContainer = stats_hbox.get_child(0) as PanelContainer if stats_hbox.get_child_count() > 0 else null
-
-	if template_panel:
-		stats_hbox.visible = true
-		template_panel.visible = false
-		
-		while stats_hbox.get_child_count() <= active_stats.size():
-			var new_panel: PanelContainer = template_panel.duplicate() as PanelContainer
-			stats_hbox.add_child(new_panel)
-			
-		for i: int in range(1, stats_hbox.get_child_count()):
-			var panel: PanelContainer = stats_hbox.get_child(i) as PanelContainer
-			var stat_idx: int = i - 1
-			if stat_idx < active_stats.size():
-				panel.visible = true
-				var label: Label = panel.find_child("*Label", true, false) as Label
-				if label:
-					var stat_val: int = active_stats[stat_idx].value
-					label.text = NumberFormatter.format_large_number(stat_val)
-				var stat_color: Color = active_stats[stat_idx].color
-				setup_stat_panel_shader(panel, stat_color, stat_size)
-			else:
-				panel.visible = false
+## Configures combat stats inside a stats bar container
+static func setup_stats(unit_instance: UnitInstance, stats_bar: UnitStatsBar) -> void:
+	stats_bar.setup_stats(unit_instance)
 
 ## Configures portrait sprite or name-fallback when no texture exists
-static func setup_portrait(unit_instance: UnitInstance, sprite_rect: TextureRect, fallback_label: Label) -> void:
-	if not sprite_rect or not fallback_label:
-		return
-		
+static func setup_portrait(unit_instance: UnitInstance, sprite_rect: TextureRect, fallback_label: Label) -> void:		
 	if unit_instance.data.sprite:
 		sprite_rect.visible = true
 		fallback_label.visible = false
@@ -121,16 +35,6 @@ static func setup_portrait(unit_instance: UnitInstance, sprite_rect: TextureRect
 		fallback_label.visible = true
 		fallback_label.text = unit_instance.get_unit_name().to_upper()
 
-## Configures backdrop shader for stat labels
-static func setup_stat_panel_shader(panel: PanelContainer, bg_color: Color, stat_size: Vector2) -> void:
-	panel.custom_minimum_size = stat_size
-	var border_rect: ShaderBorderDecorator = panel.get_node_or_null("BorderRect") as ShaderBorderDecorator
-	if border_rect:
-		border_rect.border_color = bg_color.lightened(.2)
-		border_rect.interior_color = bg_color
-		border_rect.inner_border_width = 2
-		border_rect.border_indentation = 1
-		border_rect.update_shader_parameters()
 
 ## Configures direction indicators using Control (ColorRect/Panel) and indicator_arrow shader
 static func setup_indicators(

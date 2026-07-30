@@ -9,7 +9,7 @@ signal hovered(card: BattleCard, is_hovered: bool)
 		if is_inside_tree():
 			update_ui()
 
-@onready var stats_hbox: HBoxContainer = %StatsHBox
+@onready var stats_hbox: UnitStatsBar = %StatsHBox
 @onready var sprite_rect: TextureRect = %SpriteRect
 @onready var portrait_char_label: Label = %PortraitCharLabel
 

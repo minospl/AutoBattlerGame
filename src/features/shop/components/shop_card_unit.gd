@@ -18,6 +18,12 @@ var is_highlighted: bool = false
 var is_targeted: bool = false
 var slot: ShopSlot = null
 
+@onready var stats_hbox: UnitStatsBar = %StatsHBox
+@onready var card_portrait: CardPortrait = %CardPortrait
+@onready var name_label: Label = %NameLabel
+@onready var price_label: Label = %PriceLabel
+@onready var frozen_overlay: ColorRect = %FrozenOverlay
+
 func _ready() -> void:
 	custom_minimum_size = CardUIHelper.CARD_SLOT_SIZE_SHOP
 	update_ui()
@@ -29,32 +35,24 @@ func update_ui() -> void:
 		return
 		
 	# 1. Configure stats using modular helpers
-	CardUIHelper.setup_stats(unit_instance, %StatsHBox as HBoxContainer)
+	CardUIHelper.setup_stats(unit_instance, stats_hbox)
 	
 	# 2. Configure portrait and rarity border
-	var portrait: CardPortrait = %CardPortrait as CardPortrait
-	portrait.setup_visuals(unit_instance.data)
-	portrait.border_rect.interior_color = GameColors.WHITE_COLOR
-	portrait.border_rect.update_shader_parameters()
+	card_portrait.setup_visuals(unit_instance.data)
+	card_portrait.border_rect.interior_color = GameColors.WHITE_COLOR
+	card_portrait.border_rect.update_shader_parameters()
 	
-	var texture_rect: TextureRect = portrait.find_child("TextureRect", true, false)
-	if texture_rect:
-		texture_rect.offset_top = -20.0
+	if card_portrait.card_sprite and card_portrait.card_sprite.texture_rect:
+		card_portrait.card_sprite.texture_rect.offset_top = -20.0
 		
 	# 3. Configure name and price footer
-	var name_label: Label = %NameLabel as Label
 	name_label.text = unit_instance.data.display_name
-		
-	var price_label: Label = %PriceLabel as Label
 	price_label.text = str(price) + "G"
 		
 	update_border_colors()
 
-@onready var frozen_overlay: ColorRect = %FrozenOverlay as ColorRect
-
 func set_frozen(p_frozen: bool) -> void:
-	if frozen_overlay:
-		frozen_overlay.visible = p_frozen
+	frozen_overlay.visible = p_frozen
 
 func set_highlight(active: bool) -> void:
 	is_highlighted = active
@@ -65,13 +63,7 @@ func set_target_highlight(active: bool) -> void:
 	update_border_colors()
 
 func update_border_colors() -> void:
-	var portrait: CardPortrait = %CardPortrait as CardPortrait
-	if not portrait:
-		return
-		
-	var border_rect: ShaderBorderDecorator = portrait.get_node_or_null("BorderRect") as ShaderBorderDecorator
-	if not border_rect:
-		return
+	var border_rect: ShaderBorderDecorator = card_portrait.border_rect
 		
 	if is_highlighted:
 		border_rect.border_color = GameColors.SLOT_HOVER_OUTER_BORDER

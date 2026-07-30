@@ -10,7 +10,7 @@ signal hovered(card: UnitCard, is_hovered: bool)
 			update_ui()
 
 @onready var card_portrait: CardPortrait = %CardPortrait
-@onready var stats_hbox: HBoxContainer = %StatsHBox
+@onready var stats_hbox: UnitStatsBar = %StatsHBox
 @onready var direction_indicators: DirectionIndicators = %DirectionIndicators
 
 var is_highlighted: bool = false

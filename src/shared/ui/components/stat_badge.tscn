@@ -1,0 +1,40 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/shared/ui/components/stat_badge.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
+
+[node name="StatBadge" type="PanelContainer"]
+custom_minimum_size = Vector2(28, 16)
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="BorderRect" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("2_decorator")
+border_type = 0
+outer_border_width = 2
+border_indentation = 1
+
+[node name="StatWrapper" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="StatLabel" type="Label" parent="StatWrapper"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.12, 0.13, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.4)
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
+theme_override_font_sizes/font_size = 13
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
