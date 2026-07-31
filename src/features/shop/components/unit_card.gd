@@ -12,6 +12,7 @@ signal hovered(card: UnitCard, is_hovered: bool)
 @onready var card_portrait: CardPortrait = %CardPortrait
 @onready var stats_hbox: UnitStatsBar = %StatsHBox
 @onready var direction_indicators: DirectionIndicators = %DirectionIndicators
+@onready var level_indicator: LevelIndicator = %LevelIndicator
 
 var is_highlighted: bool = false
 var is_targeted: bool = false
@@ -39,6 +40,10 @@ func update_ui() -> void:
 	# 3. Konfiguracja wskaźników celowania
 	if direction_indicators:
 		direction_indicators.setup_indicators(unit_instance)
+		
+	# 4. Konfiguracja wskaźnika poziomu
+	if level_indicator:
+		level_indicator.setup(unit_instance.level)
 		
 	update_border_colors()
 

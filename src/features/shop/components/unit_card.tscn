@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://c6unitcarduid"]
+[gd_scene load_steps=7 format=3 uid="uid://c6unitcarduid"]
 
 [ext_resource type="Script" path="res://src/features/shop/components/unit_card.gd" id="1_script"]
 [ext_resource type="PackedScene" uid="uid://ccmv3fktknktn" path="res://src/shared/ui/components/card_portrait.tscn" id="2_portrait"]
 [ext_resource type="Script" path="res://src/shared/ui/components/unit_stats_bar.gd" id="3_stats_bar"]
 [ext_resource type="PackedScene" uid="uid://cbdirectionindicatorsuid" path="res://src/shared/ui/components/direction_indicators.tscn" id="4_indicators"]
+[ext_resource type="PackedScene" uid="uid://c5levelindicatoruid" path="res://src/shared/ui/components/level_indicator.tscn" id="5_level_indicator"]
 
 [node name="UnitCard" type="MarginContainer"]
 custom_minimum_size = Vector2(100, 100)
@@ -42,5 +43,9 @@ alignment = 1
 script = ExtResource("3_stats_bar")
 
 [node name="DirectionIndicators" parent="." instance=ExtResource("4_indicators")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="LevelIndicator" parent="." instance=ExtResource("5_level_indicator")]
 unique_name_in_owner = true
 layout_mode = 2
