@@ -5,19 +5,31 @@ extends Node
 @export var battle_scene_path: String = "res://src/features/battle/battle_scene.tscn"
 @export var compendium_scene_path: String = "res://src/features/compendium/compendium_scene.tscn"
 @export var game_over_scene_path: String = "res://src/core/game_over_screen.tscn"
+@export var game_menu_modal_scene: PackedScene = preload("res://src/features/menu/game_menu_modal.tscn")
+@export var settings_modal_scene: PackedScene = preload("res://src/features/settings/settings_modal.tscn")
 
 var run_state: RunState
 @export var unit_templates: Array[UnitData] = []
 @export var item_templates: Array[ItemData] = []
 @export var relic_templates: Array[RelicData] = []
 var current_scene: Node = null
+var current_modal: Control = null
 
 func _ready() -> void:
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 	_load_unit_templates()
 	_load_item_templates()
 	_load_relic_templates()
 	_initialize_new_run()
 	_go_to_shop()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		if current_modal and is_instance_valid(current_modal):
+			return
+		if current_scene and current_scene is ShopScene:
+			get_viewport().set_input_as_handled()
+			_open_game_menu_modal()
 
 func _load_unit_templates() -> void:
 	unit_templates.clear()
@@ -98,6 +110,7 @@ func _initialize_new_run() -> void:
 			run_state.active_team[i] = null
 
 func _change_scene(scene_path: String, setup_callable: Callable) -> void:
+	_close_modal()
 	if current_scene:
 		current_scene.queue_free()
 		current_scene = null
@@ -118,16 +131,12 @@ func _go_to_shop() -> void:
 		if shop:
 			shop.setup(run_state)
 			shop.battle_requested.connect(_on_battle_requested)
-			shop.compendium_requested.connect(_on_compendium_requested)
-			shop.restart_requested.connect(_on_shop_restart_requested)
+			shop.menu_requested.connect(_on_menu_requested)
 	)
 
-func _on_shop_restart_requested() -> void:
+func _restart_run() -> void:
 	_initialize_new_run()
 	_go_to_shop()
-
-func _on_compendium_requested() -> void:
-	_go_to_compendium()
 
 func _on_compendium_back_requested() -> void:
 	_go_to_shop()
@@ -181,3 +190,45 @@ func _show_game_over(p_victory: bool) -> void:
 		_initialize_new_run()
 		_go_to_shop()
 	)
+
+func _on_menu_requested() -> void:
+	if current_modal and is_instance_valid(current_modal):
+		_close_modal()
+	else:
+		_open_game_menu_modal()
+
+func _open_game_menu_modal() -> void:
+	_close_modal()
+	if not game_menu_modal_scene:
+		printerr("Failed to load GameMenuModal")
+		return
+	var modal: GameMenuModal = game_menu_modal_scene.instantiate() as GameMenuModal
+	add_child(modal)
+	current_modal = modal
+	
+	modal.resume_requested.connect(_close_modal)
+	modal.compendium_requested.connect(func() -> void:
+		_close_modal()
+		_go_to_compendium()
+	)
+	modal.settings_requested.connect(_open_settings_modal)
+	modal.restart_requested.connect(func() -> void:
+		_close_modal()
+		_restart_run()
+	)
+
+func _open_settings_modal() -> void:
+	_close_modal()
+	if not settings_modal_scene:
+		printerr("Failed to load SettingsModal")
+		return
+	var modal: SettingsModal = settings_modal_scene.instantiate() as SettingsModal
+	add_child(modal)
+	current_modal = modal
+	
+	modal.back_requested.connect(_open_game_menu_modal)
+
+func _close_modal() -> void:
+	if current_modal and is_instance_valid(current_modal):
+		current_modal.queue_free()
+	current_modal = null

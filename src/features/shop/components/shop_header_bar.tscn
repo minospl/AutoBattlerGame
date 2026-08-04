@@ -33,25 +33,13 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="RestartButton" type="Button" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer"]
+[node name="MenuButton" type="Button" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "Restart"
+text = "Menu"
 
-[node name="GameButtonDecorator" type="Node" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer/RestartButton"]
-script = ExtResource("4_button_decorator")
-color_normal = Color(0.1, 0.11, 0.13, 1)
-color_hover = Color(0.15, 0.163, 0.189, 1)
-color_pressed = Color(0.173, 0.188, 0.217, 1)
-
-[node name="CompendiumButton" type="Button" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Compendium"
-
-[node name="GameButtonDecorator" type="Node" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer/CompendiumButton"]
+[node name="GameButtonDecorator" type="Node" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer/MenuButton"]
 script = ExtResource("4_button_decorator")
 color_normal = Color(0.18, 0.24, 0.35, 1)
 color_hover = Color(0.23, 0.31, 0.45, 1)

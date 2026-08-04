@@ -5,10 +5,8 @@ extends Control
 signal team_state_changed
 ## Signal emitted when the player wants to transition to battle
 signal battle_requested
-## Signal emitted when the player wants to view the compendium
-signal compendium_requested
-## Signal emitted when the player wants to restart the run
-signal restart_requested
+## Signal emitted when the player wants to open the game menu
+signal menu_requested
 
 var active_slot_count: int:
 	get:
@@ -69,9 +67,8 @@ func _ready() -> void:
 	team_state_changed.connect(_update_team_hp)
 	
 	# Connect control panel signals
-	shop_header_bar.restart_requested.connect(_on_restart_requested)
+	shop_header_bar.menu_requested.connect(func() -> void: menu_requested.emit())
 	shop_header_bar.battle_requested.connect(_on_battle_requested)
-	shop_header_bar.compendium_requested.connect(func() -> void: compendium_requested.emit())
 	
 	# Connect shop panel signals
 	shop_panel.roll_requested.connect(_on_roll_requested)
@@ -328,9 +325,6 @@ func clear_all() -> void:
 		run_state.bench[i] = null
 	populate_ui()
 	team_state_changed.emit()
-
-func _on_restart_requested() -> void:
-	restart_requested.emit()
 
 func _on_roll_requested() -> void:
 	run_state.request_shop_roll()

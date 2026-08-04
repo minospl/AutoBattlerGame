@@ -3,9 +3,8 @@ extends PanelContainer
 
 const SHOP_HEADER_BG_SHADER: Shader = preload("res://src/shared/shaders/shop_header_bar_bg.gdshader")
 
-signal restart_requested
+signal menu_requested
 signal battle_requested
-signal compendium_requested
 
 @export var lives: int:
 	set(value):
@@ -27,18 +26,16 @@ signal compendium_requested
 		max_trophies = value
 		_update_labels()
 
-@onready var restart_btn: Button = %RestartButton
+@onready var menu_btn: Button = %MenuButton
 @onready var battle_btn: Button = %StartBattleButton
-@onready var compendium_btn: Button = %CompendiumButton
 @onready var lives_label: Label = %LivesLabel
 @onready var day_label: Label = %DayLabel
 @onready var trophies_label: Label = %TrophiesLabel
 
 func _ready() -> void:	
 	# Connect local button signals
-	restart_btn.pressed.connect(func() -> void: restart_requested.emit())
+	menu_btn.pressed.connect(func() -> void: menu_requested.emit())
 	battle_btn.pressed.connect(func() -> void: battle_requested.emit())
-	compendium_btn.pressed.connect(func() -> void: compendium_requested.emit())
 	
 	# Apply visual styling programmatically to keep the presentation premium and clean
 	_apply_visual_styling()
