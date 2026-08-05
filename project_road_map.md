@@ -46,7 +46,7 @@ Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu m
 | [X] | **Mechanika** | **Zunifikowany System Przedmiotów (Spawnowanie, Rzadkość i Modułowość):** Przebudowa przedmiotów na wzór potworów. | **Krytyczny** |
 | [X] | **Mechanika** | **Poziom Sklepu (Shop Level):** Ulepszanie sklepu i wagi rzadkości. | **Krytyczny** |
 | [ ] | **UI / UX** | **Wskaźnik Żyć i Rund w Sklepie/Walce:** *(Częściowo gotowe)* `ShopHeaderBar` wyświetla już lives/day w sklepie. Należy dodać analogiczny wskaźnik do sceny walki `BattleScene` oraz powiadomienie o fazie Deathmatch. | **Krytyczny** |
-| [ ] | **UI / UX & Mechanika** | **Panel Podglądu i Wyboru Przeciwnika w Sklepie:** Przycisk/panel w sklepie pozwalający podejrzeć skład, pozycjonowanie i HP rywala. Wylosowani przeciwnicy pozostają w puli i ulegają zmianie wyłącznie po ich wyeliminowaniu (0 HP) lub użyciu dedykowanego przedmiotu/eventu. | **Krytyczny** |
+| [ ] | **UI / UX & Mechanika** | **Panel Podglądu i Wyboru Przeciwnika w Sklepie:** Przycisk/panel w sklepie pozwalający podejrzeć skład i HP rywala. Wylosowani przeciwnicy pozostają w puli i ulegają zmianie wyłącznie po ich wyeliminowaniu (0 HP) lub użyciu dedykowanego przedmiotu/eventu. | **Krytyczny** |
 | [X] | **Refaktor** | **Model-View separation & Null-Safety:** Reaktywna architektura sklepu oraz poprawka typowania. | **Krytyczny** |
 | [X] | **UI / UX** | **Galeria / Kompendium:** Scena kompendium prezentująca listę wszystkich istniejących w grze jednostek, przedmiotów i reliktów ([CompendiumScene](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/compendium/compendium_scene.gd)). | **Krytyczny** |
 
