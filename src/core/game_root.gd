@@ -83,6 +83,7 @@ func _initialize_new_run() -> void:
 	run_state.shop_frozen_statuses.resize(RunState.MAX_SHOP_CARDS_SIZE)
 	run_state.shop_frozen_statuses.fill(false)
 	run_state.shop_level = 1
+	run_state.opponent_provider = OfflineOpponentProvider.new(unit_templates)
 	
 	# Find templates by unit name
 	var find_template: Callable = func(p_name: String) -> UnitData:
@@ -150,11 +151,16 @@ func _go_to_compendium() -> void:
 	)
 
 func _go_to_battle() -> void:
-	var enemy_team_units: Array[UnitInstance] = run_state.generate_enemy_team()
+	var ruleset: BattleRuleset
+	if run_state.is_deathmatch and not run_state.is_endless_mode:
+		ruleset = DeathmatchBattleRuleset.new()
+	else:
+		ruleset = StandardBattleRuleset.new()
+		
 	_change_scene(battle_scene_path, func(battle_node: Node) -> void:
 		var battle: BattleScene = battle_node as BattleScene
 		if battle:
-			battle.setup(run_state, enemy_team_units)
+			battle.setup(run_state, ruleset)
 			battle.battle_finished.connect(_on_battle_finished)
 	)
 

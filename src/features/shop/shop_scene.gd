@@ -137,8 +137,6 @@ func setup(p_state: RunState) -> void:
 	overlay.z_index = 10
 	add_child(overlay)
 
-
-
 func show_floating_text_on_slot(slot: UnitSlot, text: String, color: Color) -> void:
 	if not slot or not floating_text_manager:
 		return

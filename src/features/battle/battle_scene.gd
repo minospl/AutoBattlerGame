@@ -21,10 +21,12 @@ var enemy_team: BattleTeamModel
 
 var game_speed: float = 1.0
 var preview_tooltip: CardTooltip
-var enemy_units_to_load: Array[UnitInstance] = []
+var current_enemy_profile: OpponentProfile = null
 var is_outcome_showing: bool = false
 var _battle_start_triggered: bool = false
 var relic_bar: RelicBar = null
+
+var ruleset: BattleRuleset
 
 # Countdown Timer & Fatigue
 var match_timer: float = 30.0
@@ -110,12 +112,12 @@ func _ready() -> void:
 		relic_bar.offset_right = 0.0
 		relic_bar_wrapper.add_child(relic_bar)
 
-	if run_state:
-		setup(run_state)
+	if run_state and ruleset == null:
+		pass
 
-func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
+func setup(p_state: RunState, p_ruleset: BattleRuleset) -> void:
 	run_state = p_state
-	enemy_units_to_load = p_enemy_units
+	ruleset = p_ruleset
 	
 	if run_state:
 		if run_state.battle_speed <= 0.0:
@@ -124,8 +126,8 @@ func setup(p_state: RunState, p_enemy_units: Array[UnitInstance] = []) -> void:
 		if header_bar:
 			header_bar.set_speed_text("Speed: %dx" % int(game_speed))
 			
-	# Load state and backup
-	load_battle_team()
+	if ruleset:
+		ruleset.setup_battle(self, run_state)
 	
 	if player_team.health <= 0:
 		show_battle_outcome("defeat")
@@ -186,10 +188,10 @@ func load_enemy_team() -> void:
 	var enemy_units: Array[UnitInstance] = []
 	enemy_units.resize(MAX_TEAM_SIZE)
 
-	if not enemy_units_to_load.is_empty():
+	if current_enemy_profile and not current_enemy_profile.active_team.is_empty():
 		for i: int in range(MAX_TEAM_SIZE):
-			if i < enemy_units_to_load.size() and enemy_units_to_load[i] != null:
-				enemy_units[i] = enemy_units_to_load[i].clone()
+			if i < current_enemy_profile.active_team.size() and current_enemy_profile.active_team[i] != null:
+				enemy_units[i] = current_enemy_profile.active_team[i].clone()
 	else:
 		# Fallback just in case
 		if RIVER_CRAB_RES:
@@ -218,6 +220,7 @@ func trigger_battle_start() -> void:
 					
 	# Update all health and stat overlays
 	_update_all_card_uis()
+
 
 func trigger_cast(source_idx: int) -> void:
 	player_team.execute_cast(source_idx, enemy_team)
@@ -304,12 +307,29 @@ func advance_simulation(delta: float) -> void:
 	enemy_team.tick_casts(delta, trigger_enemy_cast)
 
 func _on_enemy_defeat() -> void:
-	show_battle_outcome("victory")
+	if ruleset:
+		ruleset.on_enemy_defeat(self)
 
 func _on_team_defeat() -> void:
-	show_battle_outcome("defeat")
+	if ruleset:
+		ruleset.on_player_defeat(self)
 
-func show_battle_outcome(p_outcome: String) -> void:
+func reset_for_next_round() -> void:
+	load_battle_team()
+	if player_team.health <= 0:
+		show_battle_outcome("defeat")
+		return
+	if enemy_team.health <= 0:
+		_on_enemy_defeat()
+		return
+		
+	match_timer = 30.0
+	fatigue_tick_timer = 0.0
+	fatigue_tick_count = 0
+	_battle_start_triggered = false
+	set_playing(true)
+
+func show_battle_outcome(p_outcome: String, custom_title: String = "", custom_desc: String = "") -> void:
 	if is_outcome_showing:
 		return
 	is_outcome_showing = true
@@ -340,14 +360,15 @@ func show_battle_outcome(p_outcome: String) -> void:
 	
 	match p_outcome:
 		"victory":
-			title_text = "VICTORY"
+			title_text = custom_title if custom_title else "VICTORY"
 			title_color = Color(1.0, 0.85, 0.2)
-			desc_text = "The enemy team has been defeated!"
+			var bot_name: String = current_enemy_profile.name if current_enemy_profile else "Enemy Team"
+			desc_text = custom_desc if custom_desc else "%s has been defeated!" % bot_name
 			style.border_color = Color(1.0, 0.85, 0.2)
 		"defeat":
-			title_text = "DEFEAT"
+			title_text = custom_title if custom_title else "DEFEAT"
 			title_color = Color(1.0, 0.3, 0.3)
-			desc_text = "Your active team was wiped out!"
+			desc_text = custom_desc if custom_desc else "Your active team was wiped out!"
 			style.border_color = Color(1.0, 0.3, 0.3)
 		"draw":
 			title_text = "DRAW"

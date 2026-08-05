@@ -162,3 +162,38 @@ func absorb_bonus_stats_from(other: UnitInstance) -> void:
 	burn += maxi(0, other.burn - base_burn)
 	electrocute += maxi(0, other.electrocute - base_elec)
 	poison += maxi(0, other.poison - base_poi)
+
+func to_dict() -> Dictionary:
+	return {
+		"template_id": data.display_name if data else "",
+		"health": health,
+		"attack": attack,
+		"heal": heal,
+		"shield": shield,
+		"burn": burn,
+		"electrocute": electrocute,
+		"poison": poison,
+		"level": level,
+		"cast_speed": cast_speed
+	}
+
+static func from_dict(dict: Dictionary, templates: Array[UnitData]) -> UnitInstance:
+	var inst: UnitInstance = UnitInstance.new()
+	
+	var tpl_id: String = dict.get("template_id", "")
+	for t: UnitData in templates:
+		if t and t.display_name == tpl_id:
+			inst.data = t
+			break
+			
+	inst.health = dict.get("health", 0)
+	inst.attack = dict.get("attack", 0)
+	inst.heal = dict.get("heal", 0)
+	inst.shield = dict.get("shield", 0)
+	inst.burn = dict.get("burn", 0)
+	inst.electrocute = dict.get("electrocute", 0)
+	inst.poison = dict.get("poison", 0)
+	inst.level = dict.get("level", 1)
+	inst.cast_speed = dict.get("cast_speed", 1.0)
+	
+	return inst

@@ -6,10 +6,10 @@ const MAX_BENCH_SIZE: int = 6
 const MAX_SHOP_CARDS_SIZE: int = 5
 const ITEM_PURCHASE_LIMIT: int = 2
 const STARTING_GOLD: int = 10
-const STARTING_LIVES: int = 10
+const STARTING_LIVES: int = 5
 const STARTING_DAY: int = 1
 const STARTING_TROPHIES: int = 0
-const MAX_TROPHIES: int = 10
+const MAX_ROUNDS: int = 20
 const STARTING_BASE_HEALTH: int = 100
 
 func _init() -> void:
@@ -57,6 +57,11 @@ var unit_templates: Array[UnitData] = []
 var item_templates: Array[ItemData] = []
 var relic_templates: Array[RelicData] = []
 var pending_on_battle_end: bool = false
+var opponent_provider: OpponentProvider
+
+@export var is_deathmatch: bool = false
+@export var is_deathmatch_completed: bool = false
+@export var is_endless_mode: bool = false
 
 func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relics: Array[RelicData] = []) -> void:
 	unit_templates.clear()
@@ -79,7 +84,7 @@ func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relic
 		base_health_changed.emit(base_health)
 @export var item_purchase_limit: int = ITEM_PURCHASE_LIMIT
 @export var item_purchase_count: int = 0
-@export var max_trophies: int = MAX_TROPHIES
+@export var max_rounds: int = MAX_ROUNDS
 @export var battle_speed: float = 1.0
 @export var disabled_rarities: Array[Rarity.Type] = []
 @export var rarity_config: ShopRarityConfig = ShopRarityConfig.new()
@@ -177,7 +182,7 @@ func complete_battle(outcome: String) -> void:
 	elif outcome == "defeat":
 		lives -= 1
 		
-	if lives > 0 and trophies < max_trophies:
+	if lives > 0 and day <= MAX_ROUNDS:
 		day += 1
 		gold += 10
 		shop_level += 1
@@ -185,10 +190,13 @@ func complete_battle(outcome: String) -> void:
 			if not shop_frozen_statuses[i]:
 				shop_cards[i] = null
 				
+	if lives > 0 and day > MAX_ROUNDS:
+		is_deathmatch = true
+				
 	battle_completed.emit(outcome)
 
 func is_victory() -> bool:
-	return trophies >= max_trophies
+	return is_deathmatch_completed and lives > 0 and not is_endless_mode
 
 func is_defeat() -> bool:
 	return lives <= 0
@@ -196,8 +204,15 @@ func is_defeat() -> bool:
 func is_game_over() -> bool:
 	return is_victory() or is_defeat()
 
-func generate_enemy_team() -> Array[UnitInstance]:
-	return EnemyTeamGenerator.generate_enemy_team(day, unit_templates)
+func generate_enemy_team() -> OpponentProfile:
+	if opponent_provider:
+		return opponent_provider.get_next_opponent(self)
+	return null
+
+func generate_deathmatch_opponents() -> Array[OpponentProfile]:
+	if opponent_provider:
+		return opponent_provider.get_all_alive_opponents(self)
+	return []
 
 func sync_battle_team_stats(player_battle_units: Array[UnitInstance]) -> void:
 	TeamHelper.sync_battle_team_stats(self, player_battle_units)
@@ -291,6 +306,9 @@ func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY,
 	base_health = STARTING_BASE_HEALTH
 	relics.clear()
 	has_magnetic_core = false
+	is_deathmatch = false
+	is_deathmatch_completed = false
+	is_endless_mode = false
 	relics_changed.emit(relics)
 	
 	# Clear active team and bench

@@ -40,9 +40,10 @@ Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu m
 | Gotowe | Kategoria | Zadania do wykonania | Priorytet |
 | :---: | :--- | :--- | :--- |
 | [ ] | **Mechanika** | **System Żyć i Licznika Rund (`RunState`):** *(Częściowo gotowe)* Zmienne `lives`, `day`, `trophies` i obsługa w `complete_battle()` istnieją w `RunState`. Wymagają dostosowania limitu do 5 żyć i $N$ rund podstawowych. | **Krytyczny** |
-| [ ] | **Mechanika** | **Architektura OpponentProvider (Single Player):** Wprowadzenie wzorca strategii dla wrogów. Stworzenie lokalnej implementacji `OfflineOpponentProvider`, symulującej 7-8 przeciwników na start biegu (z wbudowanych szablonów botów), dostarczając grywalny rdzeń offline. | **Krytyczny** |
-| [ ] | **Mechanika** | **Faza Deathmatch:** Logika przejścia po $N$. rundzie do finałowych starć eliminacyjnych (Deathmatch) z przetrwałymi przeciwnikami wybranymi na początku biegu. | **Krytyczny** |
-| [ ] | **Mechanika** | **Serializacja Drużyny (`to_dict` / `from_dict`):** Dodanie obsługi przekształcania `RunState` i `UnitInstance` do/z formatu Dictionary/JSON pod kątem łatwego wysyłania/pobierania danych drużyn. | **Krytyczny** |
+| [X] | **Mechanika** | **Architektura OpponentProvider (Single Player):** Wprowadzenie wzorca strategii dla wrogów (`BattleRuleset`). Stworzenie lokalnej implementacji `OfflineOpponentProvider`, dostarczając grywalny rdzeń offline. | **Krytyczny** |
+| [ ] | **Mechanika** | **Ewolucja Drużyn Botów (Single Player):** *(Do zrobienia teraz)* Zapisywanie stałego składu drużyn botów. Rozwój algorytmu kupowania opartego na **archetypach** (np. przypisanie botowi typu Beast + Dragon). Symulacja zdobywania **reliktów** z czasem. | **Krytyczny** |
+| [X] | **Mechanika** | **Faza Deathmatch:** Zaimplementowano pętlę finałowych starć (Deathmatch) z użyciem `DeathmatchBattleRuleset`. | **Krytyczny** |
+| [X] | **Mechanika** | **Serializacja Drużyny (`to_dict` / `from_dict`):** Dodano obsługę transformacji w `UnitInstance` i integrację z `OpponentProfile`. | **Krytyczny** |
 | [X] | **Mechanika** | **Zunifikowany System Przedmiotów (Spawnowanie, Rzadkość i Modułowość):** Przebudowa przedmiotów na wzór potworów. | **Krytyczny** |
 | [X] | **Mechanika** | **Poziom Sklepu (Shop Level):** Ulepszanie sklepu i wagi rzadkości. | **Krytyczny** |
 | [ ] | **UI / UX** | **Wskaźnik Żyć i Rund w Sklepie/Walce:** *(Częściowo gotowe)* `ShopHeaderBar` wyświetla już lives/day w sklepie. Należy dodać analogiczny wskaźnik do sceny walki `BattleScene` oraz powiadomienie o fazie Deathmatch. | **Krytyczny** |
