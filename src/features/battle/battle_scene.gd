@@ -7,9 +7,10 @@ var run_state: RunState
 # Static Preloads
 const CARD_TOOLTIP_SCENE: PackedScene = preload("res://src/shared/ui/components/card_tooltip.tscn")
 const HP_BORDER_SHADER: Shader = preload("res://src/shared/shaders/hp_border.gdshader")
-const SHOP_BACKGROUND_TEXTURE: Texture2D = preload("res://src/assets/ui/shop_background.jpg")
-const RIVER_CRAB_RES: UnitData = preload("res://src/features/units/templates/river_crab.tres")
 const BATTLE_CARD_SCENE: PackedScene = preload("res://src/features/battle/components/battle_card.tscn")
+const BATTLE_BACKGROUNDS: Array[Texture2D] = [
+	preload("res://src/assets/ui/battle_background_1.png")
+]
 
 const MAX_TEAM_SIZE: int = RunState.MAX_ACTIVE_TEAM_SIZE
 
@@ -36,7 +37,7 @@ var fatigue_tick_count: int = 0
 var player_slots: Array[BattleCardSlot] = []
 var enemy_slots: Array[BattleCardSlot] = []
 
-# Cached Node References
+@onready var background_panel: TextureRect = %BackgroundPanel
 @onready var header_bar: BattleHeaderBar = %BattleHeaderBar
 @onready var preview_container: Control = %PreviewContainer
 @onready var player_relic_bag_popup: RelicBagPopup = %PlayerRelicBagPopup
@@ -46,6 +47,7 @@ var enemy_slots: Array[BattleCardSlot] = []
 @onready var floating_text_manager: FloatingTextManager = %FloatingTextManager
 
 func _ready() -> void:
+	_randomize_background()
 	# Add the tooltip instance to PreviewContainer
 	if preview_container:
 		preview_tooltip = CARD_TOOLTIP_SCENE.instantiate() as CardTooltip
@@ -111,6 +113,7 @@ func _ready() -> void:
 		pass
 
 func setup(p_state: RunState, p_ruleset: BattleRuleset) -> void:
+	_randomize_background()
 	run_state = p_state
 	ruleset = p_ruleset
 	
@@ -189,15 +192,6 @@ func load_enemy_team() -> void:
 		for i: int in range(MAX_TEAM_SIZE):
 			if i < current_enemy_profile.active_team.size() and current_enemy_profile.active_team[i] != null:
 				enemy_units[i] = current_enemy_profile.active_team[i].clone()
-	else:
-		# Fallback just in case
-		if RIVER_CRAB_RES:
-			var crab_instance: UnitInstance = UnitInstance.new()
-			crab_instance.initialize(RIVER_CRAB_RES)
-			# Override health and attack
-			crab_instance.health = 1000
-			crab_instance.attack = 10
-			enemy_units[0] = crab_instance
 		
 	enemy_team.load_team_units(enemy_units, RunState.STARTING_BASE_HEALTH)
 	
@@ -518,3 +512,7 @@ func _exit_tree() -> void:
 		player_team.cleanup()
 	if enemy_team:
 		enemy_team.cleanup()
+
+func _randomize_background() -> void:
+	if background_panel and BATTLE_BACKGROUNDS.size() > 0:
+		background_panel.texture = BATTLE_BACKGROUNDS.pick_random()

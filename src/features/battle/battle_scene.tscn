@@ -4,14 +4,10 @@
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_header_bar.tscn" id="2_header"]
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_team_panel.tscn" id="3_team_panel"]
 [ext_resource type="Script" path="res://src/features/battle/components/floating_text_manager.gd" id="4_popup_manager"]
-[ext_resource type="Texture2D" path="res://src/assets/ui/shop_background.jpg" id="5_bg"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/battle_background_1.png" id="5_bg"]
 [ext_resource type="PackedScene" path="res://src/features/relics/components/relic_bag_popup.tscn" id="6_relic_popup"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bg"]
-texture = ExtResource("5_bg")
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-modulate_color = Color(0.3, 0.3, 0.3, 1)
+
 
 [node name="BattleScene" type="Control"]
 layout_mode = 3
@@ -22,14 +18,17 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_script")
 
-[node name="BackgroundPanel" type="Panel" parent="."]
+[node name="BackgroundPanel" type="TextureRect" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxTexture_bg")
+texture = ExtResource("5_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="MarginContainer" type="MarginContainer" parent="BackgroundPanel"]
 layout_mode = 1
