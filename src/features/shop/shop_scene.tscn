@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" path="res://src/features/shop/components/shop_header_bar.tscn" id="4_panel"]
 [ext_resource type="PackedScene" path="res://src/features/shop/components/shop_panel.tscn" id="5_shop"]
 [ext_resource type="Texture2D" path="res://src/assets/ui/shop_background.jpg" id="6_bg"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="7_decorator"]
+[ext_resource type="PackedScene" path="res://src/features/relics/components/relic_bag_popup.tscn" id="8_relic_popup"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bg"]
 texture = ExtResource("6_bg")
@@ -51,10 +53,6 @@ theme_override_constants/separation = 0
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="RelicBarWrapper" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
-unique_name_in_owner = true
-layout_mode = 2
-
 [node name="MainHBox" type="HBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -88,6 +86,31 @@ size_flags_vertical = 3
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="ActionMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="StartBattleButton" type="Button" parent="ActionMargin"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "TO BATTLE"
+
+[node name="GameButtonDecorator" type="Node" parent="ActionMargin/StartBattleButton"]
+script = ExtResource("7_decorator")
+color_normal = Color(0.12, 0.45, 0.22, 1)
+color_hover = Color(0.15, 0.55, 0.27, 1)
+color_pressed = Color(0.18, 0.65, 0.32, 1)
+
 [node name="PreviewContainer" type="MarginContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 1
@@ -98,3 +121,12 @@ offset_top = 76.0
 offset_right = -16.0
 offset_bottom = 97.0
 grow_horizontal = 0
+
+[node name="RelicBagPopup" parent="." instance=ExtResource("8_relic_popup")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 196.0
+offset_bottom = 296.0

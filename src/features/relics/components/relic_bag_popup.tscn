@@ -1,0 +1,59 @@
+[gd_scene format=3 uid="uid://dcv7sjecv6uuc"]
+
+[ext_resource type="Script" path="res://src/features/relics/components/relic_bag_popup.gd" id="1_script"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="2_decorator"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_scroll"]
+content_margin_left = 4.0
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grabber"]
+content_margin_left = 4.0
+bg_color = Color(0.0352941, 0.0352941, 0.0352941, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="Theme" id="Theme_scrollbar"]
+VScrollBar/styles/grabber = SubResource("StyleBoxFlat_grabber")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_grabber")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_grabber")
+VScrollBar/styles/scroll = SubResource("StyleBoxFlat_scroll")
+
+[node name="RelicBagPopup" type="PanelContainer"]
+custom_minimum_size = Vector2(200, 280)
+script = ExtResource("1_script")
+
+[node name="BorderRect" type="ColorRect" parent="."]
+layout_mode = 2
+script = ExtResource("2_decorator")
+border_type = 0
+interior_color = Color(1, 1, 1, 1)
+border_type = 1
+outer_border_width = 2
+inner_border_width = 2
+border_indentation = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = SubResource("Theme_scrollbar")
+horizontal_scroll_mode = 0
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3

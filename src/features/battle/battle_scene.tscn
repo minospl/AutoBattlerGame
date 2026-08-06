@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_team_panel.tscn" id="3_team_panel"]
 [ext_resource type="Script" path="res://src/features/battle/components/floating_text_manager.gd" id="4_popup_manager"]
 [ext_resource type="Texture2D" path="res://src/assets/ui/shop_background.jpg" id="5_bg"]
+[ext_resource type="PackedScene" path="res://src/features/relics/components/relic_bag_popup.tscn" id="6_relic_popup"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_bg"]
 texture = ExtResource("5_bg")
@@ -47,10 +48,6 @@ layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="BattleHeaderBar" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox" instance=ExtResource("2_header")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="RelicBarWrapper" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/HeaderVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
@@ -108,4 +105,24 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-script = ExtResource("4_popup_manager")
+	script = ExtResource("4_popup_manager")
+
+[node name="PlayerRelicBagPopup" parent="." instance=ExtResource("6_relic_popup")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 0
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 196.0
+offset_bottom = 296.0
+
+[node name="EnemyRelicBagPopup" parent="." instance=ExtResource("6_relic_popup")]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -196.0
+offset_top = 56.0
+offset_right = -16.0
+offset_bottom = 296.0

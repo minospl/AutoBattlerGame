@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://src/features/shop/components/shop_header_bar.gd" id="1_script"]
 [ext_resource type="Texture2D" path="res://src/assets/ui/heart_icon.png" id="2_heart"]
-[ext_resource type="Texture2D" path="res://src/assets/ui/trophy_icon.png" id="3_trophy"]
 [ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="4_button_decorator"]
+[ext_resource type="PackedScene" path="res://src/features/relics/components/relic_bag_button.tscn" id="5_bag"]
 
 [node name="ShopHeaderBar" type="PanelContainer"]
 custom_minimum_size = Vector2(0, 45)
@@ -19,66 +19,40 @@ theme_override_constants/separation = 0
 [node name="HeaderContent" type="PanelContainer" parent="VBox"]
 layout_mode = 2
 
-[node name="SideMarginContainer" type="MarginContainer" parent="VBox/HeaderContent"]
+[node name="MainMargin" type="MarginContainer" parent="VBox/HeaderContent"]
 layout_mode = 2
 theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 8
+theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_bottom = 4
 
-[node name="SideHBox" type="HBoxContainer" parent="VBox/HeaderContent/SideMarginContainer"]
+[node name="MainHBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin"]
 layout_mode = 2
 
-[node name="ButtonsContainer" type="HBoxContainer" parent="VBox/HeaderContent/SideMarginContainer/SideHBox"]
+[node name="LeftBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox"]
 layout_mode = 2
-theme_override_constants/separation = 8
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+alignment = 0
 
-[node name="MenuButton" type="Button" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer"]
+[node name="BagButton" parent="VBox/HeaderContent/MainMargin/MainHBox/LeftBox" instance=ExtResource("5_bag")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "Menu"
+size_flags_vertical = 4
 
-[node name="GameButtonDecorator" type="Node" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer/MenuButton"]
-script = ExtResource("4_button_decorator")
-color_normal = Color(0.18, 0.24, 0.35, 1)
-color_hover = Color(0.23, 0.31, 0.45, 1)
-color_pressed = Color(0.13, 0.18, 0.27, 1)
-
-[node name="StartBattleButton" type="Button" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 14
-text = "To Battle"
-
-[node name="GameButtonDecorator" type="Node" parent="VBox/HeaderContent/SideMarginContainer/SideHBox/ButtonsContainer/StartBattleButton"]
-script = ExtResource("4_button_decorator")
-color_normal = Color(0.12, 0.45, 0.22, 1)
-color_hover = Color(0.15, 0.55, 0.27, 1)
-color_pressed = Color(0.18, 0.65, 0.32, 1)
-
-[node name="CenterContainer" type="CenterContainer" parent="VBox/HeaderContent"]
-layout_mode = 2
-mouse_filter = 2
-
-[node name="CenterHBox" type="HBoxContainer" parent="VBox/HeaderContent/CenterContainer"]
-layout_mode = 2
-theme_override_constants/separation = 24
-alignment = 1
-
-[node name="LivesContainer" type="HBoxContainer" parent="VBox/HeaderContent/CenterContainer/CenterHBox"]
+[node name="LivesContainer" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox/LeftBox"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="HeartIcon" type="TextureRect" parent="VBox/HeaderContent/CenterContainer/CenterHBox/LivesContainer"]
+[node name="HeartIcon" type="TextureRect" parent="VBox/HeaderContent/MainMargin/MainHBox/LeftBox/LivesContainer"]
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 texture = ExtResource("2_heart")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LivesLabel" type="Label" parent="VBox/HeaderContent/CenterContainer/CenterHBox/LivesContainer"]
+[node name="LivesLabel" type="Label" parent="VBox/HeaderContent/MainMargin/MainHBox/LeftBox/LivesContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
@@ -90,7 +64,7 @@ theme_override_font_sizes/font_size = 24
 text = "10"
 vertical_alignment = 1
 
-[node name="DayLabel" type="Label" parent="VBox/HeaderContent/CenterContainer/CenterHBox"]
+[node name="DayLabel" type="Label" parent="VBox/HeaderContent/MainMargin/MainHBox/LeftBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
@@ -98,34 +72,37 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 3
 theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 28
 text = "DAY 4"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TrophiesContainer" type="HBoxContainer" parent="VBox/HeaderContent/CenterContainer/CenterHBox"]
-layout_mode = 2
-theme_override_constants/separation = 8
-alignment = 1
 
-[node name="TrophyIcon" type="TextureRect" parent="VBox/HeaderContent/CenterContainer/CenterHBox/TrophiesContainer"]
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-texture = ExtResource("3_trophy")
-expand_mode = 1
-stretch_mode = 5
 
-[node name="TrophiesLabel" type="Label" parent="VBox/HeaderContent/CenterContainer/CenterHBox/TrophiesContainer"]
+[node name="OpponentsContainer" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 2
-theme_override_constants/shadow_offset_y = 2
-theme_override_constants/outline_size = 5
-theme_override_font_sizes/font_size = 24
-text = "3/10"
-vertical_alignment = 1
+size_flags_vertical = 4
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="RightBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 2
+
+[node name="MenuButton" type="Button" parent="VBox/HeaderContent/MainMargin/MainHBox/RightBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 14
+text = "Menu"
+
+[node name="GameButtonDecorator" type="Node" parent="VBox/HeaderContent/MainMargin/MainHBox/RightBox/MenuButton"]
+script = ExtResource("4_button_decorator")
+color_normal = Color(0.18, 0.24, 0.35, 1)
+color_hover = Color(0.23, 0.31, 0.45, 1)
+color_pressed = Color(0.13, 0.18, 0.27, 1)
 
 [node name="HeaderBarBorder" type="VBoxContainer" parent="VBox"]
 layout_mode = 2

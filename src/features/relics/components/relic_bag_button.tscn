@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://ct83q0ur1vbyg"]
+
+[ext_resource type="Script" path="res://src/features/relics/components/relic_bag_button.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/relic_bag.png" id="2_icon"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_badge"]
+bg_color = Color(0.8, 0.2, 0.2, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="RelicBagButton" type="TextureButton"]
+custom_minimum_size = Vector2(40, 40)
+offset_right = 40.0
+offset_bottom = 40.0
+texture_normal = ExtResource("2_icon")
+ignore_texture_size = true
+stretch_mode = 5
+script = ExtResource("1_script")
+
+[node name="BadgeContainer" type="Panel" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 24.0
+offset_top = -8.0
+offset_right = 44.0
+offset_bottom = 12.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_badge")
+mouse_filter = 2
+
+[node name="CountLabel" type="Label" parent="BadgeContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 12
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1

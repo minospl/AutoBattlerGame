@@ -24,7 +24,6 @@ var preview_tooltip: CardTooltip
 var current_enemy_profile: OpponentProfile = null
 var is_outcome_showing: bool = false
 var _battle_start_triggered: bool = false
-var relic_bar: RelicBar = null
 
 var ruleset: BattleRuleset
 
@@ -40,7 +39,8 @@ var enemy_slots: Array[BattleCardSlot] = []
 # Cached Node References
 @onready var header_bar: BattleHeaderBar = %BattleHeaderBar
 @onready var preview_container: Control = %PreviewContainer
-@onready var relic_bar_wrapper: Control = %RelicBarWrapper
+@onready var player_relic_bag_popup: RelicBagPopup = %PlayerRelicBagPopup
+@onready var enemy_relic_bag_popup: RelicBagPopup = %EnemyRelicBagPopup
 @onready var player_panel: BattleTeamPanel = %PlayerTeamPanel
 @onready var enemy_panel: BattleTeamPanel = %EnemyTeamPanel
 @onready var floating_text_manager: FloatingTextManager = %FloatingTextManager
@@ -59,6 +59,8 @@ func _ready() -> void:
 		header_bar.play_pressed.connect(_on_play_pressed)
 		header_bar.pause_pressed.connect(_on_pause_pressed)
 		header_bar.speed_pressed.connect(_on_speed_pressed)
+		header_bar.player_bag_requested.connect(func() -> void: player_relic_bag_popup.toggle())
+		header_bar.enemy_bag_requested.connect(func() -> void: enemy_relic_bag_popup.toggle())
 
 	# Populate slots from components
 	if player_panel:
@@ -102,15 +104,8 @@ func _ready() -> void:
 	player_team.initialize(false)
 	enemy_team.initialize(true)
 
-	# Initialize RelicBar below TopBar (inside the scene-defined RelicBarWrapper placeholder)
-	if relic_bar_wrapper:
-		relic_bar = RelicBar.new()
-		relic_bar.setup(preview_tooltip)
-		relic_bar.anchor_left = 0.0
-		relic_bar.anchor_right = 1.0
-		relic_bar.offset_left = 0.0
-		relic_bar.offset_right = 0.0
-		relic_bar_wrapper.add_child(relic_bar)
+	player_relic_bag_popup.setup(preview_tooltip)
+	enemy_relic_bag_popup.setup(preview_tooltip)
 
 	if run_state and ruleset == null:
 		pass
@@ -140,6 +135,8 @@ func setup(p_state: RunState, p_ruleset: BattleRuleset) -> void:
 	fatigue_tick_timer = 0.0
 	fatigue_tick_count = 0
 	_battle_start_triggered = false
+	
+	header_bar.set_round_info(run_state.day, run_state.max_rounds, run_state.lives, run_state.is_deathmatch)
 	
 	# Start simulation
 	set_playing(true)
@@ -172,8 +169,8 @@ func load_battle_team() -> void:
 		player_team.has_magnetic_core = false
 		player_team.has_focusing_lens = false
 				
-	if relic_bar:
-		relic_bar.update_relics(player_team.active_relics)
+	player_relic_bag_popup.update_relics(player_team.active_relics)
+	header_bar.update_player_bag_count(player_team.active_relics.size())
 
 	match_timer = 30.0
 	fatigue_tick_timer = 0.0
@@ -203,6 +200,14 @@ func load_enemy_team() -> void:
 			enemy_units[0] = crab_instance
 		
 	enemy_team.load_team_units(enemy_units, RunState.STARTING_BASE_HEALTH)
+	
+	enemy_team.active_relics = []
+	if current_enemy_profile and "relics" in current_enemy_profile:
+		enemy_team.active_relics = current_enemy_profile.relics
+		
+	enemy_relic_bag_popup.update_relics(enemy_team.active_relics)
+	header_bar.update_enemy_bag_count(enemy_team.active_relics.size())
+		
 	ModifierEngine.update_ongoing_modifiers(player_team, enemy_team)
 	ModifierEngine.update_ongoing_modifiers(enemy_team, player_team)
 

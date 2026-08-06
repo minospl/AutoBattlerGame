@@ -2,9 +2,10 @@ class_name ShopHeaderBar
 extends PanelContainer
 
 const SHOP_HEADER_BG_SHADER: Shader = preload("res://src/shared/shaders/shop_header_bar_bg.gdshader")
+const OPPONENT_PORTRAIT: PackedScene = preload("res://src/features/shop/components/opponent_portrait.tscn")
 
 signal menu_requested
-signal battle_requested
+signal bag_requested
 
 @export var lives: int:
 	set(value):
@@ -16,26 +17,26 @@ signal battle_requested
 		day = value
 		_update_labels()
 
-@export var trophies: int:
+@export var max_rounds: int = 20:
 	set(value):
-		trophies = value
+		max_rounds = value
 		_update_labels()
 
-@export var max_trophies: int:
+@export var is_deathmatch: bool = false:
 	set(value):
-		max_trophies = value
+		is_deathmatch = value
 		_update_labels()
 
 @onready var menu_btn: Button = %MenuButton
-@onready var battle_btn: Button = %StartBattleButton
+@onready var bag_btn: RelicBagButton = %BagButton
 @onready var lives_label: Label = %LivesLabel
 @onready var day_label: Label = %DayLabel
-@onready var trophies_label: Label = %TrophiesLabel
+@onready var opponents_container: HBoxContainer = %OpponentsContainer
 
 func _ready() -> void:	
 	# Connect local button signals
 	menu_btn.pressed.connect(func() -> void: menu_requested.emit())
-	battle_btn.pressed.connect(func() -> void: battle_requested.emit())
+	bag_btn.bag_opened.connect(func() -> void: bag_requested.emit())
 	
 	# Apply visual styling programmatically to keep the presentation premium and clean
 	_apply_visual_styling()
@@ -47,9 +48,34 @@ func _update_labels() -> void:
 			lives_label.text = str(lives)
 
 		if day_label:
-			day_label.text = "DAY " + str(day)
-		if trophies_label:
-			trophies_label.text = str(trophies) + "/" + str(max_trophies)
+			if is_deathmatch:
+				day_label.text = "DEATHMATCH"
+			else:
+				day_label.text = "DAY " + str(day)
+
+func update_bag_count(count: int) -> void:
+	bag_btn.current_count = count
+
+func setup_opponent_list(_total_days: int, current_day: int) -> void:
+	if not opponents_container: return
+	
+	for child: Node in opponents_container.get_children():
+		child.queue_free()
+		
+	# Placeholder: Generate 7 static bot profiles for the pool
+	var total_bots: int = 7
+	var active_bot_id: int = ((current_day - 1) % total_bots) + 1
+	
+	for i: int in range(total_bots):
+		var bot_id: int = i + 1
+		var portrait: OpponentPortrait = OPPONENT_PORTRAIT.instantiate() as OpponentPortrait
+		opponents_container.add_child(portrait)
+		
+		# Generate a mock color for now (will be replaced by actual data later)
+		var colors: Array[Color] = [Color(0.8, 0.2, 0.2), Color(0.2, 0.8, 0.2), Color(0.2, 0.2, 0.8), Color(0.8, 0.8, 0.2), Color(0.6, 0.2, 0.8), Color(0.2, 0.8, 0.8), Color(0.8, 0.5, 0.2)]
+		var c: Color = colors[i % colors.size()]
+		
+		portrait.setup(bot_id, bot_id == active_bot_id, c)
 
 func _apply_visual_styling() -> void:
 	var header_content: PanelContainer = get_node_or_null("VBox/HeaderContent") as PanelContainer

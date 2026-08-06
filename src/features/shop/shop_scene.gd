@@ -26,14 +26,13 @@ var gold: int:
 			shop_panel.gold = value
 
 var run_state: RunState
-var relic_bar: RelicBar = null
 var debug_manager: DebugManager = null
 
 @onready var shop_header_bar: ShopHeaderBar = %ShopHeaderBar
 @onready var bench_panel: BenchPanel = %BenchPanel
 @onready var team_panel: TeamPanel = %TeamPanel
 @onready var shop_panel: ShopPanel = %ShopPanel
-@onready var relic_bar_wrapper: Control = %RelicBarWrapper
+@onready var relic_bag_popup: RelicBagPopup = %RelicBagPopup
 
 var shop_slot_scene: PackedScene = preload("res://src/features/shop/components/shop_slot.tscn")
 var unit_slot_scene: PackedScene = preload("res://src/features/shop/components/unit_slot.tscn")
@@ -68,7 +67,9 @@ func _ready() -> void:
 	
 	# Connect control panel signals
 	shop_header_bar.menu_requested.connect(func() -> void: menu_requested.emit())
-	shop_header_bar.battle_requested.connect(_on_battle_requested)
+	
+	var battle_btn: Button = get_node_or_null("%StartBattleButton") as Button
+	battle_btn.pressed.connect(_on_battle_requested)
 	
 	# Connect shop panel signals
 	shop_panel.roll_requested.connect(_on_roll_requested)
@@ -85,15 +86,10 @@ func _ready() -> void:
 	
 	create_slots()
 	
-	# Initialize RelicBar below ShopHeaderBar (inside the scene-defined RelicBarWrapper placeholder)
-	if relic_bar_wrapper:
-		relic_bar = RelicBar.new()
-		relic_bar.setup(preview_tooltip)
-		relic_bar.anchor_left = 0.0
-		relic_bar.anchor_right = 1.0
-		relic_bar.offset_left = 0.0
-		relic_bar.offset_right = 0.0
-		relic_bar_wrapper.add_child(relic_bar)
+	relic_bag_popup.setup(preview_tooltip)
+		
+	# Bag setup
+	shop_header_bar.bag_requested.connect(func() -> void: relic_bag_popup.toggle())
 	
 	# Initialize run state if already set, otherwise wait for setup()
 	if run_state:
@@ -116,7 +112,6 @@ func setup(p_state: RunState) -> void:
 	run_state.lives_changed.connect(_on_lives_changed)
 	run_state.day_changed.connect(_on_day_changed)
 	run_state.shop_level_changed.connect(_on_shop_level_changed)
-	run_state.trophies_changed.connect(_on_trophies_changed)
 	run_state.shop_slot_updated.connect(_on_shop_slot_updated)
 	run_state.shop_slot_freeze_changed.connect(_on_shop_slot_freeze_changed)
 	run_state.relics_changed.connect(_on_relics_changed)
@@ -399,10 +394,6 @@ func _on_shop_level_changed(new_level: int) -> void:
 		shop_panel.shop_level = new_level
 		shop_panel.shop_weights = run_state.shop_weights
 
-func _on_trophies_changed(new_trophies: int) -> void:
-	if shop_header_bar:
-		shop_header_bar.trophies = new_trophies
-
 func _on_shop_slot_updated(slot_index: int, card_instance: Resource) -> void:
 	if slot_index < 0 or slot_index >= shop_panel.slots.size():
 		return
@@ -453,7 +444,8 @@ func _on_freeze_all_requested(freeze: bool) -> void:
 			run_state.toggle_freeze_shop_slot(i)
 
 func _on_relics_changed(relics: Array[RelicInstance]) -> void:
-	relic_bar.update_relics(relics)
+	relic_bag_popup.update_relics(relics)
+	shop_header_bar.update_bag_count(relics.size())
 	if shop_panel and run_state:
 		shop_panel.unique_chance = run_state.unique_chance
 		shop_panel.shop_level = run_state.shop_level
@@ -651,10 +643,12 @@ func load_state_from_run() -> void:
 	shop_panel.gold = run_state.gold
 	shop_header_bar.lives = run_state.lives
 	shop_header_bar.day = run_state.day
-	shop_header_bar.trophies = run_state.trophies
+	shop_header_bar.max_rounds = run_state.max_rounds
+	shop_header_bar.is_deathmatch = run_state.is_deathmatch
 	
-	if relic_bar:
-		relic_bar.update_relics(run_state.relics)
+	relic_bag_popup.update_relics(run_state.relics)
+	shop_header_bar.update_bag_count(run_state.relics.size())
+	shop_header_bar.setup_opponent_list(run_state.max_rounds, run_state.day)
 	
 	# Update shop level and chance weights in the shop panel
 	shop_panel.shop_level = run_state.shop_level
