@@ -162,11 +162,11 @@ func _check_and_execute_slime_fusion() -> bool:
 		if u and u.get_unit_name() == "Rainbow Slime":
 			return false
 
-	var unique_slimes: Dictionary[UnitData, UnitInstance] = {}
+	var unique_slimes: Dictionary[String, bool] = {}
 	for i: int in range(run_state.active_team.size()):
 		var unit: UnitInstance = run_state.active_team[i]
-		if unit and unit.has_type("Slime"):
-			unique_slimes[unit.data] = unit
+		if unit.has_type("Slime"):
+			unique_slimes[unit.data.display_name] = true
 
 	if unique_slimes.size() < 6:
 		return false
