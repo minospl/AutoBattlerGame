@@ -110,6 +110,9 @@ text = "TO BATTLE"
 
 [node name="GameButtonDecorator" type="Node" parent="ActionMargin/StartBattleButton"]
 script = ExtResource("7_decorator")
+outer_width = 3
+inner_width = 2
+indentation = 2
 color_normal = Color(0.12, 0.45, 0.22, 1)
 color_hover = Color(0.15, 0.55, 0.27, 1)
 color_pressed = Color(0.18, 0.65, 0.32, 1)
