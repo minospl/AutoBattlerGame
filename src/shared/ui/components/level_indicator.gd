@@ -8,34 +8,14 @@ const BASE_BADGE: PackedScene = preload("res://src/shared/ui/components/base_bad
 	set(val):
 		level = val
 		_update_badges()
-
-@export var max_level: int = 3:
-	set(val):
-		max_level = val
-		_update_badges()
-
-@export var badge_size: Vector2 = Vector2(8, 8):
-	set(val):
-		badge_size = val
-		_update_badges()
-
-@export var badge_spacing: int = 3:
-	set(val):
-		badge_spacing = val
-		_update_badges()
-
+		
+@export var max_level: int = 3
+@export var badge_size: Vector2 = Vector2(8, 8)
+@export var badge_spacing: int = 3
 @export var x_offset: float = 12.0
 @export var y_offset: float = 12.0
-
-@export var border_color: Color = Color(0.2, 0.1, 0.0, 1.0):
-	set(val):
-		border_color = val
-		_update_badges()
-
-@export var interior_color: Color = Color(0.9, 0.7, 0.2, 1.0):
-	set(val):
-		interior_color = val
-		_update_badges()
+@export var border_color: Color = Color(0.2, 0.1, 0.0, 1.0)
+@export var interior_color: Color = Color(0.9, 0.7, 0.2, 1.0)
 
 var _badges_container: HBoxContainer
 
