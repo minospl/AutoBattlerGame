@@ -191,7 +191,7 @@ func _show_game_over(p_victory: bool) -> void:
 	add_child(go_screen)
 	current_scene = go_screen
 	
-	go_screen.setup(p_victory, run_state.trophies, run_state.day)
+	go_screen.setup(p_victory, run_state.day)
 	go_screen.restart_requested.connect(func() -> void:
 		_initialize_new_run()
 		_go_to_shop()

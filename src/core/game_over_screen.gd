@@ -6,7 +6,6 @@ signal restart_requested
 @onready var title_lbl: Label = %TitleLabel
 @onready var sub_lbl: Label = %SubtitleLabel
 @onready var days_lbl: Label = %DaysLabel
-@onready var trophies_lbl: Label = %TrophiesLabel
 @onready var play_again_btn: Button = %PlayAgainButton
 
 func _ready() -> void:
@@ -35,7 +34,7 @@ func _ready() -> void:
 	stats_style.corner_radius_bottom_right = 6
 	stats_panel.add_theme_stylebox_override("panel", stats_style)
 
-func setup(p_victory: bool, p_trophies: int, p_day: int) -> void:
+func setup(p_victory: bool, p_day: int) -> void:
 	if p_victory:
 		title_lbl.text = "RUN VICTORY!"
 		title_lbl.add_theme_color_override("font_color", Color(1.0, 0.85, 0.2)) # Gold
@@ -46,4 +45,3 @@ func setup(p_victory: bool, p_trophies: int, p_day: int) -> void:
 		sub_lbl.text = "Your team succumbed to the dungeon..."
 		
 	days_lbl.text = "Days Survived: " + str(p_day)
-	trophies_lbl.text = "Trophies Earned: " + str(p_trophies) + " / 10"

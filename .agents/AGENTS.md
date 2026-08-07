@@ -34,7 +34,7 @@ Kod projektu jest podzielony modularnie w katalogu `src`:
 
 * `src/core/` – Serce gry:
   * `game_root.gd` – Główny kontroler gry zarządzający przełączaniem scen między sklepem a walką.
-  * `run_state.gd` – Zasób (Resource) przechowujący stan trwającej rozgrywki (złoto, życia, dni, trofea, stan drużyny i ławki).
+  * `run_state.gd` – Zasób (Resource) przechowujący stan trwającej rozgrywki (złoto, życia, dni, stan drużyny i ławki).
 * `src/features/units/` – System jednostek/potworów:
   * `unit_data.gd` – Definicja szablonu jednostki (UnitData) jako zasób (Resource): statystyki bazowe, typy, rzadkość, prędkość ładowania, umiejętności.
   * `unit_instance.gd` – Instancja jednostki w czasie rzeczywistym.

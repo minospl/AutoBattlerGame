@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_header_bar.tscn" id="2_header"]
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_team_panel.tscn" id="3_team_panel"]
 [ext_resource type="Script" path="res://src/features/battle/components/floating_text_manager.gd" id="4_popup_manager"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="5_decorator"]
 [ext_resource type="PackedScene" path="res://src/features/relics/components/relic_bag_popup.tscn" id="6_relic_popup"]
 
 [node name="BattleScene" type="Control"]
@@ -121,3 +122,31 @@ offset_left = -196.0
 offset_top = 56.0
 offset_right = -16.0
 offset_bottom = 296.0
+
+[node name="ActionMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="ExitButton" type="Button" parent="ActionMargin"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "EXIT TO SHOP"
+
+[node name="GameButtonDecorator" type="Node" parent="ActionMargin/ExitButton"]
+script = ExtResource("5_decorator")
+outer_width = 3
+inner_width = 2
+indentation = 2
+color_normal = Color(0.12, 0.45, 0.22, 1)
+color_hover = Color(0.15, 0.55, 0.27, 1)
+color_pressed = Color(0.18, 0.65, 0.32, 1)

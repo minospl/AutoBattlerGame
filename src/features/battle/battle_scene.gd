@@ -45,6 +45,7 @@ var enemy_slots: Array[BattleCardSlot] = []
 @onready var player_panel: BattleTeamPanel = %PlayerTeamPanel
 @onready var enemy_panel: BattleTeamPanel = %EnemyTeamPanel
 @onready var floating_text_manager: FloatingTextManager = %FloatingTextManager
+@onready var exit_button: Button = %ExitButton
 
 func _ready() -> void:
 	_randomize_background()
@@ -56,8 +57,10 @@ func _ready() -> void:
 		preview_container.add_child(preview_tooltip)
 		preview_tooltip.visible = false
 
+	if exit_button:
+		exit_button.pressed.connect(_on_exit_pressed)
+
 	if header_bar:
-		header_bar.exit_pressed.connect(_on_exit_pressed)
 		header_bar.play_pressed.connect(_on_play_pressed)
 		header_bar.pause_pressed.connect(_on_pause_pressed)
 		header_bar.speed_pressed.connect(_on_speed_pressed)
@@ -337,10 +340,13 @@ func show_battle_outcome(p_outcome: String, custom_title: String = "", custom_de
 	var overlay: ColorRect = ColorRect.new()
 	overlay.color = Color(0, 0, 0, 0.7)
 	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.z_index = 1000
 	add_child(overlay)
 	
 	var popup: PanelContainer = PanelContainer.new()
 	popup.custom_minimum_size = Vector2(400, 220)
+	popup.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	popup.grow_vertical = Control.GROW_DIRECTION_BOTH
 	
 	var style: StyleBoxFlat = StyleBoxFlat.new()
 	style.bg_color = Color(0.12, 0.12, 0.16, 1.0)

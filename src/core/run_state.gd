@@ -8,7 +8,6 @@ const ITEM_PURCHASE_LIMIT: int = 2
 const STARTING_GOLD: int = 10
 const STARTING_LIVES: int = 5
 const STARTING_DAY: int = 1
-const STARTING_TROPHIES: int = 0
 const MAX_ROUNDS: int = 20
 const STARTING_BASE_HEALTH: int = 100
 
@@ -26,7 +25,6 @@ func _init() -> void:
 signal gold_changed(p_gold: int)
 signal lives_changed(p_lives: int)
 signal day_changed(p_day: int)
-signal trophies_changed(p_trophies: int)
 signal shop_level_changed(p_level: int)
 signal shop_slot_updated(p_slot_index: int, p_card_instance: Resource)
 signal shop_slot_freeze_changed(p_slot_index: int, p_is_frozen: bool)
@@ -117,12 +115,6 @@ var has_unique_potential: bool:
 			day = val
 			day_changed.emit(day)
 
-@export var trophies: int = STARTING_TROPHIES:
-	set(val):
-		if trophies != val:
-			trophies = val
-			trophies_changed.emit(trophies)
-
 @export var shop_level: int = 1:
 	set(val):
 		if shop_level != val:
@@ -177,9 +169,7 @@ func roll_rarity() -> Rarity.Type:
 func complete_battle(outcome: String) -> void:
 	item_purchase_count = 0
 	
-	if outcome == "victory":
-		trophies += 1
-	elif outcome == "defeat":
+	if outcome == "defeat":
 		lives -= 1
 		
 	if lives > 0 and day <= MAX_ROUNDS:
@@ -298,10 +288,9 @@ func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 		available.append(relic)
 	return available
 
-func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY, p_trophies: int = STARTING_TROPHIES, p_gold: int = STARTING_GOLD) -> void:
+func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY, p_gold: int = STARTING_GOLD) -> void:
 	lives = p_lives
 	day = p_day
-	trophies = p_trophies
 	gold = p_gold
 	base_health = STARTING_BASE_HEALTH
 	relics.clear()

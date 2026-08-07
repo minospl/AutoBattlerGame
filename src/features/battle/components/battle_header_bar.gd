@@ -8,7 +8,6 @@ signal speed_pressed
 signal player_bag_requested
 signal enemy_bag_requested
 
-@onready var exit_button: Button = %ExitButton
 @onready var play_button: Button = %PlayButton
 @onready var pause_button: Button = %PauseButton
 @onready var speed_button: Button = %SpeedButton
@@ -18,7 +17,6 @@ signal enemy_bag_requested
 @onready var enemy_bag_btn: RelicBagButton = %EnemyBagButton
 
 func _ready() -> void:
-	exit_button.pressed.connect(func() -> void: exit_pressed.emit())
 	play_button.pressed.connect(func() -> void: play_pressed.emit())
 	pause_button.pressed.connect(func() -> void: pause_pressed.emit())
 	speed_button.pressed.connect(func() -> void: speed_pressed.emit())
@@ -38,10 +36,10 @@ func _add_info_label() -> void:
 	info_label.add_theme_font_size_override("font_size", 18)
 	
 	# Find the parent hbox container
-	var parent_box: Node = exit_button.get_parent()
+	var parent_box: Node = player_bag_btn.get_parent()
 	if parent_box and parent_box is HBoxContainer:
 		parent_box.add_child(info_label)
-		# Move it to center (after exit button, before center container if any)
+		# Move it to center (after player_bag_btn)
 		parent_box.move_child(info_label, 1)
 
 func set_round_info(day: int, max_rounds: int, lives: int, is_deathmatch: bool) -> void:
