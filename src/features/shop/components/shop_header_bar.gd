@@ -56,26 +56,39 @@ func _update_labels() -> void:
 func update_bag_count(count: int) -> void:
 	bag_btn.current_count = count
 
-func setup_opponent_list(_total_days: int, current_day: int) -> void:
+func setup_opponent_list(run_state: RunState) -> void:
 	if not opponents_container: return
 	
 	for child: Node in opponents_container.get_children():
 		child.queue_free()
 		
-	# Placeholder: Generate 7 static bot profiles for the pool
-	var total_bots: int = 7
-	var active_bot_id: int = ((current_day - 1) % total_bots) + 1
-	
-	for i: int in range(total_bots):
-		var bot_id: int = i + 1
+	if not run_state or not run_state.opponent_provider:
+		return
+
+	var all_opponents: Array[OpponentProfile] = run_state.opponent_provider.get_all_opponents()
+	var pool_ids: Array[int] = []
+	for bot: OpponentProfile in run_state.opponents_pool:
+		if bot != null:
+			pool_ids.append(bot.id)
+
+	var next_id: int = run_state.next_opponent.id if run_state.next_opponent else -1
+
+	var colors: Array[Color] = [
+		Color(0.8, 0.2, 0.2), Color(0.2, 0.8, 0.2), Color(0.2, 0.2, 0.8),
+		Color(0.8, 0.8, 0.2), Color(0.6, 0.2, 0.8), Color(0.2, 0.8, 0.8),
+		Color(0.8, 0.5, 0.2)
+	]
+
+	for i: int in range(all_opponents.size()):
+		var bot: OpponentProfile = all_opponents[i]
 		var portrait: OpponentPortrait = OPPONENT_PORTRAIT.instantiate() as OpponentPortrait
 		opponents_container.add_child(portrait)
-		
-		# Generate a mock color for now (will be replaced by actual data later)
-		var colors: Array[Color] = [Color(0.8, 0.2, 0.2), Color(0.2, 0.8, 0.2), Color(0.2, 0.2, 0.8), Color(0.8, 0.8, 0.2), Color(0.6, 0.2, 0.8), Color(0.2, 0.8, 0.8), Color(0.8, 0.5, 0.2)]
+
+		var is_in_pool: bool = pool_ids.has(bot.id) and bot.lives > 0
+		var is_next: bool = (bot.id == next_id)
 		var c: Color = colors[i % colors.size()]
-		
-		portrait.setup(bot_id, bot_id == active_bot_id, c)
+
+		portrait.setup(bot.id, is_in_pool, is_next, c)
 
 func _apply_visual_styling() -> void:
 	var header_content: PanelContainer = get_node_or_null("VBox/HeaderContent") as PanelContainer

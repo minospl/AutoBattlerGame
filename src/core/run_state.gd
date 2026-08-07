@@ -35,6 +35,7 @@ signal shop_rolled()
 signal shop_size_changed(p_new_size: int)
 signal base_health_changed(p_base_health: int)
 signal battle_completed(outcome: String)
+signal next_opponent_changed(p_opponent: OpponentProfile)
 
 func notify_shop_slot_updated(p_slot_index: int, p_card_instance: Resource) -> void:
 	shop_slot_updated.emit(p_slot_index, p_card_instance)
@@ -56,6 +57,9 @@ var item_templates: Array[ItemData] = []
 var relic_templates: Array[RelicData] = []
 var pending_on_battle_end: bool = false
 var opponent_provider: OpponentProvider
+
+var opponents_pool: Array[OpponentProfile] = []
+var next_opponent: OpponentProfile = null
 
 @export var is_deathmatch: bool = false
 @export var is_deathmatch_completed: bool = false
@@ -169,7 +173,10 @@ func roll_rarity() -> Rarity.Type:
 func complete_battle(outcome: String) -> void:
 	item_purchase_count = 0
 	
-	if outcome == "defeat":
+	if outcome == "victory":
+		if next_opponent != null:
+			next_opponent.lives -= 1
+	elif outcome == "defeat":
 		lives -= 1
 		
 	if lives > 0 and day <= MAX_ROUNDS:
@@ -194,10 +201,18 @@ func is_defeat() -> bool:
 func is_game_over() -> bool:
 	return is_victory() or is_defeat()
 
-func generate_enemy_team() -> OpponentProfile:
+func prepare_next_opponent() -> void:
 	if opponent_provider:
-		return opponent_provider.get_next_opponent(self)
-	return null
+		var previous: OpponentProfile = next_opponent
+		opponent_provider.update_opponents_pool(self)
+		next_opponent = opponent_provider.select_next_opponent(self, previous)
+		next_opponent_changed.emit(next_opponent)
+
+func generate_enemy_team() -> OpponentProfile:
+	if next_opponent:
+		return next_opponent
+		
+	return opponent_provider.get_next_opponent(self)
 
 func generate_deathmatch_opponents() -> Array[OpponentProfile]:
 	if opponent_provider:
@@ -293,6 +308,8 @@ func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY,
 	day = p_day
 	gold = p_gold
 	base_health = STARTING_BASE_HEALTH
+	opponents_pool.clear()
+	next_opponent = null
 	relics.clear()
 	has_magnetic_core = false
 	is_deathmatch = false

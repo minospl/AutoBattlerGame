@@ -124,6 +124,8 @@ func setup(p_state: RunState) -> void:
 		if run_state.shop_cards[i] == null:
 			run_state.shop_cards[i] = run_state.roll_single_shop_card(i)
 			
+	run_state.prepare_next_opponent()
+	shop_header_bar.setup_opponent_list(run_state)
 	load_state_from_run()
 	
 	# Instantiate and add the targeting line overlay to draw on top of everything
@@ -648,7 +650,6 @@ func load_state_from_run() -> void:
 	
 	relic_bag_popup.update_relics(run_state.relics)
 	shop_header_bar.update_bag_count(run_state.relics.size())
-	shop_header_bar.setup_opponent_list(run_state.max_rounds, run_state.day)
 	
 	# Update shop level and chance weights in the shop panel
 	shop_panel.shop_level = run_state.shop_level
