@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cx5y7hsqt4k2b"]
+[gd_scene load_steps=4 format=3 uid="uid://cx5y7hsqt4k2b"]
 
 [ext_resource type="Script" path="res://src/features/battle/components/battle_team_panel.gd" id="1_script"]
 [ext_resource type="PackedScene" path="res://src/features/battle/components/health_bar.tscn" id="2_health_bar"]
@@ -28,33 +28,49 @@ custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="GridContainer" type="GridContainer" parent="."]
+[node name="RowsVBox" type="VBoxContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 16
-theme_override_constants/v_separation = 16
-columns = 3
+theme_override_constants/separation = 16
 
-[node name="Slot0" parent="GridContainer" instance=ExtResource("3_slot")]
-unique_name_in_owner = true
-layout_mode = 2
-
-[node name="Slot1" parent="GridContainer" instance=ExtResource("3_slot")]
+[node name="TopRowMargin" type="MarginContainer" parent="RowsVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Slot2" parent="GridContainer" instance=ExtResource("3_slot")]
+[node name="TopRowHBox" type="HBoxContainer" parent="RowsVBox/TopRowMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Slot0" parent="RowsVBox/TopRowMargin/TopRowHBox" instance=ExtResource("3_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Slot3" parent="GridContainer" instance=ExtResource("3_slot")]
+[node name="Slot1" parent="RowsVBox/TopRowMargin/TopRowHBox" instance=ExtResource("3_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Slot4" parent="GridContainer" instance=ExtResource("3_slot")]
+[node name="Slot2" parent="RowsVBox/TopRowMargin/TopRowHBox" instance=ExtResource("3_slot")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Slot5" parent="GridContainer" instance=ExtResource("3_slot")]
+[node name="BottomRowMargin" type="MarginContainer" parent="RowsVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BottomRowHBox" type="HBoxContainer" parent="RowsVBox/BottomRowMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Slot3" parent="RowsVBox/BottomRowMargin/BottomRowHBox" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot4" parent="RowsVBox/BottomRowMargin/BottomRowHBox" instance=ExtResource("3_slot")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Slot5" parent="RowsVBox/BottomRowMargin/BottomRowHBox" instance=ExtResource("3_slot")]
 unique_name_in_owner = true
 layout_mode = 2

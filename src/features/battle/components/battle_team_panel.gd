@@ -3,23 +3,47 @@ extends VBoxContainer
 
 signal floating_text_spawn_requested(text: String, color: Color, position: Vector2)
 
-@export var mirrored: bool = false
+@export var mirrored: bool = false:
+	set(val):
+		mirrored = val
+		if is_node_ready():
+			_apply_row_offsets()
+
+@export var row_offset: int = 24
 
 @onready var health_bar: HealthBar = %HealthBar
-@onready var grid_container: GridContainer = %GridContainer
 @onready var status_hbox: HBoxContainer = %StatusHBox
+@onready var top_row_margin: MarginContainer = %TopRowMargin
+@onready var bottom_row_margin: MarginContainer = %BottomRowMargin
+@onready var slot_0: BattleCardSlot = %Slot0
+@onready var slot_1: BattleCardSlot = %Slot1
+@onready var slot_2: BattleCardSlot = %Slot2
+@onready var slot_3: BattleCardSlot = %Slot3
+@onready var slot_4: BattleCardSlot = %Slot4
+@onready var slot_5: BattleCardSlot = %Slot5
 
 var slots: Array[BattleCardSlot] = []
 var status_badges: Dictionary[String, StatusBadge] = {}
 
 func _ready() -> void:
-	slots = []
-	for child: Node in grid_container.get_children():
-		if child is BattleCardSlot:
-			slots.append(child)
+	slots = [slot_0, slot_1, slot_2, slot_3, slot_4, slot_5]
 			
 	if mirrored and status_hbox:
 		status_hbox.alignment = BoxContainer.ALIGNMENT_END
+
+	_apply_row_offsets()
+
+func _apply_row_offsets() -> void:
+	if mirrored:
+		top_row_margin.add_theme_constant_override("margin_left", row_offset)
+		top_row_margin.add_theme_constant_override("margin_right", 0)
+		bottom_row_margin.add_theme_constant_override("margin_left", 0)
+		bottom_row_margin.add_theme_constant_override("margin_right", row_offset)
+	else:
+		top_row_margin.add_theme_constant_override("margin_left", 0)
+		top_row_margin.add_theme_constant_override("margin_right", row_offset)
+		bottom_row_margin.add_theme_constant_override("margin_left", row_offset)
+		bottom_row_margin.add_theme_constant_override("margin_right", 0)
 
 ## Binds this panel to a logical BattleTeamModel and connects all signal updates
 func setup_model(team_model: BattleTeamModel) -> void:
