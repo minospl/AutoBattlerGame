@@ -41,13 +41,17 @@ Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu m
 | :---: | :--- | :--- | :--- |
 | [X] | **Mechanika** | **System Żyć i Licznika Rund (`RunState`):** *(Częściowo gotowe)* Zmienne `lives`, `day`, `trophies` i obsługa w `complete_battle()` istnieją w `RunState`. Wymagają dostosowania limitu do 5 żyć i $N$ rund podstawowych. | **Krytyczny** |
 | [X] | **Mechanika** | **Architektura OpponentProvider (Single Player):** Wprowadzenie wzorca strategii dla wrogów (`BattleRuleset`). Stworzenie lokalnej implementacji `OfflineOpponentProvider`, dostarczając grywalny rdzeń offline. | **Krytyczny** |
-| [ ] | **Mechanika** | **Ewolucja Drużyn Botów (Single Player):** *(Do zrobienia teraz)* Zapisywanie stałego składu drużyn botów. Rozwój algorytmu kupowania opartego na **archetypach** (np. przypisanie botowi typu Beast + Dragon). Symulacja zdobywania **reliktów** z czasem. | **Krytyczny** |
+| [ ] | **Refaktor & Mechanika** | **Wyodrębnienie Silnika Bitwy (`BattleEngine` / Headless Simulator):** Ekstrakcja czystej logiki pętli czasu bitwy z `BattleScene` do niezależnej od UI klasy `BattleEngine`. Stworzenie pojedynczego źródła prawdy (Single Source of Truth), umożliwiającego zarówno animowaną walkę na arenie UI, jak i natychmiastową symulację walk w tle w ułamku milisekundy. | **Krytyczny** |
+| [ ] | **Refaktor & Mechanika** | **Procesor Rozliczania Tury (`TurnProcessor`):** Stworzenie uniwersalnej logiki przejścia między dniami, wykonującej te same operacje dla gracza i botów bez graficznych wizualizacji (`floating text`): (1) rozliczenie efektów po-bitewnych (`ON_BATTLE_END`), (2) przydział złota (+10g podstawa + własna generacja z Mimiców/Reliktów), (3) automatyczne fuzje 3 kart na ★2/★3, (4) inicjalizacja startu sklepu (`ON_SHOP_START`). | **Krytyczny** |
+| [ ] | **Mechanika** | **Ewolucja Drużyn i Archetypy Botów (Single Player):** Trwały zapis składu 7 botów (`OpponentProfile`). Przypisanie dwuelementowych archetypów (np. *Beast+Dragon*, *Fire+Earth*, *Plant+Water*). Bot dąży do zbierania jednostek z tych 2 typów, a stałe modyfikatory (`PERMANENT`) oraz ulepszenia nie resetują się między dniami. | **Krytyczny** |
+| [ ] | **Mechanika** | **Inteligentne Pozycjonowanie AI w Siatce 2x3 (Single Player):** Heurystyka rozmieszczania jednostek: Jednostki kierunkowe (`UP`, `DOWN`, `LEFT`, `RIGHT`) lądują tam, gdzie mają sąsiada w tym kierunku, Jednostki obszarowe (`ADJACENT`, `ALL`) trafiają na środkowe sloty (1 i 4). | Wysoki |
+| [ ] | **Mechanika** | **Symulacja Ekonomii i Sklepu Botów (Single Player):** Pełna symulacja fazy sklepu 1:1 z graczem oparta na `ShopRarityConfig`, dynamicznych cenach `UnitData.price`, limitach przedmiotów oraz cztero-stopniowej hierarchii zakupów z mechanizmem ochrony przed pechem (*Pity System*). Patrz szczegółowa specyfikacja w sekcji "Algorytm Symulacji Ekonomii i Sklepu Botów". | Wysoki |
 | [X] | **Mechanika** | **Faza Deathmatch:** Zaimplementowano pętlę finałowych starć (Deathmatch) z użyciem `DeathmatchBattleRuleset`. | **Krytyczny** |
 | [X] | **Mechanika** | **Serializacja Drużyny (`to_dict` / `from_dict`):** Dodano obsługę transformacji w `UnitInstance` i integrację z `OpponentProfile`. | **Krytyczny** |
 | [X] | **Mechanika** | **Zunifikowany System Przedmiotów (Spawnowanie, Rzadkość i Modułowość):** Przebudowa przedmiotów na wzór potworów. | **Krytyczny** |
 | [X] | **Mechanika** | **Poziom Sklepu (Shop Level):** Ulepszanie sklepu i wagi rzadkości. | **Krytyczny** |
 | [X] | **UI / UX** | **Wskaźnik Żyć i Rund w Sklepie/Walce:** *(Częściowo gotowe)* `ShopHeaderBar` wyświetla już lives/day w sklepie. Należy dodać analogiczny wskaźnik do sceny walki `BattleScene` oraz powiadomienie o fazie Deathmatch. | **Krytyczny** |
-| [ ] | **UI / UX & Mechanika** | **Panel Podglądu i Wyboru Przeciwnika w Sklepie:** Przycisk/panel w sklepie pozwalający podejrzeć skład i HP rywala. Wylosowani przeciwnicy pozostają w puli i ulegają zmianie wyłącznie po ich wyeliminowaniu (0 HP) lub użyciu dedykowanego przedmiotu/eventu. | **Krytyczny** |
+| [ ] | **UI / UX & Mechanika** | **Panel Podglądu Przeciwnika w Sklepie (`OpponentPreviewModal`):** Otwierany z nagłówka sklepu (`ShopHeaderBar`) interaktywny modal podglądu rywala. Prezentuje snapshot bota **z momentu po zakończeniu poprzedniej walki (`post_battle_snapshot`)**: jego zycia (`lives`), sumaryczne HP, ułożenie siatki 2x3 z pełnymi tooltipami potworów, aktywne relikty oraz zgromadzone po walce złoto. | **Krytyczny** |
 | [X] | **Refaktor** | **Model-View separation & Null-Safety:** Reaktywna architektura sklepu oraz poprawka typowania. | **Krytyczny** |
 | [X] | **UI / UX** | **Galeria / Kompendium:** Scena kompendium prezentująca listę wszystkich istniejących w grze jednostek, przedmiotów i reliktów ([CompendiumScene](file:///d:/Projekty/AutoBattlerDungeonGame/src/features/compendium/compendium_scene.gd)). | **Krytyczny** |
 
@@ -102,3 +106,47 @@ Na podstawie analizy kodu źródłowego w katalogu `src`, obecny stan projektu m
 ### **Zaawansowany System Statystyk (Stat Modifier Pattern)**
 
 Wzorce modyfikacji statystyk (`Stat` oraz `StatModifier` o typach FLAT i PERCENT) zapobiegające konfliktom przy nakładaniu dziesiątek równoległych efektów.
+
+---
+
+### **Algorytm Symulacji Ekonomii i Sklepu Botów**
+
+Niski poziom logiki dla `OfflineOpponentProvider.simulate_bot_turn(bot: OpponentProfile, day: int)`:
+
+1. **Timing, Aktywne Boty i Snapshoty (`post_battle_snapshot`):**
+   * **Kiedy:** Faza sklepu botów wykonuje się na samym początku nowego Dnia (zanim gracz rozpocznie zakupy w sklepie).
+   * **Obsługa:** W symulacji sklepu biorą udział wyłącznie **aktywne / żyjące boty (`lives > 0`)**. Proces ten działa nieprzerwanie również w fazie finałowej **Deathmatch (Dzień 20+)**, dopóki wszyscy przeciwnicy nie zostaną wyeliminowani.
+   * **Snapshot dla Podglądu (`post_battle_snapshot`):** Przed rozpoczęciem zakupów na dany Dzień, `OpponentProfile` tworzy głęboką kopię `post_battle_snapshot = bot.clone()`. To dokładnie tę migawkę wyświetla graczowi `OpponentPreviewModal`.
+
+2. **Bezpośrednia Symulacja Walk w Tle (`BattleEngine` / Headless Simulator):**
+   * Do przeliczenia zysków zebranych przez bota w walce ze snapshotem gracza używamy czystego silnika **`BattleEngine.simulate_battle(bot_team, player_snapshot)`**.
+   * **Bezpieczne Klonowanie Gracza (`player_snapshot`):** Snapshot gracza tworzony jest jako odizolowana kopia (`clone()`) kart z `run_state.active_team`, co zapobiega wyciekom modyfikacji statystyk na żywe potwory gracza.
+   * **Brak Zgadywania (100% Prawdziwa Bitwa):** Funkcja przelicza bitwę w pętli `delta` (krok 0.05s) bez UI. Bierze pod uwagę 100% detali: `cast_speed`, statusy, tarcze, relikty, pozycjonowanie oraz rejestruje dokładne złoto wygenerowane przez umiejętności potworów (np. Mimic przy `ON_CAST`) i relikty.
+
+3. **Przetwarzanie Przejścia Tury przez `TurnProcessor`:**
+   * Po wywołaniu `BattleEngine` automatycznie wywoływany jest **`TurnProcessor.process_turn_end(bot)`**:
+     * Aplikuje efekty po-bitewne (`ON_BATTLE_END`).
+     * Przydziela budżet: `bot.gold += 10 (podstawa) + wygenerowane_złoto_z_bitwy`.
+     * Wykonuje automatyczne fuzje 3 identycznych kart na ★2 / ★3.
+     * Wyzwala modyfikatory startu sklepu (`ON_SHOP_START`).
+
+4. **Zasada Utraty Żyć (`lives -= 1`):**
+   * **Jedynie 1 wyznaczony na dany Dzień przeciwnik** (którego walka z graczem jest animowana na arenie `BattleScene`) traci 1 Życie (`lives -= 1`), jeśli przegra bezpośrednie starcie z graczem.
+   * Pozostałe żyjące boty rozwijają się w tle i zbierają zyski ze swojej symulacji przez `TurnProcessor`, ale **NIE tracą żyć**.
+
+5. **Konfiguracja Oferty Sklepu i Ławki (Bench):**
+   * **Ławka Bota (`bench`):** Bot trzyma `active_team` (max 6) oraz **ławka zapasowa `bench` (max 6)** – dokładnie tak jak gracz. Pozwala to na kupowanie duplikatów potworów przy pełnym składzie (6/6) i czekanie na 3. kartę do wykonania fuzji bez osłabiania drużyny.
+   * **Poziom Sklepu (`shop_level`):** Każdy bot posiada własną zmienną `shop_level` (start 1). Z każdym dniem wykonuje `shop_level += 1`. Dodatkowo poziom zwiększają przedmioty sklepowe (np. *Merchant Scroll*) i relikty.
+   * **Wagi Rzadkości:** Pobierane z `ShopRarityConfig.get_weights_for_day(bot.shop_level)`.
+   * **Struktura Oferty:** Sloty 0–3 zawierają jednostki, a Slot 4 zawiera przedmiot. Tak jak u gracza.
+
+6. **Pętla Decyzyjna Bota (Główny Algorytm Zakupów):**
+   Dopóki `bot.gold >= 1`:
+   * **Priorytet 1 (Merchant Scroll / Skrzynia z Reliktem):** Jeśli w Slocie na przedmioty wylosowano *Merchant Scroll* LUB Skrzynię z Reliktem (`RelicData`), a `gold >= price` oraz nie przekroczono limitu – bot natychmiast kupuje przedmiot (`bot.shop_level += 1` lub dodaje relikt).
+   * **Priorytet 2 (Jednostka z Archetypu lub Duplikat):** Bot skanuje Sloty 0–3 w poszukiwaniu potworów pasujących do jego **Archetypu Głównemu/Pobocznemu** LUB posiadanych już w drużynie. Jeśli `gold >= unit.price` – kupuje potwora (wstawia do `active_team` lub na `bench`) i wykonuje automatyczne **mergowanie 3 identycznych kart** do poziomu 2 lub 3 przez `TurnProcessor`.
+   * **Priorytet 3 (Przedmiot Dokarmiający przy 6 Jednostkach):** Jeśli bot posiada komplet **6 potworów**, a w Slocie 4 znajduje się przedmiot wzmacniający (`ItemData`) – kupuje przedmiot i aplikuje jego stały bonus (`PERMANENT`) na swoją pierwszą/najsilniejszą jednostkę.
+   * **Rolowanie Sklepu:** Jeśli brak pasujących zakupów w bieżącej ofercie, bot odejmuje 1g z budżetu i roluje całe 5 slotów sklepu na nowo.
+
+7. **Mechanizm Ochrony przed Pechem (Pity Duplication System):**
+   * Jeśli po wyczerpaniu całego złota (`gold < 1`) bot zakupił w danej rundzie **0 jednostek/przedmiotów** (cały budżet został utracony na nieudane rolowania):
+   * Uruchamia się system ochrony: bot losowo wybiera jedną z istniejących w jego drużynie jednostek i darmowo otrzymuje jej duplikat 1-poziomowy (co wspiera proces ulepszania na ★2 / ★3).
