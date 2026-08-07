@@ -127,6 +127,8 @@ func evolve(p_new_data: UnitData) -> void:
 	initialize(p_new_data)
 	absorb_bonus_stats_from(old_clone)
 
+	level = 1
+
 func level_up(p_other_units: Array[UnitInstance] = []) -> void:
 	if level >= 3:
 		return
