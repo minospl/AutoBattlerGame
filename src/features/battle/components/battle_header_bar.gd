@@ -1,7 +1,6 @@
 class_name BattleHeaderBar
 extends PanelContainer
 
-signal exit_pressed
 signal play_pressed
 signal pause_pressed
 signal speed_pressed
