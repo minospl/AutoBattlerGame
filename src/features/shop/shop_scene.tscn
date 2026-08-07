@@ -61,7 +61,6 @@ alignment = 1
 
 [node name="ContentMargin" type="MarginContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox"]
 layout_mode = 2
-theme_override_constants/margin_left = 32
 theme_override_constants/margin_bottom = 8
 
 [node name="ContentVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin"]
@@ -126,7 +125,7 @@ grow_horizontal = 0
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 0
-offset_left = 16.0
-offset_top = 56.0
+offset_left = 8.0
+offset_top = 60.0
 offset_right = 196.0
 offset_bottom = 296.0

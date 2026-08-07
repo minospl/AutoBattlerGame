@@ -514,5 +514,4 @@ func _exit_tree() -> void:
 		enemy_team.cleanup()
 
 func _randomize_background() -> void:
-	if background_panel and BATTLE_BACKGROUNDS.size() > 0:
-		background_panel.texture = BATTLE_BACKGROUNDS.pick_random()
+	background_panel.texture = BATTLE_BACKGROUNDS.pick_random()

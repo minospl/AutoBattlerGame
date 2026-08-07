@@ -4,10 +4,7 @@
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_header_bar.tscn" id="2_header"]
 [ext_resource type="PackedScene" path="res://src/features/battle/components/battle_team_panel.tscn" id="3_team_panel"]
 [ext_resource type="Script" path="res://src/features/battle/components/floating_text_manager.gd" id="4_popup_manager"]
-[ext_resource type="Texture2D" path="res://src/assets/ui/battle_background_1.png" id="5_bg"]
 [ext_resource type="PackedScene" path="res://src/features/relics/components/relic_bag_popup.tscn" id="6_relic_popup"]
-
-
 
 [node name="BattleScene" type="Control"]
 layout_mode = 3
@@ -26,7 +23,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("5_bg")
 expand_mode = 1
 stretch_mode = 6
 
@@ -104,7 +100,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-	script = ExtResource("4_popup_manager")
+script = ExtResource("4_popup_manager")
 
 [node name="PlayerRelicBagPopup" parent="." instance=ExtResource("6_relic_popup")]
 unique_name_in_owner = true

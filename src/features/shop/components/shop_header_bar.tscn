@@ -26,12 +26,21 @@ theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 4
 
+[node name="CenterOverlay" type="CenterContainer" parent="VBox/HeaderContent/MainMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="OpponentsContainer" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/CenterOverlay"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
 [node name="MainHBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin"]
 layout_mode = 2
 
 [node name="LeftBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox"]
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_constants/separation = 16
 alignment = 0
 
@@ -77,18 +86,13 @@ text = "DAY 4"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-
-
-[node name="OpponentsContainer" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox"]
-unique_name_in_owner = true
+[node name="Spacer" type="Control" parent="VBox/HeaderContent/MainMargin/MainHBox"]
 layout_mode = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 12
-alignment = 1
+size_flags_horizontal = 3
+mouse_filter = 2
 
 [node name="RightBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox"]
 layout_mode = 2
-size_flags_horizontal = 3
 alignment = 2
 
 [node name="MenuButton" type="Button" parent="VBox/HeaderContent/MainMargin/MainHBox/RightBox"]
