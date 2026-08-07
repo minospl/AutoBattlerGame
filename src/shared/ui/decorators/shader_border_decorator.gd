@@ -102,8 +102,7 @@ func _ready() -> void:
 
 func _setup_initial_size() -> void:
 	if shader_material:
-		var parent: Node = get_parent()
-		var parent_ctrl: Control = parent as Control
+		var parent_ctrl: Control = get_parent() as Control
 		var initial_size: Vector2 = size
 		if initial_size == Vector2.ZERO and parent_ctrl:
 			initial_size = parent_ctrl.size if parent_ctrl.size != Vector2.ZERO else parent_ctrl.custom_minimum_size

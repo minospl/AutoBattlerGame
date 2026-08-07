@@ -1,66 +1,78 @@
 class_name LevelIndicator
 extends Control
 
-## Indicates unit level/stars using pixel-art diamonds above the card portrait.
+const BASE_BADGE: PackedScene = preload("res://src/shared/ui/components/base_badge.tscn")
+
+## Indicates unit level/stars using pixel-art shader badges above the card portrait.
 @export var level: int = 1:
 	set(val):
-		if level != val:
-			level = val
-			queue_redraw()
+		level = val
+		_update_badges()
 
 @export var max_level: int = 3:
 	set(val):
-		if max_level != val:
-			max_level = val
-			queue_redraw()
+		max_level = val
+		_update_badges()
 
-@export var diamond_size: int = 12
-@export var half_size: int = 6
-@export var diamond_spacing: int = 3
-@export var x_offset: float = 8.0
-@export var y_offset: float = 8.0
+@export var badge_size: Vector2 = Vector2(8, 8):
+	set(val):
+		badge_size = val
+		_update_badges()
+
+@export var badge_spacing: int = 3:
+	set(val):
+		badge_spacing = val
+		_update_badges()
+
+@export var x_offset: float = 12.0
+@export var y_offset: float = 12.0
+
+@export var border_color: Color = Color(0.2, 0.1, 0.0, 1.0):
+	set(val):
+		border_color = val
+		_update_badges()
+
+@export var interior_color: Color = Color(0.9, 0.7, 0.2, 1.0):
+	set(val):
+		interior_color = val
+		_update_badges()
+
+var _badges_container: HBoxContainer
+
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	z_index = 10
 	z_as_relative = true
+	_setup_container()
+	_update_badges()
 
 ## Configures level indicator for a card.
 func setup(p_level: int, p_max_level: int = 3) -> void:
 	max_level = p_max_level
 	level = clampi(p_level, 0, max_level)
-	queue_redraw()
 
-func _draw() -> void:
-	if level <= 0 or diamond_size <= 0:
+func _setup_container() -> void:
+	if not _badges_container:
+		_badges_container = HBoxContainer.new()
+		_badges_container.name = "BadgesContainer"
+		_badges_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_badges_container.position = Vector2(x_offset, y_offset)
+		add_child(_badges_container)
+	_badges_container.add_theme_constant_override("separation", badge_spacing)
+
+func _update_badges() -> void:
+	_setup_container()
+
+	for child: Node in _badges_container.get_children():
+		_badges_container.remove_child(child)
+		child.free()
+
+	if level <= 0:
 		return
 
 	for i: int in range(level):
-		var diamond_x: float = x_offset + float(i * (diamond_size + diamond_spacing))
-		_draw_diamond(diamond_x, y_offset, true)
-
-func _draw_diamond(p_x_offset: float, p_y_offset: float, is_filled: bool) -> void:
-	var border_color: Color = Color.WHITE if is_filled else Color(0.32, 0.32, 0.36, 0.95)
-	var center_color: Color = Color.WHITE
-	var max_idx: int = diamond_size - 1
-
-	for r: int in range(diamond_size):
-		var dist: int = abs(r - half_size)
-		var left_x: int = dist
-		var right_x: int = max_idx - dist
-
-		# 1. Solid opaque black background inside the diamond
-		if right_x > left_x:
-			draw_rect(Rect2(p_x_offset + float(left_x + 1), p_y_offset + float(r), float(right_x - left_x - 1), 1.0), Color.BLACK)
-
-		# 2. Outer diamond border
-		draw_rect(Rect2(p_x_offset + float(left_x), p_y_offset + float(r), 1.0, 1.0), border_color)
-		if right_x != left_x:
-			draw_rect(Rect2(p_x_offset + float(right_x), p_y_offset + float(r), 1.0, 1.0), border_color)
-
-		# 3. Inner center diamond for active/filled level
-		if is_filled and dist <= half_size - 2:
-			var center_left: int = left_x + 2
-			var center_right: int = right_x - 2
-			if center_right >= center_left:
-				draw_rect(Rect2(p_x_offset + float(center_left), p_y_offset + float(r), float(center_right - center_left + 1), 1.0), center_color)
+		var badge: BaseBadge = BASE_BADGE.instantiate() as BaseBadge
+		badge.badge_size = badge_size
+		badge.setup(interior_color, border_color)
+		_badges_container.add_child(badge)
