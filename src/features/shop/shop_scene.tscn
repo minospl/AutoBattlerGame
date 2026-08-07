@@ -43,7 +43,7 @@ theme_override_constants/margin_bottom = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="BackgroundPanel/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 32
+theme_override_constants/separation = 8
 
 [node name="HeaderVBox" type="VBoxContainer" parent="BackgroundPanel/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -73,11 +73,15 @@ theme_override_constants/separation = 8
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="TopSpacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
 [node name="TeamPanel" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox" instance=ExtResource("3_team")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Spacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox"]
+[node name="BottomSpacer" type="Control" parent="BackgroundPanel/MarginContainer/VBoxContainer/MainHBox/ContentMargin/ContentVBox"]
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -116,9 +120,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_top = 76.0
-offset_right = -16.0
-offset_bottom = 97.0
+offset_top = 61.0
+offset_right = -8.0
+offset_bottom = 74.0
 grow_horizontal = 0
 
 [node name="RelicBagPopup" parent="." instance=ExtResource("8_relic_popup")]
@@ -126,6 +130,6 @@ unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 0
 offset_left = 8.0
-offset_top = 60.0
+offset_top = 61.0
 offset_right = 196.0
-offset_bottom = 296.0
+offset_bottom = 289.0
