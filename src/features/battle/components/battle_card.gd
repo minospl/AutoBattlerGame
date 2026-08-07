@@ -12,6 +12,7 @@ signal hovered(card: BattleCard, is_hovered: bool)
 @onready var stats_hbox: UnitStatsBar = %StatsHBox
 @onready var sprite_rect: TextureRect = %SpriteRect
 @onready var portrait_char_label: Label = %PortraitCharLabel
+@onready var level_indicator: LevelIndicator = %LevelIndicator
 
 func _ready() -> void:
 	custom_minimum_size = CardUIHelper.CARD_SIZE
@@ -31,6 +32,9 @@ func update_ui() -> void:
 		sprite_rect,
 		portrait_char_label
 	)
+	
+	if level_indicator:
+		level_indicator.setup(unit_instance.level)
 
 func _on_mouse_entered() -> void:
 	hovered.emit(self, true)
