@@ -9,7 +9,7 @@ enum DamageType {
 	FATIGUE
 }
 
-enum SpawnTarget {
+enum FloatingTextSpawnTarget {
 	TEAM_HEALTH_BAR,
 	SLOT,
 	SHIELD
@@ -19,7 +19,7 @@ signal team_units_loaded(loaded_units: Array[UnitInstance])
 signal health_changed(current_health: int, max_health: int, shield: int)
 signal status_changed(status_type: String, amount: int, cooldown_ratio: float)
 signal cast_progress_changed(slot_idx: int, ratio: float)
-signal floating_text_requested(text: String, color: Color, target: SpawnTarget, key: Variant)
+signal floating_text_requested(text: String, color: Color, target: FloatingTextSpawnTarget, key: Variant)
 signal team_defeated()
 signal gold_generated(amount: int, slot_idx: int)
 signal unit_casted(source_idx: int)
@@ -40,6 +40,8 @@ var has_focusing_lens: bool = false
 var max_health: int = 0
 var health: int = 0
 var shield: int = 0
+
+var is_enemy: bool = false
 
 # Status Effects Dictionary (Typed to avoid unsafe cast warnings)
 var active_statuses: Dictionary[String, StatusEffect] = {}
@@ -83,8 +85,6 @@ var electrocute: int:
 			else:
 				effect.stacks = val
 				effect.on_apply()
-
-var is_enemy: bool = false
 
 func initialize(p_is_enemy: bool = false) -> void:
 	is_enemy = p_is_enemy
@@ -196,9 +196,9 @@ func take_damage(amount: int, damage_type: DamageType = DamageType.PHYSICAL) -> 
 	
 	# Emit floating text popups: gray for shield hit, red/status-color for health hit
 	if damage_to_shield > 0:
-		floating_text_requested.emit("-" + NumberFormatter.format_large_number(damage_to_shield), Color(GameColors.DESC_SHIELD), SpawnTarget.TEAM_HEALTH_BAR, 0)
+		floating_text_requested.emit("-" + NumberFormatter.format_large_number(damage_to_shield), Color(GameColors.DESC_SHIELD), FloatingTextSpawnTarget.TEAM_HEALTH_BAR, 0)
 	if damage_to_health > 0:
-		floating_text_requested.emit("-" + NumberFormatter.format_large_number(damage_to_health), text_color, SpawnTarget.TEAM_HEALTH_BAR, 0)
+		floating_text_requested.emit("-" + NumberFormatter.format_large_number(damage_to_health), text_color, FloatingTextSpawnTarget.TEAM_HEALTH_BAR, 0)
 	
 	if damage_type == DamageType.PHYSICAL:
 		for i: int in range(MAX_TEAM_SIZE):
@@ -223,14 +223,14 @@ func heal(amount: int, source_slot_idx: int = -1) -> void:
 		if source_slot_idx != -1:
 			spawn_floating_text_on_slot(source_slot_idx, "+" + NumberFormatter.format_large_number(actual_heal), Color(GameColors.DESC_HEAL))
 		else:
-			floating_text_requested.emit("+" + NumberFormatter.format_large_number(actual_heal), Color(GameColors.DESC_HEAL), SpawnTarget.TEAM_HEALTH_BAR, 0)
+			floating_text_requested.emit("+" + NumberFormatter.format_large_number(actual_heal), Color(GameColors.DESC_HEAL), FloatingTextSpawnTarget.TEAM_HEALTH_BAR, 0)
 
 func add_shield(amount: int) -> void:
 	if amount <= 0:
 		return
 	shield += amount
 	health_changed.emit(health, max_health, shield)
-	floating_text_requested.emit("+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_SHIELD), SpawnTarget.SHIELD, 0)
+	floating_text_requested.emit("+" + NumberFormatter.format_large_number(amount), Color(GameColors.DESC_SHIELD), FloatingTextSpawnTarget.SHIELD, 0)
 
 func apply_status(status_type: String, amount: int) -> void:
 	if amount <= 0:
@@ -293,7 +293,7 @@ func tick_casts(delta: float, cast_callback: Callable) -> void:
 				cast_callback.call(i)
 
 func spawn_floating_text_on_slot(t_idx: int, text: String, color: Color) -> void:
-	floating_text_requested.emit(text, color, SpawnTarget.SLOT, t_idx)
+	floating_text_requested.emit(text, color, FloatingTextSpawnTarget.SLOT, t_idx)
 
 func buff_unit_attack(slot_idx: int, amount: int, permanent: bool = false) -> void:
 	if slot_idx < 0 or slot_idx >= units.size() or not units[slot_idx]:

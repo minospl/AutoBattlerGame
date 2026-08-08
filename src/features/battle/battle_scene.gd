@@ -27,11 +27,7 @@ var is_outcome_showing: bool = false
 var _battle_start_triggered: bool = false
 
 var ruleset: BattleRuleset
-
-# Countdown Timer & Fatigue
-var match_timer: float = 30.0
-var fatigue_tick_timer: float = 0.0
-var fatigue_tick_count: int = 0
+var engine: BattleEngine
 
 # Slot References
 var player_slots: Array[BattleCardSlot] = []
@@ -78,9 +74,11 @@ func _ready() -> void:
 		for i: int in range(enemy_slots.size()):
 			enemy_slots[i].slot_index = i
 
-	# Create BattleTeamModel instances
+	# Create BattleTeamModel and BattleEngine instances
 	player_team = BattleTeamModel.new()
 	enemy_team = BattleTeamModel.new()
+	engine = BattleEngine.new(player_team, enemy_team)
+	engine.timer_changed.connect(_on_engine_timer_changed)
 	
 	# Connect signals from player_team
 	player_team.team_units_loaded.connect(_on_units_loaded.bind(player_slots))
@@ -137,9 +135,7 @@ func setup(p_state: RunState, p_ruleset: BattleRuleset) -> void:
 		show_battle_outcome("victory")
 		return
 		
-	match_timer = 30.0
-	fatigue_tick_timer = 0.0
-	fatigue_tick_count = 0
+	engine.reset()
 	_battle_start_triggered = false
 	
 	header_bar.set_round_info(run_state.day, run_state.max_rounds, run_state.lives, run_state.is_deathmatch)
@@ -178,9 +174,7 @@ func load_battle_team() -> void:
 	player_relic_bag_popup.update_relics(player_team.active_relics)
 	header_bar.update_player_bag_count(player_team.active_relics.size())
 
-	match_timer = 30.0
-	fatigue_tick_timer = 0.0
-	fatigue_tick_count = 0
+	engine.reset()
 	if header_bar:
 		header_bar.set_timer_visible(true)
 		header_bar.set_timer_text("⏳ 30.0s")
@@ -209,26 +203,23 @@ func load_enemy_team() -> void:
 	ModifierEngine.update_ongoing_modifiers(enemy_team, player_team)
 
 func trigger_battle_start() -> void:
-	for i: int in range(MAX_TEAM_SIZE):
-		if player_team.units[i]:
-			ModifierEngine.trigger_unit_modifier(i, player_team, UnitModifier.Trigger.ON_BATTLE_START)
-		if enemy_team.units[i]:
-			ModifierEngine.trigger_unit_modifier(i, enemy_team, UnitModifier.Trigger.ON_BATTLE_START)
-			
-	# Trigger player relics on_battle_start
-	for relic: RelicInstance in player_team.active_relics:
-		if relic.data.modifier:
-			relic.data.modifier.on_battle_start(relic, player_team, enemy_team)
-					
+	engine.trigger_battle_start()
 	# Update all health and stat overlays
 	_update_all_card_uis()
 
-
 func trigger_cast(source_idx: int) -> void:
-	player_team.execute_cast(source_idx, enemy_team)
+	engine.trigger_cast(source_idx)
 
 func trigger_enemy_cast(source_idx: int) -> void:
-	enemy_team.execute_cast(source_idx, player_team)
+	engine.trigger_enemy_cast(source_idx)
+
+func _on_engine_timer_changed(time_remaining: float) -> void:
+	if header_bar:
+		if time_remaining > 0.0:
+			header_bar.set_timer_visible(true)
+			header_bar.set_timer_text("⏳ %.1fs" % time_remaining)
+		else:
+			header_bar.set_timer_visible(false)
 
 func _on_player_unit_stats_changed(slot_idx: int) -> void:
 	if slot_idx < 0 or slot_idx >= player_slots.size():
@@ -275,38 +266,7 @@ func _process(delta: float) -> void:
 		advance_simulation(delta * game_speed)
 
 func advance_simulation(delta: float) -> void:
-	# Update match timer
-	if match_timer > 0.0:
-		match_timer -= delta
-		if match_timer <= 0.0:
-			match_timer = 0.0
-			if header_bar:
-				header_bar.set_timer_visible(false)
-		if header_bar:
-			header_bar.set_timer_text("⏳ %.1fs" % match_timer)
-	else:
-		# Fatigue damage active
-		fatigue_tick_timer += delta
-		if fatigue_tick_timer >= 1.0:
-			fatigue_tick_timer -= 1.0
-			fatigue_tick_count += 1
-			var stage: int = floori((fatigue_tick_count - 1) / 3.0) + 1
-			var dmg: int = get_fibonacci(stage + 1)
-			
-			player_team.take_damage(dmg, BattleTeamModel.DamageType.FATIGUE)
-			enemy_team.take_damage(dmg, BattleTeamModel.DamageType.FATIGUE)
-
-	# Tick statuses
-	player_team.tick_statuses(delta)
-	enemy_team.tick_statuses(delta)
-
-	# Update ongoing modifiers
-	ModifierEngine.update_ongoing_modifiers(player_team, enemy_team)
-	ModifierEngine.update_ongoing_modifiers(enemy_team, player_team)
-
-	# Tick card casts
-	player_team.tick_casts(delta, trigger_cast)
-	enemy_team.tick_casts(delta, trigger_enemy_cast)
+	engine.advance_simulation(delta)
 
 func _on_enemy_defeat() -> void:
 	if ruleset:
@@ -325,9 +285,7 @@ func reset_for_next_round() -> void:
 		_on_enemy_defeat()
 		return
 		
-	match_timer = 30.0
-	fatigue_tick_timer = 0.0
-	fatigue_tick_count = 0
+	engine.reset()
 	_battle_start_triggered = false
 	set_playing(true)
 
@@ -481,17 +439,7 @@ func _on_speed_pressed() -> void:
 		header_bar.set_speed_text("Speed: %dx" % int(game_speed))
 
 func get_fibonacci(n: int) -> int:
-	if n <= 0:
-		return 0
-	if n == 1 or n == 2:
-		return 1
-	var a: int = 1
-	var b: int = 1
-	for i: int in range(3, n + 1):
-		var temp: int = a + b
-		a = b
-		b = temp
-	return b
+	return BattleEngine.get_fibonacci(n)
 
 # UI Team Handler Methods
 func _update_team_slots_ui(slots_arr: Array[BattleCardSlot], loaded_units: Array[UnitInstance]) -> void:

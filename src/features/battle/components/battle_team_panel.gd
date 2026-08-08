@@ -68,7 +68,7 @@ func setup_model(team_model: BattleTeamModel) -> void:
 		_on_cast_progress_changed(slot_idx, rat)
 	)
 	
-	team_model.floating_text_requested.connect(func(txt: String, col: Color, target: BattleTeamModel.SpawnTarget, key: Variant) -> void:
+	team_model.floating_text_requested.connect(func(txt: String, col: Color, target: BattleTeamModel.FloatingTextSpawnTarget, key: Variant) -> void:
 		_on_floating_text_requested(txt, col, target, key)
 	)
 
@@ -92,22 +92,22 @@ func _on_cast_progress_changed(slot_idx: int, ratio: float) -> void:
 	if slot_idx >= 0 and slot_idx < slots.size():
 		slots[slot_idx].set_cast_progress(ratio)
 
-func _on_floating_text_requested(text: String, color: Color, target: BattleTeamModel.SpawnTarget, key: Variant) -> void:
+func _on_floating_text_requested(text: String, color: Color, target: BattleTeamModel.FloatingTextSpawnTarget, key: Variant) -> void:
 	var spawn_pos: Vector2 = _get_target_position(target, key)
 	if spawn_pos != Vector2.ZERO:
 		floating_text_spawn_requested.emit(text, color, spawn_pos)
 
-func _get_target_position(target: BattleTeamModel.SpawnTarget, key: Variant) -> Vector2:
+func _get_target_position(target: BattleTeamModel.FloatingTextSpawnTarget, key: Variant) -> Vector2:
 	match target:
-		BattleTeamModel.SpawnTarget.SLOT:
+		BattleTeamModel.FloatingTextSpawnTarget.SLOT:
 			var slot_idx: int = key
 			if slot_idx >= 0 and slot_idx < slots.size():
 				var slot: BattleCardSlot = slots[slot_idx]
 				return slot.global_position + slot.size / 2.0
-		BattleTeamModel.SpawnTarget.TEAM_HEALTH_BAR:
+		BattleTeamModel.FloatingTextSpawnTarget.TEAM_HEALTH_BAR:
 			if health_bar:
 				return health_bar.global_position + health_bar.size / 2.0
-		BattleTeamModel.SpawnTarget.SHIELD:
+		BattleTeamModel.FloatingTextSpawnTarget.SHIELD:
 			if health_bar:
 				var pos_x: float = 0.0
 				if not mirrored:
