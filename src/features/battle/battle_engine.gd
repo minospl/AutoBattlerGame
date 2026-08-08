@@ -224,7 +224,7 @@ static func simulate_battle(
 		"enemy_units": e_team.units
 	}
 
-	p_team.cleanup()
-	e_team.cleanup()
+	engine.player_team.team_defeated.disconnect(engine.check_battle_end)
+	engine.enemy_team.team_defeated.disconnect(engine.check_battle_end)
 
 	return result
