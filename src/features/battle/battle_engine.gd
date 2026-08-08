@@ -23,11 +23,6 @@ func _init(p_player_team: BattleTeamModel = null, p_enemy_team: BattleTeamModel 
 	player_team = p_player_team
 	enemy_team = p_enemy_team
 
-func setup_teams(p_player_team: BattleTeamModel, p_enemy_team: BattleTeamModel) -> void:
-	player_team = p_player_team
-	enemy_team = p_enemy_team
-	reset()
-
 func load_teams(
 	player_units: Array[UnitInstance],
 	player_base_health: int,
@@ -38,13 +33,25 @@ func load_teams(
 ) -> void:
 	player_team.load_team_units(player_units, player_base_health)
 	player_team.active_relics = player_relics
+	player_team.has_magnetic_core = RelicInstance.has_relic(player_relics, "Magnetic Core")
+	player_team.has_focusing_lens = RelicInstance.has_relic(player_relics, "Focusing Lens")
 
 	enemy_team.load_team_units(enemy_units, enemy_base_health)
 	enemy_team.active_relics = enemy_relics
+	enemy_team.has_magnetic_core = RelicInstance.has_relic(enemy_relics, "Magnetic Core")
+	enemy_team.has_focusing_lens = RelicInstance.has_relic(enemy_relics, "Focusing Lens")
 
+	_connect_team_signals()
 	reset()
+	
 	ModifierEngine.update_ongoing_modifiers(player_team, enemy_team)
 	ModifierEngine.update_ongoing_modifiers(enemy_team, player_team)
+
+func _connect_team_signals() -> void:
+	if player_team and not player_team.team_defeated.is_connected(check_battle_end):
+		player_team.team_defeated.connect(check_battle_end)
+	if enemy_team and not enemy_team.team_defeated.is_connected(check_battle_end):
+		enemy_team.team_defeated.connect(check_battle_end)
 
 func reset() -> void:
 	match_timer = 30.0
@@ -80,9 +87,13 @@ func trigger_battle_start() -> void:
 	battle_started.emit()
 
 func trigger_cast(source_idx: int) -> void:
+	if is_finished:
+		return
 	player_team.execute_cast(source_idx, enemy_team)
 
 func trigger_enemy_cast(source_idx: int) -> void:
+	if is_finished:
+		return
 	enemy_team.execute_cast(source_idx, player_team)
 
 func advance_simulation(delta: float) -> void:
@@ -112,9 +123,15 @@ func advance_simulation(delta: float) -> void:
 			player_team.take_damage(dmg, BattleTeamModel.DamageType.FATIGUE)
 			enemy_team.take_damage(dmg, BattleTeamModel.DamageType.FATIGUE)
 
+	if is_finished:
+		return
+
 	# Tick statuses
 	player_team.tick_statuses(delta)
 	enemy_team.tick_statuses(delta)
+
+	if is_finished:
+		return
 
 	# Update ongoing modifiers
 	ModifierEngine.update_ongoing_modifiers(player_team, enemy_team)
@@ -206,4 +223,8 @@ static func simulate_battle(
 		"player_units": p_team.units,
 		"enemy_units": e_team.units
 	}
+
+	p_team.cleanup()
+	e_team.cleanup()
+
 	return result
