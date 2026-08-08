@@ -101,14 +101,34 @@ offset_bottom = -8.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="StartBattleButton" type="Button" parent="ActionMargin"]
+[node name="ActionHBox" type="HBoxContainer" parent="ActionMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SimulateBattleButton" type="Button" parent="ActionMargin/ActionHBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 80)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "SIMULATE"
+
+[node name="GameButtonDecorator" type="Node" parent="ActionMargin/ActionHBox/SimulateBattleButton"]
+script = ExtResource("7_decorator")
+outer_width = 3
+inner_width = 2
+indentation = 2
+color_normal = Color(0.2, 0.35, 0.55, 1)
+color_hover = Color(0.25, 0.45, 0.65, 1)
+color_pressed = Color(0.3, 0.55, 0.75, 1)
+
+[node name="StartBattleButton" type="Button" parent="ActionMargin/ActionHBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 80)
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "TO BATTLE"
 
-[node name="GameButtonDecorator" type="Node" parent="ActionMargin/StartBattleButton"]
+[node name="GameButtonDecorator" type="Node" parent="ActionMargin/ActionHBox/StartBattleButton"]
 script = ExtResource("7_decorator")
 outer_width = 3
 inner_width = 2

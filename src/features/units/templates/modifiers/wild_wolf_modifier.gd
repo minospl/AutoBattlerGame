@@ -26,4 +26,4 @@ func apply_modifier(source_idx: int, team_obj: BattleTeamModel) -> void:
 func get_description(p_level: int = 1) -> String:
 	var target_str: String = "[color=%s]ADJACENT[/color] [color=%s]BEAST[/color] allies" % [GameColors.DESC_TARGET, GameColors.DESC_TYPE_BEAST]
 	var buff: int = int(get_modifier_value(p_level))
-	return "%s\nGive %s [color=%s]+%d ATK[/color] for this battle" % [get_trigger_name(), target_str, GameColors.DESC_ATTACK, buff]
+	return "%s\nGive %s [color=%s]+%d ATK[/color] permanently" % [get_trigger_name(), target_str, GameColors.DESC_ATTACK, buff]

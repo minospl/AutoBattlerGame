@@ -286,10 +286,10 @@ func tick_casts(delta: float, cast_callback: Callable) -> void:
 			var speed: float = units[i].get_cast_speed()
 			if speed <= 0.0: speed = 1.0
 			
-			cast_progress_changed.emit(i, cast_timers[i] / speed)
+			cast_progress_changed.emit(i, clampf(cast_timers[i] / speed, 0.0, 1.0))
 			
-			if cast_timers[i] >= speed:
-				cast_timers[i] = 0.0
+			while cast_timers[i] >= speed:
+				cast_timers[i] -= speed
 				cast_callback.call(i)
 
 func spawn_floating_text_on_slot(t_idx: int, text: String, color: Color) -> void:

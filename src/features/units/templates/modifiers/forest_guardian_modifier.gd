@@ -45,6 +45,6 @@ func get_description(p_level: int = 1) -> String:
 
 	var hp_buff_string: String = ""
 	if hp_buff > 0:
-		hp_buff_string = "and [color=%s]+%d HP[/color]" % [GameColors.DESC_HEALTH, hp_buff]
+		hp_buff_string = "and [color=%s]+%d HP[/color] " % [GameColors.DESC_HEALTH, hp_buff]
 	
-	return "%s\nGive [color=%s]HORIZONTAL[/color] allies [color=%s]+%d SHIELD[/color] %s permanently." % [get_trigger_name(), GameColors.DESC_TARGET, GameColors.DESC_SHIELD, shield_buff, hp_buff_string]
+	return "%s\nGive [color=%s]HORIZONTAL[/color] allies [color=%s]+%d SHIELD[/color] %spermanently." % [get_trigger_name(), GameColors.DESC_TARGET, GameColors.DESC_SHIELD, shield_buff, hp_buff_string]

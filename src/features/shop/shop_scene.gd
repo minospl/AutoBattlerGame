@@ -69,7 +69,12 @@ func _ready() -> void:
 	shop_header_bar.menu_requested.connect(func() -> void: menu_requested.emit())
 	
 	var battle_btn: Button = get_node_or_null("%StartBattleButton") as Button
-	battle_btn.pressed.connect(_on_battle_requested)
+	if battle_btn:
+		battle_btn.pressed.connect(_on_battle_requested)
+
+	var sim_btn: Button = get_node_or_null("%SimulateBattleButton") as Button
+	if sim_btn:
+		sim_btn.pressed.connect(_on_simulate_battle_pressed)
 	
 	# Connect shop panel signals
 	shop_panel.roll_requested.connect(_on_roll_requested)
@@ -167,7 +172,7 @@ func _check_and_execute_slime_fusion() -> bool:
 	var unique_slimes: Dictionary[String, bool] = {}
 	for i: int in range(run_state.active_team.size()):
 		var unit: UnitInstance = run_state.active_team[i]
-		if unit.has_type("Slime"):
+		if unit and unit.has_type("Slime"):
 			unique_slimes[unit.data.display_name] = true
 
 	if unique_slimes.size() < 6:
@@ -193,13 +198,13 @@ func _check_and_execute_slime_fusion() -> bool:
 		rainbow_inst.data.modifier = custom_mod
 
 	var merge_anim_data: Dictionary = {
-		"main": { "is_bench": false, "idx": 0 },
+		"main": {"is_bench": false, "idx": 0},
 		"removed": [
-			{ "is_bench": false, "idx": 1 },
-			{ "is_bench": false, "idx": 2 },
-			{ "is_bench": false, "idx": 3 },
-			{ "is_bench": false, "idx": 4 },
-			{ "is_bench": false, "idx": 5 }
+			{"is_bench": false, "idx": 1},
+			{"is_bench": false, "idx": 2},
+			{"is_bench": false, "idx": 3},
+			{"is_bench": false, "idx": 4},
+			{"is_bench": false, "idx": 5}
 		]
 	}
 
@@ -719,3 +724,119 @@ func _unhandled_input(event: InputEvent) -> void:
 				CardUIHelper.hide_tooltip(preview_tooltip)
 				_on_sell_card_requested(unit_card, slot)
 				current_hovered_card = null
+
+func _on_simulate_battle_pressed() -> void:
+	if run_state == null:
+		return
+
+	# Prepare player units (cloned)
+	var player_units: Array[UnitInstance] = []
+	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
+		var inst: UnitInstance = run_state.active_team[i]
+		if inst:
+			player_units.append(inst.clone())
+		else:
+			player_units.append(null)
+
+	# Prepare player relics (cloned)
+	var player_relics: Array[RelicInstance] = []
+	for relic: RelicInstance in run_state.relics:
+		player_relics.append(relic.clone())
+
+	# Prepare enemy units & relics (cloned)
+	var enemy_units: Array[UnitInstance] = []
+	enemy_units.resize(RunState.MAX_ACTIVE_TEAM_SIZE)
+	var enemy_relics: Array[RelicInstance] = []
+
+	var opponent: OpponentProfile = run_state.next_opponent
+	if opponent and not opponent.active_team.is_empty():
+		for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
+			if i < opponent.active_team.size() and opponent.active_team[i] != null:
+				enemy_units[i] = opponent.active_team[i].clone()
+		if "relics" in opponent:
+			enemy_relics = opponent.relics
+
+	# Run simulation via BattleEngine
+	var result: Dictionary[String, Variant] = BattleEngine.simulate_battle(
+		player_units,
+		run_state.base_health,
+		player_relics,
+		enemy_units,
+		RunState.STARTING_BASE_HEALTH,
+		enemy_relics
+	)
+
+	_print_simulation_report(result, run_state.active_team, opponent)
+
+func _print_simulation_report(result: Dictionary[String, Variant], original_player_units: Array[UnitInstance], opponent: OpponentProfile) -> void:
+	var outcome: String = str(result.get("outcome", "UNKNOWN")).to_upper()
+	var total_time: float = result.get("total_time", 0.0)
+	var p_hp: int = result.get("player_final_health", 0)
+	var e_hp: int = result.get("enemy_final_health", 0)
+	var sim_p_units: Array = result.get("player_units", [])
+	var sim_e_units: Array = result.get("enemy_units", [])
+
+	var outcome_color: String = "gold"
+	if outcome == "DEFEAT":
+		outcome_color = "red"
+	elif outcome == "DRAW":
+		outcome_color = "gray"
+
+	print_rich("[color=cyan]===========================================================[/color]")
+	print_rich("[color=cyan]            🧪 BATTLE SIMULATION REPORT 🧪[/color]")
+	print_rich("[color=cyan]===========================================================[/color]")
+	print_rich("[b]OUTCOME:[/b] [color=%s][b]%s[/b][/color]" % [outcome_color, outcome])
+	print_rich("[b]ESTIMATED DURATION:[/b] %.1fs" % total_time)
+	print_rich("[b]PLAYER TEAM FINAL HP:[/b] %d" % p_hp)
+	print_rich("[b]ENEMY TEAM FINAL HP:[/b]  %d" % e_hp)
+	print_rich("-----------------------------------------------------------")
+	
+	# Player Team Table
+	print_rich("[color=yellow][b]--- PLAYER TEAM STATS (BEFORE ➔ AFTER) ---[/b][/color]")
+	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
+		var orig: UnitInstance = original_player_units[i] if i < original_player_units.size() else null
+		var sim_unit: UnitInstance = sim_p_units[i] if i < sim_p_units.size() else null
+		_print_unit_stats(i, orig, sim_unit)
+
+	print_rich("-----------------------------------------------------------")
+	# Enemy Team Table
+	var opp_name: String = opponent.name if opponent else "Enemy"
+	print_rich("[color=orange][b]--- ENEMY TEAM (%s) STATS (BEFORE ➔ AFTER) ---[/b][/color]" % opp_name)
+	var orig_enemy_units: Array[UnitInstance] = opponent.active_team if opponent else []
+	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
+		var orig: UnitInstance = orig_enemy_units[i] if i < orig_enemy_units.size() else null
+		var sim_unit: UnitInstance = sim_e_units[i] if i < sim_e_units.size() else null
+		_print_unit_stats(i, orig, sim_unit)
+
+	print_rich("[color=cyan]===========================================================[/color]\n")
+
+func _print_unit_stats(i: int, orig: UnitInstance, sim_unit: UnitInstance) -> void:
+	if orig:
+		print_rich(" Slot %d | [b]%s[/b] (★%d) %s" % [i, orig.data.display_name, orig.level, _format_unit_all_stats(orig, sim_unit)])
+	else:
+		print_rich(" Slot %d | [color=gray][EMPTY][/color]" % i)
+
+func _format_unit_all_stats(orig: UnitInstance, sim: UnitInstance) -> String:
+	var parts: Array[String] = []
+	var extra_stats: Array[Dictionary] = [
+		{"name": "CD", "o": orig.get_cast_speed(), "s": sim.get_cast_speed()},
+		{"name": "ATK", "o": orig.get_attack(), "s": sim.get_attack()},
+		{"name": "HP", "o": orig.health, "s": sim.health},
+		{"name": "HEAL", "o": orig.heal, "s": sim.heal},
+		{"name": "SHIELD", "o": orig.shield, "s": sim.shield},
+		{"name": "POISON", "o": orig.poison, "s": sim.poison},
+		{"name": "BURN", "o": orig.burn, "s": sim.burn},
+		{"name": "ELEC", "o": orig.electrocute, "s": sim.electrocute}
+	]
+
+	for stat_info: Dictionary in extra_stats:
+		var s_name: String = stat_info["name"]
+		var o_val: Variant = stat_info["o"]
+		var s_val: Variant = stat_info["s"]
+		var diff: Variant = s_val - o_val
+		var val_str: String = "%s➔%s" % [o_val, s_val]
+		if s_val > o_val: val_str += " [color=green](+%s)[/color]" % diff
+		elif s_val < o_val: val_str += " [color=red](%s)[/color]" % diff
+		parts.append("%s: %s" % [s_name, val_str])
+
+	return " | ".join(parts)
