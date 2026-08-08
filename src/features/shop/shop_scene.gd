@@ -835,8 +835,10 @@ func _format_unit_all_stats(orig: UnitInstance, sim: UnitInstance) -> String:
 		var s_val: Variant = stat_info["s"]
 		var diff: Variant = s_val - o_val
 		var val_str: String = "%s➔%s" % [o_val, s_val]
-		if s_val > o_val: val_str += " [color=green](+%s)[/color]" % diff
-		elif s_val < o_val: val_str += " [color=red](%s)[/color]" % diff
+		if (s_val > o_val and s_name != "CD") or (s_val < o_val and s_name == "CD"):
+			val_str += " [color=green](%s%s)[/color]" % ["+" if s_name != "CD" else "", diff]
+		elif (s_val < o_val and s_name != "CD") or (s_val > o_val and s_name == "CD"):
+			val_str += " [color=red](%s%s)[/color]" % ["-" if s_name != "CD" else "+", diff]
 		parts.append("%s: %s" % [s_name, val_str])
 
 	return " | ".join(parts)
