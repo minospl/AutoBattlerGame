@@ -120,7 +120,7 @@ Niski poziom logiki dla `OfflineOpponentProvider.simulate_bot_turn(bot: Opponent
 
 2. **Bezpośrednia Symulacja Walk w Tle (`BattleEngine` / Headless Simulator):**
    * Do przeliczenia zysków zebranych przez bota w walce ze snapshotem gracza używamy czystego silnika **`BattleEngine.simulate_battle(bot_team, player_snapshot)`**.
-   * **Bezpieczne Klonowanie Gracza (`player_snapshot`):** Snapshot gracza tworzony jest jako odizolowana kopia (`clone()`) kart z `run_state.active_team`, co zapobiega wyciekom modyfikacji statystyk na żywe potwory gracza.
+   * **Bezpieczne Klonowanie Gracza w Odpowiednim Czasie (`player_snapshot`):** Aby zapobiec walce z przeciwnikiem z "przyszłości", Snapshot gracza pobierany jest dokładnie w momencie OPUSZCZANIA SKLEPU przez Gracza (tuż przed jego własną walką). Tworzona jest wtedy odizolowana kopia (`clone()`) z `run_state.active_team`. To do tej zapisanej w czasie "starej" wersji Gracza biją w tle zsymulowane Boty następnego dnia, gwarantując równość czasową po zakupach.
    * **Brak Zgadywania (100% Prawdziwa Bitwa):** Funkcja przelicza bitwę w pętli `delta` (krok 0.05s) bez UI. Bierze pod uwagę 100% detali: `cast_speed`, statusy, tarcze, relikty, pozycjonowanie oraz rejestruje dokładne złoto wygenerowane przez umiejętności potworów (np. Mimic przy `ON_CAST`) i relikty.
 
 3. **Przetwarzanie Przejścia Tury przez `TurnProcessor`:**

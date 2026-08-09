@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://src/features/units/unit_type.gd" id="1_type_script"]
 [ext_resource type="Script" path="res://src/features/units/templates/modifiers/rot_knight_modifier.gd" id="2_modifier_script"]
-[ext_resource type="Resource" path="res://src/features/units/types/toxic.tres" id="type_toxic"]
+[ext_resource type="Resource" path="res://src/features/units/types/beast.tres" id="type_beast"]
 [ext_resource type="Script" path="res://src/features/units/unit_data.gd" id="4_unit_data_script"]
 [ext_resource type="Resource" path="res://src/features/units/rarities/unique.tres" id="5_rarity"]
 
@@ -16,7 +16,7 @@ display_name = "Rot Knight"
 price = 5
 max_health = 50
 attack = 6
-types = Array[ExtResource("1_type_script")]([ExtResource("type_toxic")])
+types = Array[ExtResource("1_type_script")]([ExtResource("type_beast")])
 rarity = ExtResource("5_rarity")
 cast_speed = 5
 modifier = SubResource("Resource_rot_knight_modifier")
