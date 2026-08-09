@@ -3,7 +3,7 @@ extends RefCounted
 
 static func process_turn_end(data: RunData, generated_gold_from_battle: int) -> void:
 	# 1. Dodaj złoto z walki + bazowe
-	data.gold += 10 + generated_gold_from_battle
+	data.gold += data.DAY_GOLD_INCREASE + generated_gold_from_battle
 	
 	# 2. Awans do następnego dnia i podbicie sklepu
 	data.day += 1

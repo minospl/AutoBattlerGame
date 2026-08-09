@@ -5,6 +5,7 @@ const MAX_ACTIVE_TEAM_SIZE: int = 6
 const MAX_BENCH_SIZE: int = 6
 const MAX_SHOP_CARDS_SIZE: int = 5
 const STARTING_GOLD: int = 10
+const DAY_GOLD_INCREASE: int = 10
 const STARTING_LIVES: int = 5
 const STARTING_DAY: int = 1
 const MAX_ROUNDS: int = 20
