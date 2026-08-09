@@ -1,9 +1,9 @@
 class_name ShopHelper
 extends RefCounted
 
-static func get_random_unit_template_by_rarity(p_run_state: RunState, rarity_type: Rarity.Type) -> UnitData:
+static func get_random_unit_template_by_rarity(rarity_type: Rarity.Type) -> UnitData:
 	var matching: Array[UnitData] = []
-	for template: UnitData in p_run_state.unit_templates:
+	for template: UnitData in GameTemplates.units:
 		if not template.can_appear_in_shop:
 			continue
 		var r_type: Rarity.Type = template.rarity.rarity_type
@@ -17,7 +17,7 @@ static func get_random_unit_template_by_rarity(p_run_state: RunState, rarity_typ
 			matching.append(template)
 
 	if matching.is_empty():
-		for template: UnitData in p_run_state.unit_templates:
+		for template: UnitData in GameTemplates.units:
 			if not template.can_appear_in_shop:
 				continue
 			var r_type: Rarity.Type = template.rarity.rarity_type
@@ -29,16 +29,16 @@ static func get_random_unit_template_by_rarity(p_run_state: RunState, rarity_typ
 		
 	return matching[randi() % matching.size()]
 
-static func get_random_item_template_by_rarity(p_run_state: RunState, rarity_type: Rarity.Type) -> ItemData:
+static func get_random_item_template_by_rarity(rarity_type: Rarity.Type) -> ItemData:
 	var matching: Array[ItemData] = []
-	for template: ItemData in p_run_state.item_templates:
+	for template: ItemData in GameTemplates.items:
 		var r_type: Rarity.Type = template.rarity.rarity_type
 			
 		if r_type == rarity_type:
 			matching.append(template)
 			
 	if matching.is_empty():
-		for template: ItemData in p_run_state.item_templates:
+		for template: ItemData in GameTemplates.items:
 			var r_type: Rarity.Type = template.rarity.rarity_type
 			if r_type != Rarity.Type.UNIQUE:
 				matching.append(template)
@@ -56,21 +56,21 @@ static func roll_single_shop_card(p_run_state: RunState, slot_idx: int) -> Resou
 	var spawn_item: bool = false
 	var last_slot_idx: int = p_run_state.shop_cards.size() - 1
 	if slot_idx == last_slot_idx and p_run_state.item_purchase_count < p_run_state.item_purchase_limit:
-		if not p_run_state.item_templates.is_empty():
+		if not GameTemplates.items.is_empty():
 			spawn_item = true
 		
 	var rolled_card: Resource = null
 	if spawn_item:
-		var template: ItemData = get_random_item_template_by_rarity(p_run_state, rolled_rarity)
+		var template: ItemData = get_random_item_template_by_rarity(rolled_rarity)
 		if template:
 			var instance: ItemInstance = ItemInstance.new()
 			instance.initialize(template)
 			rolled_card = instance
 	else:
-		if p_run_state.unit_templates.is_empty():
+		if GameTemplates.units.is_empty():
 			return null
 			
-		var template: UnitData = get_random_unit_template_by_rarity(p_run_state, rolled_rarity)
+		var template: UnitData = get_random_unit_template_by_rarity(rolled_rarity)
 		if template:
 			var instance: UnitInstance = UnitInstance.new()
 			instance.initialize(template)
@@ -252,13 +252,13 @@ static func change_shop_size(p_run_state: RunState, p_diff: int) -> void:
 
 static func handle_unit_evolution(p_run_state: RunState, p_old_data: UnitData, p_new_data: UnitData) -> void:
 	if p_old_data:
-		for t: UnitData in p_run_state.unit_templates:
+		for t: UnitData in GameTemplates.units:
 			if t.display_name == p_old_data.display_name:
 				t.can_appear_in_shop = false
 				break
 				
 	if p_new_data:
-		for t: UnitData in p_run_state.unit_templates:
+		for t: UnitData in GameTemplates.units:
 			if t.display_name == p_new_data.display_name:
 				t.can_appear_in_shop = true
 				break

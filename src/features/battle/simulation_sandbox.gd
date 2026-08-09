@@ -4,10 +4,9 @@ extends RefCounted
 ## Uruchamia w pełni odizolowaną symulację bitwy pomiędzy dwoma profilami (RunData).
 ## `active_data` działa jako gracz "główny" (zbiera nagrody, wyzwala ON_BATTLE_END).
 ## `opponent_data` służy jako statyczny przeciwnik ("worek treningowy").
-static func run_sandbox_battle(active_data: RunData, opponent_data: RunData, unit_templates: Array[UnitData], item_templates: Array[ItemData], relic_templates: Array[RelicData]) -> Dictionary:
+static func run_sandbox_battle(active_data: RunData, opponent_data: RunData) -> Dictionary:
 	# 1. Inicjalizacja zamkniętego obiektu RunState (Piaskownicy) dla aktywnego gracza
 	var dummy_state: RunState = RunState.new()
-	dummy_state.setup_templates(unit_templates, item_templates, relic_templates)
 	dummy_state.data = active_data.duplicate_data()
 	
 	# Przepięcie reliktów aktywnego gracza pod nowy stan

@@ -39,9 +39,6 @@ func notify_shop_rolled() -> void:
 func notify_shop_size_changed(p_new_size: int) -> void:
 	shop_size_changed.emit(p_new_size)
 
-var unit_templates: Array[UnitData] = []
-var item_templates: Array[ItemData] = []
-var relic_templates: Array[RelicData] = []
 var pending_on_battle_end: bool = false
 var opponent_provider: OpponentProvider
 
@@ -51,15 +48,6 @@ var next_opponent: OpponentProfile = null
 @export var is_deathmatch: bool = false
 @export var is_deathmatch_completed: bool = false
 @export var is_endless_mode: bool = false
-
-func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relics: Array[RelicData] = []) -> void:
-	unit_templates.clear()
-	for u: UnitData in p_units:
-		if u:
-			# var dup: UnitData = u.duplicate(true) as UnitData
-			unit_templates.append(u.duplicate(true))
-	item_templates = p_items
-	relic_templates = p_relics
 
 var active_team: Array[UnitInstance]:
 	get: return data.active_team
@@ -238,10 +226,10 @@ func check_and_merge_units() -> Dictionary:
 # --- SHOP BUSINESS LOGIC & ROLLING ---
 
 func get_random_unit_template_by_rarity(rarity_type: Rarity.Type) -> UnitData:
-	return ShopHelper.get_random_unit_template_by_rarity(self, rarity_type)
+	return ShopHelper.get_random_unit_template_by_rarity(rarity_type)
 
 func get_random_item_template_by_rarity(rarity_type: Rarity.Type) -> ItemData:
-	return ShopHelper.get_random_item_template_by_rarity(self, rarity_type)
+	return ShopHelper.get_random_item_template_by_rarity(rarity_type)
 
 func roll_single_shop_card(slot_idx: int) -> Resource:
 	return ShopHelper.roll_single_shop_card(self, slot_idx)
@@ -298,7 +286,7 @@ func has_relic(p_name: String) -> bool:
 
 func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 	var available: Array[RelicData] = []
-	for relic: RelicData in relic_templates:
+	for relic: RelicData in GameTemplates.relics:
 		if not relic:
 			continue
 		if p_rarity and (not relic.rarity or relic.rarity.rarity_type != p_rarity.rarity_type):

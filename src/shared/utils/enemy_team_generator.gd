@@ -1,7 +1,7 @@
 class_name EnemyTeamGenerator
 extends RefCounted
 
-static func generate_enemy_team(day: int, unit_templates: Array[UnitData]) -> Array[UnitInstance]:
+static func generate_enemy_team(day: int) -> Array[UnitInstance]:
 	var enemies: Array[UnitInstance] = []
 	enemies.resize(6)
 	
@@ -16,7 +16,7 @@ static func generate_enemy_team(day: int, unit_templates: Array[UnitData]) -> Ar
 		max_price_unlocked = 5
 		
 	var pool: Array[UnitData] = []
-	for t: UnitData in unit_templates:
+	for t: UnitData in GameTemplates.units:
 		if t.price <= max_price_unlocked:
 			pool.append(t)
 			

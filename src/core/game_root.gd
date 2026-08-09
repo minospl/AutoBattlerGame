@@ -9,9 +9,6 @@ extends Node
 @export var settings_modal_scene: PackedScene = preload("res://src/features/settings/settings_modal.tscn")
 
 var run_state: RunState
-@export var unit_templates: Array[UnitData] = []
-@export var item_templates: Array[ItemData] = []
-@export var relic_templates: Array[RelicData] = []
 var current_scene: Node = null
 var current_modal: Control = null
 
@@ -32,25 +29,25 @@ func _unhandled_input(event: InputEvent) -> void:
 			_open_game_menu_modal()
 
 func _load_unit_templates() -> void:
-	unit_templates.clear()
+	GameTemplates.units.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/units/templates/")
 	for res: UnitData in resources:
-		if not unit_templates.has(res):
-			unit_templates.append(res)
+		if not GameTemplates.units.has(res):
+			GameTemplates.units.append(res)
 
 func _load_item_templates() -> void:
-	item_templates.clear()
+	GameTemplates.items.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/items/templates/")
 	for res: ItemData in resources:
-		if not item_templates.has(res):
-			item_templates.append(res)
+		if not GameTemplates.items.has(res):
+			GameTemplates.items.append(res)
 
 func _load_relic_templates() -> void:
-	relic_templates.clear()
+	GameTemplates.relics.clear()
 	var resources: Array[Resource] = _load_resources_from_dir("res://src/features/relics/templates/")
 	for res: RelicData in resources:
-		if not relic_templates.has(res):
-			relic_templates.append(res)
+		if not GameTemplates.relics.has(res):
+			GameTemplates.relics.append(res)
 
 func _load_resources_from_dir(path: String) -> Array[Resource]:
 	var list: Array[Resource] = []
@@ -76,18 +73,17 @@ func _load_resources_from_dir(path: String) -> Array[Resource]:
 func _initialize_new_run() -> void:
 	_load_unit_templates()
 	run_state = RunState.new()
-	run_state.setup_templates(unit_templates, item_templates, relic_templates)
 	run_state.active_team.resize(RunData.MAX_ACTIVE_TEAM_SIZE)
 	run_state.bench.resize(RunData.MAX_BENCH_SIZE)
 	run_state.shop_cards.resize(RunData.MAX_SHOP_CARDS_SIZE)
 	run_state.shop_frozen_statuses.resize(RunData.MAX_SHOP_CARDS_SIZE)
 	run_state.shop_frozen_statuses.fill(false)
 	run_state.shop_level = 1
-	run_state.opponent_provider = OfflineOpponentProvider.new(unit_templates)
+	run_state.opponent_provider = OfflineOpponentProvider.new()
 	
 	# Find templates by unit name
 	var find_template: Callable = func(p_name: String) -> UnitData:
-		for t: UnitData in unit_templates:
+		for t: UnitData in GameTemplates.units:
 			if t and t.display_name.to_lower() == p_name.to_lower():
 				return t
 		return null

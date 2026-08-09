@@ -56,10 +56,10 @@ func _unhandled_input(event: InputEvent) -> void:
 				run_state.shop_level += 1
 
 func _add_random_monster() -> void:
-	if not run_state or run_state.unit_templates.is_empty():
+	if GameTemplates.units.is_empty():
 		return
 		
-	var template: UnitData = run_state.unit_templates[randi() % run_state.unit_templates.size()]
+	var template: UnitData = GameTemplates.units[randi() % GameTemplates.units.size()]
 	var instance: UnitInstance = UnitInstance.new()
 	instance.initialize(template)
 	
@@ -81,7 +81,7 @@ func add_all_non_unique_relics() -> void:
 	if not run_state:
 		return
 		
-	for template: RelicData in run_state.relic_templates:
+	for template: RelicData in GameTemplates.relics:
 		if template.rarity.rarity_type == Rarity.Type.UNIQUE:
 			continue
 			
@@ -90,7 +90,7 @@ func add_all_non_unique_relics() -> void:
 		run_state.add_relic(relic_inst)
 
 func add_all_unique_relics() -> void:
-	for template: RelicData in run_state.relic_templates:
+	for template: RelicData in GameTemplates.relics:
 		if template.rarity.rarity_type != Rarity.Type.UNIQUE:
 			continue
 			
@@ -146,10 +146,7 @@ func _run_sandbox_simulation(is_human_active: bool) -> void:
 
 	var result: Dictionary = SimulationSandbox.run_sandbox_battle(
 		active_data,
-		enemy_data,
-		run_state.unit_templates,
-		run_state.item_templates,
-		run_state.relic_templates
+		enemy_data
 	)
 
 	var sim_mode: String = "SIMULATION PLAYER" if is_human_active else "SIMULATION BOT"

@@ -2,11 +2,7 @@ class_name OfflineOpponentProvider
 extends OpponentProvider
 
 var _bots: Array[OpponentProfile] = []
-var _unit_templates: Array[UnitData] = []
-
-func _init(p_templates: Array[UnitData]) -> void:
-	_unit_templates = p_templates
-	
+func _init() -> void:
 	# Inicjalizacja puli symulowanych rywali (botów)
 	for i: int in range(7):
 		var profile: OpponentProfile = OpponentProfile.new()
@@ -66,7 +62,7 @@ func select_next_opponent(run_state: RunState, previous_opponent: OpponentProfil
 		chosen = _bots[0]
 
 	if chosen != null:
-		chosen.data.active_team = EnemyTeamGenerator.generate_enemy_team(run_state.day, _unit_templates)
+		chosen.data.active_team = EnemyTeamGenerator.generate_enemy_team(run_state.day)
 
 	return chosen
 
@@ -82,7 +78,7 @@ func get_all_alive_opponents(run_state: RunState) -> Array[OpponentProfile]:
 	for bot: OpponentProfile in _bots:
 		if bot.data.lives > 0:
 			# Odświeżamy ich drużynę na dany dzień (tymczasowe dopóki nie ma ewolucji)
-			bot.data.active_team = EnemyTeamGenerator.generate_enemy_team(run_state.day, _unit_templates)
+			bot.data.active_team = EnemyTeamGenerator.generate_enemy_team(run_state.day)
 			opponents.append(bot)
 			
 	# Upewniamy się, że zawsze jest chociaż minimum 1 przeciwnik do deathmatchu

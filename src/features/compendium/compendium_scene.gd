@@ -76,13 +76,13 @@ func _load_category(category: Category) -> void:
 
 	var templates: Array[GameResourceData] = []
 	if category == Category.MONSTERS:
-		for t: UnitData in run_state.unit_templates:
+		for t: UnitData in GameTemplates.units:
 			templates.append(t)
 	elif category == Category.ITEMS:
-		for t: ItemData in run_state.item_templates:
+		for t: ItemData in GameTemplates.items:
 			templates.append(t)
 	elif category == Category.RELICS:
-		for t: RelicData in run_state.relic_templates:
+		for t: RelicData in GameTemplates.relics:
 			templates.append(t)
 
 	# Sort templates by rarity first, then by name alphabetically
