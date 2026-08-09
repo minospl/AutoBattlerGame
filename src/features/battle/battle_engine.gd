@@ -187,7 +187,7 @@ static func simulate_battle(
 	enemy_base_health: int,
 	enemy_relics: Array[RelicInstance],
 	delta_step: float = 0.05,
-	max_simulation_time: float = 120.0
+	max_simulation_time: float = 300.0
 ) -> Dictionary[String, Variant]:
 	var p_team: BattleTeamModel = BattleTeamModel.new()
 	p_team.initialize(false)
@@ -205,6 +205,9 @@ static func simulate_battle(
 		enemy_relics
 	)
 
+	var sim_gold: Array[int] = [0]
+	p_team.gold_generated.connect(func(amount: int) -> void: sim_gold[0] += amount)
+
 	var elapsed: float = 0.0
 	while not engine.is_finished and elapsed < max_simulation_time:
 		engine.advance_simulation(delta_step)
@@ -218,10 +221,9 @@ static func simulate_battle(
 	var result: Dictionary[String, Variant] = {
 		"outcome": engine.outcome,
 		"total_time": engine.total_elapsed_time,
-		"player_final_health": p_team.health,
-		"enemy_final_health": e_team.health,
 		"player_units": p_team.units,
-		"enemy_units": e_team.units
+		"enemy_units": e_team.units,
+		"generated_gold": sim_gold[0]
 	}
 
 	engine.player_team.team_defeated.disconnect(engine.check_battle_end)
