@@ -77,10 +77,10 @@ func _initialize_new_run() -> void:
 	_load_unit_templates()
 	run_state = RunState.new()
 	run_state.setup_templates(unit_templates, item_templates, relic_templates)
-	run_state.active_team.resize(RunState.MAX_ACTIVE_TEAM_SIZE)
-	run_state.bench.resize(RunState.MAX_BENCH_SIZE)
-	run_state.shop_cards.resize(RunState.MAX_SHOP_CARDS_SIZE)
-	run_state.shop_frozen_statuses.resize(RunState.MAX_SHOP_CARDS_SIZE)
+	run_state.active_team.resize(RunData.MAX_ACTIVE_TEAM_SIZE)
+	run_state.bench.resize(RunData.MAX_BENCH_SIZE)
+	run_state.shop_cards.resize(RunData.MAX_SHOP_CARDS_SIZE)
+	run_state.shop_frozen_statuses.resize(RunData.MAX_SHOP_CARDS_SIZE)
 	run_state.shop_frozen_statuses.fill(false)
 	run_state.shop_level = 1
 	run_state.opponent_provider = OfflineOpponentProvider.new(unit_templates)
@@ -100,7 +100,7 @@ func _initialize_new_run() -> void:
 	var dragon_slime: UnitData = find_template.call("Dragon Slime")
 
 	var setup: Array[UnitData] = [water_slime, plant_slime, earth_slime, toxic_slime, fire_slime, dragon_slime]
-	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
+	for i: int in range(RunData.MAX_ACTIVE_TEAM_SIZE):
 		var temp: UnitData = setup[i]
 		if temp:
 			var instance: UnitInstance = UnitInstance.new()
@@ -167,8 +167,8 @@ func _go_to_battle() -> void:
 func _on_battle_requested() -> void:
 	_go_to_battle()
 
-func _on_battle_finished(p_outcome: String) -> void:
-	run_state.complete_battle(p_outcome)
+func _on_battle_finished(p_outcome: String, generated_gold: int = 0) -> void:
+	run_state.complete_battle(p_outcome, generated_gold)
 	
 	if run_state.is_defeat():
 		_show_game_over(false)

@@ -1,26 +1,13 @@
 class_name RunState
 extends Resource
 
-const MAX_ACTIVE_TEAM_SIZE: int = 6
-const MAX_BENCH_SIZE: int = 6
-const MAX_SHOP_CARDS_SIZE: int = 5
 const ITEM_PURCHASE_LIMIT: int = 2
-const STARTING_GOLD: int = 10
-const STARTING_LIVES: int = 5
-const STARTING_DAY: int = 1
-const MAX_ROUNDS: int = 20
-const STARTING_BASE_HEALTH: int = 100
+
+@export var data: RunData = RunData.new()
 
 func _init() -> void:
-	if active_team.is_empty():
-		active_team.resize(MAX_ACTIVE_TEAM_SIZE)
-	if bench.is_empty():
-		bench.resize(MAX_BENCH_SIZE)
-	if shop_cards.is_empty():
-		shop_cards.resize(MAX_SHOP_CARDS_SIZE)
-	if shop_frozen_statuses.is_empty():
-		shop_frozen_statuses.resize(MAX_SHOP_CARDS_SIZE)
-		shop_frozen_statuses.fill(false)
+	if data == null:
+		data = RunData.new()
 
 signal gold_changed(p_gold: int)
 signal lives_changed(p_lives: int)
@@ -74,19 +61,68 @@ func setup_templates(p_units: Array[UnitData], p_items: Array[ItemData], p_relic
 	item_templates = p_items
 	relic_templates = p_relics
 
-@export var active_team: Array[UnitInstance] = []
-@export var bench: Array[UnitInstance] = []
-@export var shop_cards: Array[Resource] = [] # Can hold UnitInstance, ItemInstance, or null
-@export var shop_frozen_statuses: Array[bool] = []
-@export var relics: Array[RelicInstance] = []
-@export var has_magnetic_core: bool = false
-@export var base_health: int = STARTING_BASE_HEALTH:
+var active_team: Array[UnitInstance]:
+	get: return data.active_team
+	set(val): data.active_team = val
+
+var bench: Array[UnitInstance]:
+	get: return data.bench
+	set(val): data.bench = val
+
+var shop_cards: Array[Resource]:
+	get: return data.shop_cards
+	set(val): data.shop_cards = val
+
+var shop_frozen_statuses: Array[bool]:
+	get: return data.shop_frozen_statuses
+	set(val): data.shop_frozen_statuses = val
+
+var relics: Array[RelicInstance]:
+	get: return data.relics
+	set(val): data.relics = val
+
+var has_magnetic_core: bool:
+	get: return data.has_magnetic_core
+	set(val): data.has_magnetic_core = val
+
+var base_health: int:
+	get: return data.base_health
 	set(val):
-		base_health = val
-		base_health_changed.emit(base_health)
+		if data.base_health != val:
+			data.base_health = val
+			base_health_changed.emit(val)
+
+var gold: int:
+	get: return data.gold
+	set(val):
+		if data.gold != val:
+			data.gold = val
+			gold_changed.emit(val)
+
+var lives: int:
+	get: return data.lives
+	set(val):
+		if data.lives != val:
+			data.lives = val
+			lives_changed.emit(val)
+
+var day: int:
+	get: return data.day
+	set(val):
+		if data.day != val:
+			data.day = val
+			day_changed.emit(val)
+
+var shop_level: int:
+	get: return data.shop_level
+	set(val):
+		if data.shop_level != val:
+			data.shop_level = val
+			shop_level_changed.emit(val)
+
 @export var item_purchase_limit: int = ITEM_PURCHASE_LIMIT
 @export var item_purchase_count: int = 0
-@export var max_rounds: int = MAX_ROUNDS
+@export var max_rounds: int = RunData.MAX_ROUNDS
 @export var battle_speed: float = 1.0
 @export var disabled_rarities: Array[Rarity.Type] = []
 @export var rarity_config: ShopRarityConfig = ShopRarityConfig.new()
@@ -100,30 +136,6 @@ var has_focusing_lens: bool:
 var has_unique_potential: bool:
 	get:
 		return unique_chance > 0.0
-
-@export var gold: int = STARTING_GOLD:
-	set(val):
-		if gold != val:
-			gold = val
-			gold_changed.emit(gold)
-
-@export var lives: int = STARTING_LIVES:
-	set(val):
-		if lives != val:
-			lives = val
-			lives_changed.emit(lives)
-
-@export var day: int = STARTING_DAY:
-	set(val):
-		if day != val:
-			day = val
-			day_changed.emit(day)
-
-@export var shop_level: int = 1:
-	set(val):
-		if shop_level != val:
-			shop_level = val
-			shop_level_changed.emit(shop_level)
 
 func get_base_shop_weights() -> Array[float]:
 	return rarity_config.get_weights_for_day(shop_level, disabled_rarities)
@@ -170,24 +182,22 @@ func roll_rarity() -> Rarity.Type:
 			return Rarity.Type.LEGENDARY
 	return Rarity.Type.COMMON
 
-func complete_battle(outcome: String) -> void:
+func complete_battle(outcome: String, generated_gold: int = 0) -> void:
 	item_purchase_count = 0
 	
 	if outcome == "victory":
 		if next_opponent != null:
-			next_opponent.lives -= 1
+			next_opponent.data.lives -= 1
 	elif outcome == "defeat":
 		lives -= 1
 		
-	if lives > 0 and day <= MAX_ROUNDS:
-		day += 1
-		gold += 10
-		shop_level += 1
-		for i: int in range(shop_cards.size()):
-			if not shop_frozen_statuses[i]:
-				shop_cards[i] = null
+	if lives > 0 and day <= RunData.MAX_ROUNDS:
+		TurnProcessor.process_turn_end(data, generated_gold)
+		gold_changed.emit(gold)
+		day_changed.emit(day)
+		shop_level_changed.emit(shop_level)
 				
-	if lives > 0 and day > MAX_ROUNDS:
+	if lives > 0 and day > RunData.MAX_ROUNDS:
 		is_deathmatch = true
 				
 	battle_completed.emit(outcome)
@@ -286,28 +296,24 @@ func buy_clickable_item(shop_slot_idx: int) -> bool:
 func has_relic(p_name: String) -> bool:
 	return RelicInstance.has_relic(relics, p_name)
 
-## Returns an array of relic templates that are available to be rolled/acquired
-## (filters out unique relics that the player already owns).
-## If a rarity is specified, it also filters by that rarity.
 func get_available_relic_templates(p_rarity: Rarity = null) -> Array[RelicData]:
 	var available: Array[RelicData] = []
 	for relic: RelicData in relic_templates:
 		if not relic:
 			continue
-		# Filter by rarity if requested
 		if p_rarity and (not relic.rarity or relic.rarity.rarity_type != p_rarity.rarity_type):
 			continue
-		# Filter out unique relics (those with UNIQUE rarity) that are already owned
 		if relic.rarity.rarity_type == Rarity.Type.UNIQUE and has_relic(relic.display_name):
 			continue
 		available.append(relic)
 	return available
 
-func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY, p_gold: int = STARTING_GOLD) -> void:
+func reset_for_new_run(p_lives: int = RunData.STARTING_LIVES, p_day: int = RunData.STARTING_DAY, p_gold: int = RunData.STARTING_GOLD) -> void:
+	data = RunData.new()
 	lives = p_lives
 	day = p_day
 	gold = p_gold
-	base_health = STARTING_BASE_HEALTH
+	base_health = RunData.STARTING_BASE_HEALTH
 	opponents_pool.clear()
 	next_opponent = null
 	relics.clear()
@@ -317,18 +323,15 @@ func reset_for_new_run(p_lives: int = STARTING_LIVES, p_day: int = STARTING_DAY,
 	is_endless_mode = false
 	relics_changed.emit(relics)
 	
-	# Clear active team and bench
 	for i: int in range(active_team.size()):
 		active_team[i] = null
 	for i: int in range(bench.size()):
 		bench[i] = null
 		
-	# Reset shop cards and frozen statuses
 	for i: int in range(shop_cards.size()):
 		shop_cards[i] = null
 	shop_frozen_statuses.fill(false)
 	
-	# Roll the shop for free
 	roll_shop()
 
 func add_random_relic(p_rarity: Rarity = null) -> void:

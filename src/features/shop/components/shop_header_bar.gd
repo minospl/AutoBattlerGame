@@ -84,7 +84,7 @@ func setup_opponent_list(run_state: RunState) -> void:
 		var portrait: OpponentPortrait = OPPONENT_PORTRAIT.instantiate() as OpponentPortrait
 		opponents_container.add_child(portrait)
 
-		var is_in_pool: bool = pool_ids.has(bot.id) and bot.lives > 0
+		var is_in_pool: bool = pool_ids.has(bot.id) and bot.data.lives > 0
 		var is_next: bool = (bot.id == next_id)
 		var c: Color = colors[i % colors.size()]
 

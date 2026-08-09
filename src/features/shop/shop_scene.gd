@@ -10,11 +10,11 @@ signal menu_requested
 
 var active_slot_count: int:
 	get:
-		return RunState.MAX_ACTIVE_TEAM_SIZE
+		return RunData.MAX_ACTIVE_TEAM_SIZE
 
 var bench_slot_count: int:
 	get:
-		return RunState.MAX_BENCH_SIZE
+		return RunData.MAX_BENCH_SIZE
 
 var gold: int:
 	get:
@@ -145,84 +145,13 @@ func show_floating_text_on_slot(slot: UnitSlot, text: String, color: Color) -> v
 	var pos: Vector2 = slot.global_position + (slot.size * 0.5)
 	floating_text_manager.show_popup(text, color, pos)
 
-func _trigger_on_battle_end_modifiers() -> void:
-	if not run_state.pending_on_battle_end:
-		return
-	run_state.pending_on_battle_end = false
-	await get_tree().process_frame
-
-	_check_and_execute_slime_fusion()
-
-	for i: int in range(run_state.active_team.size()):
-		var unit: UnitInstance = run_state.active_team[i]
-		if not unit or not unit.data.modifier:
-			continue
-			
-		if unit.data.modifier.trigger == UnitModifier.Trigger.ON_BATTLE_END:
-			unit.data.modifier.apply_shop_modifier(i, run_state.active_team)
-
-func _check_and_execute_slime_fusion() -> bool:
-	if run_state.active_team.size() < 6:
-		return false
-
-	for u: UnitInstance in run_state.active_team + run_state.bench:
-		if u and u.get_unit_name() == "Rainbow Slime":
-			return false
-
-	var unique_slimes: Dictionary[String, bool] = {}
-	for i: int in range(run_state.active_team.size()):
-		var unit: UnitInstance = run_state.active_team[i]
-		if unit and unit.has_type("Slime"):
-			unique_slimes[unit.data.display_name] = true
-
-	if unique_slimes.size() < 6:
-		return false
-
-	var rainbow_template: UnitData = load("res://src/features/units/templates/rainbow_slime.tres")
-	var rainbow_inst: UnitInstance = UnitInstance.new()
-	rainbow_inst.initialize(rainbow_template)
-
-	var absorbed_list: Array[Dictionary] = []
-	for i: int in range(run_state.active_team.size()):
-		var slime_inst: UnitInstance = run_state.active_team[i]
-		rainbow_inst.absorb_bonus_stats_from(slime_inst)
-		absorbed_list.append({
-			"unit_data": slime_inst.data,
-			"level": slime_inst.level
-		})
-
-	var custom_mod: RainbowSlimeModifier = rainbow_inst.data.modifier.duplicate() as RainbowSlimeModifier
-	if custom_mod:
-		custom_mod.absorbed_units = absorbed_list
-		rainbow_inst.data = rainbow_inst.data.duplicate() as UnitData
-		rainbow_inst.data.modifier = custom_mod
-
-	var merge_anim_data: Dictionary = {
-		"main": {"is_bench": false, "idx": 0},
-		"removed": [
-			{"is_bench": false, "idx": 1},
-			{"is_bench": false, "idx": 2},
-			{"is_bench": false, "idx": 3},
-			{"is_bench": false, "idx": 4},
-			{"is_bench": false, "idx": 5}
-		]
-	}
-
-	run_state.active_team[0] = rainbow_inst
-	for i: int in range(1, run_state.active_team.size()):
-		run_state.active_team[i] = null
-
-	ShopMergeAnimator.animate_merge(self, merge_anim_data, func() -> void:
-		load_state_from_run()
-	, rainbow_inst)
-	return true
 
 ## Instantiate slot scenes and arrange them inside containers
 func create_slots() -> void:
 	bench_panel.create_slots(unit_slot_scene, bench_slot_count)
 	team_panel.create_slots(unit_slot_scene, active_slot_count)
 	
-	var shop_size: int = run_state.shop_cards.size() if run_state else RunState.MAX_SHOP_CARDS_SIZE
+	var shop_size: int = run_state.shop_cards.size() if run_state else RunData.MAX_SHOP_CARDS_SIZE
 	shop_panel.create_slots(shop_slot_scene, shop_size)
 	
 	var all_slots: Array[UnitSlot] = []
@@ -668,7 +597,6 @@ func load_state_from_run() -> void:
 		run_state.bench.resize(bench_slot_count)
 	
 	populate_ui()
-	_trigger_on_battle_end_modifiers()
 	
 	# Recreate cards in shop slots
 	for i: int in range(shop_panel.slots.size()):
@@ -731,7 +659,7 @@ func _on_simulate_battle_pressed() -> void:
 
 	# Prepare player units (cloned)
 	var player_units: Array[UnitInstance] = []
-	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
+	for i: int in range(RunData.MAX_ACTIVE_TEAM_SIZE):
 		var inst: UnitInstance = run_state.active_team[i]
 		if inst:
 			player_units.append(inst.clone())
@@ -745,16 +673,15 @@ func _on_simulate_battle_pressed() -> void:
 
 	# Prepare enemy units & relics (cloned)
 	var enemy_units: Array[UnitInstance] = []
-	enemy_units.resize(RunState.MAX_ACTIVE_TEAM_SIZE)
+	enemy_units.resize(RunData.MAX_ACTIVE_TEAM_SIZE)
 	var enemy_relics: Array[RelicInstance] = []
 
 	var opponent: OpponentProfile = run_state.next_opponent
-	if opponent and not opponent.active_team.is_empty():
-		for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
-			if i < opponent.active_team.size() and opponent.active_team[i] != null:
-				enemy_units[i] = opponent.active_team[i].clone()
-		if "relics" in opponent:
-			enemy_relics = opponent.relics
+	if opponent and not opponent.data.active_team.is_empty():
+		for i: int in range(RunData.MAX_ACTIVE_TEAM_SIZE):
+			if i < opponent.data.active_team.size() and opponent.data.active_team[i] != null:
+				enemy_units[i] = opponent.data.active_team[i].clone()
+		enemy_relics = opponent.data.relics
 
 	# Run simulation via BattleEngine
 	var result: Dictionary[String, Variant] = BattleEngine.simulate_battle(
@@ -762,7 +689,7 @@ func _on_simulate_battle_pressed() -> void:
 		run_state.base_health,
 		player_relics,
 		enemy_units,
-		RunState.STARTING_BASE_HEALTH,
+		RunData.STARTING_BASE_HEALTH,
 		enemy_relics
 	)
 
@@ -793,7 +720,7 @@ func _print_simulation_report(result: Dictionary[String, Variant], original_play
 	
 	# Player Team Table
 	print_rich("[color=yellow][b]--- PLAYER TEAM STATS (BEFORE ➔ AFTER) ---[/b][/color]")
-	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
+	for i: int in range(RunData.MAX_ACTIVE_TEAM_SIZE):
 		var orig: UnitInstance = original_player_units[i] if i < original_player_units.size() else null
 		var sim_unit: UnitInstance = sim_p_units[i] if i < sim_p_units.size() else null
 		_print_unit_stats(i, orig, sim_unit)
@@ -802,8 +729,8 @@ func _print_simulation_report(result: Dictionary[String, Variant], original_play
 	# Enemy Team Table
 	var opp_name: String = opponent.name if opponent else "Enemy"
 	print_rich("[color=orange][b]--- ENEMY TEAM (%s) STATS (BEFORE ➔ AFTER) ---[/b][/color]" % opp_name)
-	var orig_enemy_units: Array[UnitInstance] = opponent.active_team if opponent else []
-	for i: int in range(RunState.MAX_ACTIVE_TEAM_SIZE):
+	var orig_enemy_units: Array[UnitInstance] = opponent.data.active_team if opponent else []
+	for i: int in range(RunData.MAX_ACTIVE_TEAM_SIZE):
 		var orig: UnitInstance = orig_enemy_units[i] if i < orig_enemy_units.size() else null
 		var sim_unit: UnitInstance = sim_e_units[i] if i < sim_e_units.size() else null
 		_print_unit_stats(i, orig, sim_unit)

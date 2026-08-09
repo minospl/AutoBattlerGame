@@ -12,7 +12,7 @@ func _init(p_templates: Array[UnitData]) -> void:
 		var profile: OpponentProfile = OpponentProfile.new()
 		profile.id = i + 1
 		profile.name = "Bot %d" % (i + 1)
-		profile.lives = 5
+		profile.data.lives = 5
 		# TODO: W przyszłości przypisać archetypy e.g. ["Beast", "Dragon"]
 		_bots.append(profile)
 
@@ -21,12 +21,12 @@ const POOL_SIZE: int = 3
 func update_opponents_pool(run_state: RunState) -> void:
 	var new_pool: Array[OpponentProfile] = []
 	for bot: OpponentProfile in run_state.opponents_pool:
-		if bot != null and bot.lives > 0:
+		if bot != null and bot.data.lives > 0:
 			new_pool.append(bot)
 			
 	var available_bots: Array[OpponentProfile] = []
 	for bot: OpponentProfile in _bots:
-		if bot != null and bot.lives > 0 and not new_pool.has(bot):
+		if bot != null and bot.data.lives > 0 and not new_pool.has(bot):
 			available_bots.append(bot)
 
 	available_bots.shuffle()
@@ -47,7 +47,7 @@ func select_next_opponent(run_state: RunState, previous_opponent: OpponentProfil
 		
 	var alive_in_pool: Array[OpponentProfile] = []
 	for bot: OpponentProfile in run_state.opponents_pool:
-		if bot != null and bot.lives > 0:
+		if bot != null and bot.data.lives > 0:
 			alive_in_pool.append(bot)
 
 	var candidates: Array[OpponentProfile] = []
@@ -66,7 +66,7 @@ func select_next_opponent(run_state: RunState, previous_opponent: OpponentProfil
 		chosen = _bots[0]
 
 	if chosen != null:
-		chosen.active_team = EnemyTeamGenerator.generate_enemy_team(run_state.day, _unit_templates)
+		chosen.data.active_team = EnemyTeamGenerator.generate_enemy_team(run_state.day, _unit_templates)
 
 	return chosen
 
@@ -80,9 +80,9 @@ func get_all_alive_opponents(run_state: RunState) -> Array[OpponentProfile]:
 	var opponents: Array[OpponentProfile] = []
 	
 	for bot: OpponentProfile in _bots:
-		if bot.lives > 0:
+		if bot.data.lives > 0:
 			# Odświeżamy ich drużynę na dany dzień (tymczasowe dopóki nie ma ewolucji)
-			bot.active_team = EnemyTeamGenerator.generate_enemy_team(run_state.day, _unit_templates)
+			bot.data.active_team = EnemyTeamGenerator.generate_enemy_team(run_state.day, _unit_templates)
 			opponents.append(bot)
 			
 	# Upewniamy się, że zawsze jest chociaż minimum 1 przeciwnik do deathmatchu

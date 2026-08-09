@@ -1,7 +1,8 @@
 class_name BattleScene
 extends Control
 
-signal battle_finished(outcome: String)
+signal battle_finished(outcome: String, generated_gold: int)
+var generated_gold_from_battle: int = 0
 var run_state: RunState
 
 # Static Preloads
@@ -12,7 +13,7 @@ const BATTLE_BACKGROUNDS: Array[Texture2D] = [
 	preload("res://src/assets/ui/battle_background_1.png")
 ]
 
-const MAX_TEAM_SIZE: int = RunState.MAX_ACTIVE_TEAM_SIZE
+const MAX_TEAM_SIZE: int = RunData.MAX_ACTIVE_TEAM_SIZE
 
 enum State { PLAYING, PAUSED }
 var simulation_state: State = State.PAUSED
@@ -185,16 +186,16 @@ func load_enemy_team() -> void:
 	var enemy_units: Array[UnitInstance] = []
 	enemy_units.resize(MAX_TEAM_SIZE)
 
-	if current_enemy_profile and not current_enemy_profile.active_team.is_empty():
+	if current_enemy_profile and not current_enemy_profile.data.active_team.is_empty():
 		for i: int in range(MAX_TEAM_SIZE):
-			if i < current_enemy_profile.active_team.size() and current_enemy_profile.active_team[i] != null:
-				enemy_units[i] = current_enemy_profile.active_team[i].clone()
+			if i < current_enemy_profile.data.active_team.size() and current_enemy_profile.data.active_team[i] != null:
+				enemy_units[i] = current_enemy_profile.data.active_team[i].clone()
 		
-	enemy_team.load_team_units(enemy_units, RunState.STARTING_BASE_HEALTH)
+	enemy_team.load_team_units(enemy_units, RunData.STARTING_BASE_HEALTH)
 	
 	enemy_team.active_relics = []
-	if current_enemy_profile and "relics" in current_enemy_profile:
-		enemy_team.active_relics = current_enemy_profile.relics
+	if current_enemy_profile:
+		enemy_team.active_relics = current_enemy_profile.data.relics
 		
 	enemy_relic_bag_popup.update_relics(enemy_team.active_relics)
 	header_bar.update_enemy_bag_count(enemy_team.active_relics.size())
@@ -373,7 +374,7 @@ func show_battle_outcome(p_outcome: String, custom_title: String = "", custom_de
 	btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	btn.pressed.connect(func() -> void:
 		sync_stats_to_run_state()
-		battle_finished.emit(p_outcome)
+		battle_finished.emit(p_outcome, generated_gold_from_battle)
 	)
 	vbox.add_child(btn)
 	
@@ -381,8 +382,7 @@ func show_battle_outcome(p_outcome: String, custom_title: String = "", custom_de
 	popup.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 
 func _on_gold_generated(amount: int) -> void:
-	if run_state:
-		run_state.gold += amount
+	generated_gold_from_battle += amount
 
 func set_playing(play: bool) -> void:
 	if play:
@@ -406,7 +406,7 @@ func sync_stats_to_run_state() -> void:
 
 func _on_exit_pressed() -> void:
 	sync_stats_to_run_state()
-	battle_finished.emit("draw")
+	battle_finished.emit("draw", generated_gold_from_battle)
 
 func _on_card_hovered(card: Control, is_hovered: bool) -> void:
 	if not preview_tooltip:
