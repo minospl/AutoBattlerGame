@@ -39,6 +39,7 @@ var unit_slot_scene: PackedScene = preload("res://src/features/shop/components/u
 var shop_card_unit_scene: PackedScene = preload("res://src/features/shop/components/shop_card_unit.tscn")
 var item_card_scene: PackedScene = preload("res://src/features/shop/components/shop_card_item.tscn")
 var unit_card_scene: PackedScene = preload("res://src/features/shop/components/unit_card.tscn")
+const OPPONENT_PREVIEW_MODAL_SCENE: PackedScene = preload("res://src/features/shop/modals/opponent_preview_modal.tscn")
 var tooltip_scene: PackedScene = preload("res://src/shared/ui/components/card_tooltip.tscn")
 
 var active_slots: Array[UnitSlot]:
@@ -67,6 +68,7 @@ func _ready() -> void:
 	
 	# Connect control panel signals
 	shop_header_bar.menu_requested.connect(func() -> void: menu_requested.emit())
+	shop_header_bar.opponent_portrait_clicked.connect(_open_opponent_preview)
 	
 	var battle_btn: Button = get_node_or_null("%StartBattleButton") as Button
 	if battle_btn:
@@ -84,6 +86,7 @@ func _ready() -> void:
 	if has_node("%PreviewContainer"):
 		preview_tooltip = tooltip_scene.instantiate() as CardTooltip
 		# Align the preview card to the top of the margin container (height of the bench)
+		preview_tooltip.z_index = 998
 		preview_tooltip.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		preview_tooltip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		%PreviewContainer.add_child(preview_tooltip)
@@ -242,7 +245,23 @@ func _calculate_total_team_hp() -> int:
 	return total_hp
 
 func _update_team_hp() -> void:
-	team_panel.update_team_hp(_calculate_total_team_hp())
+	if team_panel:
+		team_panel.update_team_hp(_calculate_total_team_hp())
+
+func _open_opponent_preview(bot_id: int) -> void:
+	if not run_state or not run_state.opponent_provider: return
+	
+	var bot_to_preview: OpponentProfile = null
+	var all_bots: Array[OpponentProfile] = run_state.opponent_provider.get_all_opponents()
+	for bot: OpponentProfile in all_bots:
+		if bot and bot.id == bot_id:
+			bot_to_preview = bot
+			break
+			
+	if bot_to_preview:
+		var modal: OpponentPreviewModal = OPPONENT_PREVIEW_MODAL_SCENE.instantiate() as OpponentPreviewModal
+		add_child(modal)
+		modal.setup(bot_to_preview, preview_tooltip)
 
 ## Empty all team and bench slots
 func clear_all() -> void:

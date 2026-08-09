@@ -1,0 +1,133 @@
+[gd_scene load_steps=6 format=3 uid="uid://cx6g0q2k8a1j"]
+
+[ext_resource type="Script" path="res://src/features/shop/modals/opponent_preview_modal.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://src/assets/ui/heart_icon.png" id="2_heart"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/panel_header_decorator.gd" id="3_header_decorator"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/shader_border_decorator.gd" id="4_shader_decorator"]
+[ext_resource type="Script" path="res://src/shared/ui/decorators/game_button_decorator.gd" id="5_button_decorator"]
+
+[node name="OpponentPreviewModal" type="ColorRect"]
+z_index = 100
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+script = ExtResource("1_script")
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TeamPanel" type="PanelContainer" parent="CenterContainer"]
+theme_type_variation = &"TransparentPanel"
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="BackgroundOverlay" type="ColorRect" parent="CenterContainer/TeamPanel"]
+layout_mode = 2
+script = ExtResource("4_shader_decorator")
+border_type = 0
+border_color = Color(1, 1, 1, 1)
+interior_color = Color(1, 1, 1, 1)
+border_indentation = 3
+
+[node name="TeamOuterMargin" type="MarginContainer" parent="CenterContainer/TeamPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 3
+theme_override_constants/margin_right = 3
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_bottom = 0
+
+[node name="VBox" type="VBoxContainer" parent="CenterContainer/TeamPanel/TeamOuterMargin"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TeamHeader" type="PanelContainer" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="PanelHeaderDecorator" type="Node" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/TeamHeader"]
+script = ExtResource("3_header_decorator")
+header_color = Color(0.89, 0.31, 0.44, 1)
+
+[node name="Margin" type="MarginContainer" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/TeamHeader"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 0
+
+[node name="HeaderHBox" type="HBoxContainer" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/TeamHeader/Margin"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/TeamHeader/Margin/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "OPPONENT"
+vertical_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/TeamHeader/Margin/HeaderHBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.9, 0.5, 1)
+theme_override_font_sizes/font_size = 18
+text = "Lives: 0 | Gold: 0 | HP: 0"
+vertical_alignment = 1
+horizontal_alignment = 2
+
+[node name="TeamMargin" type="MarginContainer" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="GridAlign" type="CenterContainer" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/TeamMargin"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/TeamMargin/GridAlign"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+columns = 3
+
+[node name="CloseMargin" type="MarginContainer" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_bottom = 12
+
+[node name="CloseButton" type="Button" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/CloseMargin"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Close"
+
+[node name="GameButtonDecorator" type="Node" parent="CenterContainer/TeamPanel/TeamOuterMargin/VBox/CloseMargin/CloseButton"]
+script = ExtResource("5_button_decorator")
+color_normal = Color(0.2, 0.2, 0.25, 1)
+color_hover = Color(0.3, 0.3, 0.35, 1)
+color_pressed = Color(0.15, 0.15, 0.2, 1)
+outer_width = 3
+inner_width = 2
+indentation = 2
+
+[node name="BorderOverlay" type="ColorRect" parent="CenterContainer/TeamPanel"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("4_shader_decorator")
+border_type = 1
+inner_border_color = Color(1,1,1,1)

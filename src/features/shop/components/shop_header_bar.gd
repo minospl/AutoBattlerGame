@@ -6,6 +6,7 @@ const OPPONENT_PORTRAIT: PackedScene = preload("res://src/features/shop/componen
 
 signal menu_requested
 signal bag_requested
+signal opponent_portrait_clicked(bot_id: int)
 
 @export var lives: int:
 	set(value):
@@ -89,6 +90,7 @@ func setup_opponent_list(run_state: RunState) -> void:
 		var c: Color = colors[i % colors.size()]
 
 		portrait.setup(bot.id, is_in_pool, is_next, c)
+		portrait.portrait_clicked.connect(func(id: int) -> void: opponent_portrait_clicked.emit(id))
 
 func _apply_visual_styling() -> void:
 	var header_content: PanelContainer = get_node_or_null("VBox/HeaderContent") as PanelContainer

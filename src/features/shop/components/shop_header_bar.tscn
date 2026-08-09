@@ -38,9 +38,11 @@ alignment = 1
 
 [node name="MainHBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="LeftBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 16
 alignment = 0
 
@@ -93,6 +95,7 @@ mouse_filter = 2
 
 [node name="RightBox" type="HBoxContainer" parent="VBox/HeaderContent/MainMargin/MainHBox"]
 layout_mode = 2
+mouse_filter = 2
 alignment = 2
 
 [node name="MenuButton" type="Button" parent="VBox/HeaderContent/MainMargin/MainHBox/RightBox"]
