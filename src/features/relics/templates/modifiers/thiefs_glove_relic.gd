@@ -17,7 +17,7 @@ func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, _e
 func get_description(relic_inst: RelicInstance = null) -> String:
 	var current_stacks: int = relic_inst.stacks if relic_inst else 1
 	var limit: int = max_gold_per_battle * current_stacks
-	return "%s\nGain [color=%s]+1 GOLD[/color] (up to [color=%s]%d GOLD[/color] per battle)." % [get_trigger_name("ON CAST"), GameColors.DESC_GOLD, GameColors.DESC_GOLD, limit]
+	return "%s\nGain [color=%s]+1 GOLD[/color] (up to [color=%s]%d GOLD[/color] per battle)." % [get_trigger_name(BaseModifier.Trigger.ON_CAST), GameColors.DESC_GOLD, GameColors.DESC_GOLD, limit]
 
 func get_implied_keywords() -> Array[String]:
 	return ["trigger_cast"]

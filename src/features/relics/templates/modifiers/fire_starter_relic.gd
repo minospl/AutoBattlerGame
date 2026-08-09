@@ -1,4 +1,4 @@
-class_name FireOpalRelic
+class_name FireStarterRelic
 extends RelicModifier
 
 @export var burn_stacks: int = 8
@@ -11,7 +11,7 @@ func on_battle_start(relic_inst: RelicInstance, _player_team: BattleTeamModel, e
 func get_description(relic_inst: RelicInstance = null) -> String:
 	var current_stacks: int = relic_inst.stacks if relic_inst else 1
 	var total_stacks: int = burn_stacks * current_stacks
-	return "%s\nApply [color=%s]%d BURN[/color] stacks to the enemy team." % [get_trigger_name("ON BATTLE START"), GameColors.DESC_BURN, total_stacks]
+	return "%s\nApply [color=%s]%d BURN[/color] stacks to the enemy team." % [get_trigger_name(BaseModifier.Trigger.ON_BATTLE_START), GameColors.DESC_BURN, total_stacks]
 
 func get_implied_keywords() -> Array[String]:
 	return ["burn", "trigger_battle_start"]

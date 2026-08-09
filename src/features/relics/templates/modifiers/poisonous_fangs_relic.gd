@@ -13,7 +13,7 @@ func on_battle_start(relic_inst: RelicInstance, player_team: BattleTeamModel, en
 func get_description(relic_inst: RelicInstance = null) -> String:
 	var current_stacks: int = relic_inst.stacks if relic_inst else 1
 	var total_poison: int = poison_stacks * current_stacks
-	return "%s\nApply [color=%s]+%d POISON[/color] to the enemy team." % [get_trigger_name("ON CAST"), GameColors.DESC_POISON, total_poison]
+	return "%s\nApply [color=%s]+%d POISON[/color] to the enemy team." % [get_trigger_name(BaseModifier.Trigger.ON_CAST), GameColors.DESC_POISON, total_poison]
 
 func get_implied_keywords() -> Array[String]:
 	return ["poison", "trigger_cast"]
